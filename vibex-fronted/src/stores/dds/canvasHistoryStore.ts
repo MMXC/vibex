@@ -84,7 +84,8 @@ export interface SnapshotData {
 }
 
 /** A named snapshot of the canvas state — stored in IndexedDB
- * E1 (Sprint60): extended with branchName / isStarred */
+ * E1 (Sprint60): extended with branchName / isStarred
+ * E1 (Sprint65): extended with parentSnapshotId for branch lineage */
 export interface Snapshot {
   id: string;
   name: string;
@@ -94,6 +95,8 @@ export interface Snapshot {
   branchName?: string;
   /** Whether this snapshot is starred by the user */
   isStarred?: boolean;
+  /** Parent snapshot ID for branch lineage (null = root/main snapshot) */
+  parentSnapshotId?: string | null;
 }
 
 /** Diff result between two snapshots */
@@ -204,13 +207,18 @@ interface CanvasHistoryState {
   // E2 (Sprint64): Restore snapshot — applies snapshot data to DDSCanvasStore
   /** Restore a snapshot by loading its data from IndexedDB and applying to DDSCanvasStore */
   restoreSnapshot: (canvasId: string, snapshotId: string) => Promise<void>;
-  // E2 (Sprint64): Auto-snapshot timer
+  // E1 (Sprint64): Auto-snapshot timer
   /** Current auto-snapshot interval in ms (null = disabled) */
   autoSnapshotMs: number | null;
   /** Start auto-snapshot: periodically saves canvas state every intervalMs milliseconds */
   startAutoSnapshot: (canvasId: string, getCanvasData: () => { nodes: unknown[]; edges: unknown[] }, intervalMs: number) => void;
   /** Stop auto-snapshot timer */
   stopAutoSnapshot: () => void;
+  // E1 (Sprint65): Named snapshot with auto-name generation
+  /** Save a named snapshot; if name is omitted, auto-generates "Snapshot-{ISO timestamp}" */
+  saveNamedSnapshot: (canvasId: string, name?: string, data?: { nodes: unknown[]; edges: unknown[] }) => Promise<string>;
+  /** Create a branch snapshot based on a source snapshot; sets parentSnapshotId */
+  createBranch: (canvasId: string, sourceSnapshotId: string, branchName: string, currentData?: { nodes: unknown[]; edges: unknown[] }) => Promise<string>;
 }
 
 // ==================== Helper ====================
@@ -569,6 +577,60 @@ export const useCanvasHistoryStore = create<CanvasHistoryState>((set, get) => ({
 
     (window as unknown as { __canvasAutoSnapshotTimer?: ReturnType<typeof setInterval> }).__canvasAutoSnapshotTimer = timer;
     set({ autoSnapshotMs: intervalMs });
+  },
+
+  // ==================== E1 (Sprint65): Named Snapshot & Branch Management ====================
+
+  /** Save a named snapshot; name defaults to "Snapshot-{ISO timestamp}" */
+  saveNamedSnapshot: async (canvasId: string, name?: string, data?: { nodes: unknown[]; edges: unknown[] }) => {
+    if (typeof window === 'undefined' || !window.indexedDB) return '';
+    const { saveSnapshotToDB, listSnapshotsFromDB } = await import('@/lib/canvas/historyDB');
+    const id = `snapshot-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+    const finalName = name ?? `Snapshot-${new Date().toISOString().slice(0, 19).replace('T', ' ')}`;
+    const snapshot = { id, name: finalName, timestamp: Date.now(), data: data ?? { nodes: [], edges: [] } };
+    await saveSnapshotToDB(canvasId, snapshot);
+    // Branch-aware LRU: per-branch MAX_SNAPSHOTS
+    const allSnapshots = await listSnapshotsFromDB(canvasId);
+    const byBranch = new Map<string, typeof allSnapshots>();
+    for (const s of allSnapshots) {
+      const branch = s.branchName ?? 'main';
+      if (!byBranch.has(branch)) byBranch.set(branch, []);
+      byBranch.get(branch)!.push(s);
+    }
+    const { deleteSnapshotFromDB } = await import('@/lib/canvas/historyDB');
+    for (const [, branchSnaps] of byBranch) {
+      const sorted = branchSnaps.sort((a, b) => b.timestamp - a.timestamp);
+      if (sorted.length > MAX_SNAPSHOTS) {
+        const toDelete = sorted.slice(MAX_SNAPSHOTS);
+        await Promise.all(toDelete.map((s) => deleteSnapshotFromDB(canvasId, s.id)));
+      }
+    }
+    return id;
+  },
+
+  /** Create a branch snapshot with parentSnapshotId linking back to source */
+  createBranch: async (canvasId: string, sourceSnapshotId: string, branchName: string, currentData?: { nodes: unknown[]; edges: unknown[] }) => {
+    if (typeof window === 'undefined' || !window.indexedDB) return '';
+    const { saveSnapshotToDB, loadSnapshotFromDB, listSnapshotsFromDB, deleteSnapshotFromDB } = await import('@/lib/canvas/historyDB');
+    const sourceSnap = await loadSnapshotFromDB(canvasId, sourceSnapshotId);
+    const id = `snapshot-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+    const newSnap = {
+      id,
+      name: `${branchName} (from ${sourceSnap?.name ?? sourceSnapshotId})`,
+      timestamp: Date.now(),
+      data: currentData ?? sourceSnap?.data ?? { nodes: [], edges: [] },
+      branchName,
+      parentSnapshotId: sourceSnapshotId,
+    };
+    await saveSnapshotToDB(canvasId, newSnap);
+    // Branch-aware LRU for the new branch
+    const allSnaps = await listSnapshotsFromDB(canvasId);
+    const branchSnaps = allSnaps.filter((s) => (s.branchName ?? 'main') === branchName).sort((a, b) => b.timestamp - a.timestamp);
+    if (branchSnaps.length > MAX_SNAPSHOTS) {
+      const toDelete = branchSnaps.slice(MAX_SNAPSHOTS);
+      await Promise.all(toDelete.map((s) => deleteSnapshotFromDB(canvasId, s.id)));
+    }
+    return id;
   },
 
   stopAutoSnapshot: () => {

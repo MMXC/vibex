@@ -16,7 +16,37 @@ export interface HistoryPanelProps {
 }
 
 /** View mode for the history panel */
-type ViewMode = 'timeline' | 'list';
+type ViewMode = 'timeline' | 'list' | 'tree';
+
+/** E1 (Sprint65): Tree node — represents a snapshot in the branch tree */
+interface TreeNode {
+  snap: Snapshot;
+  children: TreeNode[];
+  isExpanded: boolean;
+}
+
+/** Build a tree from flat snapshots using parentSnapshotId */
+function buildSnapshotTree(snapshots: Snapshot[]): TreeNode[] {
+  const snapMap = new Map<string, TreeNode>();
+  const roots: TreeNode[] = [];
+
+  // First pass: create nodes
+  for (const snap of snapshots) {
+    snapMap.set(snap.id, { snap, children: [], isExpanded: true });
+  }
+
+  // Second pass: link children to parents
+  for (const snap of snapshots) {
+    const node = snapMap.get(snap.id)!;
+    if (snap.parentSnapshotId && snapMap.has(snap.parentSnapshotId)) {
+      snapMap.get(snap.parentSnapshotId)!.children.push(node);
+    } else {
+      roots.push(node);
+    }
+  }
+
+  return roots;
+}
 
 /** Format size in bytes to human-readable string */
 function formatSize(bytes?: number): string {
@@ -37,6 +67,8 @@ const HistoryPanel = React.memo(function HistoryPanel({
   const [diff, setDiff] = useState<SnapshotDiff | null>(null);
   const [branchFilter, setBranchFilter] = useState<string>('all');
   const [nameFilter, setNameFilter] = useState('');
+  // E1 (Sprint65): Tree view state
+  const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
 
   const snapshots = useCanvasHistoryStore((s) => s.snapshots);
   const compareSnapshots = useCanvasHistoryStore((s) => s.compareSnapshots);
@@ -89,6 +121,16 @@ const HistoryPanel = React.memo(function HistoryPanel({
     setBranchFilter(branch);
   }, []);
 
+  // E1 (Sprint65): Tree view expand/collapse
+  const handleToggleExpand = useCallback((snapId: string) => {
+    setExpandedNodes((prev) => {
+      const next = new Set(prev);
+      if (next.has(snapId)) next.delete(snapId);
+      else next.add(snapId);
+      return next;
+    });
+  }, []);
+
   if (!open) return null;
 
   return (
@@ -106,6 +148,14 @@ const HistoryPanel = React.memo(function HistoryPanel({
               title="时间线视图"
             >
               ≡
+            </button>
+            <button
+              className={`view-toggle-btn ${viewMode === 'tree' ? 'active' : ''}`}
+              onClick={() => setViewMode('tree')}
+              aria-pressed={viewMode === 'tree'}
+              title="分支树视图"
+            >
+              ⌘
             </button>
             <button
               className={`view-toggle-btn ${viewMode === 'list' ? 'active' : ''}`}
@@ -170,6 +220,56 @@ const HistoryPanel = React.memo(function HistoryPanel({
             onRestore={handleRestore}
             onDelete={handleDelete}
           />
+        ) : viewMode === 'tree' ? (
+          /* E1 (Sprint65): Branch tree view */
+          <div className="history-tree" role="tree" aria-label="快照分支树">
+            {filteredSnapshots.length === 0 ? (
+              <div className="history-empty">没有匹配的快照</div>
+            ) : (
+              (() => {
+                const tree = buildSnapshotTree(filteredSnapshots);
+                if (tree.length === 0) {
+                  // Fallback: no tree structure — show flat list with indent
+                  return (
+                    <div className="history-tree-flat">
+                      {filteredSnapshots.map((snap) => (
+                        <div key={snap.id} className="history-tree-node history-tree-root">
+                          <SnapshotTreeNode
+                            snap={snap}
+                            depth={0}
+                            isExpanded={expandedNodes.has(snap.id)}
+                            isSelected={selectedSnap?.id === snap.id}
+                            onToggleExpand={handleToggleExpand}
+                            onSelect={() => setSelectedSnap(snap)}
+                            onStar={handleStar}
+                            onCompare={handleCompare}
+                            onRestore={handleRestore}
+                            onDelete={handleDelete}
+                            hasChildren={false}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  );
+                }
+                return tree.map((root) => (
+                  <TreeNodeRenderer
+                    key={root.snap.id}
+                    node={root}
+                    depth={0}
+                    expandedNodes={expandedNodes}
+                    selectedId={selectedSnap?.id ?? null}
+                    onToggleExpand={handleToggleExpand}
+                    onSelect={setSelectedSnap}
+                    onStar={handleStar}
+                    onCompare={handleCompare}
+                    onRestore={handleRestore}
+                    onDelete={handleDelete}
+                  />
+                ));
+              })()
+            )}
+          </div>
         ) : (
           /* List view */
           <div className="history-list" role="list" aria-label="快照列表">
@@ -265,5 +365,166 @@ const HistoryPanel = React.memo(function HistoryPanel({
     </div>
   );
 });
+
+/* ===== E1 (Sprint65): Tree View Components ===== */
+
+/** Recursive tree node renderer */
+function TreeNodeRenderer({
+  node,
+  depth,
+  expandedNodes,
+  selectedId,
+  onToggleExpand,
+  onSelect,
+  onStar,
+  onCompare,
+  onRestore,
+  onDelete,
+}: {
+  node: TreeNode;
+  depth: number;
+  expandedNodes: Set<string>;
+  selectedId: string | null;
+  onToggleExpand: (id: string) => void;
+  onSelect: (snap: Snapshot) => void;
+  onStar: (snap: Snapshot) => void;
+  onCompare: (snap: Snapshot) => void;
+  onRestore: (snap: Snapshot) => void;
+  onDelete: (snap: Snapshot) => void;
+}) {
+  const { snap, children } = node;
+  const isExpanded = expandedNodes.has(snap.id);
+  const hasChildren = children.length > 0;
+  const isSelected = selectedId === snap.id;
+
+  return (
+    <div className="history-tree-node" style={{ paddingLeft: `${depth * 16}px` }} role="treeitem">
+      <SnapshotTreeNode
+        snap={snap}
+        depth={depth}
+        isExpanded={isExpanded}
+        isSelected={isSelected}
+        onToggleExpand={onToggleExpand}
+        onSelect={() => onSelect(snap)}
+        onStar={() => onStar(snap)}
+        onCompare={() => onCompare(snap)}
+        onRestore={() => onRestore(snap)}
+        onDelete={() => onDelete(snap)}
+        hasChildren={hasChildren}
+      />
+      {isExpanded && hasChildren && (
+        <div className="history-tree-children" role="group">
+          {children.map((child) => (
+            <TreeNodeRenderer
+              key={child.snap.id}
+              node={child}
+              depth={depth + 1}
+              expandedNodes={expandedNodes}
+              selectedId={selectedId}
+              onToggleExpand={onToggleExpand}
+              onSelect={onSelect}
+              onStar={onStar}
+              onCompare={onCompare}
+              onRestore={onRestore}
+              onDelete={onDelete}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/** Individual snapshot node in the tree */
+function SnapshotTreeNode({
+  snap,
+  depth,
+  isExpanded,
+  isSelected,
+  onToggleExpand,
+  onSelect,
+  onStar,
+  onCompare,
+  onRestore,
+  onDelete,
+  hasChildren,
+}: {
+  snap: Snapshot;
+  depth: number;
+  isExpanded: boolean;
+  isSelected: boolean;
+  onToggleExpand: (id: string) => void;
+  onSelect: () => void;
+  onStar: () => void;
+  onCompare: () => void;
+  onRestore: () => void;
+  onDelete: () => void;
+  hasChildren: boolean;
+}) {
+  return (
+    <div
+      className={`tree-snap-item ${isSelected ? 'selected' : ''}`}
+      onClick={onSelect}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => e.key === 'Enter' && onSelect()}
+    >
+      {/* Expand/collapse toggle */}
+      {hasChildren ? (
+        <button
+          className="tree-toggle-btn"
+          onClick={(e) => { e.stopPropagation(); onToggleExpand(snap.id); }}
+          aria-label={isExpanded ? '折叠' : '展开'}
+          aria-expanded={isExpanded}
+        >
+          {isExpanded ? '▼' : '▶'}
+        </button>
+      ) : (
+        <span className="tree-toggle-placeholder" />
+      )}
+
+      {/* Star indicator */}
+      {snap.isStarred && <span className="tree-star" aria-label="已星标">★</span>}
+
+      {/* Branch label */}
+      {snap.branchName && snap.branchName !== 'main' && (
+        <span className="tree-branch-label">{snap.branchName}</span>
+      )}
+
+      {/* Name */}
+      <span className="tree-snap-name">{snap.name}</span>
+
+      {/* Timestamp */}
+      <span className="tree-snap-time">
+        {new Date(snap.timestamp).toLocaleString('zh-CN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+      </span>
+
+      {/* Inline actions */}
+      <span className="tree-actions" onClick={(e) => e.stopPropagation()}>
+        <button
+          className={`tree-action-btn ${snap.isStarred ? 'starred' : ''}`}
+          onClick={(e) => { e.stopPropagation(); onStar(); }}
+          aria-label={snap.isStarred ? '取消星标' : '星标'}
+        >
+          {snap.isStarred ? '★' : '☆'}
+        </button>
+        <button
+          className="tree-action-btn"
+          onClick={(e) => { e.stopPropagation(); onCompare(); }}
+          aria-label="对比"
+        >
+          ⟷
+        </button>
+        <button
+          className="tree-action-btn restore"
+          onClick={(e) => { e.stopPropagation(); onRestore(); }}
+          aria-label="恢复"
+        >
+          ↩
+        </button>
+      </span>
+    </div>
+  );
+}
 
 export default HistoryPanel;

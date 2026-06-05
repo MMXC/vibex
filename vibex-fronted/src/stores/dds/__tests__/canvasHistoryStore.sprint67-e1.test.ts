@@ -41,7 +41,7 @@ describe('canvasHistoryStore — E1 Branch Comparison (Sprint67)', () => {
     mockGetLatestSnapshotFromDB
       .mockResolvedValueOnce(null)  // branchA: no snapshot
       .mockResolvedValueOnce({       // branchB: has snapshot
-        id: 's2', name: 'v1', timestamp: 2000, branch: 'feature-a',
+        id: 's2', name: 'v1', timestamp: 2000, branchName: 'feature-a',
         data: { nodes: [{ id: 'n1' }], edges: [] },
       });
 
@@ -50,7 +50,7 @@ describe('canvasHistoryStore — E1 Branch Comparison (Sprint67)', () => {
 
     expect(result.branchA).toBe('main');
     expect(result.branchB).toBe('feature-a');
-    expect(result.error).toContain('not found');
+    expect(result.error).toContain('No snapshot found');
     expect(result.diffs).toEqual({ added: [], removed: [], modified: [] });
     expect(result.summary.totalChanges).toBe(0);
   });
@@ -58,7 +58,7 @@ describe('canvasHistoryStore — E1 Branch Comparison (Sprint67)', () => {
   it('compareBranches returns error when branchB has no snapshots', async () => {
     mockGetLatestSnapshotFromDB
       .mockResolvedValueOnce({       // branchA: has snapshot
-        id: 's1', name: 'v1', timestamp: 1000, branch: 'main',
+        id: 's1', name: 'v1', timestamp: 1000, branchName: 'main',
         data: { nodes: [{ id: 'n1' }], edges: [] },
       })
       .mockResolvedValueOnce(null);  // branchB: no snapshot
@@ -66,18 +66,18 @@ describe('canvasHistoryStore — E1 Branch Comparison (Sprint67)', () => {
     const { compareBranches } = useCanvasHistoryStore.getState();
     const result = await compareBranches('canvas-1', 'main', 'feature-a');
 
-    expect(result.error).toContain('not found');
+    expect(result.error).toContain('No snapshot found');
     expect(result.diffs).toEqual({ added: [], removed: [], modified: [] });
     expect(result.summary.totalChanges).toBe(0);
   });
 
   it('compareBranches returns correct snapA and snapB', async () => {
     const snapA: Snapshot = {
-      id: 's1', name: 'main v1', timestamp: 1000, branch: 'main',
+      id: 's1', name: 'main v1', timestamp: 1000, branchName: 'main',
       data: { nodes: [{ id: 'n1' }, { id: 'n2' }], edges: [] },
     };
     const snapB: Snapshot = {
-      id: 's2', name: 'feature v1', timestamp: 2000, branch: 'feature-a',
+      id: 's2', name: 'feature v1', timestamp: 2000, branchName: 'feature-a',
       data: { nodes: [{ id: 'n1' }, { id: 'n3' }], edges: [] },
     };
 
@@ -97,7 +97,7 @@ describe('canvasHistoryStore — E1 Branch Comparison (Sprint67)', () => {
 
   it('compareBranches returns diffs with correct types (added/removed/modified)', async () => {
     const snapA: Snapshot = {
-      id: 's1', name: 'main v1', timestamp: 1000, branch: 'main',
+      id: 's1', name: 'main v1', timestamp: 1000, branchName: 'main',
       data: {
         nodes: [
           { id: 'n1', type: 'context', label: 'Node A' },
@@ -107,7 +107,7 @@ describe('canvasHistoryStore — E1 Branch Comparison (Sprint67)', () => {
       },
     };
     const snapB: Snapshot = {
-      id: 's2', name: 'feature v1', timestamp: 2000, branch: 'feature-a',
+      id: 's2', name: 'feature v1', timestamp: 2000, branchName: 'feature-a',
       data: {
         nodes: [
           { id: 'n1', type: 'context', label: 'Node A' },     // unchanged
@@ -125,30 +125,21 @@ describe('canvasHistoryStore — E1 Branch Comparison (Sprint67)', () => {
     const result = await compareBranches('canvas-1', 'main', 'feature-a');
 
     // n2 removed, n3 added
-    expect(result.diffs.removed.length).toBeGreaterThan(0);
-    expect(result.diffs.added.length).toBeGreaterThan(0);
-    expect(
-      [...result.diffs.added, ...result.diffs.removed, ...result.diffs.modified].every(d =>
-        ['added', 'removed', 'modified'].includes(d.type as unknown as string)
-      )
-    ).toBe(true);
+    expect(result.diffs.removed.some(d => d.id === 'n2')).toBe(true);
+    expect(result.diffs.added.some(d => d.id === 'n3')).toBe(true);
 
     // Summary counts
     expect(result.summary.totalChanges).toBeGreaterThan(0);
-    expect(
-      result.summary.contextsRemoved +
-      result.summary.contextsAdded +
-      result.summary.contextsModified
-    ).toBe(result.summary.totalChanges);
+    expect(result.summary.contextsRemoved + result.summary.contextsAdded + result.summary.contextsModified).toBe(result.summary.totalChanges);
   });
 
   it('compareBranches DoD acceptance — diffs exist and have valid types', async () => {
     const snapA: Snapshot = {
-      id: 'sA', name: 'a', timestamp: 1000, branch: 'main',
+      id: 'sA', name: 'a', timestamp: 1000, branchName: 'main',
       data: { nodes: [{ id: 'n1', type: 'context' }], edges: [] },
     };
     const snapB: Snapshot = {
-      id: 'sB', name: 'b', timestamp: 2000, branch: 'feature',
+      id: 'sB', name: 'b', timestamp: 2000, branchName: 'feature',
       data: { nodes: [{ id: 'n2', type: 'context' }], edges: [] },
     };
 
@@ -163,7 +154,7 @@ describe('canvasHistoryStore — E1 Branch Comparison (Sprint67)', () => {
     const allDiffs = [...result.diffs.added, ...result.diffs.removed, ...result.diffs.modified];
     expect(allDiffs.length).toBeGreaterThan(0);
     expect(allDiffs.every(d =>
-      ['added', 'removed', 'modified'].includes(d.type as unknown as string)
+      ['added', 'removed', 'modified'].includes(d.type)
     )).toBe(true);
   });
 });

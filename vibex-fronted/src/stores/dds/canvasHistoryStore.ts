@@ -125,7 +125,6 @@ export interface BranchDiffResult {
   };
 }
 
-export const useCanvasHistoryStore = create
 export interface SnapshotListFilters {
   branch?: string;
   starred?: boolean;
@@ -506,9 +505,9 @@ export const useCanvasHistoryStore = create<CanvasHistoryState>((set, get) => ({
       const inB = idsB.has(id);
 
       if (!inA && inB) {
-        added.push({ id, label: (mapB.get(id) as { label?: string })?.label });
+        added.push({ id, label: (mapB.get(id) as { label?: string })?.label, type: 'added' });
       } else if (inA && !inB) {
-        removed.push({ id, label: (mapA.get(id) as { label?: string })?.label });
+        removed.push({ id, label: (mapA.get(id) as { label?: string })?.label, type: 'removed' });
       } else if (inA && inB) {
         // Deep comparison of node properties (excluding id)
         const a = mapA.get(id)!;
@@ -528,7 +527,7 @@ export const useCanvasHistoryStore = create<CanvasHistoryState>((set, get) => ({
         }
 
         if (isModified) {
-          modified.push({ id, label: a.label, changes });
+          modified.push({ id, label: a.label, changes, type: 'modified' });
         }
       }
     }

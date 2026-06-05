@@ -206,4 +206,92 @@ describe('TemplateStore - E2 Favorites & Category', () => {
       expect(filtered.length).toBeGreaterThan(0);
     });
   });
+
+  // ---- E5: 自定义分类管理 ----
+  describe('E5: customCategories', () => {
+    beforeEach(() => {
+      localStorageMock.clear();
+      useTemplateStore.setState({
+        customCategories: [],
+        favoriteTemplateIds: [],
+        templates: [
+          {
+            id: 't1', name: 'SaaS E-commerce Platform', description: '...',
+            category: 'saas', tags: ['shop', 'cart'], displayName: '电商平台',
+            content: '', scenes: [] as const, entities: [], features: [], items: [],
+          },
+          {
+            id: 't2', name: 'Online Learning Platform', description: '...',
+            category: 'education', tags: ['course', 'student'], displayName: '在线教育',
+            content: '', scenes: [] as const, entities: [], features: [], items: [],
+          },
+        ],
+        filteredTemplates: [],
+        selectedCategory: 'all',
+        searchQuery: '',
+        stats: { usageCount: {}, ratings: {} },
+      });
+    });
+
+    describe('addCustomCategory', () => {
+      it('should add a custom category with generated id and timestamp', () => {
+        useTemplateStore.getState().addCustomCategory('我的分类');
+        const cats = useTemplateStore.getState().getCustomCategories();
+        expect(cats.length).toBe(1);
+        expect(cats[0].name).toBe('我的分类');
+        expect(cats[0].id).toMatch(/^cat-/);
+        expect(cats[0].createdAt).toBeGreaterThan(0);
+      });
+
+      it('should support multiple custom categories', () => {
+        useTemplateStore.getState().addCustomCategory('分类A');
+        useTemplateStore.getState().addCustomCategory('分类B');
+        const cats = useTemplateStore.getState().getCustomCategories();
+        expect(cats.length).toBe(2);
+        expect(cats.map(c => c.name)).toContain('分类A');
+        expect(cats.map(c => c.name)).toContain('分类B');
+      });
+    });
+
+    describe('removeCustomCategory', () => {
+      it('should remove a custom category by id', () => {
+        useTemplateStore.getState().addCustomCategory('临时分类');
+        const cats = useTemplateStore.getState().getCustomCategories();
+        expect(cats.length).toBe(1);
+        const catId = cats[0].id;
+        useTemplateStore.getState().removeCustomCategory(catId);
+        expect(useTemplateStore.getState().getCustomCategories().length).toBe(0);
+      });
+
+      it('should do nothing when removing non-existent category', () => {
+        useTemplateStore.getState().addCustomCategory('真实分类');
+        useTemplateStore.getState().removeCustomCategory('non-existent-id');
+        expect(useTemplateStore.getState().getCustomCategories().length).toBe(1);
+      });
+    });
+
+    describe('getCustomCategories', () => {
+      it('should return empty array when no categories exist', () => {
+        expect(useTemplateStore.getState().getCustomCategories()).toEqual([]);
+      });
+    });
+
+    describe('incrementUsage', () => {
+      it('should increment usage count for a template', () => {
+        expect(useTemplateStore.getState().stats.usageCount['t1']).toBeUndefined();
+        useTemplateStore.getState().incrementUsage('t1');
+        expect(useTemplateStore.getState().stats.usageCount['t1']).toBe(1);
+        useTemplateStore.getState().incrementUsage('t1');
+        expect(useTemplateStore.getState().stats.usageCount['t1']).toBe(2);
+      });
+
+      it('should work for multiple templates independently', () => {
+        useTemplateStore.getState().incrementUsage('t1');
+        useTemplateStore.getState().incrementUsage('t2');
+        useTemplateStore.getState().incrementUsage('t2');
+        expect(useTemplateStore.getState().stats.usageCount['t1']).toBe(1);
+        expect(useTemplateStore.getState().stats.usageCount['t2']).toBe(2);
+      });
+    });
+  });
 });

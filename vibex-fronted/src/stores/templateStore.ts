@@ -86,6 +86,18 @@ interface TemplateState {
   // 移除标签
   removeTemplateTag: (id: string, tag: string) => Promise<void>;
 
+  // ---- E5: 自定义分类管理 ----
+  // 自定义分类列表
+  customCategories: { id: string; name: string; createdAt: number }[];
+  // 添加自定义分类
+  addCustomCategory: (name: string) => void;
+  // 移除自定义分类
+  removeCustomCategory: (id: string) => void;
+  // 获取自定义分类列表
+  getCustomCategories: () => { id: string; name: string; createdAt: number }[];
+  // 使用频率递增（在打开模板时调用）
+  incrementUsage: (templateId: string) => void;
+
   // ---- E4: 模板导入/导出管理 ----
   // 导出所有模板为 JSON
   exportTemplates: () => { version: string; exportedAt: string; templates: RequirementTemplate[] };
@@ -139,6 +151,8 @@ export const useTemplateStore = create<TemplateState>()(
       favoriteTemplateIds: [],
       // ---- E5: 模板画廊搜索增强 ----
       selectedTags: [],
+      // ---- E5: 自定义分类 ----
+      customCategories: [] as { id: string; name: string; createdAt: number }[],
       // ---- E2: 缩略图缓存 ----
       thumbnailCache: {},
       
@@ -292,6 +306,27 @@ export const useTemplateStore = create<TemplateState>()(
       getFavorites: () => {
         const { templates, favoriteTemplateIds } = get();
         return templates.filter(t => favoriteTemplateIds.includes(t.id));
+      },
+
+      // ---- E5: 自定义分类管理 ----
+      addCustomCategory: (name) => {
+        const id = `cat-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+        set(state => ({
+          customCategories: [...state.customCategories, { id, name, createdAt: Date.now() }],
+        }));
+      },
+
+      removeCustomCategory: (id) => {
+        set(state => ({
+          customCategories: state.customCategories.filter(c => c.id !== id),
+        }));
+      },
+
+      getCustomCategories: () => get().customCategories,
+
+      // 使用频率递增
+      incrementUsage: (templateId) => {
+        get().recordUsage(templateId);
       },
 
       // ---- E4: 模板版本管理 ----

@@ -19,6 +19,14 @@ export interface TemplateCardProps {
   onToggleFavorite?: (template: Template) => void;
   /** 自定义类名 */
   className?: string;
+  /** E5: 当前选中的自定义分类ID */
+  customCategoryId?: string;
+  /** E5: 添加模板到自定义分类 */
+  onAddToCategory?: (templateId: string, categoryId: string) => void;
+  /** E5: 从自定义分类移除模板 */
+  onRemoveFromCategory?: (templateId: string, categoryId: string) => void;
+  /** E5: 模板→自定义分类映射 */
+  templateCategories?: Record<string, string[]>;
 }
 
 export function TemplateCard({
@@ -27,6 +35,10 @@ export function TemplateCard({
   isSelected = false,
   onToggleFavorite,
   className = '',
+  customCategoryId,
+  onAddToCategory,
+  onRemoveFromCategory,
+  templateCategories,
 }: TemplateCardProps) {
   const handleFavoriteClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -86,6 +98,25 @@ export function TemplateCard({
         <span className={`${styles.price} ${template.price === 'free' ? styles.free : styles.premium}`}>
           {template.price === 'free' ? '免费' : '付费'}
         </span>
+
+        {/* E5: 自定义分类按钮 */}
+        {customCategoryId && (
+          <button
+            className={styles.favoriteBtn}
+            onClick={(e) => {
+              e.stopPropagation();
+              const cats = templateCategories?.[template.id] || [];
+              if (cats.includes(customCategoryId)) {
+                onRemoveFromCategory?.(template.id, customCategoryId);
+              } else {
+                onAddToCategory?.(template.id, customCategoryId);
+              }
+            }}
+            aria-label={templateCategories?.[template.id]?.includes(customCategoryId) ? '从分类移除' : '添加到分类'}
+          >
+            {templateCategories?.[template.id]?.includes(customCategoryId) ? '📁' : '+📁'}
+          </button>
+        )}
       </div>
 
       {/* 内容 */}

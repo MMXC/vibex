@@ -1014,3 +1014,15 @@
 - **S65-E3.7**: `DDSFlow.tsx` — Background 读取 settingsStore（color / variant / gap）+ snapToGrid / snapGrid props + fitView 使用 defaultZoom
 - **S65-E3.10**: `settingsStore.test.ts` — 17/17 vitest 测试通过
 - **Test**: 17/17 vitest ✅
+
+
+## [Unreleased] S65-E4: 画布搜索与过滤增强 — IndexedDB + Fuse.js 全局搜索 — 2026-06-05
+- **S65-E4.1**: `canvasDb.ts` — IndexedDB 封装：initCanvasDb / saveCanvasMeta / getCanvasMetas / searchCanvases（Fuse.js 模糊搜索，name 权重 0.5，阈值 0.4，includeScore）
+- **S65-E4.2**: `GlobalSearchPanel.tsx` — Cmd+Shift+K 全局画布名称搜索浮层（模糊匹配 + 历史记录 + 排名徽章 + 键盘导航）
+- **S65-E4.3**: `canvasSearchStore.ts` — 全局搜索状态：globalSearchQuery + globalSearchResults + searchHistory（MAX 5）
+- **S65-E4.4**: `CanvasSearchPanel.tsx` — 页内节点文本搜索面板（精确匹配 + 正则模式 + Fuse.js 模糊）
+- **S65-E4.5**: `DDSCanvasPage.tsx` — 集成 GlobalSearchPanel + Cmd+Shift+K 快捷键
+- **S65-E4.6**: canvasDb 错误处理 — openDB / idbGetAll / idbPut 全部 try-catch
+- **S65-E4.7**: `canvasDb.test.ts` — searchCanvases 5 个测试用例（空查询 / 阈值限制 / 排序验证 / score+item 字段）
+- **Test**: 5/5 vitest ✅
+

@@ -10,6 +10,31 @@
 
 ---
 
+
+---
+
+## [Unreleased] S66-E3: 画布视图预设保存与切换 — 2026-06-06
+
+### Features
+- **新增 viewPresetsStore**: Zustand store，localStorage 持久化，支持 savePreset/deletePreset/loadPreset/updatePreset
+- **新增 ViewPresetsTab**: 预设卡片列表 UI（颜色预览 + 删除）+ 保存表单（名称输入 + 自适应开关）
+- **新增 viewPresetsStore.test.ts**: 20 个测试用例覆盖所有 CRUD 路径
+
+### Files Added
+- `vibex-fronted/src/stores/viewPresetsStore.ts`
+- `vibex-fronted/src/components/dds/settings/ViewPresetsTab.tsx`
+- `vibex-fronted/src/components/dds/settings/ViewPresetsTab.module.css`
+- `vibex-fronted/src/stores/__tests__/viewPresetsStore.test.ts`
+
+### DoD
+- [x] D3.1: viewPresetsStore CRUD 操作正确 (20 vitest)
+- [x] D3.2: localStorage 持久化
+- [x] D3.3: ViewPresetsTab 预设列表 + 保存表单
+- [x] D3.4: 预设卡片颜色预览 (背景色 + 网格样式)
+- [x] D3.5: loadPreset 批量应用所有 settings
+- [x] D3.6: vitest 20/20
+- [x] D3.7: dual-CHANGELOG
+
 ## [Unreleased] S66-E1: 画布分支操作 — 2026-06-06
 - **E1.1**: `historyDB.ts` — DB_VERSION=4, parentSnapshotId field in SnapshotEntry/load/update, branchName+parentSnapshotId indexes in onupgradeneeded
 - **E1.2**: `historyDB.ts` — renameBranchInDB/deleteBranchFromDB/mergeBranchInDB/listBranchesFromDB (bulk IndexedDB operations)

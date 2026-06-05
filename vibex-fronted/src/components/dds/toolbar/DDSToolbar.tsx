@@ -44,6 +44,7 @@ import { TemplateSaveDialog } from '@/components/dds/templates/TemplateSaveDialo
 import { ShortcutSettingsPanel } from '@/components/dds/shortcuts/ShortcutSettingsPanel';
 import { HistoryPanel } from '@/components/dds/history/HistoryPanel';
 import { BackupPanel } from '@/components/dds/settings/BackupPanel';
+import { CanvasSettingsPanel } from '@/components/dds/settings/CanvasSettingsPanel';
 import { ConflictDialog } from '@/components/dds/canvas-dashboard/ConflictDialog';
 import styles from './DDSToolbar.module.css';
 
@@ -131,6 +132,16 @@ function BackupIcon() {
       <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
       <polyline points="7 10 12 15 17 10" />
       <line x1="12" y1="15" x2="12" y2="3" />
+    </svg>
+  );
+}
+
+// S65-E3: Settings icon for canvas view settings panel
+function SettingsIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="3" />
+      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
     </svg>
   );
 }
@@ -251,6 +262,7 @@ export const DDSToolbar = memo(function DDSToolbar({
   const [isShortcutSettingsOpen, setIsShortcutSettingsOpen] = useState(false);
   const [isHistoryPanelOpen, setIsHistoryPanelOpen] = useState(false);
   const [isBackupOpen, setIsBackupOpen] = useState(false);
+  const [isCanvasSettingsOpen, setIsCanvasSettingsOpen] = useState(false);
 
   // E3-S3: RBAC for toolbar actions
   const rbac = useCanvasRBAC(projectId);
@@ -798,6 +810,17 @@ export const DDSToolbar = memo(function DDSToolbar({
             <BackupIcon />
           </button>
 
+          {/* S65-E3: Canvas settings panel */}
+          <button
+            type="button"
+            className={styles.iconButton}
+            onClick={() => setIsCanvasSettingsOpen(true)}
+            aria-label="画布设置"
+            title="画布设置"
+          >
+            <SettingsIcon />
+          </button>
+
           {/* S61-E3: Language switcher */}
           <LanguageSwitcher />
 
@@ -966,6 +989,12 @@ export const DDSToolbar = memo(function DDSToolbar({
         isOpen={isBackupOpen}
         onClose={() => setIsBackupOpen(false)}
         canvasId={canvasId ?? ''}
+      />
+
+      {/* S65-E3: Canvas View Settings panel */}
+      <CanvasSettingsPanel
+        isOpen={isCanvasSettingsOpen}
+        onClose={() => setIsCanvasSettingsOpen(false)}
       />
 
       {/* S63-E2: Collaborative undo/redo conflict resolution dialog */}

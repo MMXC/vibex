@@ -1,6 +1,11 @@
-
-
 ---
+
+## [Unreleased] S65-E5: 模板画廊用户收藏管理 — 2026-06-05
+- **S65-E5.1**: `templateStore.addCustomCategory()` / `removeCustomCategory()` / `incrementUsage()` — 自定义分类管理 + 使用频率统计
+- **S65-E5.2**: Zustand persist middleware 自动持久化 `customCategories` + `stats.usageCount` (localStorage)
+- **S65-E5.3**: `TemplateCard` 📁 按钮 — 自定义分类添加/移除交互
+- **S65-E5.4**: `TemplateGallery` 动态 tabs — 收藏 + 自定义分类 + 新建分类 + 分类过滤
+- **S65-E5.5**: 收藏夹按使用频率排序 (`incrementUsage` → `stats.usageCount`)
 
 ## [Unreleased] S64-E2: 画布版本历史 LRU 缓存 + 恢复 — 2026-06-05
 - **S64-E2.1**: `MAX_SNAPSHOTS = 50` — 导出常量，供 HistoryPanel 使用
@@ -20,7 +25,6 @@
 ---
 
 ## [Unreleased] S58-E2: 桌面文件拖拽导入 — 2026-06-03
-
 
 ---
 
@@ -54,7 +58,6 @@
 - **S60-E5.3**: `DDSSearchPanel.tsx` — 搜索结果关键词高亮（`<mark>` 标签），支持大小写不敏感
 - **S60-E5.4**: `DDSSearchPanel.tsx` — history tab ↑↓ 键盘导航 + Enter 选历史项
 - **S60-E5.5**: vitest: `canvasSearchStore.test.ts` 10/10 + `DDSSearchPanel.test.tsx` 16/16
-
 
 - **S58-E2.1**: `useFileDrop.ts` — drag state management, `.vibex`/`.json`/`.yaml`/`.yml` parse, confirmImport
 - **S58-E2.2**: `DropOverlay.tsx` — full-screen animated overlay during drag
@@ -156,7 +159,6 @@
   - 新增: `src/hooks/__tests__/useCanvasList.test.ts` (12 tests 12/12 PASS)
   - Vitest 回归: DDSCanvasStore 57/57 PASS
 
-
 ##### S47-P001-E5: Canvas 导出格式扩展 (PNG/SVG/Figma)
 - **E5 需求**: 扩展 `useCanvasExport` → `exportAsFigma()`, ExportMenu 显示 Figma 选项, PNG 分辨率选择 (1x/2x/3x), SVG 矢量语义
 - **E5 状态**: ✅ 完成 (28f2c8818)
@@ -165,8 +167,6 @@
   - 新增: ExportMenu Figma 选项 + PNG 分辨率选择器下拉菜单
   - vitest: useCanvasExport.test.ts 10/10 PASS
   - Vitest 回归: DDSCanvasStore 57/57 PASS
-
-
 
 
 
@@ -204,7 +204,6 @@
 - **E2 RemoteCursor.test.tsx**: 6 vitest tests (empty, single, multiple, self-exclusion, missing name fallback, position rendering) ✅
 - **E2 presenceStore vitest**: 9/9 PASS (setRemoteUsers, updateCursor, removeUser, clearAll, lock/unlock) ✅
 - **E2 IntentionBubble.tsx**: self-contained IntentionType re-export (removed Firebase dependency) ✅
-
 
 ##### S45-P003-E3: 画布 MiniMap + 视口导航
 - **E3 DDSFlow.tsx**: import MiniMap, Controls, Background from @xyflow/react ✅
@@ -244,7 +243,6 @@
 - **E1 useStreamingAgent.ts**: add onChunk callback for streaming progress ✅
 - **E1 AgentFeedbackPanel.tsx**: show received char count during streaming ✅
 - **E1 agentStore.test.ts**: 4 persistence tests (add/update/remove/initAgentSessions) ✅
-
 
 ##### S44-P002-E2: 画布模板分类 + 搜索 + 收藏
 - **E2 RequirementTemplate.isFavorite**: `src/data/templates/types.ts` — 添加 isFavorite 字段 ✅
@@ -305,7 +303,6 @@
 - **E4 useCanvasExport**: `src/hooks/canvas/useCanvasExport.ts` — html-to-image PNG/SVG 导出 ✅
 - **E4 POST /api/export/pdf**: `src/app/api/export/pdf/route.ts` — jsPDF PDF 生成 ✅
 - **E4 vitest**: `src/hooks/canvas/__tests__/useCanvasExport.test.ts` — validateFileSize 4/4 PASS ✅
-
 
 ##### S43-P002-E5: 快捷键自定义收尾
 - **E5 ShortcutPanel i18n**: `src/components/canvas/features/ShortcutPanel.tsx` — useTranslations('shortcuts') 集成 ✅
@@ -389,7 +386,6 @@
 - **E1 /ai 页面**: `src/app/ai/page.tsx` — 新建 AI 页面，双栏布局（AgentSessions sidebar + AgentFeedbackPanel main）
 - **E1 i18n keys**: `src/i18n/messages/en.json` + `zh.json` 新增 54 个 ai namespace keys
 
-
 ---
 
 ## [Unreleased] S58-E1: 画布版本分支管理 — Snapshot 持久化
@@ -399,7 +395,6 @@
 - **E1 快照命名**: 保存快照时弹窗输入名称，默认 "快照 {YYYY-MM-DD HH:mm}"
 - **E1 测试覆盖**: `canvasHistoryStore.test.ts` 新增 Snapshot + E3 Revision 测试
 - **E1 实现文件**: `canvasHistoryStore.ts`, `historyDB.ts`, `HistoryPanel.tsx`, `HistoryPanel.module.css`
-
 
 ## [2026-05-31] - Sprint 46
 
@@ -423,7 +418,6 @@
 - **E1 DDSCanvasPage集成**: `<MiniMapPanel />` 集成到画布页面（position:absolute浮动）
 - **E1 E2E测试**: `tests/e2e/minimap-panel.spec.ts` — 5 tests，TypeScript clean ✅
 
-
 ## [Unreleased] Sprint 40 — P004 Canvas 持久化 + 导入导出
 
 ##### S40-P004-E1: Canvas 持久化 + 导入导出
@@ -439,7 +433,6 @@
 - **E1 layout.tsx 集成**: 在 layout.tsx body 中渲染 SWRegistration Client Component
 - **E1 sw.js 验证**: public/sw.js 已存在（Workbox v1，Cache-First 静态资源 + networkFirst API）
 - **E1 console.log('[SW] Registered')**: 浏览器 DevTools → Application → Service Workers 可见
-
 
 ## [Unreleased] Sprint 40 — P005 键盘快捷键系统完善
 
@@ -509,7 +502,6 @@
 - **E2 uiStore isOffline**: `src/lib/canvas/stores/uiStore.ts` — 新增 `isOffline: boolean` 状态 + `setIsOffline()` + `window.addEventListener('online'/'offline')` 自动同步
 - **E2 DDSToolbar 离线 Badge**: `DDSToolbar.tsx` — 集成 `useUIStore.isOffline`，网络断开时显示 📴
 
-
 ### [Unreleased] Sprint 40 — P001 AI Agent i18n 国际化
 
 ##### S40-P001-E1: AI Agent i18n 迁移收尾
@@ -546,8 +538,6 @@
 - **E1 视口边框**: MiniMapViewportBorder 组件，ViewportPortal + SVG rect 标注当前视口范围
 ---
 
----
-
 ## [Unreleased] S49-E4: 画布版本历史可视化 — 2026-06-01
 - **S49-E4.1 snapshotHistoryStore**: `src/stores/dds/snapshotHistoryStore.ts` — debounce 2s auto-snapshot / MAX_SNAPSHOTS=20 / ai-generate + pre-export trigger / manual snapshot / restoreSnapshot / clearSnapshots
 - **S49-E4.2 Timeline**: `src/components/dds/version-history/Timeline.tsx` — 水平滚动时间轴，颜色 badge（AI生成/导出前/手动），点击选中，下载 JSON / 删除
@@ -577,7 +567,6 @@
 - **S49-E2.6 Vitest 覆盖**: `stores/templateStore.test.ts` 新增 16 个测试（searchTemplates ×4 / filterByCategory ×2 / renameTemplate ×3 / thumbnailCache ×4）；总计 30 个测试
 - 提交: epic/s49-e2-template-mgmt
 
-
 ---
 
 ## [Unreleased] S49-E3: 大型画布性能优化 v2 — 2026-06-01
@@ -602,7 +591,6 @@
 - **E4 templateStore.ts**: `exportTemplates()` + `importTemplates()` actions — version 1.0 format
 - **E4 TemplateGallery.tsx**: ⬇️ Export / ⬆️ Import buttons in header
 - **E4 vitest**: templateExport.test.ts + templateImport.test.ts + templateStore E4 tests
-
 
 ## [Unreleased] S50-E1: 画布全局搜索 — 2026-06-02
 - **S50-E1.1 canvasSearchStore**: `stores/dds/canvasSearchStore.ts` — keywordIndex Map + Fuse.js 搜索
@@ -642,7 +630,6 @@
 - **S51-E2.5 Vitest 覆盖**: 7/7 通过
 - 提交: epic/s51-e2-png-batch-export
 
-
 ---
 
 ## [Unreleased] S51-E3: MiniMap 节点类型着色 — 2026-06-04
@@ -672,7 +659,6 @@
 - **S51-E5.6**: `wsCommentHandler.ts` — comment:mention 类型 → mentionsStore 写入 + 未读计数
 - **Tests**: parseMentions 9 tests, mentionsStore 7 tests, vitest 21/21 ✅
 
-
 ---
 
 ## [Unreleased] S52-E2: 批量导出 PNG/SVG/PDF — 2026-06-02
@@ -687,7 +673,6 @@
 - **S52-E1.1**: `presenceStore.test.ts` 10个测试用例 — setRemoteUsers replace/update/remove semantics, cursor update, node locking, WebSocket message handlers
 - **S52-E1.2**: 复用 S42/S44 WebSocket presence 实现，新增 10 个 vitest cases 覆盖协作感知边界条件
 
-
 ---
 
 ## [Unreleased] S52-E3: Undo/Redo 协作冲突处理 — 2026-06-02
@@ -699,8 +684,6 @@
 - **S52-E3.5**: `saveHistoryWithRevision()` / `loadHistoryWithRevision()` / `getRevision()` → IndexedDB revision 乐观锁
 - **S52-E3.6**: `wsRevisionHandler` → WebSocket `revision:bump` / `revision:conflict` 消息处理
 - **Test**: 44/44 vitest (15 new E3 revision tests)
-
-
 
 ---
 
@@ -725,8 +708,6 @@
 - **S52-E5.4**: `shortcutStore.test.ts` → 9 vitest (conflict detection, reset, save)
 - **S52-E5.5**: `DDSToolbar.tsx` → 键盘图标按钮 + ShortcutSettingsPanel modal
 - **Test**: 9/9 vitest
-
-
 
 ---
 
@@ -764,7 +745,6 @@
 - **S58-E5.5**: `wsConflictHandler.ts` — 冲突解决后发送 `conflict:resolved` 消息
 - **S58-E5.6**: `conflictStore.test.ts` — 6 个 vitest 测试全部通过
 - **S58-E5.7**: `ConflictDialog.test.tsx` — 18 个 vitest 测试全部通过
-
 
 ---
 
@@ -849,7 +829,6 @@
 - **S61-E3.6**: `en.json`/`zh.json` — 新增 `toolbar`、`common`、`search`、`batchOps` 命名空间翻译键（batchOps 19 key, toolbar 18 key, search 12 key）
 - **S61-E3.7**: vitest: `useLanguage.test.ts` 4/4 通过
 
-
 ## [Unreleased] S61-E4: AI Session 画布上下文集成 — 2026-06-04
 - **S61-E4.1**: `agentStore.ts` — DDS AI 会话 Store，持有 sessions[]/canvasContext/retryConfig，支持重试模式（3/5/无限）
 - **S61-E4.2**: `useAIAgentContext.ts` — Hook，序列化画布状态为节点/边计数摘要字符串（e.g. "3 nodes, 1 edge, chapters: 需求, 流程"）
@@ -865,7 +844,6 @@
 - **S61-E5.3**: BackupService.test.ts — 14 tests covering export/import/list/delete/format
 - **S61-E5.4**: DDSToolbar integration — backup toolbar button + panel render
 - **S61-E5.5**: i18n — zh.json/en.json canvasBackup key
-
 
 ---
 
@@ -899,7 +877,6 @@
 - **S62-E3.4**: /api/backup route.ts + /api/backup/[canvasId] route.ts — Next.js API routes proxying VIBEX_BACKEND_URL
 - **S62-E3.5**: BackupService.cloud.test.ts 22 passing (AbortSignal-in-jsdom 5 failures pre-existing)
 
-
 ## [Unreleased] S62-E4: 协作 Undo/Redo — 2026-06-04
 - **S62-E4.1**: undoRedoStore — currentOperator + conflictDialog + performUndo/performRedo + checkConflict + showConflict/dismissConflict
 - **S62-E4.2**: wsCollabHandler — broadcastUndo/broadcastRedo + collab:undo/collab:redo message types
@@ -907,7 +884,6 @@
 - **新增文件**: undoRedoStore.ts, __tests__/undoRedoStore.test.ts
 - **修改文件**: wsCollabHandler.ts (新增 collab:undo/redo 消息处理)
 - **测试**: undoRedoStore 13/13 ✅
-
 
 ---
 
@@ -917,7 +893,6 @@
 - **S62-E5.3**: 离线页面 offline.html 支持基础离线提示
 - **S62-E5.4**: OfflineBanner 在 CanvasPage 中渲染，网络断开时显示提示
 - **S62-E5.5**: public/sw.js 新增画布数据缓存层（MAX_CACHED_CANVASES=5, CACHE_TTL=7天），cacheCanvasResponse/evictOldestCanvasEntries/getCachedCanvasResponse/handleCanvasAPI
-
 
 ---
 
@@ -929,7 +904,6 @@
 - **S63-E1.5**: `wsCollabHandler.ts` + `types.ts` — `CursorMoveMessage` 类型扩展
 - **S63-E1.6**: `DDSCanvasPage.tsx` + `DDSFlow.tsx` — `onPaneMouseMove` → `onCursorMove` → WS broadcast 链路
 - **S63-E1**: vitest 23/23 通过 (presenceStore cursor 生命周期 + remoteCursors Map 状态)
-
 
 ---
 
@@ -992,7 +966,6 @@
 - **S64-E5.4**: `src/components/dds/templates/TemplateSaveDialog.tsx` — 保存时选择使用场景标签
 - **S64-E5.5**: `src/stores/templateStore.test.ts` — 10 个 E5 测试用例（filterByTag + setSelectedTags + Fuse.js searchTemplates）
 
-
 ## [Unreleased] S65-E2: 协作者编辑指示器 — 节点聚焦感知 — 2026-06-05
 - **S65-E2.1**: `wsNodeFocusHandler.ts` — `node:focused`/`node:unfocused` WebSocket 消息处理 + broadcastNodeFocus/clearNodeFocus
 - **S65-E2.2**: `presenceStore.ts` — `focusedNodes` (Record<nodeId, userId>) + `focusedNodeInfos` (Record<nodeId, FocusedNodeInfo>) + `setNodeFocus(nodeId, userId)` + `clearNodeFocus(nodeId)` + 30s setTimeout 自动释放
@@ -1002,7 +975,6 @@
 - **S65-E2.6**: 30s 超时自动释放 — `setNodeFocus` 启动 setTimeout 定时器，超时自动调用 `clearNodeFocus`
 - **S65-E2.7**: `presenceStore.test.ts` — 覆盖 focus/lock 逻辑 (57/57 pass)
 - **Test**: 57/57 vitest ✅
-
 
 ## [Unreleased] S65-E3: 画布视图个性化设置面板 — 2026-06-05
 - **S65-E3.1**: `settingsStore.ts` — 统一设置 Store：backgroundColor / gridSize / gridVariant / defaultZoom / snapToGrid，localStorage 持久化
@@ -1014,7 +986,6 @@
 - **S65-E3.7**: `DDSFlow.tsx` — Background 读取 settingsStore（color / variant / gap）+ snapToGrid / snapGrid props + fitView 使用 defaultZoom
 - **S65-E3.10**: `settingsStore.test.ts` — 17/17 vitest 测试通过
 - **Test**: 17/17 vitest ✅
-
 
 ## [Unreleased] S65-E4: 画布搜索与过滤增强 — IndexedDB + Fuse.js 全局搜索 — 2026-06-05
 - **S65-E4.1**: `canvasDb.ts` — IndexedDB 封装：initCanvasDb / saveCanvasMeta / getCanvasMetas / searchCanvases（Fuse.js 模糊搜索，name 权重 0.5，阈值 0.4，includeScore）

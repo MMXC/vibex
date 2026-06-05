@@ -1,6 +1,11 @@
-
-
 ---
+
+## [Unreleased] S65-E5: 模板画廊用户收藏管理 — 2026-06-05
+- **S65-E5.1**: `templateStore.addCustomCategory()` / `removeCustomCategory()` / `incrementUsage()` — 自定义分类管理 + 使用频率统计
+- **S65-E5.2**: Zustand persist middleware 自动持久化 `customCategories` + `stats.usageCount` (localStorage)
+- **S65-E5.3**: `TemplateCard` 📁 按钮 — 自定义分类添加/移除交互
+- **S65-E5.4**: `TemplateGallery` 动态 tabs — 收藏 + 自定义分类 + 新建分类 + 分类过滤
+- **S65-E5.5**: 收藏夹按使用频率排序 (`incrementUsage` → `stats.usageCount`)
 
 ## [Unreleased] S64-E2: 画布版本历史 LRU 缓存 + 恢复 — 2026-06-05
 - **S64-E2.1**: `MAX_SNAPSHOTS = 50` — 导出常量，供 HistoryPanel 使用
@@ -20,7 +25,6 @@
 ---
 
 ## [Unreleased] S58-E2: 桌面文件拖拽导入 — 2026-06-03
-
 
 ---
 
@@ -54,7 +58,6 @@
 - **S60-E5.3**: `DDSSearchPanel.tsx` — 搜索结果关键词高亮（`<mark>` 标签），支持大小写不敏感
 - **S60-E5.4**: `DDSSearchPanel.tsx` — history tab ↑↓ 键盘导航 + Enter 选历史项
 - **S60-E5.5**: vitest: `canvasSearchStore.test.ts` 10/10 + `DDSSearchPanel.test.tsx` 16/16
-
 
 - **S58-E2.1**: `useFileDrop.ts` — drag state management, `.vibex`/`.json`/`.yaml`/`.yml` parse, confirmImport
 - **S58-E2.2**: `DropOverlay.tsx` — full-screen animated overlay during drag
@@ -123,7 +126,6 @@
 - **E2 presenceStore vitest**: 9/9 PASS (setRemoteUsers, updateCursor, removeUser, clearAll, lock/unlock) ✅
 - **E2 IntentionBubble.tsx**: self-contained IntentionType re-export (removed Firebase dependency) ✅
 
-
 ##### S45-P003-E3: 画布 MiniMap + 视口导航
 - **E3 DDSFlow.tsx**: import MiniMap, Controls, Background from @xyflow/react ✅
 - **E3 MiniMapPanel.tsx**: collapsible panel (right side), 150×100px, dark theme, click-to-navigate via handleMiniMapClick + useReactFlow.project() ✅
@@ -162,7 +164,6 @@
 - **E1 useStreamingAgent.ts**: add onChunk callback for streaming progress ✅
 - **E1 AgentFeedbackPanel.tsx**: show received char count during streaming ✅
 - **E1 agentStore.test.ts**: 4 persistence tests (add/update/remove/initAgentSessions), 9 total PASS ✅
-
 
 ##### S44-P002-E2: 画布模板分类 + 搜索 + 收藏
 - **E2 RequirementTemplate.isFavorite**: `src/data/templates/types.ts` — 添加 isFavorite 字段 ✅
@@ -223,7 +224,6 @@
 - **E4 useCanvasExport**: `src/hooks/canvas/useCanvasExport.ts` — html-to-image PNG/SVG 导出 ✅
 - **E4 POST /api/export/pdf**: `src/app/api/export/pdf/route.ts` — jsPDF PDF 生成 ✅
 - **E4 vitest**: `src/hooks/canvas/__tests__/useCanvasExport.test.ts` — validateFileSize 4/4 PASS ✅
-
 
 ##### S43-P002-E5: 快捷键自定义收尾
 - **E5 ShortcutPanel i18n**: `src/components/canvas/features/ShortcutPanel.tsx` — useTranslations('shortcuts') 集成 ✅
@@ -335,7 +335,6 @@
 
 ### [Unreleased] Sprint 39 — P002 WebSocket 实时协作同步层
 
-
 ### [Unreleased] Sprint 40 — P004 Canvas 持久化 + 导入导出
 
 ##### S40-P004-E1: Canvas 持久化 + 导入导出
@@ -366,7 +365,6 @@
 - **E3 OfflineIndicator**: `OfflineIndicator.tsx` — 连接断开时显示 🔴，已集成到 DDSToolbar
 - **E2 Toast 增强**: `conflictToastEmitter` 支持用户ID参数，Toast 显示"⚠️ 与用户X的修改冲突"
 - **E3 WebSocket Close**: WS close 事件触发 setOnlineUsers([])，用户下线自动从列表移除
-
 
 ### [Unreleased] Sprint 40 — P005 键盘快捷键系统完善
 
@@ -440,7 +438,6 @@
 ##### S39-P005-E1: Service Worker 注册 + 静态资源缓存
 - **E1 SWRegistration**: `src/components/sw/SWRegistration.tsx` — navigator.serviceWorker.register("/sw.js") + 错误处理
 - **E1 layout.tsx 集成**: 在 layout.tsx body 中渲染 SWRegistration Client Component
-
 
 ##### S39-P004-E2: Canvas 节点点击 → 视口导航
 - **E2 onNodeClick**: ReactFlow onNodeClick → reactFlow.setViewport() 300ms 动画居中
@@ -551,7 +548,6 @@
 - **frontend CHANGELOG**: `vibex-fronted/CHANGELOG.md` ✅ 已更新
 - **coord self-implement**: tester-epic1 ghost 超过 12h 阈值，coord 自验证 dev commit 后自行完成
 
-
 ##### S38-P002-E2: 冲突检测——5s 窗口内相同节点编辑警告（coord self-implement）
 - **confirmationStore**: 新增 `conflictSnapshots: Record<string,number>` + `conflictNodeIds: Record<string,number>`，JSON 可序列化
 - **oplogStore**: `addOplogEntry` 记录时间戳，5s 冲突窗口检测，`triggerConflictWarning()` + `conflictToastEmitter` 事件桥接
@@ -632,7 +628,6 @@
 - **E1 AI 页面 i18n 化**: `src/app/flow/page.tsx`, `src/app/domain/DomainPageContent.tsx`, `src/app/preview/page.tsx`, `src/app/landing/page.tsx` — 硬编码中文替换为 `t('ai.*')` 调用
 - **E1 ai namespace**: `src/i18n/messages/en.json` + `zh.json` 新增 30 个 key
 - **coord self-implement**: 3353995f2
-
 
 #### F001 — playwright.config.ts 改进（P004-E1）
 
@@ -1161,7 +1156,6 @@
 - **Fix: step data-testid**: PreviewStep data-testid `onboarding-step-4` → `onboarding-step-5`（与 PRD 规格对齐）；`onboarding-skip-btn` 添加；单元测试同步更新
 - **提交**: ceb6cbf73 (feat), 5343a9140 (docs), b360d8c9a (fix), da6488937 (fix), 60203c181 (ESLint fix), 83e7a0c9 (fix step-5 data-testid)
 
-
 ---
 
 ## [Unreleased] S58-E1: 画布版本分支管理 — Snapshot 持久化
@@ -1171,7 +1165,6 @@
 - **E1 快照命名**: 保存快照时弹窗输入名称，默认 "快照 {YYYY-MM-DD HH:mm}"
 - **E1 测试覆盖**: `canvasHistoryStore.test.ts` 新增 Snapshot + E3 Revision 测试，`historyDB.test.ts` 新增 Snapshot CRUD 测试
 - **E1 实现文件**: `canvasHistoryStore.ts` (snapshot state + actions), `historyDB.ts` (DB_VERSION=2, snapshots objectStore), `HistoryPanel.tsx` (双Tab UI), `HistoryPanel.module.css` (SnapshotTab 样式)
-
 
 ## [2026-05-31] - Sprint 46
 
@@ -1273,7 +1266,6 @@
 - **S3 DDSToolbar RBAC buttons**: `DDSToolbar.tsx` — 导出/导入按钮集成 RBAC disabled 逻辑（`canShare`/`canEdit`），导出模态框（JSON/Vibex/OpenAPI/StateMachine）
 - TS: 0 errors ✅；Security ✅；Changelog ✅
 - 提交: 0a64dca25
-
 
 - **Epic1-E2E-Staging-Isolation**: CI E2E 环境强制隔离 staging，禁止生产 fallback
 - **C1 BASE_URL 无生产 fallback**: `.github/workflows/test.yml` — 移除 `|| 'https://vibex.top'` fallback，BASE_URL 严格来自 `${{ vars.BASE_URL }}`
@@ -1746,7 +1738,6 @@
 - **单元测试**: `APIEndpointCard.test.tsx` — 11 个测试用例覆盖 method badge/path/summary/tags/parameters/responses
 - 提交: 581b5ad7
 
-
 ### [Unreleased] vibex-sprint4-spec-canvas-extend E2: 业务规则章节 — 2026-04-18
 - **E2-U1 类型定义**: `types/dds/state-machine.ts` — StateType/TransitionType/SMState/SMTransition/StateMachineCard
 - **E2-U2 StateMachineCard**: `StateMachineCard.tsx` — state list/transition count/selected highlight
@@ -2140,7 +2131,6 @@
   - 刷新后 ReactFlow miniMap scroll 复位修复
 - Tests: `DDSScrollContainer.test.tsx` + `useChapterURLSync.test.ts` passing
 - 提交: `edd08e1d` (feat E2a) / `476ec40d` (test E2a)
-
 
 ### [Unreleased] vibex-dds-canvas-s2 Epic2b: ReactFlow 画布集成 — 2026-04-16
 - **E2b-1 ReactFlow 集成**: `vibex-fronted/src/components/dds/canvas/DDSFlow.tsx`
@@ -2607,7 +2597,6 @@
   - AuthForm useEffect 从 URL 读取 returnTo 参数并持久化到 sessionStorage（供 OAuth 回调使用）
   - validateReturnTo.test.ts: 12 个单元测试 case 全覆盖
   - 提交: 5a2543bb
-
 
 ### Added (vibex E1 Epic3: Next.js auth middleware 测试覆盖) — 2026-04-11
 - **E1 Epic3 middleware 测试**: Next.js middleware 保护路由 + 22个测试 case
@@ -5172,7 +5161,6 @@
   - `canvasStore.test.ts`: 44 个综合测试全部通过
   - Review: `docs/review-reports/20260328/review-vibex-canvas-expand-dir-20260328-epic1.md`
 
-
 # Changelog
 
 ### Added (vibex-canvas-bc-layout-20260328 Epic1: BC卡片布局虚线领域框分组) — 2026-03-28
@@ -5302,7 +5290,6 @@
   - `canvasStore.ts`: `truncateName()` + `slice(0, 10)` 数量限制
   - Review: `docs/review-reports/20260326/review-vibex-step-context-fix-epic3.md`
 
-
 ### Added (vibex-task-state-20260326 Epic1-4: task_state CLI + 乐观锁) — 2026-03-26
 - **Epic1**: `atomic_write_json()` + `save_project_with_lock()` + `load_project_with_rev()` (F1.1-F1.4)
   - tempfile.mkstemp + os.rename 原子写入，乐观锁 revision 比对 + 重试
@@ -5318,7 +5305,6 @@
   - `test_atomic.py` (7 tests): 崩溃恢复、Unicode、契约测试
   - Review: `docs/review-reports/20260326/review-vibex-task-state-20260326-epic4.md`
 - **总计**: 37 task-state tests pass (Epic1-4 全部通过) 🎉
-
 
 All notable changes to this project will be documented in this file.
 
@@ -5474,7 +5460,6 @@ All notable changes to this project will be documented in this file.
 - **SyntaxWarning 修复**: % 格式化替换为 f-strings，编译零警告
 - **测试覆盖**: pytest 13/13 全绿
 
-
 ## [Epic3 Fix] - 2026-03-22
 
 ### Fixed
@@ -5570,7 +5555,6 @@ All notable changes to this project will be documented in this file.
   - 新增: ExportMenu Figma 选项 + PNG 分辨率选择器下拉菜单
   - vitest: useCanvasExport.test.ts 10/10 PASS
   - Vitest 回归: DDSCanvasStore 57/57 PASS
-
 
 
 
@@ -5816,8 +5800,6 @@ See git history for complete changelog.
 - 提交: 6faa55db7
 ---
 
----
-
 ## [Unreleased] S49-E4: 画布版本历史可视化 — 2026-06-01
 - **S49-E4.1 snapshotHistoryStore**: `src/stores/dds/snapshotHistoryStore.ts` — debounce 2s auto-snapshot / MAX_SNAPSHOTS=20 / ai-generate + pre-export trigger / manual snapshot / restoreSnapshot / clearSnapshots
 - **S49-E4.2 Timeline**: `src/components/dds/version-history/Timeline.tsx` — 水平滚动时间轴，颜色 badge（AI生成/导出前/手动），点击选中，下载 JSON / 删除
@@ -5849,7 +5831,6 @@ See git history for complete changelog.
 - **S49-E2.8 Vitest 覆盖**: 新增 16 个测试用例（searchTemplates ×4 / filterByCategory ×2 / renameTemplate ×3 / thumbnailCache ×4）；总计 30 个测试
 - 提交: epic/s49-e2-template-mgmt
 
-
 ---
 
 ## [Unreleased] S49-E3: 大型画布性能优化 v2 — 2026-06-01
@@ -5876,7 +5857,6 @@ See git history for complete changelog.
 - **E4 templateStore.ts**: `exportTemplates()` + `importTemplates()` actions — version 1.0 format
 - **E4 TemplateGallery.tsx**: ⬇️ Export / ⬆️ Import buttons in header
 - **E4 vitest**: templateExport.test.ts + templateImport.test.ts + templateStore E4 tests
-
 
 ## [Unreleased] S50-E1: 画布全局搜索 — 2026-06-02
 - **S50-E1.1 canvasSearchStore**: `keywordIndex` Map + Fuse.js 搜索 + `buildIndex`/`updateIndex`/`search` actions
@@ -5916,7 +5896,6 @@ See git history for complete changelog.
 - **S51-E2.5 Vitest 覆盖**: `exportMultipleAsPNG.test.ts` (4 cases) + `useBatchExport.test.ts` (2 cases)，7/7 通过
 - 提交: epic/s51-e2-png-batch-export
 
-
 ---
 
 ## [Unreleased] S51-E3: MiniMap 节点类型着色 — 2026-06-04
@@ -5946,7 +5925,6 @@ See git history for complete changelog.
 - **S51-E5.6**: `wsCommentHandler.ts` — comment:mention 类型 → mentionsStore 写入 + 未读计数
 - **Tests**: parseMentions 9 tests, mentionsStore 7 tests, vitest 21/21 ✅
 
-
 ---
 
 ## [Unreleased] S52-E2: 批量导出 PNG/SVG/PDF — 2026-06-02
@@ -5961,7 +5939,6 @@ See git history for complete changelog.
 - **S52-E1.1**: `presenceStore.test.ts` 10个测试用例 — setRemoteUsers replace/update/remove semantics, cursor update, node locking, WebSocket message handlers
 - **S52-E1.2**: 复用 S42/S44 WebSocket presence 实现，新增 10 个 vitest cases 覆盖协作感知边界条件
 
-
 ---
 
 ## [Unreleased] S52-E3: Undo/Redo 协作冲突处理 — 2026-06-02
@@ -5973,8 +5950,6 @@ See git history for complete changelog.
 - **S52-E3.5**: `saveHistoryWithRevision()` / `loadHistoryWithRevision()` / `getRevision()` → IndexedDB revision 乐观锁
 - **S52-E3.6**: `wsRevisionHandler` → WebSocket `revision:bump` / `revision:conflict` 消息处理
 - **Test**: 44/44 vitest (15 new E3 revision tests)
-
-
 
 ---
 
@@ -5999,8 +5974,6 @@ See git history for complete changelog.
 - **S52-E5.4**: `shortcutStore.test.ts` → 9 vitest (conflict detection, reset, save)
 - **S52-E5.5**: `DDSToolbar.tsx` → 键盘图标按钮 + ShortcutSettingsPanel modal
 - **Test**: 9/9 vitest
-
-
 
 ---
 
@@ -6038,7 +6011,6 @@ See git history for complete changelog.
 - **S58-E5.5**: `wsConflictHandler.ts` — 冲突解决后发送 `conflict:resolved` 消息
 - **S58-E5.6**: `conflictStore.test.ts` — 6 个 vitest 测试全部通过
 - **S58-E5.7**: `ConflictDialog.test.tsx` — 18 个 vitest 测试全部通过
-
 
 ---
 
@@ -6124,7 +6096,6 @@ See git history for complete changelog.
 - **S61-E3.6**: `en.json`/`zh.json` — 新增 `toolbar`、`common`、`search`、`batchOps` 命名空间翻译键（batchOps 19 key, toolbar 18 key, search 12 key）
 - **S61-E3.7**: vitest: `useLanguage.test.ts` 4/4 通过
 
-
 ## [Unreleased] S61-E4: AI Session 画布上下文集成 — 2026-06-04
 - **S61-E4.1**: `agentStore.ts` — DDS AI 会话 Store，持有 sessions[]/canvasContext/retryConfig，支持重试模式（3/5/无限）
 - **S61-E4.2**: `useAIAgentContext.ts` — Hook，序列化画布状态为节点/边计数摘要字符串（e.g. "3 nodes, 1 edge, chapters: 需求, 流程"）
@@ -6140,7 +6111,6 @@ See git history for complete changelog.
 - **S61-E5.3**: BackupService.test.ts — 14 tests covering export/import/list/delete/format
 - **S61-E5.4**: DDSToolbar integration — backup toolbar button + panel render
 - **S61-E5.5**: i18n — zh.json/en.json canvasBackup key
-
 
 ---
 
@@ -6174,7 +6144,6 @@ See git history for complete changelog.
 - **S62-E3.4**: /api/backup route.ts + /api/backup/[canvasId] route.ts — Next.js API routes proxying VIBEX_BACKEND_URL
 - **S62-E3.5**: BackupService.cloud.test.ts 22 passing (AbortSignal-in-jsdom 5 failures pre-existing)
 
-
 ---
 
 ## [Unreleased] S62-E4: 协作 Undo/Redo — 2026-06-04
@@ -6185,7 +6154,6 @@ See git history for complete changelog.
 - **修改文件**: wsCollabHandler.ts (新增 collab:undo/redo 消息处理)
 - **测试**: undoRedoStore 13/13 ✅
 
-
 ---
 
 ## [Unreleased] S62-E5: 离线 PWA 支持 — 2026-06-04
@@ -6194,7 +6162,6 @@ See git history for complete changelog.
 - **S62-E5.3**: 离线页面 offline.html 支持基础离线提示
 - **S62-E5.4**: OfflineBanner 在 CanvasPage 中渲染，网络断开时显示提示
 - **S62-E5.5**: public/sw.js 新增画布数据缓存层（MAX_CACHED_CANVASES=5, CACHE_TTL=7天），cacheCanvasResponse/evictOldestCanvasEntries/getCachedCanvasResponse/handleCanvasAPI
-
 
 ---
 
@@ -6206,7 +6173,6 @@ See git history for complete changelog.
 - **S63-E1.5**: `wsCollabHandler.ts` + `types.ts` — `CursorMoveMessage` 类型扩展
 - **S63-E1.6**: `DDSCanvasPage.tsx` + `DDSFlow.tsx` — `onPaneMouseMove` → `onCursorMove` → WS broadcast 链路
 - **S63-E1**: vitest 23/23 通过 (presenceStore cursor 生命周期 + remoteCursors Map 状态)
-
 
 ---
 
@@ -6263,7 +6229,6 @@ See git history for complete changelog.
 - **S64-E4.7**: `canvasListStore.e4.test.ts` — 6/6 vitest 测试通过（去重逻辑 + 归档过滤）
 - **Test**: 6/6 vitest ✅
 
-
 ## [Unreleased] S64-E5: 模板画廊搜索增强 — 2026-06-05
 - **S64-E5.1**: `types.ts` — `TemplateTag` 类型定义（`'工作'|'个人'|'教程'|'空白'`） + `TEMPLATE_USE_CASE_TAGS` 配置数组
 - **S64-E5.2**: `templateStore.ts` — `selectedTags` 状态 + `filterByTag()` 交集过滤 + `setSelectedTags()` + 升级 `searchTemplates()` 使用 Fuse.js 模糊搜索（threshold=0.4）
@@ -6271,7 +6236,6 @@ See git history for complete changelog.
 - **S64-E5.4**: `TemplateSaveDialog.tsx` — 保存模板时选择使用场景标签（多选） + 默认标签 `['blank']`
 - **S64-E5.5**: `templateStore.test.ts` — E5 测试用例 10 个：filterByTag 4 个 + setSelectedTags 3 个 + Fuse.js searchTemplates 3 个
 - **Test**: 66/66 vitest ✅（含全部既有测试 + 新增 E5 覆盖）
-
 
 ## [Unreleased] S65-E2: 协作者编辑指示器 — 节点聚焦感知 — 2026-06-05
 - **S65-E2.1**: `wsNodeFocusHandler.ts` — `node:focused`/`node:unfocused` WebSocket 消息处理 + broadcastNodeFocus/clearNodeFocus
@@ -6283,7 +6247,6 @@ See git history for complete changelog.
 - **S65-E2.7**: `presenceStore.test.ts` — 覆盖 focus/lock 逻辑 (57/57 pass)
 - **Test**: 57/57 vitest ✅
 
-
 ## [Unreleased] S65-E3: 画布视图个性化设置面板 — 2026-06-05
 - **S65-E3.1**: `settingsStore.ts` — 统一设置 Store：backgroundColor / gridSize / gridVariant / defaultZoom / snapToGrid，localStorage 持久化
 - **S65-E3.2**: `CanvasSettingsPanel.tsx` — Tab 式设置面板（背景 / 网格 / 缩放 / 快捷键）
@@ -6294,7 +6257,6 @@ See git history for complete changelog.
 - **S65-E3.7**: `DDSFlow.tsx` — Background 读取 settingsStore（color / variant / gap）+ snapToGrid / snapGrid props + fitView 使用 defaultZoom
 - **S65-E3.10**: `settingsStore.test.ts` — 17/17 vitest 测试通过
 - **Test**: 17/17 vitest ✅
-
 
 ## [Unreleased] S65-E4: 画布搜索与过滤增强 — IndexedDB + Fuse.js 全局搜索 — 2026-06-05
 - **S65-E4.1**: `canvasDb.ts` — IndexedDB 封装：initCanvasDb / saveCanvasMeta / getCanvasMetas / searchCanvases（Fuse.js 模糊搜索，name 权重 0.5，阈值 0.4，includeScore）

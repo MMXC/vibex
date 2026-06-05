@@ -40,6 +40,7 @@ import { createDDSAPI } from '@/hooks/dds/useDDSAPI';
 import { useDDSCanvasSearch } from '@/hooks/dds/useDDSCanvasSearch';
 import { DDSSearchPanel } from '@/components/dds/DDSSearchPanel';
 import { SearchPanel } from '@/components/dds/SearchPanel';
+import { GlobalSearchPanel } from '@/components/dds/search/GlobalSearchPanel';
 import { useSearchIndex } from '@/hooks/useSearchIndex';
 import { useCanvasSearchStore } from '@/stores/canvasSearchStore';
 import { useAutoLayout } from '@/hooks/dds/useAutoLayout';
@@ -518,6 +519,7 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
   // P001: useKeyboardShortcuts wired to canvasHistoryStore for DDS canvas undo/redo.
   const [searchPanelOpen, setSearchPanelOpen] = useState(false);
   const [canvasSearchPanelOpen, setCanvasSearchPanelOpen] = useState(false);
+  const [globalSearchPanelOpen, setGlobalSearchPanelOpen] = useState(false);
   const [historyPanelOpen, setHistoryPanelOpen] = useState(false);
   const { query: searchQuery, setQuery: setSearchQuery, results: searchResults, clearResults } =
     useDDSCanvasSearch();
@@ -542,6 +544,18 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
     }
     document.addEventListener('keydown', handleCtrlK);
     return () => document.removeEventListener('keydown', handleCtrlK);
+  }, []);
+
+  // S65-E4: Ctrl+Shift+K / Cmd+Shift+K: toggle GlobalSearchPanel (canvas name fuzzy search)
+  useEffect(() => {
+    function handleGlobalSearch(e: KeyboardEvent) {
+      if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setGlobalSearchPanelOpen((v) => !v);
+      }
+    }
+    document.addEventListener('keydown', handleGlobalSearch);
+    return () => document.removeEventListener('keydown', handleGlobalSearch);
   }, []);
 
   // S62-E1: Escape key — deselect all cards and broadcast editing end
@@ -886,6 +900,12 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
           canvasSetActive(canvasId);
           setCanvasSearchPanelOpen(false);
         }}
+      />
+
+      {/* S65-E4: GlobalSearchPanel — Cmd+Shift+K canvas name fuzzy search */}
+      <GlobalSearchPanel
+        open={globalSearchPanelOpen}
+        onClose={() => setGlobalSearchPanelOpen(false)}
       />
 
       {/* S43-E1: WebSocket PresenceOverlay — replaces Firebase PresenceAvatars + RemoteCursor */}

@@ -207,3 +207,38 @@ global.IntersectionObserver = (function () {
   // Wrap with vi.fn() so vitest recognizes it as a mock (enables .mockImplementationOnce etc.)
   return vi.fn(MockIntersectionObserver as unknown as typeof IntersectionObserver);
 })() as unknown as typeof IntersectionObserver;
+
+// ──────────────────────────────────────────────────────────────────────────────
+// indexedDB mock for jsdom — jsdom has no indexedDB, but stores use it for
+// canvas metadata persistence. Deferred via setTimeout so fake timers can flush.
+// ──────────────────────────────────────────────────────────────────────────────
+{
+  const mockDB = {
+    transaction: vi.fn(() => ({
+      objectStore: vi.fn(() => ({
+        put: vi.fn(() => ({ onsuccess: null, onerror: null })),
+        get: vi.fn(() => ({ onsuccess: null, onerror: null })),
+        delete: vi.fn(() => ({ onsuccess: null, onerror: null })),
+        getAll: vi.fn(() => ({ onsuccess: null, onerror: null })),
+        clear: vi.fn(() => ({ onsuccess: null, onerror: null })),
+      })),
+    })),
+    close: vi.fn(),
+    objectStoreNames: { contains: vi.fn(() => true), length: 0 },
+  };
+
+  // Deferred success — fires after setTimeout, which fake timers can flush
+  globalThis.indexedDB = {
+    open: vi.fn(() => {
+      const req = {
+        onsuccess: null as ((e: { target: unknown }) => void) | null,
+        onerror: null,
+        result: mockDB,
+      } as IDBOpenDBRequest;
+      // Deferred so vi.advanceTimersByTime(0) can flush it in tests
+      setTimeout(() => req.onsuccess?.({ target: req }), 0);
+      return req;
+    }),
+    deleteDatabase: vi.fn(() => ({ onsuccess: null, onerror: null })),
+  } as unknown as IDBFactory;
+}

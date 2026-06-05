@@ -33,7 +33,7 @@ import type { Snapshot } from '@/stores/dds/canvasHistoryStore';
 // ============================================
 
 const DB_NAME = 'vibex-canvas-history';
-const DB_VERSION = 3; // Bumped to 3 for snapshot branchName/isStarred (Sprint60)
+const DB_VERSION = 4; // E1 (Sprint66): branch ops indexes + parentSnapshotId field
 const STORE_NAME = 'history';
 const SNAPSHOTS_STORE_NAME = 'snapshots';
 
@@ -94,6 +94,7 @@ function openDB(): Promise<IDBDatabase> {
 
     request.onupgradeneeded = (event) => {
       const db = (event.target as IDBOpenDBRequest).result;
+      const oldVersion = event.oldVersion;
       // history store (v1)
       if (!db.objectStoreNames.contains(STORE_NAME)) {
         const store = db.createObjectStore(STORE_NAME, { keyPath: 'canvasId' });
@@ -105,6 +106,17 @@ function openDB(): Promise<IDBDatabase> {
         const snapshotStore = db.createObjectStore(SNAPSHOTS_STORE_NAME, { keyPath: ['canvasId', 'snapshotId'] });
         snapshotStore.createIndex('canvasId', 'canvasId', { unique: false });
         snapshotStore.createIndex('timestamp', 'timestamp', { unique: false });
+        snapshotStore.createIndex('branchName', 'branchName', { unique: false }); // E1 (Sprint66)
+        snapshotStore.createIndex('parentSnapshotId', 'parentSnapshotId', { unique: false }); // E1 (Sprint66)
+      } else if (oldVersion < 4) {
+        // E1 (Sprint66): Add indexes for branch operations
+        const snapshotStore = db.transaction(SNAPSHOTS_STORE_NAME, 'versionchange').objectStore(SNAPSHOTS_STORE_NAME);
+        if (!snapshotStore.indexNames.contains('branchName')) {
+          snapshotStore.createIndex('branchName', 'branchName', { unique: false });
+        }
+        if (!snapshotStore.indexNames.contains('parentSnapshotId')) {
+          snapshotStore.createIndex('parentSnapshotId', 'parentSnapshotId', { unique: false });
+        }
       }
     };
   });
@@ -413,6 +425,7 @@ export async function getRevision(canvasId: string): Promise<number> {
 /**
  * E1: Snapshot stored in IndexedDB with compound key (canvasId, snapshotId)
  * E1 (Sprint60): extended with branchName / isStarred
+ * E1 (Sprint65): extended with parentSnapshotId for branch lineage
  */
 interface SnapshotEntry {
   canvasId: string;
@@ -424,6 +437,8 @@ interface SnapshotEntry {
   branchName?: string;
   /** E1 (Sprint60): Whether this snapshot is starred */
   isStarred?: boolean;
+  /** E1 (Sprint65): Parent snapshot ID for branch lineage */
+  parentSnapshotId?: string | null;
 }
 
 function estimateSnapshotSize(entry: SnapshotEntry): number {
@@ -438,6 +453,7 @@ function estimateSnapshotSize(entry: SnapshotEntry): number {
  * E1: Save a snapshot to IndexedDB snapshots store.
  * Compound key: [canvasId, snapshotId]
  * E1 (Sprint60): includes branchName / isStarred
+ * E1 (Sprint65): includes parentSnapshotId
  */
 export async function saveSnapshotToDB(canvasId: string, snapshot: Snapshot): Promise<void> {
   if (!isIndexedDBAvailable()) return;
@@ -450,6 +466,7 @@ export async function saveSnapshotToDB(canvasId: string, snapshot: Snapshot): Pr
     data: snapshot.data,
     branchName: snapshot.branchName,
     isStarred: snapshot.isStarred,
+    parentSnapshotId: snapshot.parentSnapshotId,
   };
 
   await idbPut(entry, SNAPSHOTS_STORE_NAME);
@@ -475,6 +492,7 @@ export async function loadSnapshotFromDB(
     data: entry.data,
     branchName: entry.branchName,
     isStarred: entry.isStarred,
+    parentSnapshotId: entry.parentSnapshotId,
   };
 }
 
@@ -511,6 +529,7 @@ export async function listSnapshotsFromDB(
             data: entry.data,
             branchName: entry.branchName,
             isStarred: entry.isStarred,
+            parentSnapshotId: entry.parentSnapshotId,
           }));
           // E1 (Sprint61): Apply optional filters
           if (filters) {
@@ -576,6 +595,7 @@ export async function updateSnapshotMetadataInDB(
       data: updated.data,
       branchName: updated.branchName,
       isStarred: updated.isStarred,
+      parentSnapshotId: updated.parentSnapshotId,
     },
     SNAPSHOTS_STORE_NAME
   );
@@ -618,4 +638,156 @@ export async function clearSnapshotsFromDB(canvasId: string): Promise<void> {
       })
       .catch(reject);
   });
+}
+
+// ============================================
+// E1 (Sprint66): Branch Operations
+// ============================================
+
+/**
+ * E1 (Sprint66): Rename all snapshots in a branch (bulk update branchName).
+ */
+export async function renameBranchInDB(
+  canvasId: string,
+  oldBranchName: string,
+  newBranchName: string
+): Promise<void> {
+  if (!isIndexedDBAvailable()) return;
+
+  const snapshots = await listSnapshotsFromDB(canvasId, { branch: oldBranchName });
+  const pending = snapshots.length;
+  if (pending === 0) return;
+
+  return new Promise((resolve, reject) => {
+    openDB()
+      .then((db) => {
+        const tx = db.transaction(SNAPSHOTS_STORE_NAME, 'readwrite');
+        const store = tx.objectStore(SNAPSHOTS_STORE_NAME);
+        let done = 0;
+        let errors = 0;
+
+        for (const snap of snapshots) {
+          const entry: SnapshotEntry = {
+            canvasId,
+            snapshotId: snap.id,
+            name: snap.name,
+            timestamp: snap.timestamp,
+            data: snap.data,
+            branchName: newBranchName,
+            isStarred: snap.isStarred,
+            parentSnapshotId: snap.parentSnapshotId,
+          };
+          const req = store.put(entry);
+          req.onsuccess = () => {
+            done++;
+            if (done + errors === pending) done === pending ? resolve() : reject(new Error(`${errors} renameBranch errors`));
+          };
+          req.onerror = () => {
+            errors++;
+            done++;
+            if (done === pending) reject(new Error(`${errors} renameBranch errors`));
+          };
+        }
+      })
+      .catch(reject);
+  });
+}
+
+/**
+ * E1 (Sprint66): Delete all snapshots in a branch (bulk delete).
+ */
+export async function deleteBranchFromDB(canvasId: string, branchName: string): Promise<void> {
+  if (!isIndexedDBAvailable()) return;
+
+  const snapshots = await listSnapshotsFromDB(canvasId, { branch: branchName });
+  if (snapshots.length === 0) return;
+
+  return new Promise((resolve, reject) => {
+    openDB()
+      .then((db) => {
+        const tx = db.transaction(SNAPSHOTS_STORE_NAME, 'readwrite');
+        const store = tx.objectStore(SNAPSHOTS_STORE_NAME);
+        let done = 0;
+        let errors = 0;
+
+        for (const snap of snapshots) {
+          const req = store.delete([canvasId, snap.id]);
+          req.onsuccess = () => {
+            done++;
+            if (done + errors === snapshots.length) done === snapshots.length ? resolve() : reject(new Error(`${errors} deleteBranch errors`));
+          };
+          req.onerror = () => {
+            errors++;
+            done++;
+            if (done === snapshots.length) reject(new Error(`${errors} deleteBranch errors`));
+          };
+        }
+      })
+      .catch(reject);
+  });
+}
+
+/**
+ * E1 (Sprint66): Merge source branch into target branch.
+ * All source snapshots get branchName → targetBranch and parentSnapshotId → targetTipId.
+ * targetTipId = snapshot with latest timestamp in target branch (null if target has no snapshots).
+ */
+export async function mergeBranchInDB(
+  canvasId: string,
+  sourceBranch: string,
+  targetBranch: string,
+  targetTipSnapshotId: string | null
+): Promise<void> {
+  if (!isIndexedDBAvailable()) return;
+
+  const sourceSnaps = await listSnapshotsFromDB(canvasId, { branch: sourceBranch });
+  if (sourceSnaps.length === 0) return;
+
+  return new Promise((resolve, reject) => {
+    openDB()
+      .then((db) => {
+        const tx = db.transaction(SNAPSHOTS_STORE_NAME, 'readwrite');
+        const store = tx.objectStore(SNAPSHOTS_STORE_NAME);
+        let done = 0;
+        let errors = 0;
+
+        for (const snap of sourceSnaps) {
+          const entry: SnapshotEntry = {
+            canvasId,
+            snapshotId: snap.id,
+            name: snap.name,
+            timestamp: snap.timestamp,
+            data: snap.data,
+            branchName: targetBranch,
+            isStarred: snap.isStarred,
+            parentSnapshotId: targetTipSnapshotId,
+          };
+          const req = store.put(entry);
+          req.onsuccess = () => {
+            done++;
+            if (done + errors === sourceSnaps.length) done === sourceSnaps.length ? resolve() : reject(new Error(`${errors} mergeBranch errors`));
+          };
+          req.onerror = () => {
+            errors++;
+            done++;
+            if (done === sourceSnaps.length) reject(new Error(`${errors} mergeBranch errors`));
+          };
+        }
+      })
+      .catch(reject);
+  });
+}
+
+/**
+ * E1 (Sprint66): List all unique branch names for a canvas.
+ */
+export async function listBranchesFromDB(canvasId: string): Promise<string[]> {
+  if (!isIndexedDBAvailable()) return [];
+
+  const snapshots = await listSnapshotsFromDB(canvasId);
+  const branchSet = new Set<string>(['main']); // always include 'main'
+  for (const snap of snapshots) {
+    if (snap.branchName) branchSet.add(snap.branchName);
+  }
+  return Array.from(branchSet);
 }

@@ -7,6 +7,24 @@ import TimelineView from './TimelineView';
 import SnapshotDiffDialog from './SnapshotDiffDialog';
 import SnapshotPreview from './SnapshotPreview';
 
+/** E1 (Sprint66): Branch merge dialog props */
+export interface BranchMergeDialogProps {
+  open: boolean;
+  sourceBranch: string;
+  targetBranch: string;
+  branches: string[];
+  onMerge: (source: string, target: string) => void;
+  onClose: () => void;
+}
+
+/** E1 (Sprint66): Branch rename dialog props */
+export interface BranchRenameDialogProps {
+  open: boolean;
+  branch: string;
+  onRename: (oldName: string, newName: string) => void;
+  onClose: () => void;
+}
+
 export interface HistoryPanelProps {
   /** Whether the panel is open */
   open: boolean;
@@ -74,6 +92,15 @@ const HistoryPanel = React.memo(function HistoryPanel({
   const compareSnapshots = useCanvasHistoryStore((s) => s.compareSnapshots);
   const updateSnapshotMetadata = useCanvasHistoryStore((s) => s.updateSnapshotMetadata);
   const deleteSnapshot = useCanvasHistoryStore((s) => s.deleteSnapshot);
+  // E1 (Sprint66): Branch operations
+  const renameBranch = useCanvasHistoryStore((s) => s.renameBranch);
+  const deleteBranch = useCanvasHistoryStore((s) => s.deleteBranch);
+  const mergeBranch = useCanvasHistoryStore((s) => s.mergeBranch);
+
+  // E1 (Sprint66): Branch operation menu state
+  const [openMenuBranch, setOpenMenuBranch] = useState<string | null>(null);
+  const [renameDialog, setRenameDialog] = useState<{ open: boolean; branch: string }>({ open: false, branch: '' });
+  const [mergeDialog, setMergeDialog] = useState<{ open: boolean; source: string; target: string }>({ open: false, source: '', target: '' });
 
   // Reset state when panel opens
   useEffect(() => {
@@ -130,6 +157,39 @@ const HistoryPanel = React.memo(function HistoryPanel({
       return next;
     });
   }, []);
+
+  // E1 (Sprint66): Branch operations
+  const handleBranchMenuOpen = useCallback((branch: string) => {
+    setOpenMenuBranch((prev) => (prev === branch ? null : branch));
+  }, []);
+
+  const handleBranchRename = useCallback(async (oldName: string, newName: string) => {
+    if (!newName.trim() || newName === oldName) { setRenameDialog({ open: false, branch: '' }); return; }
+    await renameBranch('', oldName, newName.trim());
+    setRenameDialog({ open: false, branch: '' });
+    setOpenMenuBranch(null);
+  }, [renameBranch]);
+
+  const handleBranchDelete = useCallback(async (branch: string) => {
+    if (!confirm(`确定删除分支 "${branch}" 及其所有快照吗？此操作不可恢复。`)) { setOpenMenuBranch(null); return; }
+    await deleteBranch('', branch);
+    setOpenMenuBranch(null);
+  }, [deleteBranch]);
+
+  const handleBranchMerge = useCallback(async (source: string, target: string) => {
+    if (source === target) { setMergeDialog({ open: false, source: '', target: '' }); return; }
+    await mergeBranch('', source, target);
+    setMergeDialog({ open: false, source: '', target: '' });
+    setOpenMenuBranch(null);
+  }, [mergeBranch]);
+
+  // Close menus on outside click
+  useEffect(() => {
+    if (!openMenuBranch) return;
+    const handler = () => setOpenMenuBranch(null);
+    document.addEventListener('click', handler);
+    return () => document.removeEventListener('click', handler);
+  }, [openMenuBranch]);
 
   if (!open) return null;
 
@@ -192,6 +252,46 @@ const HistoryPanel = React.memo(function HistoryPanel({
               <option key={b} value={b}>{b === 'main' ? '主分支' : b}</option>
             ))}
           </select>
+        )}
+        {/* E1 (Sprint66): Branch operation menus */}
+        {branches.length > 1 && (
+          <div className="branch-ops-list" aria-label="分支管理">
+            {branches.map((branch) => (
+              <div key={branch} className={`branch-ops-item ${branchFilter === branch ? 'active' : ''}`}>
+                <span
+                  className="branch-ops-name"
+                  onClick={() => handleBranchFilter(branch)}
+                  title={`筛选到分支: ${branch}`}
+                >
+                  {branch === 'main' ? '🌿' : '📂'} {branch}
+                </span>
+                <div className="branch-ops-actions">
+                  <button
+                    className="branch-ops-btn"
+                    onClick={(e) => { e.stopPropagation(); setRenameDialog({ open: true, branch }); setOpenMenuBranch(null); }}
+                    title="重命名分支"
+                    aria-label={`重命名分支 ${branch}`}
+                  >✎</button>
+                  {branch !== 'main' && (
+                    <>
+                      <button
+                        className="branch-ops-btn"
+                        onClick={(e) => { e.stopPropagation(); setMergeDialog({ open: true, source: branch, target: branches.find((b) => b !== branch) ?? 'main' }); setOpenMenuBranch(null); }}
+                        title="合并到其他分支"
+                        aria-label={`合并分支 ${branch}`}
+                      >↗</button>
+                      <button
+                        className="branch-ops-btn danger"
+                        onClick={(e) => { e.stopPropagation(); handleBranchDelete(branch); }}
+                        title="删除分支"
+                        aria-label={`删除分支 ${branch}`}
+                      >🗑</button>
+                    </>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
         )}
         <span className="history-filter-count" aria-live="polite">
           {filteredSnapshots.length} 个快照
@@ -348,6 +448,69 @@ const HistoryPanel = React.memo(function HistoryPanel({
             >
               ✕
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* E1 (Sprint66): Branch Rename Dialog */}
+      {renameDialog.open && (
+        <div className="snapshot-dialog-overlay" onClick={() => setRenameDialog({ open: false, branch: '' })}>
+          <div className="snapshot-dialog" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-label="重命名分支">
+            <h3 className="dialog-title">重命名分支</h3>
+            <p className="dialog-desc">将分支 <strong>{renameDialog.branch}</strong> 重命名为：</p>
+            <input
+              className="dialog-input"
+              type="text"
+              id="branch-rename-input"
+              defaultValue={renameDialog.branch}
+              autoFocus
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  const val = (e.target as HTMLInputElement).value;
+                  handleBranchRename(renameDialog.branch, val);
+                }
+              }}
+            />
+            <div className="dialog-actions">
+              <button className="dialog-btn cancel" onClick={() => setRenameDialog({ open: false, branch: '' })}>取消</button>
+              <button
+                className="dialog-btn confirm"
+                onClick={(e) => {
+                  const input = document.getElementById('branch-rename-input') as HTMLInputElement;
+                  handleBranchRename(renameDialog.branch, input?.value ?? '');
+                }}
+              >确认</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* E1 (Sprint66): Branch Merge Dialog */}
+      {mergeDialog.open && (
+        <div className="snapshot-dialog-overlay" onClick={() => setMergeDialog({ open: false, source: '', target: '' })}>
+          <div className="snapshot-dialog" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-label="合并分支">
+            <h3 className="dialog-title">合并分支</h3>
+            <p className="dialog-desc">将 <strong>{mergeDialog.source}</strong> 合并到：</p>
+            <select
+              className="dialog-select"
+              id="branch-merge-target"
+              defaultValue={mergeDialog.target}
+            >
+              {branches.filter((b) => b !== mergeDialog.source).map((b) => (
+                <option key={b} value={b}>{b === 'main' ? '主分支 (main)' : b}</option>
+              ))}
+            </select>
+            <p className="dialog-hint">源分支的所有快照将被移至目标分支，目标分支名称保持不变。</p>
+            <div className="dialog-actions">
+              <button className="dialog-btn cancel" onClick={() => setMergeDialog({ open: false, source: '', target: '' })}>取消</button>
+              <button
+                className="dialog-btn confirm"
+                onClick={() => {
+                  const sel = document.getElementById('branch-merge-target') as HTMLSelectElement;
+                  handleBranchMerge(mergeDialog.source, sel?.value ?? 'main');
+                }}
+              >合并</button>
+            </div>
           </div>
         </div>
       )}

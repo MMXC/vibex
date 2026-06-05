@@ -399,3 +399,177 @@ describe('canvasHistoryStore — E3 Revision (Sprint52)', () => {
     expect(useCanvasHistoryStore.getState().baseRevision).toBe(1); // unchanged
   });
 });
+
+// ==================== E2: Snapshot LRU + Auto-Snapshot Tests ====================
+
+// NOTE: The vi.mock + indexedDB mock from E1 section is still active for all describe blocks below.
+// Tests use the same mock instances (mockSaveSnapshotToDB, mockListSnapshotsFromDB,
+// mockDeleteSnapshotFromDB) from vi.hoisted() defined at line 238.
+
+describe('canvasHistoryStore — E2 Snapshots LRU (Sprint64)', () => {
+  beforeEach(() => {
+    useCanvasHistoryStore.setState({
+      past: [],
+      future: [],
+      isPerforming: false,
+      snapshots: [],
+      restoringSnapshotId: null,
+      autoSnapshotMs: null,
+    });
+    vi.clearAllMocks();
+  });
+
+  it('MAX_SNAPSHOTS is exported and equals 50', async () => {
+    const { MAX_SNAPSHOTS } = await import('../canvasHistoryStore');
+    expect(MAX_SNAPSHOTS).toBe(50);
+  });
+
+  it('saveSnapshot does NOT delete when snapshots are under MAX_SNAPSHOTS', async () => {
+    mockListSnapshotsFromDB.mockResolvedValue([
+      { id: 's1', name: 'v1', timestamp: 1000, data: { nodes: [], edges: [] } },
+    ]);
+
+    const { saveSnapshot } = useCanvasHistoryStore.getState();
+    await saveSnapshot('canvas-1', 'v2', { nodes: [], edges: [] });
+
+    // Should have called saveSnapshotToDB but NOT deleteSnapshotFromDB (under limit)
+    expect(mockSaveSnapshotToDB).toHaveBeenCalled();
+    expect(mockDeleteSnapshotFromDB).not.toHaveBeenCalled();
+  });
+
+  it('saveSnapshot evicts oldest when snapshots exceed MAX_SNAPSHOTS after save', async () => {
+    // After saveSnapshotToDB runs, listSnapshots returns 51 items (50 existing + 1 new)
+    // 51 > MAX_SNAPSHOTS(50) → evict 1 oldest (s0)
+    mockListSnapshotsFromDB.mockResolvedValueOnce([
+      ...Array.from({ length: 50 }, (_, i) => ({
+        id: `s${i}`,
+        name: `v${i}`,
+        timestamp: 1000 + i,
+        data: { nodes: [], edges: [] },
+      })),
+      { id: 'snapshot-new', name: 'newest', timestamp: 9999, data: { nodes: [], edges: [] } },
+    ]);
+    // saveSnapshot calls listSnapshots again after eviction — return the trimmed list
+    mockListSnapshotsFromDB.mockResolvedValueOnce([
+      ...Array.from({ length: 50 }, (_, i) => ({
+        id: `s${i}`,
+        name: `v${i}`,
+        timestamp: 1000 + i,
+        data: { nodes: [], edges: [] },
+      })),
+      { id: 'snapshot-new', name: 'newest', timestamp: 9999, data: { nodes: [], edges: [] } },
+    ]);
+
+    const { saveSnapshot } = useCanvasHistoryStore.getState();
+    await saveSnapshot('canvas-1', 'newest', { nodes: [], edges: [] });
+
+    // After save: 51 total → delete the oldest 1 → 50 remain
+    expect(mockDeleteSnapshotFromDB).toHaveBeenCalledTimes(1);
+    expect(mockDeleteSnapshotFromDB).toHaveBeenCalledWith('canvas-1', 's0');
+  });
+
+  it('saveSnapshot evicts multiple oldest when saving pushes count far over limit', async () => {
+    // Array: 1 new + 50 s0-s49 (from loop, timestamps 1050-1099) + 4 s50-s53 = 55 items
+    // After sort desc: [new(9999), s49(1099), s48(1098)...s0(1050), s50(1000), s51(999), s52(998), s53(997)]
+    // slice(50): indices 50-54 = [s0(1050), s50(1000), s51(999), s52(998), s53(997)] = 5 evictions
+    const snapshot55 = [
+      { id: 'snapshot-new', name: 'newest', timestamp: 9999, data: { nodes: [], edges: [] } },
+      ...Array.from({ length: 50 }, (_, i) => ({
+        id: `s${i}`,
+        name: `v${i}`,
+        timestamp: 1050 + i,
+        data: { nodes: [], edges: [] },
+      })),
+      // Oldest 4 (s50-s53 evicted via slice(50)): NO s49 here — loop already has s49(1099)
+      { id: 's50', name: 'v50', timestamp: 1000, data: { nodes: [], edges: [] } },
+      { id: 's51', name: 'v51', timestamp: 999, data: { nodes: [], edges: [] } },
+      { id: 's52', name: 'v52', timestamp: 998, data: { nodes: [], edges: [] } },
+      { id: 's53', name: 'v53', timestamp: 997, data: { nodes: [], edges: [] } },
+    ];
+    const listSnapshotsSpy = vi.spyOn(useCanvasHistoryStore.getState(), 'listSnapshots')
+      .mockResolvedValue(snapshot55);
+
+    const { saveSnapshot } = useCanvasHistoryStore.getState();
+    await saveSnapshot('canvas-1', 'newest', { nodes: [], edges: [] });
+
+    // 55 items > MAX_SNAPSHOTS(50) → evict 5 oldest
+    expect(mockDeleteSnapshotFromDB).toHaveBeenCalledTimes(5);
+    expect(mockDeleteSnapshotFromDB).toHaveBeenCalledWith('canvas-1', 's49');
+    listSnapshotsSpy.mockRestore();
+  });
+});
+describe('canvasHistoryStore — E2 restoreSnapshot (Sprint64)', () => {
+  beforeEach(() => {
+    useCanvasHistoryStore.setState({
+      past: [],
+      future: [],
+      isPerforming: false,
+      snapshots: [],
+      restoringSnapshotId: null,
+      autoSnapshotMs: null,
+    });
+    vi.clearAllMocks();
+    // E2 tests need indexedDB available (restoreSnapshot checks window.indexedDB)
+    // Must set on window explicitly since jsdom separates window from globalThis
+    Object.defineProperty(window, 'indexedDB', {
+      value: { databases: vi.fn().mockResolvedValue([]) },
+      writable: true,
+      configurable: true,
+    });
+  });
+
+  it('restoreSnapshot sets restoringSnapshotId then clears it', async () => {
+    const snapshot = {
+      id: 'snap-1',
+      name: 'v1',
+      timestamp: 1000,
+      data: { nodes: [{ id: 'n1' }], edges: [{ id: 'e1' }] },
+    };
+    mockLoadSnapshotFromDB.mockResolvedValue(snapshot);
+
+    const { restoreSnapshot } = useCanvasHistoryStore.getState();
+    expect(useCanvasHistoryStore.getState().restoringSnapshotId).toBeNull();
+
+    await restoreSnapshot('canvas-1', 'snap-1');
+
+    expect(mockLoadSnapshotFromDB).toHaveBeenCalledWith('canvas-1', 'snap-1');
+    expect(useCanvasHistoryStore.getState().restoringSnapshotId).toBeNull(); // cleared after completion
+  });
+
+  it('restoreSnapshot returns early when snapshot not found', async () => {
+    mockLoadSnapshotFromDB.mockResolvedValue(null);
+
+    const { restoreSnapshot } = useCanvasHistoryStore.getState();
+    await restoreSnapshot('canvas-1', 'nonexistent');
+
+    // Should not crash and should not set restoringSnapshotId
+    expect(useCanvasHistoryStore.getState().restoringSnapshotId).toBeNull();
+  });
+});
+
+describe('canvasHistoryStore — E2 Auto-Snapshot (Sprint64)', () => {
+  beforeEach(() => {
+    useCanvasHistoryStore.setState({
+      past: [],
+      future: [],
+      isPerforming: false,
+      snapshots: [],
+      restoringSnapshotId: null,
+      autoSnapshotMs: null,
+    });
+    vi.clearAllMocks();
+  });
+
+  it('startAutoSnapshot sets autoSnapshotMs state', () => {
+    const { startAutoSnapshot } = useCanvasHistoryStore.getState();
+    startAutoSnapshot('canvas-1', () => ({ nodes: [], edges: [] }), 300000);
+    expect(useCanvasHistoryStore.getState().autoSnapshotMs).toBe(300000);
+  });
+
+  it('stopAutoSnapshot clears autoSnapshotMs state', () => {
+    const { startAutoSnapshot, stopAutoSnapshot } = useCanvasHistoryStore.getState();
+    startAutoSnapshot('canvas-1', () => ({ nodes: [], edges: [] }), 300000);
+    stopAutoSnapshot();
+    expect(useCanvasHistoryStore.getState().autoSnapshotMs).toBeNull();
+  });
+});

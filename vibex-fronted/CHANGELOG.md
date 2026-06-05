@@ -1052,11 +1052,3 @@
 - **Test**: 5/5 vitest ✅
 
 ---
-
-## [Unreleased] S66-E2: 协作者冲突检测与通知 — 2026-06-06
-- **E2.1**: `presenceStore.ts` — `nodeLocks: Map<string, NodeLockInfo>` 状态; `focusNode(nodeId)` 记录锁定 + 30s auto-release timer; `blurNode(nodeId)` 清除; `isNodeLockedByOther(nodeId)` 查询; `handleNodeFocusMessage`/`handleNodeBlurMessage` WS 消息处理
-- **E2.2**: `wsNodeFocusHandler.ts` — `node:focus`/`node:blur` case handlers; `NodeFocusMessage`/`NodeBlurMessage` interfaces
-- **E2.3**: `NodeLockedToast.tsx` — `useNodeLockedToast()` hook，锁定时显示 warning toast (4s)
-- **E2.4**: `DDSFlow.tsx` — 读取 `presenceStore.nodeLocks`; `handleNodeClick` 拦截 + toast; `handleNodesChange` 拦截拖拽
-- **E2.5**: `CardRenderer.tsx` — 读取 `presenceStore.nodeLocks`; 锁定节点显示金色边框 (`outline: 2px solid #f59e0b`) + 🔒 角标
-- **Test**: vitest presenceStore 57/57 ✅, collab 74/74 ✅

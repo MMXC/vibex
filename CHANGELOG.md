@@ -7,6 +7,11 @@
 
 ---
 
+## [Unreleased] S66-E1: 画布分支操作 — 2026-06-06
+- **E1.1**: `historyDB.ts` — DB_VERSION=4, parentSnapshotId field in SnapshotEntry/load/update, branchName+parentSnapshotId indexes in onupgradeneeded
+- **E1.2**: `historyDB.ts` — renameBranchInDB/deleteBranchFromDB/mergeBranchInDB/listBranchesFromDB (bulk IndexedDB operations)
+- **E1.3**: `canvasHistoryStore.ts` — renameBranch/deleteBranch/mergeBranch/listBranches actions (auto-refresh snapshots list after each op)
+
 ## [Unreleased] S66-E4: 模板高级搜索与过滤 — 标签自定义 + 日期范围 + URL 持久化 — 2026-06-06
 - **E4.1**: `templateStore.ts` — FilterOptions 状态 + setFilterOptions / applyFilters / search / addCustomTag / removeCustomTag / getCustomTags; applyFiltersImpl 实现 AND-标签 + 日期范围过滤
 - **E4.2**: `TagSelector.tsx` — 自定义标签多选下拉（预定义标签 + 自定义输入 + 本地持久化）; 集成 TEMPLATE_USE_CASE_TAGS
@@ -6301,11 +6306,3 @@ See git history for complete changelog.
 - **Test**: 5/5 vitest ✅
 
 ---
-
-## [Unreleased] S66-E2: 协作者冲突检测与通知 — 2026-06-06
-- **E2.1**: `presenceStore.ts` — `nodeLocks: Map<string, NodeLockInfo>` 状态; `focusNode(nodeId)` 记录锁定 + 30s auto-release timer; `blurNode(nodeId)` 清除; `isNodeLockedByOther(nodeId)` 查询; `handleNodeFocusMessage`/`handleNodeBlurMessage` WS 消息处理
-- **E2.2**: `wsNodeFocusHandler.ts` — `node:focus`/`node:blur` case handlers; `NodeFocusMessage`/`NodeBlurMessage` interfaces
-- **E2.3**: `NodeLockedToast.tsx` — `useNodeLockedToast()` hook，锁定时显示 warning toast (4s)
-- **E2.4**: `DDSFlow.tsx` — 读取 `presenceStore.nodeLocks`; `handleNodeClick` 拦截 + toast; `handleNodesChange` 拦截拖拽
-- **E2.5**: `CardRenderer.tsx` — 读取 `presenceStore.nodeLocks`; 锁定节点显示金色边框 (`outline: 2px solid #f59e0b`) + 🔒 角标
-- **Test**: vitest presenceStore 57/57 ✅, collab 74/74 ✅

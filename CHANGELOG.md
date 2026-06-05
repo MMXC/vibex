@@ -1,3 +1,10 @@
+## [Unreleased] S66-E5: 协作会话历史与回放 — 2026-06-06
+
+- **E5.1**: `collabSessionStore.ts` — Zustand store + IndexedDB persistence (idb); startRecording/stopRecording CRUD; SessionEvent types: node:focused/unfocused/focus/blur, cursor:move, user:join/leave, editing:start/end; Replay engine: speed control (0.5x/1x/2x/4x), pause/resume/stop; SESSION_EVENT_LABELS zh-CN
+- **E5.2**: `wsSessionCaptureHandler.ts` — WebSocket event capture; registers with CollabWebSocket subscribe; forwards all collab events to session store when recording
+- **E5.3**: `SessionReplayPanel.tsx` + `SessionReplayPanel.module.css` — React UI; recording controls (start/stop with name input); session list with CRUD; replay controls (play/pause/stop, speed selector); progress bar + current event display; full event timeline
+- **E5.4**: `collabSessionStore.test.ts` — vitest 8/8 ✅
+
 ---
 
 ## [Unreleased] S66-E4: 模板高级搜索与过滤 — 标签自定义 + 日期范围 + URL 持久化 — 2026-06-06

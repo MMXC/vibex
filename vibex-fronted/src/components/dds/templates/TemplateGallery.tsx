@@ -23,6 +23,7 @@ import { TemplateExportDialog } from './TemplateExportDialog';
 import { TemplateShareDialog } from './TemplateShareDialog';
 import { ImportFromUrlDialog } from './ImportFromUrlDialog';
 import { TemplateAnalytics } from './TemplateAnalytics';
+import { TemplateMarketplacePanel } from './TemplateMarketplacePanel';
 import { CategoryTab, type CategoryTabValue, type CanvasCategory } from './CategoryTab';
 import { TagSelector } from './TagSelector';
 import { DateRangePicker } from './DateRangePicker';
@@ -67,6 +68,8 @@ export function TemplateGallery({ isOpen, onClose, onTemplateApplied }: Template
   const [exportDialogOpen, setExportDialogOpen] = useState(false);
   // ---- E3: 模板分析面板 ----
   const [showAnalytics, setShowAnalytics] = useState(false);
+  // ---- E2: 模板市场发现面板 ----
+  const [showMarketplace, setShowMarketplace] = useState(false);
   // ---- E3: Share Dialog state ----
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const [shareTemplateId, setShareTemplateId] = useState<string | null>(null);
@@ -296,13 +299,26 @@ export function TemplateGallery({ isOpen, onClose, onTemplateApplied }: Template
           selected={selectedCategory as CategoryTabValue}
           onSelect={(cat) => {
             if (cat === 'discover') {
-              setImportUrlDialogOpen(true);
+              setShowMarketplace(true);
               return;
             }
             setSelectedCategory(cat);
+            setShowMarketplace(false);
             if (showAnalytics) setShowAnalytics(false);
           }}
         />
+
+        {/* ---- E2: Template Marketplace Panel ---- */}
+        {showMarketplace && (
+          <div className={styles.marketplaceWrapper}>
+            <TemplateMarketplacePanel
+              onTemplateSelect={(templateId) => {
+                applyTemplate(templateId);
+                setShowMarketplace(false);
+              }}
+            />
+          </div>
+        )}
 
         {/* ---- E3: Analytics Panel ---- */}
         {showAnalytics && (

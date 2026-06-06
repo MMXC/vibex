@@ -1279,3 +1279,18 @@
 - **E4.2**: `vibex-fronted/src/stores/dds/canvasAnalyticsStore.ts` — `archiveHistory`/`getHistory`/`shareAnalytics`/`exportAnalytics` 扩展
 - **E4.3**: `vibex-fronted/src/stores/dds/__tests__/canvasAnalyticsStore.test.ts` — 8 tests: archiveHistory/getHistory/shareAnalytics/exportAnalytics
 - **E4.4**: `vibex-fronted/src/components/dds/analytics/__tests__/AnalyticsTrendChart.test.tsx` — 5 tests: header/bar toggle/share
+## [Unreleased] S73-E1: 画布内容全文搜索 — 2026-06-07
+- **E1.1**: `canvasSearchStore.ts` — `searchNodes(query)` 同步方法，返回 fulltextResults；re-export `NodeSearchResult` 类型
+- **E1.2**: `CanvasSearchPanel.tsx` — 浮动搜索面板，Cmd/Ctrl+F 呼出，含搜索输入、HighlightMatch 高亮、结果点击滚动
+- **E1.3**: `DDSCanvasPage.tsx` — 集成 CanvasSearchPanel，添加 `canvas:scroll-to-node` 事件监听实现节点滚动定位
+- **E1.4**: `canvasSearchStore.test.ts` — 新增 `describe('searchNodes — S73-E1 D1.1')` 4 用例
+- **E1.5**: `CanvasSearchPanel.test.tsx` — 新建集成测试 16 用例
+
+---
+
+## [Unreleased] S73-E1: 画布内容全文搜索 — 2026-06-07
+- **E1.1**: `canvasSearchStore.ts` — `searchNodes(query)` 同步方法，返回 fulltextResults；re-export `NodeSearchResult` 类型
+- **E1.2**: `CanvasSearchPanel.tsx` — 浮动搜索面板，Cmd/Ctrl+F 呼出，含搜索输入、HighlightMatch 高亮、结果点击滚动
+- **E1.3**: `DDSCanvasPage.tsx` — 集成 CanvasSearchPanel，添加 `canvas:scroll-to-node` 事件监听实现节点滚动定位
+- **E1.4**: `canvasSearchStore.test.ts` — 新增 `describe('searchNodes — S73-E1 D1.1')` 4 用例
+- **E1.5**: `CanvasSearchPanel.test.tsx` — 新建集成测试 16 用例

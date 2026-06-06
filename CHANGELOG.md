@@ -6375,3 +6375,14 @@ See git history for complete changelog.
 - **E3.2**: `canvasSearchStore.ts` — 新增 `fulltextQuery/fulltextResults/fulltextLoading` + `searchNodeContent()`
 - **E3.3**: `GlobalSearchPanel.tsx` — 新增 Tab2（节点内容），Tab1（画布名称），键盘导航完整保留
 - **E3.4**: `canvasSearchStore.test.ts` — 12项测试全部通过
+
+
+---
+
+## [Unreleased] S68-E4: 批量操作画布节点复制/导出 — 2026-06-13
+- **E4.1**: `canvasListStore.ts` — `copyNodesBetweenCanvases(srcCanvasId, nodeIds, destCanvasId)` copies CanvasMeta entries with new IDs, appends " (副本)" suffix
+- **E4.2**: `canvasListStore.ts` — `batchTemplateExport(canvasIds)` exports `.vbtmpl` JSON blob with type `canvas-meta-template`, triggers browser download
+- **E4.3**: `CrossCanvasCopyDialog.tsx` — modal dialog for selecting source → destination canvas copy operation
+- **E4.4**: `BatchDeleteConfirmDialog.tsx` — confirmation dialog for multi-canvas deletion
+- **E4.5**: i18n keys under `batchOps` namespace: zh.json + en.json (`copyToCanvas`, `copyTo`, `exportAsTemplate`, `copiedToCanvas`, `templateExported`, `itemsCopied`)
+- **E4.6**: `canvasListStore.batchOps.test.ts` — 13 unit tests (vitest 13/13)

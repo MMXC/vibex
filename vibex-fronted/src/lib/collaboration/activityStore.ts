@@ -1,12 +1,14 @@
 /**
  * activityStore — Zustand store for collaboration activity feed
  * S60-E3: 协作活动流 + 在线状态指示
+ * S67-E2: 扩展到 20 条，添加 focus/blur 类型，添加 recentActivity 别名
  *
  * Manages:
- * - Activity entries (recent 5, FIFO ring buffer)
+ * - Activity entries (recent 20, FIFO ring buffer)
  * - Per-user online/idle status derived from lastSeen timestamps
  *
  * Updated by activityHandler when receiving WS activity:update messages.
+ * Updated by wsActivityHandler for local user activity broadcast.
  */
 
 import { create } from 'zustand';
@@ -24,10 +26,14 @@ export interface UserActivityStatus {
 
 const IDLE_THRESHOLD_MS = 60_000; // 60 seconds → idle
 const OFFLINE_THRESHOLD_MS = 5 * 60_000; // 5 minutes → offline
+const MAX_ENTRIES = 20; // E2: extended from 5 to 20
 
 interface ActivityState {
-  /** Ring buffer of recent activity entries (max 5) */
+  /** Ring buffer of recent activity entries (max 20) */
   entries: ActivityEntry[];
+
+  /** E2: Alias for entries — DoD compatibility (max 20) */
+  recentActivity: ActivityEntry[];
 
   /** Per-user status snapshot */
   userStatuses: Record<string, UserActivityStatus>;
@@ -62,25 +68,27 @@ function deriveStatus(lastSeen: number): UserStatus {
   return 'offline';
 }
 
+function trimAndSort(entries: ActivityEntry[]): ActivityEntry[] {
+  return [...entries].sort((a, b) => b.timestamp - a.timestamp).slice(0, MAX_ENTRIES);
+}
+
 export const useActivityStore = create<ActivityState>((set, get) => ({
   entries: [],
+  recentActivity: [],
   userStatuses: {},
 
   addEntries: (newEntries: ActivityEntry[]) =>
     set((state) => {
-      // Ring buffer: keep newest 5 entries
       const combined = [...state.entries, ...newEntries];
-      const trimmed = combined
-        .sort((a, b) => b.timestamp - a.timestamp)
-        .slice(0, 5);
-      return { entries: trimmed };
+      const trimmed = trimAndSort(combined);
+      return { entries: trimmed, recentActivity: trimmed };
     }),
 
   addEntry: (entry: Omit<ActivityEntry, 'id'>) =>
     set((state) => {
       const full: ActivityEntry = { ...entry, id: generateId() };
-      const combined = [full, ...state.entries].sort((a, b) => b.timestamp - a.timestamp);
-      return { entries: combined.slice(0, 5) };
+      const trimmed = trimAndSort([full, ...state.entries]);
+      return { entries: trimmed, recentActivity: trimmed };
     }),
 
   updateUserStatus: (userId: string, userName: string, timestamp: number) =>
@@ -96,12 +104,11 @@ export const useActivityStore = create<ActivityState>((set, get) => ({
       },
     })),
 
-  clearEntries: () => set({ entries: [] }),
+  clearEntries: () => set({ entries: [], recentActivity: [] }),
 
   getUserStatus: (userId: string): UserStatus => {
     const record = get().userStatuses[userId];
     if (!record) return 'offline';
-    // Re-derive status on access (avoids stale state)
     return deriveStatus(record.lastSeen);
   },
 
@@ -121,6 +128,8 @@ export function activityLabel(type: ActivityType): string {
     delete: '删除了节点',
     lock: '锁定了节点',
     unlock: '解锁了节点',
+    focus: '聚焦了节点',
+    blur: '取消聚焦节点',
     cursor_move: '移动了光标',
   };
   return labels[type] ?? type;

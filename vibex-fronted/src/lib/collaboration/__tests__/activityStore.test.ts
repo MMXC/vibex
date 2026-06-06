@@ -9,7 +9,7 @@ import { useActivityStore } from '../activityStore';
 describe('activityStore', () => {
   beforeEach(() => {
     // Reset store between tests
-    useActivityStore.setState({ entries: [], userStatuses: {} });
+    useActivityStore.setState({ entries: [], recentActivity: [], userStatuses: {} });
   });
 
   describe('addEntries', () => {
@@ -26,7 +26,7 @@ describe('activityStore', () => {
       expect(state.entries[1]!.id).toBe('1');
     });
 
-    it('keeps at most 5 entries (ring buffer)', () => {
+    it('keeps at most 20 entries (ring buffer, E2: extended from 5)', () => {
       const entries = Array.from({ length: 8 }, (_, i) => ({
         id: `e${i}`,
         userId: `u${i}`,
@@ -37,10 +37,35 @@ describe('activityStore', () => {
       useActivityStore.getState().addEntries(entries);
 
       const state = useActivityStore.getState();
-      expect(state.entries).toHaveLength(5);
-      // Newest 5 (timestamps 8→4): e7, e6, e5, e4, e3
+      expect(state.entries).toHaveLength(8);
+      // All 8 fit in max 20 buffer: newest first
       expect(state.entries[0]!.id).toBe('e7');
-      expect(state.entries[4]!.id).toBe('e3');
+      expect(state.entries[7]!.id).toBe('e0');
+    });
+  });
+
+  describe('recentActivity sync', () => {
+    it('recentActivity stays in sync with entries after addEntry', () => {
+      useActivityStore.getState().addEntry({
+        userId: 'u1', userName: 'Alice', type: 'join', timestamp: Date.now(),
+      });
+      const state = useActivityStore.getState();
+      expect(state.recentActivity).toHaveLength(1);
+      expect(state.recentActivity[0]!.userId).toBe('u1');
+    });
+
+    it('recentActivity stays in sync with entries after addEntries', () => {
+      const entries = Array.from({ length: 5 }, (_, i) => ({
+        id: `sync${i}`,
+        userId: `u${i}`,
+        userName: `User${i}`,
+        type: 'edit' as const,
+        timestamp: Date.now() + i * 1000,
+      }));
+      useActivityStore.getState().addEntries(entries);
+      const state = useActivityStore.getState();
+      expect(state.recentActivity).toHaveLength(5);
+      expect(state.entries).toEqual(state.recentActivity);
     });
   });
 

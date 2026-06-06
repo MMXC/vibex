@@ -43,6 +43,7 @@ import { DropOverlay } from './DropOverlay';
 import { FileImportDialog } from './FileImportDialog';
 // E3: Collaboration cursor broadcast
 import { useCollaboration } from '@/hooks/useCollaboration';
+import { broadcastActivity } from '@/lib/collaboration/wsActivityHandler';
 import { screenToFlowPosition } from '@xyflow/react';
 // S65-E3: Canvas view settings
 import { useSettingsStore } from '@/stores/dds/settingsStore';
@@ -123,6 +124,35 @@ function DDSFlowInner({
 
   // E3: Collaboration cursor broadcast
   const { broadcastCursor } = useCollaboration();
+
+  // E2: Wrap onNodesChange to broadcast activity events
+  const handleNodesChange = useCallback(
+    (changes: Parameters<typeof onNodesChange>[0]) => {
+      // Broadcast activity for add/remove operations
+      for (const change of changes) {
+        if (change.type === 'add' && change.node) {
+          broadcastActivity({
+            userId: 'local-user',
+            userName: '我',
+            type: 'add',
+            nodeId: change.node.id,
+            timestamp: Date.now(),
+          });
+        } else if (change.type === 'remove' && change.id) {
+          broadcastActivity({
+            userId: 'local-user',
+            userName: '我',
+            type: 'delete',
+            nodeId: change.id,
+            timestamp: Date.now(),
+          });
+        }
+      }
+      // Call original handler
+      onNodesChange(changes);
+    },
+    [onNodesChange]
+  );
 
   // S65-E3: Canvas view settings
   const backgroundColor = useSettingsStore((s) => s.backgroundColor);
@@ -218,7 +248,7 @@ function DDSFlowInner({
         <ReactFlow
           nodes={nodes}
           edges={edges}
-          onNodesChange={onNodesChange}
+          onNodesChange={handleNodesChange}
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
           onNodeClick={handleNodeClick}

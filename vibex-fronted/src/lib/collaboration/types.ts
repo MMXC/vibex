@@ -83,6 +83,8 @@ export type ActivityType =
   | 'delete'     // User deleted a node
   | 'lock'       // User locked a node
   | 'unlock'     // User unlocked a node
+  | 'focus'      // User focused on a node
+  | 'blur'       // User blurred from a node
   | 'cursor_move'; // User moved cursor (throttled — not broadcast on every move)
 
 /** Single activity entry for the activity feed */
@@ -100,6 +102,14 @@ export interface ActivityEntry {
 export interface ActivityMessage {
   type: 'activity:update';
   entries: ActivityEntry[];
+}
+
+// ==================== E2: User Activity ====================
+
+export interface UserActivityMessage {
+  type: 'user:activity';
+  entries: ActivityEntry[];
+  userId: string;
 }
 
 // ==================== Union ====================

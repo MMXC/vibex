@@ -1,9 +1,10 @@
 /**
  * useCollaboration — Zustand-friendly WebSocket collaboration hook
  * P002-E1: WebSocket 连接层 + useCollaboration Hook
+ * S67-E2: 注册 wsActivityHandler — user:activity 消息处理 + 节流广播
  *
  * Usage:
- *   const { connect, disconnect, broadcast, subscribe, isConnected, onlineUsers } =
+ *   const { connect, disconnect, broadcast, subscribe, sendRaw, isConnected, onlineUsers } =
  *     useCollaboration();
  */
 
@@ -11,6 +12,7 @@
 
 import { useEffect, useRef, useCallback, useState } from 'react';
 import { CollabWebSocket } from './websocket';
+import { registerActivityWSHandler } from './wsActivityHandler';
 import type {
   CollabMessage,
   CollabActionPayload,
@@ -38,7 +40,7 @@ export interface UseCollaborationOptions {
 }
 
 const DEFAULT_WS_URL = 'wss://ws.vibex.top';
-const DEFAULT_TOKEN_KEY = 'vibex-token';
+const DEFAULT_TOKEN_KEY='***';
 
 export function useCollaboration(options: UseCollaborationOptions = {}) {
   const {
@@ -88,6 +90,12 @@ export function useCollaboration(options: UseCollaborationOptions = {}) {
       },
       onMessage: handleMessage,
     });
+
+    // E2: Register activity handler for user:activity messages + throttled broadcast
+    registerActivityWSHandler(
+      (h) => wsRef.current!.subscribe(h),
+      (msg) => wsRef.current!.send(msg)
+    );
 
     return () => {
       wsRef.current?.disconnect();

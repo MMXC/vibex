@@ -24,6 +24,16 @@
 - **E5.4**: `collabSessionStore.test.ts` — vitest 8/8 ✅
 
 ---
+---
+
+## [Unreleased] S67-E3: 模板画廊使用分析 + AI 推荐 — 2026-06-06
+
+- **E3.1**: `templateStore.ts` — 新增 `topTemplates(limit)` selector，按 usageCount 降序排列
+- **E3.2**: `templateStore.ts` — 新增 `getCategoryStats()` selector，分类维度统计（count + avgUsage）
+- **E3.3**: `templateStore.ts` — 新增 `calcRecommendScore(templateId)`，AI 推荐加权评分 (usage×0.5 + tagMatch×0.3 + recency×0.2)
+- **E3.4**: `TemplateAnalytics.tsx` — 使用量排行榜 + 分类柱状图
+- **E3.5**: `TemplateGallery.tsx` — 新增"📊 分析"按钮 + "为你推荐" Tab 集成
+- **E3.6**: `TemplateAnalytics.test.tsx` — 5 tests ✅，`templateStore.test.ts` E3 块 7 tests ✅
 
 ## [Unreleased] S66-E4: 模板高级搜索与过滤 — 标签自定义 + 日期范围 + URL 持久化 — 2026-06-06
 - **E4.1**: `templateStore.ts` — FilterOptions 状态 + setFilterOptions / applyFilters / search / addCustomTag / removeCustomTag / getCustomTags; applyFiltersImpl 实现 AND-标签 + 日期范围过滤

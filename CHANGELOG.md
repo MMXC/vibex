@@ -6468,3 +6468,12 @@ See git history for complete changelog.
 - **E4.3**: `CollabConflictDialog.tsx` — 新建协作冲突解决对话框（双版本对比 + 保留我的/保留对方按钮）
 - **E4.4**: `DDSCanvasPage.tsx` — 监听 `presenceStore.pendingConflicts` 变化，自动弹出冲突对话框
 - **E4.5**: `presenceStore.conflict.test.ts` — 18个vitest测试覆盖冲突检测全场景
+
+
+## [Unreleased] S70-E5: 画布设置面板完善 — 2026-06-06
+- **E5.1**: `CanvasSettingsDrawer.tsx` — 新建侧边抽屉组件，4 tabs（预设/画布/节点/协作），复用 ViewPresetsTab + BackgroundSettings + GridSettings + ZoomSettings
+- **E5.2**: `CanvasSettingsDrawer.module.css` — 抽屉样式（overlay/drawer/tabs/content）
+- **E5.3**: `DDSToolbar.tsx` — 替换 `CanvasSettingsPanel` → `CanvasSettingsDrawer`，settings 按钮保持
+- **E5.4**: ESC 键盘关闭 — `useEffect` + `keydown` 监听器
+- **E5.5**: `CanvasSettingsDrawer.test.tsx` — vitest 9/9 ✅（抽屉开关/tab切换/ESC/close button）
+- **vitest**: `CanvasSettingsDrawer.test.tsx` 9/9 通过

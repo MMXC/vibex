@@ -1207,6 +1207,12 @@
 
 ---
 
+## [Unreleased] S70-E3: 多格式批量画布导出 — 2026-06-06
+- **E3.1**: `MultiFormatExporter.ts` — `exportMultiFormatZip(canvasId, options)` 编排 PNG+SVG+PDF 三格式并行生成 + JSZip 打包下载
+- **E3.2**: `ExportMenu.tsx` — 新增"多格式导出(ZIP)"菜单项，支持勾选 PNG/SVG/PDF 三格式
+- **E3.3**: `ZipExporter.multi-format.test.ts` — 6/6 接口测试覆盖三种格式 + ZIP 打包
+- **vitest**: `ZipExporter.multi-format.test.ts` 6/6 通过
+
 ## [Unreleased] S70-E4: 协作冲突检测与锁升级 — 2026-06-06
 - **E4.1**: `presenceStore.ts` — 新增 `pendingConflicts: ConflictRecord[]` + `addConflict()`/`resolveConflict()`/`hasConflict()`/`getUnresolvedCount()`，冲突检测逻辑嵌入 `startEditing`
 - **E4.2**: `useCollabEditing.ts` — 新增 `detectConflict()` 5秒双写窗口检测

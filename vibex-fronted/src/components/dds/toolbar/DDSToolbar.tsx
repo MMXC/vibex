@@ -45,7 +45,7 @@ import { TemplateSaveDialog } from '@/components/dds/templates/TemplateSaveDialo
 import { ShortcutSettingsPanel } from '@/components/dds/shortcuts/ShortcutSettingsPanel';
 import { HistoryPanel } from '@/components/dds/history/HistoryPanel';
 import { BackupPanel } from '@/components/dds/settings/BackupPanel';
-import { CanvasSettingsPanel } from '@/components/dds/settings/CanvasSettingsPanel';
+import { CanvasSettingsDrawer } from '@/components/dds/settings/CanvasSettingsDrawer';
 import { ConflictDialog } from '@/components/dds/canvas-dashboard/ConflictDialog';
 import styles from './DDSToolbar.module.css';
 
@@ -1021,8 +1021,8 @@ export const DDSToolbar = memo(function DDSToolbar({
         canvasId={canvasId ?? ''}
       />
 
-      {/* S65-E3: Canvas View Settings panel */}
-      <CanvasSettingsPanel
+      {/* S70-E5: Canvas Settings Drawer */}
+      <CanvasSettingsDrawer
         isOpen={isCanvasSettingsOpen}
         onClose={() => setIsCanvasSettingsOpen(false)}
       />

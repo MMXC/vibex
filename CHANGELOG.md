@@ -6501,3 +6501,8 @@ See git history for complete changelog.
 - **E5.3**: `templateStore.rating.test.ts` — rateTemplate / getTemplateStats / toggleFavorite / isFavorite 4 测试
 - **E5.4**: `TemplateMarketplacePanel.e5.test.tsx` — sort selector / rating / favorite / panel render 6 测试
 - **vitest**: `templateStore.rating.test.ts` + `TemplateMarketplacePanel.e5.test.tsx` 10/10 通过
+---
+
+## [Unreleased] S72-E1: 画布历史管理面板快照测试 — 2026-06-07
+- **E1.4**: `canvasHistoryStore.snapshots.test.ts` — saveSnapshot/restoreSnapshot/renameSnapshot/deleteSnapshot + LRU eviction vitest 14/14
+- **E1.5**: `TimelineView.test.tsx` — 快照时间线组件测试：空状态/列表渲染/操作回调/键盘交互/相对时间格式化 vitest 16/16

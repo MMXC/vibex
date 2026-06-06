@@ -18,6 +18,7 @@ import {
 import { useTemplateStore } from '@/stores/templateStore';
 import { downloadTemplatesAsFile } from '@/lib/canvas/templateExport';
 import { TemplateImportDialog } from './TemplateImportDialog';
+import { TemplateExportDialog } from './TemplateExportDialog';
 import { TemplateAnalytics } from './TemplateAnalytics';
 import { CategoryTab, type CanvasCategory } from './CategoryTab';
 import { TagSelector } from './TagSelector';
@@ -59,6 +60,8 @@ export function TemplateGallery({ isOpen, onClose, onTemplateApplied }: Template
   const [loading, setLoading] = useState(false);
   const [applying, setApplying] = useState<string | null>(null);
   const [importDialogOpen, setImportDialogOpen] = useState(false);
+  // ---- E1: Export Dialog state ----
+  const [exportDialogOpen, setExportDialogOpen] = useState(false);
   // ---- E3: 模板分析面板 ----
   const [showAnalytics, setShowAnalytics] = useState(false);
 
@@ -184,7 +187,7 @@ export function TemplateGallery({ isOpen, onClose, onTemplateApplied }: Template
         <div className={styles.header}>
           <h2 className={styles.title}>📋 模板画廊</h2>
           <div className={styles.headerActions}>
-            <button type="button" className={styles.actionBtn} onClick={handleExportAll} title="导出全部">
+            <button type="button" className={styles.actionBtn} onClick={() => setExportDialogOpen(true)} title="导出模板">
               ⬇️ 导出
             </button>
             <button type="button" className={styles.actionBtn} onClick={() => setImportDialogOpen(true)} title="导入模板">
@@ -322,6 +325,16 @@ export function TemplateGallery({ isOpen, onClose, onTemplateApplied }: Template
                 <span className={styles.cardName}>{t.name}</span>
                 <span className={styles.cardDesc}>{t.description}</span>
                 <div className={styles.cardTags}>
+                  {/* ---- E1: Favorite star toggle ---- */}
+                  <button
+                    type="button"
+                    className={styles.favBtn}
+                    onClick={(e) => { e.stopPropagation(); templateStore.toggleFavorite(t.id); }}
+                    aria-label={templateStore.isFavorite(t.id) ? '取消收藏' : '添加收藏'}
+                    title={templateStore.isFavorite(t.id) ? '取消收藏' : '添加收藏'}
+                  >
+                    {templateStore.isFavorite(t.id) ? '★' : '☆'}
+                  </button>
                   {/* ---- E3: usageCount badge ---- */}
                   {templateStore.stats.usageCount[t.id] ? (
                     <span className={styles.usageBadge} title="使用次数">
@@ -349,6 +362,13 @@ export function TemplateGallery({ isOpen, onClose, onTemplateApplied }: Template
           onClose={() => setImportDialogOpen(false)}
           onImport={handleImport}
           existingTemplates={templateStore.templates}
+        />
+        {/* ---- E1: Export Dialog ---- */}
+        <TemplateExportDialog
+          isOpen={exportDialogOpen}
+          onClose={() => setExportDialogOpen(false)}
+          templates={templateStore.templates}
+          favoriteIds={templateStore.favoriteTemplateIds}
         />
       </div>
     </div>

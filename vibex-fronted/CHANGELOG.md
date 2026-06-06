@@ -1203,3 +1203,13 @@
 - **E2.5**: `TemplateGallery.module.css` — 市场面板包装器样式
 - **E2.6**: `templateStore.marketplace.test.ts` — E2 纯函数单元测试 20/20 通过
 
+
+
+---
+
+## [Unreleased] S70-E4: 协作冲突检测与锁升级 — 2026-06-06
+- **E4.1**: `presenceStore.ts` — 新增 `pendingConflicts: ConflictRecord[]` + `addConflict()`/`resolveConflict()`/`hasConflict()`/`getUnresolvedCount()`，冲突检测逻辑嵌入 `startEditing`
+- **E4.2**: `useCollabEditing.ts` — 新增 `detectConflict()` 5秒双写窗口检测
+- **E4.3**: `CollabConflictDialog.tsx` — 新建协作冲突解决对话框（双版本对比 + 保留我的/保留对方按钮）
+- **E4.4**: `DDSCanvasPage.tsx` — 监听 `presenceStore.pendingConflicts` 变化，自动弹出冲突对话框
+- **E4.5**: `presenceStore.conflict.test.ts` — 18个vitest测试覆盖冲突检测全场景

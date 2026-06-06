@@ -6367,3 +6367,11 @@ See git history for complete changelog.
 - **E2.5**: `DDSToolbar.tsx` — 通知铃铛按钮 + NotificationPanel 抽屉集成 ✅
 - **E2.6**: `CollabActivityPanel.tsx` — MentionInput 集成（消息输入） ✅
 - **E2.7**: `notificationStore.test.ts` — 11项测试覆盖
+
+---
+
+## [Unreleased] S68-E3: 全局画布全文搜索 — 2026-06-06
+- **E3.1**: `src/services/canvasFulltextIndex.ts` — Fuse.js 全文索引服务，IndexedDB 存储，1h TTL 缓存
+- **E3.2**: `canvasSearchStore.ts` — 新增 `fulltextQuery/fulltextResults/fulltextLoading` + `searchNodeContent()`
+- **E3.3**: `GlobalSearchPanel.tsx` — 新增 Tab2（节点内容），Tab1（画布名称），键盘导航完整保留
+- **E3.4**: `canvasSearchStore.test.ts` — 12项测试全部通过

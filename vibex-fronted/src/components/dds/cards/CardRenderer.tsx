@@ -26,6 +26,7 @@ import { CardErrorBoundary } from '@/components/dds/canvas/CardErrorBoundary';
 import { StateMachineCard } from './StateMachineCard';
 import { NodeEditorLock } from '@/components/canvas/NodeEditorLock';
 import { NodeFocusOverlay } from '@/components/canvas/NodeFocusOverlay';
+import { NodeCommentBadge } from '@/components/dds/comments/NodeCommentBadge';
 import { usePresenceStore } from '@/lib/collaboration/presenceStore';
 import type { APIEndpointCard as APIEndpointCardType, StateMachineCard as SMCardType } from '@/types/dds';
 
@@ -132,6 +133,8 @@ export const CardRenderer = memo(function CardRenderer({
       <NodeEditorLock nodeId={card.id} />
       {/* S65-E2: Show remote focus indicator (reads directly from presenceStore) */}
       <NodeFocusOverlay nodeId={card.id} />
+      {/* S69-E4: Show unread comment count badge on nodes */}
+      <NodeCommentBadge nodeId={card.id} />
       {/* S66-E2: 锁定提示（当被其他人锁定时显示） */}
       {isLockedByOther && lockUserName && (
         <div

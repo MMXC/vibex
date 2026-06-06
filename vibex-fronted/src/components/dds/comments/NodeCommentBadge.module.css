@@ -1,0 +1,47 @@
+/* NodeCommentBadge — S69-E4: 节点评论系统 */
+/* 红色醒目设计，用于 Canvas 节点 */
+
+.badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 9px;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+  color: white;
+  background-color: #ef4444; /* 红色醒目 */
+  border: 1.5px solid white;
+  box-shadow: 0 1px 4px rgba(239, 68, 68, 0.4);
+  cursor: pointer;
+  pointer-events: auto;
+  z-index: 20;
+  animation: pulse-red 2s ease-in-out infinite;
+  user-select: none;
+}
+
+.badge:hover {
+  background-color: #dc2626;
+  transform: scale(1.1);
+}
+
+.count {
+  font-family: var(--font-mono, monospace);
+  text-align: center;
+  letter-spacing: -0.5px;
+}
+
+@keyframes pulse-red {
+  0%, 100% {
+    box-shadow: 0 1px 4px rgba(239, 68, 68, 0.4);
+  }
+  50% {
+    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.6);
+  }
+}

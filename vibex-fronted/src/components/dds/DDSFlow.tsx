@@ -45,6 +45,7 @@ import { useNodeFocus } from '@/lib/collaboration/useNodeFocus';
 import { useNodeLockedToast } from '@/components/dds/notifications/NodeLockedToast';
 import { RemoteCursorsLayer } from './canvas-dashboard/RemoteCursorsLayer';
 import { MiniMapPanel } from '@/components/dds/MiniMapPanel';
+import { CommentThread } from '@/components/dds/comments/CommentThread';
 import styles from './DDSFlow.module.css';
 
 // ==================== Node Type Wrappers ====================
@@ -269,6 +270,10 @@ function DDSFlowInner({
   // Track viewport for overlay positioning
   const [viewport, setViewport] = useState<Viewport>({ x: 0, y: 0, zoom: 1 });
 
+  // S69-E4: Comment thread overlay state
+  const [commentThreadNodeId, setCommentThreadNodeId] = useState<string | null>(null);
+  const [commentThreadPosition, setCommentThreadPosition] = useState({ x: 0, y: 0 });
+
   useOnViewportChange({
     onChange: (vp) => {
       setViewport(vp);
@@ -377,6 +382,20 @@ function DDSFlowInner({
     [toggleCollapse]
   );
 
+  // S69-E4: Right-click context menu → "查看评论" → open CommentThread
+  const handleNodeContextMenu = useCallback(
+    (event: React.MouseEvent, node: Node) => {
+      event.preventDefault();
+      setCommentThreadNodeId(node.id);
+      setCommentThreadPosition({ x: event.clientX, y: event.clientY });
+    },
+    []
+  );
+
+  const handleCommentThreadClose = useCallback(() => {
+    setCommentThreadNodeId(null);
+  }, []);
+
   return (
     <div className={styles.container}>
       {/* E2-U1: ConflictBubble — renders outside ReactFlow, shows dialog when conflict active */}
@@ -389,6 +408,7 @@ function DDSFlowInner({
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
         onNodeClick={handleNodeClick}
+        onNodeContextMenu={handleNodeContextMenu}
         nodeTypes={nodeTypes}
         /* E5: In touch mode, useTouchGestures hook handles ALL gestures — disable ReactFlow built-in */
         nodesDraggable={!touchMode}
@@ -436,6 +456,16 @@ function DDSFlowInner({
         {/* S63-E1: Remote cursors layer — renders all remote user cursors */}
         <RemoteCursorsLayer />
       </ReactFlow>
+
+      {/* S69-E4: Comment thread overlay — right-click node → "查看评论" */}
+      {commentThreadNodeId && (
+        <CommentThread
+          nodeId={commentThreadNodeId}
+          position={commentThreadPosition}
+          onClose={handleCommentThreadClose}
+          currentUserId={currentUserId}
+        />
+      )}
     </div>
   );
 }

@@ -140,6 +140,14 @@ interface TemplateState {
   // 使用频率递增（在打开模板时调用）
   incrementUsage: (templateId: string) => void;
 
+  // ---- E2: 模板市场发现与浏览 ----
+  // 获取热门/精选模板（按使用量排序）
+  featuredTemplates: (limit?: number) => RequirementTemplate[];
+  // 市场搜索（query + tags 组合）
+  searchMarketplace: (query?: string, tags?: string[]) => RequirementTemplate[];
+  // 获取所有市场模板
+  getMarketplaceTemplates: () => RequirementTemplate[];
+
   // ---- E4: 模板导入/导出管理 ----
   // 导出所有模板为 JSON
   exportTemplates: () => { version: string; exportedAt: string; templates: RequirementTemplate[] };
@@ -430,6 +438,48 @@ export const useTemplateStore = create<TemplateState>()(
       // 使用频率递增
       incrementUsage: (templateId) => {
         get().recordUsage(templateId);
+      },
+
+      // ---- E2: 模板市场发现与浏览 ----
+      // 获取热门/精选模板（按使用量排序）
+      featuredTemplates: (limit = 8) => {
+        const { templates, stats } = get();
+        return [...templates]
+          .sort((a, b) => {
+            const aCount = stats.usageCount[a.id] ?? 0;
+            const bCount = stats.usageCount[b.id] ?? 0;
+            return bCount - aCount;
+          })
+          .slice(0, limit);
+      },
+
+      // 市场搜索（query + tags 组合）
+      searchMarketplace: (query, tags) => {
+        const { templates } = get();
+        let result = templates;
+        if (query) {
+          const lowerQuery = query.toLowerCase();
+          result = result.filter(t =>
+            t.name.toLowerCase().includes(lowerQuery) ||
+            (t.displayName ?? '').toLowerCase().includes(lowerQuery) ||
+            t.description.toLowerCase().includes(lowerQuery) ||
+            (t.metadata?.tags ?? []).some((tag: string) => tag.toLowerCase().includes(lowerQuery))
+          );
+        }
+        if (tags && tags.length > 0) {
+          result = result.filter(t => {
+            const templateTags: string[] = t.metadata?.tags ?? t.tags ?? [];
+            return tags.every(tag => templateTags.some(
+              (tTag: string) => tTag.toLowerCase().includes(tag.toLowerCase())
+            ));
+          });
+        }
+        return result;
+      },
+
+      // 获取所有市场模板
+      getMarketplaceTemplates: () => {
+        return get().templates;
       },
 
       // ---- E4: 模板版本管理 ----

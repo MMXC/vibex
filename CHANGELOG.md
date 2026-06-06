@@ -6449,3 +6449,12 @@ See git history for complete changelog.
 - **E1.4**: `ConflictResolutionDialog.tsx` — 冲突解决对话框（保留我的/采用对方/合并内容）三按钮
 - **E1.5**: `DDSCanvasPage.tsx` — 合并成功后调用 `reloadFromSnapshot` 刷新画布
 - **E1.6**: `canvasHistoryStore.e1-merge.test.ts` — E1 测试：mergeBranch + pendingConflicts + resolveBranchConflict
+
+## [Unreleased] S70-E2: 模板市场发现与浏览 — 2026-06-06
+- **E2.1**: `templateStore.ts` — `featuredTemplates(limit?)` 按 usageCount 降序排序 + `searchMarketplace(query?, tags?)` 组合过滤 + `getMarketplaceTemplates()`
+- **E2.2**: `TemplateMarketplacePanel.tsx` — 市场发现面板（搜索框 + 标签云 + 热门模板 + 模板卡片网格 + 使用量徽章 + 导入按钮）
+- **E2.3**: `TemplateMarketplacePanel.module.css` — 面板样式（搜索行、标签云、卡片网格、使用量徽章、导入按钮）
+- **E2.4**: `TemplateGallery.tsx` — `discover` Tab 改为打开市场面板（`showMarketplace` state）+ `TemplateMarketplacePanel` 集成
+- **E2.5**: `TemplateGallery.module.css` — 市场面板包装器样式
+- **E2.6**: `templateStore.marketplace.test.ts` — E2 纯函数单元测试 20/20 通过
+

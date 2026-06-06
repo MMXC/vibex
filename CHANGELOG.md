@@ -6350,3 +6350,11 @@ See git history for complete changelog.
 - **E5.2**: `SvgExporter.ts` — exportSvg(canvasId) 服务函数，生成 SVG 向量格式含章节分组、节点关系箭头、特殊字符转义
 - **E5.3**: `PdfExporter.test.ts` — 11 项测试覆盖 MIME type、A4/Letter、单页/多页、progress callback、abort
 - **E5.4**: `SvgExporter.test.ts` — 11 项测试覆盖 SVG 结构、节点数、章节 ID、空数组、特殊字符转义
+
+---
+
+## [Unreleased] S68-E1: 模板画廊增强（导出/评分）— 2026-06-06
+- **E1.1**: `TemplateExportDialog.tsx` — 导出预览对话框，支持全量/收藏/手动选择导出范围 + 文件名定制 + .vbtmpl 下载
+- **E1.2**: `TemplateGallery.tsx` — 每张卡片添加★收藏切换按钮，stopPropagation 防冒泡
+- **E1.3**: `templateStore.test.ts` — 新增 E1 收藏测试 9 项：toggleFavorite×2, isFavorite×2, getFavorites×2, exportTemplates×1, importTemplates×1
+- **Test**: 89/89 vitest ✅

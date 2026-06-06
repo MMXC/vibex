@@ -6515,3 +6515,11 @@ See git history for complete changelog.
 - **E3.3**: `src/components/dds/canvas-dashboard/RemoteCursorsLayer.tsx` — 重构为 `usePresenceStore(s => s.cursors)` 驱动 (S63-E1 + S68-E5)
 - **E3.4**: `src/lib/collaboration/__tests__/presenceStore.test.ts` — 91 tests (84 原有 + 7 E3专项)
 - **E3.5**: `src/components/dds/canvas-dashboard/__tests__/RemoteCursorsLayer.test.tsx` — 7 tests
+
+---
+
+## [Unreleased] S72-E4: 画布数据趋势分析图表 — 2026-06-07
+- **E4.1**: `vibex-fronted/src/components/dds/analytics/AnalyticsTrendChart.tsx` — 7天/30天切换柱状图, 历史记录列表, 分享按钮
+- **E4.2**: `vibex-fronted/src/stores/dds/canvasAnalyticsStore.ts` — `archiveHistory`/`getHistory`/`shareAnalytics`/`exportAnalytics` 扩展
+- **E4.3**: `vibex-fronted/src/stores/dds/__tests__/canvasAnalyticsStore.test.ts` — 8 tests: archiveHistory/getHistory/shareAnalytics/exportAnalytics
+- **E4.4**: `vibex-fronted/src/components/dds/analytics/__tests__/AnalyticsTrendChart.test.tsx` — 5 tests: header/bar toggle/share

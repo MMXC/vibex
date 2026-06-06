@@ -378,3 +378,50 @@ export async function removeTemplateTag(id: string, tag: string): Promise<void> 
   const tags = existing.tags.filter((t) => t !== tag);
   await updateTemplate(id, { tags });
 }
+
+// ─── E3: Share URL Import ────────────────────────────────────────────────────
+
+export type ShareImportResult =
+  | { success: true; id: string }
+  | { success: false; reason: 'duplicate_skip' | 'imported' | 'error'; id?: string };
+
+/**
+ * Import a template from a Base64 share URL.
+ * Returns the imported template id or the reason for skipping.
+ *
+ * Conflict resolution:
+ *   - 'skip': return { success: false, reason: 'duplicate_skip' } if exists
+ *   - 'overwrite': replace existing template
+ *   - 'rename': import with new id
+ */
+export async function importFromShareUrl(
+  template: CanvasTemplateData,
+  strategy: 'skip' | 'overwrite' | 'rename' = 'skip'
+): Promise<ShareImportResult> {
+  const existing = await getTemplate(template.id);
+
+  if (existing) {
+    if (strategy === 'skip') {
+      return { success: false, reason: 'duplicate_skip' };
+    }
+    if (strategy === 'rename') {
+      template.id = `${template.id}-import-${Date.now()}`;
+    }
+    // strategy === 'overwrite': fall through to createTemplate (it overwrites)
+  }
+
+  try {
+    const toSave: CanvasTemplateData = {
+      ...template,
+      id: template.id,
+      // Force isPreset=false for user-imported templates
+      isPreset: false,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    await createTemplate(toSave);
+    return { success: true, id: toSave.id };
+  } catch {
+    return { success: false, reason: 'error' };
+  }
+}

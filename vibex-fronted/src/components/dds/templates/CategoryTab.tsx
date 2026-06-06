@@ -11,20 +11,22 @@ import React, { memo, useCallback } from 'react';
 import styles from './CategoryTab.module.css';
 
 export type CanvasCategory = 'flowchart' | 'mindmap' | 'uml' | 'other' | null;
+export type CategoryTabValue = CanvasCategory | 'all' | 'favorites' | 'discover';
 
 interface CategoryTabProps {
   /** Currently selected category */
-  selected: CanvasCategory | 'all' | 'favorites';
+  selected: CategoryTabValue;
   /** Callback when a category is selected */
-  onSelect: (category: CanvasCategory | 'all' | 'favorites') => void;
+  onSelect: (category: CategoryTabValue) => void;
 }
 
-const CATEGORIES: { key: CanvasCategory | 'all'; label: string; icon: string }[] = [
+const CATEGORIES: { key: CategoryTabValue; label: string; icon: string }[] = [
   { key: 'all', label: '全部', icon: '📋' },
   { key: 'flowchart', label: '流程图', icon: '🔀' },
   { key: 'mindmap', label: '思维导图', icon: '🧠' },
   { key: 'uml', label: 'UML', icon: '📐' },
   { key: 'other', label: '其他', icon: '📄' },
+  { key: 'discover', label: '发现', icon: '🔗' },
 ];
 
 const CATEGORY_COLORS: Record<string, string> = {
@@ -36,7 +38,7 @@ const CATEGORY_COLORS: Record<string, string> = {
 
 export const CategoryTab = memo<CategoryTabProps>(({ selected, onSelect }) => {
   const handleSelect = useCallback(
-    (key: CanvasCategory | 'all' | 'favorites') => {
+    (key: CategoryTabValue) => {
       onSelect(key);
     },
     [onSelect]

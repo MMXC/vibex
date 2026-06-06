@@ -336,3 +336,26 @@
 .favBtn:active {
   transform: scale(0.9);
 }
+
+/* ---- E3: Share button ---- */
+.shareBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 2px 4px;
+  border-radius: 4px;
+  opacity: 0.6;
+  transition: opacity 0.15s, transform 0.15s;
+  flex-shrink: 0;
+}
+
+.shareBtn:hover {
+  opacity: 1;
+  transform: scale(1.15);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.shareBtn:active {
+  transform: scale(0.9);
+}

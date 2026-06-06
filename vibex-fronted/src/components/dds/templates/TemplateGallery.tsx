@@ -16,11 +16,14 @@ import {
   type CanvasTemplateSummary,
 } from '@/lib/canvas/templateStore';
 import { useTemplateStore } from '@/stores/templateStore';
+import { useTemplateShareStore } from '@/stores/templateShareStore';
 import { downloadTemplatesAsFile } from '@/lib/canvas/templateExport';
 import { TemplateImportDialog } from './TemplateImportDialog';
 import { TemplateExportDialog } from './TemplateExportDialog';
+import { TemplateShareDialog } from './TemplateShareDialog';
+import { ImportFromUrlDialog } from './ImportFromUrlDialog';
 import { TemplateAnalytics } from './TemplateAnalytics';
-import { CategoryTab, type CanvasCategory } from './CategoryTab';
+import { CategoryTab, type CategoryTabValue, type CanvasCategory } from './CategoryTab';
 import { TagSelector } from './TagSelector';
 import { DateRangePicker } from './DateRangePicker';
 import { deserializeThreeTrees, restoreStore } from '@/lib/canvas/serialize';
@@ -64,6 +67,10 @@ export function TemplateGallery({ isOpen, onClose, onTemplateApplied }: Template
   const [exportDialogOpen, setExportDialogOpen] = useState(false);
   // ---- E3: 模板分析面板 ----
   const [showAnalytics, setShowAnalytics] = useState(false);
+  // ---- E3: Share Dialog state ----
+  const [shareDialogOpen, setShareDialogOpen] = useState(false);
+  const [shareTemplateId, setShareTemplateId] = useState<string | null>(null);
+  const [importUrlDialogOpen, setImportUrlDialogOpen] = useState(false);
 
   const templateStore = useTemplateStore();
 
@@ -284,10 +291,14 @@ export function TemplateGallery({ isOpen, onClose, onTemplateApplied }: Template
           ) : null}
         </div>
 
-        {/* Category tabs (E4: CategoryTab component) */}
+        {/* Category tabs (E4: CategoryTab component, E3: +discover) */}
         <CategoryTab
-          selected={selectedCategory as CanvasCategory | 'all' | 'favorites'}
+          selected={selectedCategory as CategoryTabValue}
           onSelect={(cat) => {
+            if (cat === 'discover') {
+              setImportUrlDialogOpen(true);
+              return;
+            }
             setSelectedCategory(cat);
             if (showAnalytics) setShowAnalytics(false);
           }}
@@ -342,6 +353,20 @@ export function TemplateGallery({ isOpen, onClose, onTemplateApplied }: Template
                     </span>
                   ) : null}
                   {t.isPreset && <span className={styles.presetBadge}>预设</span>}
+                  {/* ---- E3: Share button ---- */}
+                  <button
+                    type="button"
+                    className={styles.shareBtn}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShareTemplateId(t.id);
+                      setShareDialogOpen(true);
+                    }}
+                    aria-label="分享模板"
+                    title="分享模板"
+                  >
+                    🔗
+                  </button>
                   {t.tags.slice(0, 2).map((tag) => (
                     <span
                       key={tag}
@@ -369,6 +394,25 @@ export function TemplateGallery({ isOpen, onClose, onTemplateApplied }: Template
           onClose={() => setExportDialogOpen(false)}
           templates={templateStore.templates}
           favoriteIds={templateStore.favoriteTemplateIds}
+        />
+        {/* ---- E3: Share Dialog ---- */}
+        {shareDialogOpen && shareTemplateId && (
+          <TemplateShareDialog
+            isOpen={shareDialogOpen}
+            templateId={shareTemplateId}
+            onClose={() => {
+              setShareDialogOpen(false);
+              setShareTemplateId(null);
+            }}
+          />
+        )}
+        {/* ---- E3: Import from URL Dialog ---- */}
+        <ImportFromUrlDialog
+          isOpen={importUrlDialogOpen}
+          onClose={() => setImportUrlDialogOpen(false)}
+          onImported={() => {
+            loadTemplates();
+          }}
         />
       </div>
     </div>

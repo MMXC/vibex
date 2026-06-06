@@ -156,7 +156,76 @@
   justify-content: flex-end;
 }
 
-.resetAllBtn {
+/* S71-E1: Tab bar */
+.tabBar {
+  display: flex;
+  gap: 4px;
+  padding: 0 24px;
+  border-bottom: 1px solid #2e2e4a;
+  background: #1a1a2e;
+  overflow-x: auto;
+}
+
+.tabBtn {
+  padding: 10px 14px;
+  border: none;
+  background: transparent;
+  color: #8b8bb0;
+  font-size: 13px;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: color 0.15s, border-color 0.15s;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tabBtn:hover {
+  color: #c0c0d0;
+}
+
+.tabBtnActive {
+  color: #818cf8;
+  border-bottom-color: #818cf8;
+  font-weight: 600;
+}
+
+.tabBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  background: #6366f1;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 9px;
+  line-height: 1;
+}
+
+/* S71-E1: Custom badge */
+.customBadge {
+  margin-left: 6px;
+  font-size: 11px;
+}
+
+/* S71-E1: Empty custom state */
+.emptyCustom {
+  color: #6b6b8b;
+  font-size: 13px;
+  text-align: center;
+  padding: 32px 16px;
+  margin: 0;
+}
+
+.customHint {
+  color: #8b8bb0;
+  font-size: 12px;
+  margin: 0 0 10px;
+}
   font-size: 13px;
   padding: 7px 16px;
   background: transparent;

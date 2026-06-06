@@ -1,3 +1,14 @@
+---
+
+## [Unreleased] S67-E4: 画布快捷键可配置化 — 2026-06-06
+
+- **E4.1**: `shortcutStore.ts` — 新增 `addBinding(action, key)` / `removeBinding(action)` / `exportBindings()` / `importBindings(json)` 方法，支持直接绑定 API + JSON 导入导出
+- **E4.2**: `shortcutStore.ts` — 新增 `ImportResult` 接口，部分导入失败报告错误
+- **E4.3**: `ShortcutEditor.tsx` — 新增专用快捷键录制 Modal，支持按键捕获 + 冲突检测 + 保存/重置
+- **E4.4**: `ShortcutEditor.module.css` — ShortcutEditor 样式
+- **E4.5**: `ShortcutSettingsPanel.tsx` — Footer 新增 📥 导入 / 📤 导出按钮 + 隐藏 file input
+- **E4.6**: `shortcutStore.test.ts` — 22 个 E4 测试用例覆盖 addBinding/removeBinding/export/import/conflict/round-trip
+
 
 ## [Unreleased] S67-E2: 实时协作活动流面板 — 2026-06-06
 

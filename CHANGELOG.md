@@ -6491,3 +6491,13 @@ See git history for complete changelog.
 - **E4.2**: `AnalyticsPanel.tsx` — HistoryPanel Tab5，显示编辑最多节点排行 + 导出 CSV，支持全量/折叠切换
 - **E4.3**: `AnalyticsPanel.module.css` — Tab5 样式，summary cards + bar chart
 - **vitest**: `canvasAnalyticsStore.test.ts` + `AnalyticsPanel.test.tsx` 9/9 通过
+
+
+---
+
+## [Unreleased] S71-E5: 模板评分与收藏增强 — 2026-06-07
+- **E5.1**: `TemplateMarketplacePanel.tsx` — 新增排序选择器（⭐评分/🔥使用量/📅最近）+ 卡片评分星标（显示+交互）+ 收藏按钮
+- **E5.2**: `TemplateMarketplacePanel.module.css` — sortRow / starRow / favoriteBtn 样式
+- **E5.3**: `templateStore.rating.test.ts` — rateTemplate / getTemplateStats / toggleFavorite / isFavorite 4 测试
+- **E5.4**: `TemplateMarketplacePanel.e5.test.tsx` — sort selector / rating / favorite / panel render 6 测试
+- **vitest**: `templateStore.rating.test.ts` + `TemplateMarketplacePanel.e5.test.tsx` 10/10 通过

@@ -6539,3 +6539,10 @@ See git history for complete changelog.
 - **E1.3**: DDSCanvasPage.tsx 集成 CanvasSearchPanel + canvas:scroll-to-node 事件监听
 - **E1.4**: canvasSearchStore.test.ts 新增 searchNodes 测试 4 用例
 - **E1.5**: CanvasSearchPanel.test.tsx 新建集成测试 16 用例
+
+## [Unreleased] S73-E2: 模板节点导入画布 — 2026-06-07
+- **E2.1**: `lib/canvas/templateStore.ts` — `importTemplateToCanvas(templateId, position?, mode?)` 纯函数: 解析模板snapshot, ID映射, chapter类型映射, 节点/边构建, ImportResult返回
+- **E2.2**: `stores/templateStore.ts` — Zustand `importTemplateToCanvas()` 包装器: 模板存在性校验, 委托lib实现, 分组chapter调用addCard/addEdge, recordUsage追踪
+- **E2.3**: `ImportMode` / `ImportResult` / `ImportedNode` / `ImportedEdge` 类型导出
+- **E2.4**: `stores/templateStore.ts` — 新增导入: `@/lib/canvas/templateStore`, `@/stores/dds/DDSCanvasStore`, `@/lib/canvas/id`
+

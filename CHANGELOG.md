@@ -6364,6 +6364,6 @@ See git history for complete changelog.
 - **E2.2**: `wsNotificationHandler.ts` — 处理 `notification:*` WebSocket 消息（new/update/read）
 - **E2.3**: `MentionInput.tsx` — @ 自动补全组件，输入 @ 显示用户列表
 - **E2.4**: `NotificationPanel.tsx` — 通知中心面板，未读红点、分页、标记已读
-- **E2.5**: `DDSToolbar.tsx` — 添加通知铃铛按钮（integration pending）
-- **E2.6**: `CollabActivityPanel.tsx` — MentionInput 集成（integration pending）
-- **E2.7**: `notificationStore.test.ts` — 13项测试覆盖
+- **E2.5**: `DDSToolbar.tsx` — 通知铃铛按钮 + NotificationPanel 抽屉集成 ✅
+- **E2.6**: `CollabActivityPanel.tsx` — MentionInput 集成（消息输入） ✅
+- **E2.7**: `notificationStore.test.ts` — 11项测试覆盖

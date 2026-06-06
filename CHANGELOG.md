@@ -6411,3 +6411,12 @@ See git history for complete changelog.
 - **E2.2**: `canvasFulltextIndex.ts` — `ContextSearchResult` 接口（`before`/`after` 字段）+ `searchWithContext()` 函数
 
 - **E2.3**: `GlobalSearchPanel.tsx` — `<mark>` 高亮搜索关键词（#fef08a）+ before/after 上下文片段渲染
+
+
+- **E3.1**: `templateShare.ts` — Base64 URL encode/decode (`encodeTemplateToShareUrl`/`decodeShareUrl`) + URL-safe base64 (`+/=` → `-_.`) + 8KB size warn
+- **E3.2**: `templateShareStore.ts` — 分享/导入对话框状态 (Zustand, `isShareDialogOpen`/`isImportDialogOpen`)
+- **E3.3**: `TemplateShareDialog.tsx` — 分享按钮 + URL预览 + 一键复制 (copyToClipboard)
+- **E3.4**: `ImportFromUrlDialog.tsx` — 从分享URL导入模板对话框 + Base64解析 + 冲突处理(skip/rename/replace)
+- **E3.5**: `TemplateGallery.tsx` — "发现"页签(CategoryTab+discover) + 每张卡片分享按钮 + 对话框集成
+- **E3.6**: `templateStore.ts` — `importFromShareUrl(payload)` + IndexedDB存储 + 冲突检测
+- **E3.7**: `templateShare.test.ts` — 21 vitest: encode/decode roundtrip/clipboard/location/edge cases

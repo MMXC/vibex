@@ -1152,3 +1152,5 @@
 - **S69-E1.4**: `canvasHistoryStore.ts` — 扩展 +getSnapshotsByCanvas/+restoreSnapshot/+deleteSnapshot（已在 main）
 - **S69-E1.5**: DDSToolbar — 历史按钮集成（已在 main）
 - **S69-E1.6**: `canvasHistoryStore.test.ts` — E1 测试 8 个全部通过
+
+- **E2.3**: `GlobalSearchPanel.tsx` — `<mark>` 高亮搜索关键词（#fef08a）+ before/after 上下文片段渲染

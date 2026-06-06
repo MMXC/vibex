@@ -1142,3 +1142,13 @@
 - **E4.4**: `BatchDeleteConfirmDialog.tsx` — confirmation dialog for multi-canvas deletion
 - **E4.5**: i18n keys under `batchOps` namespace: zh.json + en.json (`copyToCanvas`, `copyTo`, `exportAsTemplate`, `copiedToCanvas`, `templateExported`, `itemsCopied`)
 - **E4.6**: `canvasListStore.batchOps.test.ts` — 13 unit tests (vitest 13/13)
+
+---
+
+## [Unreleased] S69-E1: 画布版本快照历史 — 2026-06-06
+- **S69-E1.1**: `BranchManager.tsx` — 分支管理面板（创建/切换/删除分支）
+- **S69-E1.2**: `BranchManager.module.css` — 分支管理面板样式
+- **S69-E1.3**: `HistoryPanel.tsx` (canvas-history) — 渲染快照列表含 branch/author 字段
+- **S69-E1.4**: `canvasHistoryStore.ts` — 扩展 +getSnapshotsByCanvas/+restoreSnapshot/+deleteSnapshot（已在 main）
+- **S69-E1.5**: DDSToolbar — 历史按钮集成（已在 main）
+- **S69-E1.6**: `canvasHistoryStore.test.ts` — E1 测试 8 个全部通过

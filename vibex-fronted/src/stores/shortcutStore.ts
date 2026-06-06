@@ -330,7 +330,7 @@ export function formatKeyDisplay(key: string): string {
 }
 
 /**
- * Parse keyboard event to key string
+ * Parse keyboard event to key string (S71-E1: extended)
  */
 export function parseKeyEvent(e: KeyboardEvent): string {
   const parts: string[] = [];
@@ -350,4 +350,51 @@ export function parseKeyEvent(e: KeyboardEvent): string {
   parts.push(keyName);
   
   return parts.join('+');
+}
+
+// ==================== E1: detectConflict Standalone (S71-E1) ====================
+
+export interface ShortcutBinding {
+  action: string;
+  key: string;
+}
+
+/**
+ * E1: Standalone conflict detection for ShortcutBinding format.
+ * Checks if a proposed key conflicts with any existing binding (excluding the same action).
+ * Used by shortcutManager.ts and external callers.
+ */
+export function detectConflict(
+  bindings: ShortcutBinding[],
+  proposedKey: string,
+  excludeAction?: string
+): { hasConflict: boolean; conflictingAction?: string; conflictingDescription?: string } {
+  const store = useShortcutStore.getState();
+
+  // Check store-level conflict (same key, different action)
+  const storeConflict = store.shortcuts.find(
+    (s) => s.currentKey === proposedKey && s.action !== excludeAction
+  );
+  if (storeConflict) {
+    return {
+      hasConflict: true,
+      conflictingAction: storeConflict.action,
+      conflictingDescription: storeConflict.description,
+    };
+  }
+
+  // Check passed-in bindings list
+  const bindingConflict = bindings.find(
+    (b) => b.key === proposedKey && b.action !== excludeAction
+  );
+  if (bindingConflict) {
+    const desc = store.shortcuts.find((s) => s.action === bindingConflict.action)?.description;
+    return {
+      hasConflict: true,
+      conflictingAction: bindingConflict.action,
+      conflictingDescription: desc,
+    };
+  }
+
+  return { hasConflict: false };
 }

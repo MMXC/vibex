@@ -5,7 +5,7 @@
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const Mousetrap = require('mousetrap');
-import { useShortcutStore, type ShortcutConfig } from '../../stores/shortcutStore';
+import { useShortcutStore, type ShortcutConfig, detectConflict as storeDetectConflict } from '../../stores/shortcutStore';
 
 // ==================== Types ====================
 
@@ -230,4 +230,34 @@ export function isReservedShortcut(key: string): boolean {
  */
 export function getReservedDescription(key: string): string | undefined {
   return SYSTEM_RESERVED[key];
+}
+
+// ==================== E1: detectConflict for ShortcutBinding (S71-E1) ====================
+
+/**
+ * E1: Extended detectConflict — checks against both ShortcutBinding[] and the store.
+ * Returns conflict info including conflicting action/description.
+ * Uses storeDetectConflict internally for store-level conflict detection.
+ */
+export function detectConflict(
+  bindings: ShortcutBinding[],
+  proposedKey: string,
+  excludeAction?: string
+): { hasConflict: boolean; conflictingAction?: string; conflictingDescription?: string } {
+  // Check system reserved keys
+  const globalResult = shortcutManager.checkGlobalConflict(proposedKey);
+  if (globalResult.hasConflict) {
+    return {
+      hasConflict: true,
+      conflictingAction: globalResult.systemAction,
+      conflictingDescription: globalResult.description,
+    };
+  }
+
+  // Delegate to store-level detectConflict
+  return storeDetectConflict(
+    bindings.map((b) => ({ action: b.action, key: b.key })),
+    proposedKey,
+    excludeAction
+  );
 }

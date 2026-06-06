@@ -313,3 +313,26 @@
   background: rgba(239, 68, 68, 0.1);
   border-color: #ef4444;
 }
+
+
+/* ---- E1: Favorite star button ---- */
+.favBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 0;
+  color: #94a3b8;
+  line-height: 1;
+  transition: color 0.15s, transform 0.1s;
+  flex-shrink: 0;
+}
+
+.favBtn:hover {
+  transform: scale(1.2);
+  color: #f59e0b;
+}
+
+.favBtn:active {
+  transform: scale(0.9);
+}

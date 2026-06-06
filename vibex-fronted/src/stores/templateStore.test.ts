@@ -446,4 +446,83 @@ describe('E5: 模板画廊搜索增强', () => {
       expect(Array.isArray(result)).toBe(true);
     });
   });
+
+
+  describe('E1: Favorites & Export', () => {
+    beforeEach(() => {
+      useTemplateStore.setState({
+        favoriteTemplateIds: [],
+        stats: { usageCount: {}, ratings: {} },
+      });
+    });
+
+    it('toggleFavorite adds template to favorites', () => {
+      const { toggleFavorite, templates } = useTemplateStore.getState();
+      const templateId = templates[0].id;
+      toggleFavorite(templateId);
+      expect(useTemplateStore.getState().favoriteTemplateIds).toContain(templateId);
+    });
+
+    it('toggleFavorite removes template from favorites (toggle off)', () => {
+      const { toggleFavorite, templates } = useTemplateStore.getState();
+      const templateId = templates[0].id;
+      toggleFavorite(templateId);
+      toggleFavorite(templateId);
+      expect(useTemplateStore.getState().favoriteTemplateIds).not.toContain(templateId);
+    });
+
+    it('isFavorite returns true for favorited template', () => {
+      const { toggleFavorite, isFavorite, templates } = useTemplateStore.getState();
+      const templateId = templates[0].id;
+      toggleFavorite(templateId);
+      expect(isFavorite(templateId)).toBe(true);
+    });
+
+    it('isFavorite returns false for non-favorited template', () => {
+      const { isFavorite, templates } = useTemplateStore.getState();
+      const templateId = templates[0].id;
+      expect(isFavorite(templateId)).toBe(false);
+    });
+
+    it('getFavorites returns only favorited templates', () => {
+      const { toggleFavorite, getFavorites, templates } = useTemplateStore.getState();
+      toggleFavorite(templates[0].id);
+      toggleFavorite(templates[1].id);
+      const favorites = getFavorites();
+      expect(favorites.length).toBe(2);
+      expect(favorites.map(t => t.id)).toContain(templates[0].id);
+      expect(favorites.map(t => t.id)).toContain(templates[1].id);
+    });
+
+    it('getFavorites returns empty array when no favorites', () => {
+      const { getFavorites } = useTemplateStore.getState();
+      expect(getFavorites()).toEqual([]);
+    });
+
+    it('exportTemplates includes all templates with version 1.0', () => {
+      const { exportTemplates } = useTemplateStore.getState();
+      const result = exportTemplates();
+      expect(result.version).toBe('1.0');
+      expect(result.templates.length).toBeGreaterThan(0);
+      expect(result.exportedAt).toBeTruthy();
+    });
+
+    it('importTemplates adds new templates with strategy=rename', () => {
+      const { importTemplates } = useTemplateStore.getState();
+      const newTemplate = {
+        id: 'import-test-001',
+        name: 'Imported Test',
+        description: 'Test import',
+        icon: '📦',
+        category: 'flowchart' as const,
+        tags: ['test'],
+        isPreset: false,
+      };
+      const json = JSON.stringify({ version: '1.0', templates: [newTemplate] });
+      const result = importTemplates(json, 'rename');
+      expect(result.success).toBe(true);
+      expect(result.imported).toBe(1);
+    });
+  });
+
 });

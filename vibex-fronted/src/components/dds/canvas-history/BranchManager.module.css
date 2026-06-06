@@ -1,0 +1,270 @@
+/* BranchManager — E1 (Sprint69): Branch lifecycle management panel */
+
+.branch-manager {
+  display: flex;
+  flex-direction: column;
+  width: 320px;
+  max-height: 100%;
+  background: #fff;
+  border-left: 1px solid #e5e7eb;
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* Header */
+.branch-manager-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid #e5e7eb;
+  background: #f9fafb;
+}
+
+.branch-manager-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+}
+
+.branch-manager-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  color: #6b7280;
+  padding: 4px;
+  border-radius: 4px;
+  line-height: 1;
+}
+
+.branch-manager-close:hover {
+  background: #f3f4f6;
+  color: #111827;
+}
+
+/* Tabs */
+.branch-manager-tabs {
+  display: flex;
+  border-bottom: 1px solid #e5e7eb;
+  background: #f9fafb;
+}
+
+.branch-tab {
+  flex: 1;
+  padding: 8px 4px;
+  border: none;
+  background: none;
+  font-size: 12px;
+  font-weight: 500;
+  color: #6b7280;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.branch-tab:hover {
+  color: #374151;
+}
+
+.branch-tab.active {
+  color: #4f46e5;
+  border-bottom-color: #4f46e5;
+}
+
+/* Content area */
+.branch-manager-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+}
+
+/* Branch list */
+.branch-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.branch-list-empty {
+  text-align: center;
+  color: #9ca3af;
+  font-size: 13px;
+  padding: 24px 0;
+}
+
+.branch-list-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  background: #fff;
+  transition: border-color 0.15s;
+}
+
+.branch-list-item.active {
+  border-color: #4f46e5;
+  background: #f5f3ff;
+}
+
+.branch-list-item.delete-mode {
+  border-color: #fca5a5;
+  background: #fff5f5;
+}
+
+.branch-list-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.branch-list-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #111827;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.branch-list-count {
+  font-size: 11px;
+  color: #9ca3af;
+}
+
+.branch-list-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.branch-action-btn {
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  color: #374151;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.branch-action-btn:hover {
+  background: #f9fafb;
+  border-color: #d1d5db;
+}
+
+.branch-action-btn.switch {
+  color: #4f46e5;
+  border-color: #c7d2fe;
+  background: #eef2ff;
+}
+
+.branch-action-btn.switch:hover {
+  background: #e0e7ff;
+}
+
+.branch-action-btn.delete {
+  color: #dc2626;
+  border-color: #fca5a5;
+  background: #fff5f5;
+}
+
+.branch-action-btn.delete:hover {
+  background: #fee2e2;
+}
+
+.branch-action-btn.confirm-delete {
+  color: #fff;
+  background: #dc2626;
+  border-color: #dc2626;
+}
+
+.branch-action-btn.confirm-delete:hover {
+  background: #b91c1c;
+}
+
+.branch-action-btn.cancel {
+  color: #6b7280;
+  background: #f9fafb;
+}
+
+.branch-active-badge {
+  font-size: 11px;
+  font-weight: 600;
+  color: #4f46e5;
+  background: #eef2ff;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+/* Form */
+.branch-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.branch-form-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #374151;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.branch-form-input,
+.branch-form-select {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 13px;
+  color: #111827;
+  background: #fff;
+  box-sizing: border-box;
+}
+
+.branch-form-input:focus,
+.branch-form-select:focus {
+  outline: none;
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
+}
+
+.branch-form-error {
+  font-size: 12px;
+  color: #dc2626;
+  background: #fef2f2;
+  border: 1px solid #fca5a5;
+  border-radius: 4px;
+  padding: 8px 10px;
+}
+
+.branch-form-submit {
+  width: 100%;
+  padding: 9px 16px;
+  background: #4f46e5;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.branch-form-submit:hover:not(:disabled) {
+  background: #4338ca;
+}
+
+.branch-form-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

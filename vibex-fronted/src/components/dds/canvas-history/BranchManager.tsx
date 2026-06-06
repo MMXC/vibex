@@ -17,15 +17,70 @@ interface BranchManagerProps {
 
 type Tab = 'list' | 'create' | 'delete';
 
-/**
- * BranchManager — E1 (Sprint69): Dedicated panel for canvas branch lifecycle management.
- *
- * Provides:
- * - List all branches with snapshot counts
- * - Create new branch from any existing snapshot
- * - Switch active branch (updates HistoryPanel filter)
- * - Delete branch (with 'main' protection)
- */
+// E1 (Sprint70): MergeBranchButton — visible only on non-main branches
+interface MergeBranchButtonProps {
+  /** Current branch name */
+  branch: string;
+  /** Current canvas ID */
+  canvasId?: string;
+  /** Called when merge completes successfully */
+  onMergeSuccess?: () => void;
+  /** Called to close the panel */
+  onClose: () => void;
+}
+
+function MergeBranchButton({ branch, canvasId, onMergeSuccess, onClose }: MergeBranchButtonProps) {
+  const [loading, setLoading] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
+  const mergeBranch = useCanvasHistoryStore((s) => s.mergeBranch);
+  const setCurrentBranch = useCanvasHistoryStore((s) => s.setCurrentBranch);
+  const listSnapshots = useCanvasHistoryStore((s) => s.listSnapshots);
+
+  const handleMerge = React.useCallback(async () => {
+    if (branch === 'main') return;
+    setLoading(true);
+    setError(null);
+    try {
+      await mergeBranch(canvasId ?? '', branch, 'main');
+      setCurrentBranch('main');
+      // Reload snapshots
+      await listSnapshots(canvasId ?? '');
+      onMergeSuccess?.();
+      onClose();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : '合并失败');
+    } finally {
+      setLoading(false);
+    }
+  }, [branch, canvasId, mergeBranch, setCurrentBranch, listSnapshots, onMergeSuccess, onClose]);
+
+  if (branch === 'main') return null;
+
+  return (
+    <div className="branch-merge-section">
+      <div className="branch-merge-header">
+        <span className="branch-merge-label">分支合并</span>
+      </div>
+      <div className="branch-merge-actions">
+        <button
+          className="branch-merge-btn"
+          onClick={handleMerge}
+          disabled={loading}
+          title={`将 "${branch}" 分支合并到 main`}
+        >
+          {loading ? '合并中…' : '合并到主分支'}
+        </button>
+      </div>
+      {error && (
+        <div className="branch-merge-error" role="alert">
+          {error}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// E1 (Sprint69): BranchManager
 const BranchManager = memo(function BranchManager({
   open,
   canvasId,
@@ -197,6 +252,13 @@ const BranchManager = memo(function BranchManager({
           ✕
         </button>
       </div>
+
+      {/* E1 (Sprint70): Merge to Main — visible only when on non-main branch */}
+      <MergeBranchButton
+        branch={activeBranch}
+        canvasId={canvasId}
+        onClose={onClose}
+      />
 
       {/* Tab navigation */}
       <div className="branch-manager-tabs" role="tablist">

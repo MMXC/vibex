@@ -28,6 +28,9 @@ import { AIDraftDrawer } from '@/components/dds/ai-draft';
 import { DDSFlow } from '@/components/dds/DDSFlow';
 import { useDDSCanvasStore, ddsChapterActions } from '@/stores/dds/DDSCanvasStore';
 import { useCanvasHistoryStore, saveHistoryToStorage, loadHistoryFromStorage } from '@/stores/dds/canvasHistoryStore';
+import { loadSnapshotFromDB } from '@/lib/canvas/historyDB';
+import { canvasStoreRegistry } from '@/lib/canvas/canvasStoreRegistry';
+import type { CanvasChapterData } from '@/lib/canvas/canvasStoreRegistry';
 import { parseRequirementContent } from '@/components/dds/canvas/ChapterPanel';
 import { TreeErrorBoundary } from '@/components/canvas/panels/TreeErrorBoundary';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
@@ -73,6 +76,21 @@ import { useResponsiveMode } from '@/hooks/useResponsiveMode';
 import { TouchModeIndicator } from '@/components/shared/TouchModeIndicator';
 import { SelectionToolbar } from '@/components/dds/SelectionToolbar';
 import { useSelectionBox } from '@/hooks/dds/useSelectionBox';
+
+// E1 (Sprint70): reloadFromSnapshot — reads a snapshot from IndexedDB and replaces canvas nodes
+async function reloadFromSnapshot(canvasId: string, snapshotId: string): Promise<void> {
+  const snapshot = await loadSnapshotFromDB(canvasId, snapshotId);
+  if (!snapshot?.data) return;
+  const current = canvasStoreRegistry.get(canvasId);
+  if (!current) return;
+  // Replace chapters with snapshot data
+  const updated: CanvasChapterData = {
+    ...current,
+    chapters: snapshot.data.chapters ?? current.chapters,
+    updatedAt: Date.now(),
+  };
+  canvasStoreRegistry.set(canvasId, updated);
+}
 
 // ==================== Props ====================
 
@@ -227,6 +245,42 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
   // ---- S16-P0-2: Conflict Resolution Dialog ----
   const [conflictDialogOpen, setConflictDialogOpen] = useState(false);
   const [conflictChanges, setConflictChanges] = useState<TokenChange[]>([]);
+
+  // E1 (Sprint70): Branch merge conflict dialog state
+  const [mergeConflictOpen, setMergeConflictOpen] = useState(false);
+  const [mergeConflictError, setMergeConflictError] = useState<string | null>(null);
+
+  // E1 (Sprint70): Set current branch on mount (restore active branch from store)
+  const pendingConflicts = useCanvasHistoryStore((s) => s.pendingConflicts);
+  const setCurrentBranch = useCanvasHistoryStore((s) => s.setCurrentBranch);
+  useEffect(() => {
+    const { currentBranch } = useCanvasHistoryStore.getState();
+    if (currentBranch) {
+      setCurrentBranch(currentBranch);
+    }
+    // Show merge conflict dialog if there are pending conflicts
+    if (pendingConflicts.length > 0) {
+      setMergeConflictOpen(true);
+    }
+  }, []);
+
+  // E1 (Sprint70): Called after all merge conflicts are resolved (called by ConflictResolutionDialog internally)
+  const handleMergeResolve = useCallback(async () => {
+    setMergeConflictError(null);
+    try {
+      // Reload canvas from latest snapshot after all conflicts resolved
+      if (projectId) {
+        const listSnapshots = useCanvasHistoryStore.getState().listSnapshots;
+        const snapshots = await listSnapshots(projectId);
+        const latest = snapshots[snapshots.length - 1];
+        if (latest) {
+          await reloadFromSnapshot(projectId, latest.id);
+        }
+      }
+    } catch (e) {
+      setMergeConflictError(e instanceof Error ? e.message : '合并后重载失败');
+    }
+  }, [projectId]);
 
   // E5-U1 AC1: Touch mode detection
   const { isMobile, isTablet } = useResponsiveMode();
@@ -977,13 +1031,13 @@ const { onCursorMove, broadcastCursor } = useWebSocketPresence({
           />
         );
       }
-      // Fallback: existing ConflictResolutionDialog for design-sync conflicts
+      // E1 (Sprint70): Branch merge conflict dialog — show when pendingConflicts exist
       return (
         <ConflictResolutionDialog
-          isOpen={conflictDialogOpen}
-          changes={conflictChanges}
-          onResolve={() => setConflictDialogOpen(false)}
-          onClose={() => setConflictDialogOpen(false)}
+          open={mergeConflictOpen}
+          canvasId={projectId}
+          onResolved={handleMergeResolve}
+          onClose={() => setMergeConflictOpen(false)}
         />
       );
     })()}

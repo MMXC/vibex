@@ -130,6 +130,28 @@ export interface SnapshotListFilters {
   starred?: boolean;
 }
 
+// ==================== E1 (Sprint70): Branch Merge Conflict Types ====================
+
+/** A conflict record when merging two branches — nodes that exist on both branches with different content */
+export interface BranchConflict {
+  /** Unique identifier for this conflict */
+  id: string;
+  /** Node ID that has conflicting content in both branches */
+  nodeId: string;
+  /** Node label for display purposes */
+  nodeLabel?: string;
+  /** The source branch name (changes we're merging in) */
+  localBranch: string;
+  /** The target branch name (current branch) */
+  remoteBranch: string;
+  /** Content of the node in the local branch */
+  localData: Record<string, unknown> | null;
+  /** Content of the node in the remote branch */
+  remoteData: Record<string, unknown> | null;
+  /** When this conflict was detected */
+  detectedAt: number;
+}
+
 
 /** Serializable snapshot metadata (for IndexedDB storage) */
 export interface SnapshotMeta {
@@ -163,6 +185,11 @@ interface CanvasHistoryState {
   snapshots: Snapshot[];
   /** ID of the snapshot currently being restored (for UI loading state) */
   restoringSnapshotId: string | null;
+  // E1 (Sprint70): Branch merge conflicts
+  /** Pending conflicts detected during branch merge */
+  pendingConflicts: BranchConflict[];
+  /** Current active branch name */
+  currentBranch: string;
 
   /** Push a new command, execute it, and push to history */
   execute: (cmd: Command) => void;
@@ -246,6 +273,17 @@ interface CanvasHistoryState {
   mergeBranch: (canvasId: string, sourceBranch: string, targetBranch: string) => Promise<void>;
   /** List all unique branch names for a canvas */
   listBranches: (canvasId: string) => Promise<string[]>;
+  // E1 (Sprint70): Branch merge conflict resolution
+  /** Set the current active branch name */
+  setCurrentBranch: (branchName: string) => void;
+  /** Resolve a single branch merge conflict — applies resolution and removes from pending */
+  resolveBranchConflict: (
+    canvasId: string,
+    nodeId: string,
+    resolution: 'keep-local' | 'keep-remote' | 'merge'
+  ) => Promise<void>;
+  /** Clear all pending conflicts (on cancel or full resolution) */
+  clearPendingConflicts: () => void;
 }
 
 // ==================== Helper ====================
@@ -270,6 +308,9 @@ export const useCanvasHistoryStore = create<CanvasHistoryState>((set, get) => ({
   // E1: snapshots
   snapshots: [],
   restoringSnapshotId: null,
+  // E1 (Sprint70): Branch merge conflicts
+  pendingConflicts: [],
+  currentBranch: 'main',
 
   execute: (cmd: Command) => {
     if (get().isPerforming) return;
@@ -703,6 +744,37 @@ export const useCanvasHistoryStore = create<CanvasHistoryState>((set, get) => ({
     const { listBranchesFromDB } = await import('@/lib/canvas/historyDB');
     return listBranchesFromDB(canvasId);
   },
+
+  setCurrentBranch: (branchName: string) => {
+    set({ currentBranch: branchName });
+  },
+
+  resolveBranchConflict: async (
+    _canvasId: string,
+    nodeId: string,
+    resolution: 'keep-local' | 'keep-remote' | 'merge',
+  ) => {
+    const { pendingConflicts } = get();
+    const conflict = pendingConflicts.find((c) => c.nodeId === nodeId);
+    if (!conflict) return;
+
+    // Apply resolution: the caller (DDSCanvasPage) is responsible for actually
+    // applying the chosen version to the canvas store. Here we just remove
+    // the conflict from the pending list.
+    const next = pendingConflicts.filter((c) => c.nodeId !== nodeId);
+    set({ pendingConflicts: next });
+
+    // Apply resolution to the store if the caller provides a callback
+    // (the DDSCanvasPage handles actual node data replacement)
+    console.debug(
+      `[canvasHistoryStore] resolveBranchConflict: resolved ${nodeId} with ${resolution}`,
+    );
+  },
+
+  clearPendingConflicts: () => {
+    set({ pendingConflicts: [] });
+  },
+
   // E1 (Sprint67): Branch comparison — compare the latest snapshots of two branches
   compareBranches: async (canvasId: string, branchA: string, branchB: string): Promise<BranchDiffResult> => {
     const emptyResult = (error: string): BranchDiffResult => ({

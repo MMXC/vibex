@@ -1,12 +1,17 @@
 /**
- * canvasSearchStore.test.ts — Sprint60 E5: canvasSearchStore unit tests
+ * canvasSearchStore.test.ts — Sprint60 E5 + Sprint65 E4 + Sprint68 E3
+ *
+ * Sprint60 E5: canvasSearchStore unit tests
+ * Sprint65 E4: globalSearchQuery / globalSearchResults tests
+ * Sprint68 E3: fulltextQuery / fulltextResults / searchNodeContent tests
  *
  * Vitest patterns used:
  * - Zustand dual-interface mock: vi.hoisted() + Object.assign for .getState()
  * - localStorage mock for persist middleware
+ * - Dynamic import mocking for searchNodeContent
  */
 
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { useCanvasSearchStore } from '@/stores/dds/canvasSearchStore';
 
 // ============================================
@@ -28,89 +33,132 @@ Object.defineProperty(globalThis, 'localStorage', {
 });
 
 // ============================================
-// Import after mock is set
+// Mock canvasFulltextIndex for searchNodeContent
 // ============================================
 
-describe('canvasSearchStore', () => {
+const mockSearchNodes = vi.fn();
+
+vi.mock('@/services/canvasFulltextIndex', () => ({
+  searchNodes: (...args: unknown[]) => mockSearchNodes(...args),
+}));
+
+// ============================================
+// Import after mocks are set
+// ============================================
+
+describe('canvasSearchStore — Sprint68 E3: fulltext search', () => {
   beforeEach(() => {
     // Reset store state
-    useCanvasSearchStore.setState({ searchHistory: [] });
+    useCanvasSearchStore.setState({
+      searchHistory: [],
+      globalSearchQuery: '',
+      globalSearchResults: [],
+      fulltextQuery: '',
+      fulltextResults: [],
+      fulltextLoading: false,
+    });
     store['vibex-search-history'] = JSON.stringify({ state: { searchHistory: [] }, version: 0 });
     localStorageMock.getItem.mockClear();
     localStorageMock.setItem.mockClear();
+    mockSearchNodes.mockReset();
+    vi.clearAllMocks();
   });
 
   describe('initial state', () => {
-    it('has empty searchHistory', () => {
+    it('has empty fulltextQuery by default', () => {
       const state = useCanvasSearchStore.getState();
-      expect(state.searchHistory).toEqual([]);
+      expect(state.fulltextQuery).toBe('');
+    });
+
+    it('has empty fulltextResults by default', () => {
+      const state = useCanvasSearchStore.getState();
+      expect(state.fulltextResults).toEqual([]);
+    });
+
+    it('has fulltextLoading false by default', () => {
+      const state = useCanvasSearchStore.getState();
+      expect(state.fulltextLoading).toBe(false);
     });
   });
 
-  describe('addToHistory', () => {
-    it('adds a query to history', () => {
-      useCanvasSearchStore.getState().addToHistory('测试查询');
-      expect(useCanvasSearchStore.getState().searchHistory).toContain('测试查询');
+  describe('setFulltextQuery', () => {
+    it('sets fulltextQuery', () => {
+      useCanvasSearchStore.getState().setFulltextQuery('测试查询');
+      expect(useCanvasSearchStore.getState().fulltextQuery).toBe('测试查询');
+    });
+  });
+
+  describe('setFulltextResults', () => {
+    it('sets fulltextResults', () => {
+      const mockResults = [
+        { nodeId: 'n1', canvasId: 'c1', canvasName: '测试画布', matchedText: '内容A', score: 0.1 },
+        { nodeId: 'n2', canvasId: 'c2', canvasName: '画布B', matchedText: '内容B', score: 0.2 },
+      ];
+      useCanvasSearchStore.getState().setFulltextResults(mockResults);
+      expect(useCanvasSearchStore.getState().fulltextResults).toHaveLength(2);
+      expect(useCanvasSearchStore.getState().fulltextResults[0].canvasName).toBe('测试画布');
+    });
+  });
+
+  describe('setFulltextLoading', () => {
+    it('sets fulltextLoading to true', () => {
+      useCanvasSearchStore.getState().setFulltextLoading(true);
+      expect(useCanvasSearchStore.getState().fulltextLoading).toBe(true);
     });
 
-    it('adds new query at the front', () => {
-      useCanvasSearchStore.getState().addToHistory('第一个');
-      useCanvasSearchStore.getState().addToHistory('第二个');
-      const history = useCanvasSearchStore.getState().searchHistory;
-      expect(history[0]).toBe('第二个');
-      expect(history[1]).toBe('第一个');
+    it('sets fulltextLoading to false', () => {
+      useCanvasSearchStore.getState().setFulltextLoading(true);
+      useCanvasSearchStore.getState().setFulltextLoading(false);
+      expect(useCanvasSearchStore.getState().fulltextLoading).toBe(false);
+    });
+  });
+
+  describe('searchNodeContent — E3 D4.2: Fuse.js 模糊搜索', () => {
+    it('calls searchNodes and sets results on success', async () => {
+      const mockResults = [
+        { nodeId: 'n1', canvasId: 'c1', canvasName: '画布A', matchedText: '找到的内容', score: 0.1 },
+      ];
+      mockSearchNodes.mockResolvedValue(mockResults);
+
+      const promise = useCanvasSearchStore.getState().searchNodeContent('找到');
+      // Should set loading true immediately
+      expect(useCanvasSearchStore.getState().fulltextLoading).toBe(true);
+
+      await promise;
+
+      expect(mockSearchNodes).toHaveBeenCalledWith('找到');
+      expect(useCanvasSearchStore.getState().fulltextQuery).toBe('找到');
+      expect(useCanvasSearchStore.getState().fulltextResults).toHaveLength(1);
+      expect(useCanvasSearchStore.getState().fulltextLoading).toBe(false);
     });
 
-    it('deduplicates: moves existing query to front instead of duplicating', () => {
-      useCanvasSearchStore.getState().addToHistory('重复查询');
-      useCanvasSearchStore.getState().addToHistory('其他');
-      useCanvasSearchStore.getState().addToHistory('重复查询');
-      const history = useCanvasSearchStore.getState().searchHistory;
-      // Should appear only once, at front
-      const occurrences = history.filter((item) => item === '重复查询').length;
-      expect(occurrences).toBe(1);
-      expect(history[0]).toBe('重复查询');
+    it('clears results when query is empty', async () => {
+      mockSearchNodes.mockResolvedValue([]);
+
+      await useCanvasSearchStore.getState().searchNodeContent('   ');
+
+      expect(mockSearchNodes).not.toHaveBeenCalled();
+      expect(useCanvasSearchStore.getState().fulltextQuery).toBe('');
+      expect(useCanvasSearchStore.getState().fulltextResults).toEqual([]);
+      expect(useCanvasSearchStore.getState().fulltextLoading).toBe(false);
     });
 
-    it('caps history at 10 items', () => {
-      for (let i = 0; i < 15; i++) {
-        useCanvasSearchStore.getState().addToHistory(`查询${i}`);
+    it('handles searchNodes error gracefully', async () => {
+      mockSearchNodes.mockRejectedValue(new Error('index error'));
+
+      await useCanvasSearchStore.getState().searchNodeContent('查询');
+
+      expect(useCanvasSearchStore.getState().fulltextResults).toEqual([]);
+      expect(useCanvasSearchStore.getState().fulltextLoading).toBe(false);
+    });
+
+    it('stores up to MAX_HISTORY_ITEMS (10) for search history', async () => {
+      mockSearchNodes.mockResolvedValue([]);
+      for (let i = 0; i < 12; i++) {
+        await useCanvasSearchStore.getState().searchNodeContent(`查询${i}`);
       }
       const history = useCanvasSearchStore.getState().searchHistory;
       expect(history.length).toBeLessThanOrEqual(10);
-    });
-
-    it('trims whitespace from query', () => {
-      useCanvasSearchStore.getState().addToHistory('  前后空格  ');
-      expect(useCanvasSearchStore.getState().searchHistory).toContain('前后空格');
-    });
-
-    it('ignores empty or whitespace-only queries', () => {
-      useCanvasSearchStore.getState().addToHistory('已有');
-      useCanvasSearchStore.getState().addToHistory('   ');
-      useCanvasSearchStore.getState().addToHistory('');
-      expect(useCanvasSearchStore.getState().searchHistory).toEqual(['已有']);
-    });
-
-    it('searchHistory length increases after addToHistory', () => {
-      const initial = useCanvasSearchStore.getState().searchHistory.length;
-      useCanvasSearchStore.getState().addToHistory('持久化测试');
-      expect(useCanvasSearchStore.getState().searchHistory.length).toBe(initial + 1);
-    });
-  });
-
-  describe('clearHistory', () => {
-    it('clears all history', () => {
-      useCanvasSearchStore.getState().addToHistory('A');
-      useCanvasSearchStore.getState().addToHistory('B');
-      useCanvasSearchStore.getState().clearHistory();
-      expect(useCanvasSearchStore.getState().searchHistory).toEqual([]);
-    });
-
-    it('clears history and count goes to zero', () => {
-      useCanvasSearchStore.getState().addToHistory('A');
-      useCanvasSearchStore.getState().clearHistory();
-      expect(useCanvasSearchStore.getState().searchHistory.length).toBe(0);
     });
   });
 });

@@ -1,28 +1,33 @@
 /**
- * wsCommentHandler — Sprint51 E5: WebSocket 评论实时通知处理器
+ * wsCommentHandler — Sprint51 E5 + Sprint53-E2 + S71-E2
  *
  * 功能：
  * - 订阅 backend 发送的 comment:created / comment:resolved / comment:mention 消息
  * - 将远程评论事件转发到 commentStore（驱动 UI 自动刷新）
  * - S51-E5: comment:mention 消息转发到 mentionsStore 并更新未读计数
  * - S53-E2: revision:bump / revision:conflict 消息转发到 canvasHistoryStore
- * - 提供 addCommentFromRemote() 给本地添加评论（带 timestamp 用于去重）
+ * - S71-E2: comment:reaction / comment:delete 消息类型
  *
  * S51-E5: 新增 comment:mention 类型 — WebSocket 通知被 @ 的用户
  * S53-E2: 新增 revision:bump / revision:conflict — Undo/Redo 协作冲突处理
+ * S71-E2: 新增 comment:reaction / comment:delete — Reactions + 远程删除
  */
 import { useCommentStore } from '@/stores/dds/commentStore';
-import type { Comment } from '@/stores/dds/commentStore';
+import type { Comment, ReactionType } from '@/stores/dds/commentStore';
 import { useMentionsStore } from '@/stores/dds/mentionsStore';
 
 /** Extended comment shape from WebSocket (backend augments Comment with extra fields) */
 export interface WSCommentMessage {
-  type: 'comment:created' | 'comment:resolved' | 'comment:mention';
+  type: 'comment:created' | 'comment:resolved' | 'comment:mention' | 'comment:reaction' | 'comment:delete';
   payload: {
-    comment: Comment & {
+    comment?: Comment & {
       authorId?: string;
       projectId?: string;
     };
+    commentId?: string;
+    reactionType?: ReactionType;
+    userId?: string;
+    reactionId?: string;
   };
 }
 
@@ -45,10 +50,11 @@ export function handleCommentWSMessage(data: unknown): void {
   if (!isWSCommentMessage(data)) return;
 
   const { type, payload } = data;
-  const { comment } = payload;
 
   switch (type) {
     case 'comment:created': {
+      const { comment } = payload;
+      if (!comment) return;
       // Deduplication: skip if comment already exists (by commentId)
       const store = useCommentStore.getState();
       const existing = store.comments.find(c => c.commentId === comment.commentId);
@@ -62,6 +68,8 @@ export function handleCommentWSMessage(data: unknown): void {
     }
 
     case 'comment:resolved': {
+      const { comment } = payload;
+      if (!comment) return;
       // Mark comment as resolved (even if it already exists)
       useCommentStore.setState(state => {
         const comments = state.comments.map(c =>
@@ -72,15 +80,33 @@ export function handleCommentWSMessage(data: unknown): void {
       break;
     }
 
+    case 'comment:reaction': {
+      // S71-E2: Remote reaction added by another user
+      const { commentId, reactionType, userId } = payload;
+      if (!commentId || !reactionType || !userId) return;
+      useCommentStore.getState().addReaction(commentId, reactionType, userId);
+      break;
+    }
+
+    case 'comment:delete': {
+      // S71-E2: Remote comment deleted by another user
+      const { commentId } = payload;
+      if (!commentId) return;
+      // Only delete if exists locally (don't throw)
+      const existing = useCommentStore.getState().comments.find(c => c.commentId === commentId);
+      if (existing) {
+        useCommentStore.getState().deleteComment(commentId);
+      }
+      break;
+    }
+
     // ── S51-E5: @mention 通知 ───────────────────────────────────────────────
-    // Backend 发送某用户被 @ 的通知，前端写入 mentionsStore 并触发未读计数
-    // Map Comment → Mention shape expected by mentionsStore.addMention
     case 'comment:mention': {
+      const { comment } = payload;
+      if (!comment) return;
       import('@/stores/dds/mentionsStore').then(({ useMentionsStore: useMentionStore }) => {
-        // Dynamic import parseMentions within the promise chain
         import('@/lib/canvas/parseMentions').then(({ parseMentions }) => {
           const mentionedUsers = parseMentions(comment.text);
-          // toUser is the second mention (the notified user), fallback to first
           const toUser = mentionedUsers[1] ?? mentionedUsers[0] ?? 'unknown';
 
           useMentionStore.getState().addMention({
@@ -133,18 +159,24 @@ export function handleCommentWSMessage(data: unknown): void {
 }
 
 /**
- * 类型守卫 — 支持 S51-E5 comment:mention 类型
+ * 类型守卫 — 支持 S51-E5 comment:mention + S71-E2 comment:reaction / comment:delete
  */
 function isWSCommentMessage(data: unknown): data is WSCommentMessage {
   if (typeof data !== 'object' || data === null) return false;
   const msg = data as Record<string, unknown>;
+  const validTypes = [
+    'comment:created',
+    'comment:resolved',
+    'comment:mention',
+    'comment:reaction',
+    'comment:delete',
+    'revision:bump',
+    'revision:conflict',
+  ];
   return (
-    (msg.type === 'comment:created' ||
-      msg.type === 'comment:resolved' ||
-      msg.type === 'comment:mention') &&
+    validTypes.includes(msg.type as string) &&
     typeof msg.payload === 'object' &&
-    msg.payload !== null &&
-    'comment' in (msg.payload as Record<string, unknown>)
+    msg.payload !== null
   );
 }
 
@@ -155,8 +187,6 @@ function isWSCommentMessage(data: unknown): data is WSCommentMessage {
 export function registerCommentWSHandler(
   _sendMessage: (data: unknown) => void
 ): () => void {
-  // 这个函数返回一个 cleanup，注册方持有
-  // 实际的消息路由在 handleCommentWSMessage 中处理
   return () => {
     // cleanup — WebSocket 关闭时调用
   };
@@ -167,13 +197,18 @@ export function registerCommentWSHandler(
  * 触发 backend 向其他连接广播 comment:created 消息
  *
  * S51-E5: 支持 comment:mention 类型
+ * S71-E2: 支持 comment:reaction / comment:delete 类型
  */
 export function publishCommentEvent(
   sendMessage: (data: unknown) => void,
-  event: { type: 'comment:created' | 'comment:resolved' | 'comment:mention'; comment: Comment }
+  event: {
+    type: 'comment:created' | 'comment:resolved' | 'comment:mention' | 'comment:reaction' | 'comment:delete';
+    comment?: Comment;
+    commentId?: string;
+    reactionType?: ReactionType;
+    userId?: string;
+    reactionId?: string;
+  }
 ): void {
-  sendMessage({
-    type: event.type,
-    payload: { comment: event.comment },
-  });
+  sendMessage({ type: event.type, payload: { comment: event.comment, commentId: event.commentId, reactionType: event.reactionType, userId: event.userId, reactionId: event.reactionId } });
 }

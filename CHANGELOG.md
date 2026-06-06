@@ -6358,3 +6358,12 @@ See git history for complete changelog.
 - **E1.2**: `TemplateGallery.tsx` — 每张卡片添加★收藏切换按钮，stopPropagation 防冒泡
 - **E1.3**: `templateStore.test.ts` — 新增 E1 收藏测试 9 项：toggleFavorite×2, isFavorite×2, getFavorites×2, exportTemplates×1, importTemplates×1
 - **Test**: 89/89 vitest ✅
+
+## [Unreleased] S68-E2: @提及通知系统 — 2026-06-06
+- **E2.1**: `notificationStore.ts` — Zustand + persist，通知列表 CRUD、getUnreadCount、getByCanvas、getByType
+- **E2.2**: `wsNotificationHandler.ts` — 处理 `notification:*` WebSocket 消息（new/update/read）
+- **E2.3**: `MentionInput.tsx` — @ 自动补全组件，输入 @ 显示用户列表
+- **E2.4**: `NotificationPanel.tsx` — 通知中心面板，未读红点、分页、标记已读
+- **E2.5**: `DDSToolbar.tsx` — 添加通知铃铛按钮（integration pending）
+- **E2.6**: `CollabActivityPanel.tsx` — MentionInput 集成（integration pending）
+- **E2.7**: `notificationStore.test.ts` — 13项测试覆盖

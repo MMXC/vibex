@@ -79,6 +79,21 @@ export interface CursorState {
   lastSeen: number;
 }
 
+/** S70-E4: Collaboration conflict record */
+export interface ConflictRecord {
+  nodeId: string;
+  nodeName: string;
+  localVersion: string;
+  remoteVersion: string;
+  localUserId: string;
+  localUserName: string;
+  remoteUserId: string;
+  remoteUserName: string;
+  detectedAt: number;
+  /** 'keep-local' | 'keep-remote' | 'pending' */
+  resolution: 'keep-local' | 'keep-remote' | 'pending';
+}
+
 /** Heartbeat timeout in milliseconds (30s) */
 const HEARTBEAT_TIMEOUT_MS = 30_000;
 
@@ -113,6 +128,21 @@ interface PresenceState {
   // S68-E5: Dedicated cursors field
   /** S68-E5: Dedicated cursor tracking: userId → CursorState */
   cursors: Record<string, CursorState>;
+
+  /** S70-E4: Pending collaboration conflicts requiring resolution */
+  pendingConflicts: ConflictRecord[];
+
+  /** S70-E4: Add a new conflict to the pending queue */
+  addConflict: (conflict: Omit<ConflictRecord, 'resolution'>) => void;
+
+  /** S70-E4: Resolve a specific conflict by nodeId */
+  resolveConflict: (nodeId: string, resolution: 'keep-local' | 'keep-remote') => void;
+
+  /** S70-E4: Check if a conflict exists for a node */
+  hasConflict: (nodeId: string) => boolean;
+
+  /** S70-E4: Get the number of unresolved conflicts */
+  getUnresolvedCount: () => number;
 
   /** S68-E5: Update a user's cursor position in the cursors map */
   broadcastCursor: (userId: string, x: number, y: number) => void;
@@ -394,6 +424,30 @@ export const usePresenceStore = create<PresenceState>((set, get) => {
 
     startEditing: (nodeId: string, userId: string, userName: string, avatar: string) =>
       set((state) => {
+        // S70-E4: Conflict detection — if a remote user is already editing this node,
+        // trigger a conflict (both versions are "current" — no version history captured)
+        const existingRemote = state.editingNodeIds.get(nodeId);
+        if (existingRemote && existingRemote.userId !== userId) {
+          // Remote user is editing — this is a conflict
+          const conflict: ConflictRecord = {
+            nodeId,
+            nodeName: nodeId, // nodeName fallback to nodeId
+            localVersion: '(编辑中)',
+            remoteVersion: '(编辑中)',
+            localUserId: userId,
+            localUserName: userName,
+            remoteUserId: existingRemote.userId,
+            remoteUserName: existingRemote.userName,
+            detectedAt: Date.now(),
+            resolution: 'pending',
+          };
+          // addConflict handles dedup
+          const store = get();
+          if (store.pendingConflicts.every((c) => c.nodeId !== nodeId)) {
+            set({ pendingConflicts: [...state.pendingConflicts, conflict] });
+          }
+        }
+
         const updated = new Map(state.editingNodeIds);
         updated.set(nodeId, { userId, userName, avatar, startedAt: Date.now() });
         const localUpdated = new Map(state.localEditing);
@@ -671,6 +725,39 @@ export const usePresenceStore = create<PresenceState>((set, get) => {
         delete focusTimers[nodeId];
       }
       set({ nodeLocks: new Map() });
+    },
+
+    // S70-E4: Conflict detection & resolution actions
+
+    pendingConflicts: [],
+
+    addConflict: (conflict) => {
+      set((state) => {
+        // Avoid duplicates for same nodeId
+        if (state.pendingConflicts.some((c) => c.nodeId === conflict.nodeId)) {
+          return state;
+        }
+        return {
+          pendingConflicts: [
+            ...state.pendingConflicts,
+            { ...conflict, resolution: 'pending' as const },
+          ],
+        };
+      });
+    },
+
+    resolveConflict: (nodeId, resolution) => {
+      set((state) => ({
+        pendingConflicts: state.pendingConflicts.filter((c) => c.nodeId !== nodeId),
+      }));
+    },
+
+    hasConflict: (nodeId) => {
+      return get().pendingConflicts.some((c) => c.nodeId === nodeId);
+    },
+
+    getUnresolvedCount: () => {
+      return get().pendingConflicts.length;
     },
   };
 });

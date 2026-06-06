@@ -98,10 +98,31 @@ function CanvasResults({
 function NodeContentResults({
   results, selectedIdx, loading, onSelect, onHover, query
 }: {
-  results: Array<{ nodeId: string; canvasId: string; canvasName: string; matchedText: string; score: number }>;
+  results: Array<{ nodeId: string; canvasId: string; canvasName: string; matchedText: string; score: number; before?: string; after?: string }>;
   selectedIdx: number; loading: boolean;
   onSelect: (r: typeof results[0]) => void; onHover: (i: number) => void; query: string;
 }) {
+  /**
+   * E2 (Sprint69): Render matched text with <mark> highlighting.
+   * Falls back to plain text if no before/after context is available.
+   */
+  const renderSnippet = (result: typeof results[0]) => {
+    if (result.before !== undefined && result.after !== undefined) {
+      return (
+        <span style={{ fontSize: 12, color: '#6b7280', paddingLeft: 22 }}>
+          {result.before}
+          <mark style={{ background: '#fef08a', borderRadius: 2 }}>{result.matchedText}</mark>
+          {result.after}
+        </span>
+      );
+    }
+    return (
+      <span style={{ fontSize: 12, color: '#6b7280', paddingLeft: 22, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+        &quot;{result.matchedText}&quot;
+      </span>
+    );
+  };
+
   return (
     <ul style={{ maxHeight: 320, overflowY: 'auto', padding: '4px 0', margin: 0, listStyle: 'none' }} role="tabpanel">
       {results.length === 0 && query.trim() && !loading && (
@@ -132,9 +153,7 @@ function NodeContentResults({
                 {result.canvasName}
               </span>
             </span>
-            <span style={{ fontSize: 12, color: '#6b7280', paddingLeft: 22, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              "{result.matchedText}"
-            </span>
+            {renderSnippet(result)}
           </button>
         </li>
       ))}
@@ -155,7 +174,7 @@ export function GlobalSearchPanel({ open, onClose }: GlobalSearchPanelProps) {
   const [loading, setLoading] = useState(false);
   const [selectedIdx, setSelectedIdx] = useState(0);
 
-  const addToHistory = useCanvasSearchStore((s) => s.addToHistory);
+  const addToSearchHistory = useCanvasSearchStore((s) => s.addToSearchHistory);
   const setActiveCanvas = useCanvasListStore((s) => s.setActiveCanvas);
   const router = useRouter();
 
@@ -201,8 +220,8 @@ export function GlobalSearchPanel({ open, onClose }: GlobalSearchPanelProps) {
     setLoading(true);
     const timer = setTimeout(async () => {
       try {
-        const { searchNodes } = await import('@/services/canvasFulltextIndex');
-        const found = await searchNodes(query);
+        const { searchWithContext } = await import('@/services/canvasFulltextIndex');
+        const found = await searchWithContext(query);
         setNodeResults(found);
         setSelectedIdx(0);
       } catch (err) {
@@ -225,19 +244,19 @@ export function GlobalSearchPanel({ open, onClose }: GlobalSearchPanelProps) {
   }, []);
 
   const handleSelectCanvas = useCallback((result: SearchResult) => {
-    addToHistory(query);
+    addToSearchHistory(query);
     setActiveCanvas(result.item.id);
     router.push(`/canvas/${result.item.id}`);
     onClose();
-  }, [query, addToHistory, setActiveCanvas, router, onClose]);
+  }, [query, addToSearchHistory, setActiveCanvas, router, onClose]);
 
   const handleSelectNode = useCallback((result: { nodeId: string; canvasId: string; canvasName: string; matchedText: string }) => {
-    addToHistory(query);
+    addToSearchHistory(query);
     setActiveCanvas(result.canvasId);
     // TODO(E3): highlightNode(result.nodeId) — would require passing highlightNode from DDSCanvasPage
     router.push(`/canvas/${result.canvasId}`);
     onClose();
-  }, [query, addToHistory, setActiveCanvas, router, onClose]);
+  }, [query, addToSearchHistory, setActiveCanvas, router, onClose]);
 
   // Keyboard navigation
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {

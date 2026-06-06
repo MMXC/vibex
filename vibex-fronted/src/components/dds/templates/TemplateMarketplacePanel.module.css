@@ -1,6 +1,7 @@
 /**
  * TemplateMarketplacePanel.module.css — Marketplace panel styles
  * Sprint70 E2: 模板市场发现与浏览
+ * Sprint71 E5: 评分星标 + 收藏按钮 + 排序选择器
  */
 
 .panel {
@@ -60,6 +61,39 @@
 
 .searchInput:focus {
   border-color: var(--color-primary, #6366f1);
+}
+
+/* E5: Sort selector */
+.sortRow {
+  display: flex;
+  gap: 6px;
+  padding: 4px 16px 8px;
+}
+
+.sortBtn {
+  flex: 1;
+  padding: 5px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--color-border, rgba(255, 255, 255, 0.1));
+  background: transparent;
+  color: var(--color-text-secondary, #94a3b8);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+  text-align: center;
+}
+
+.sortBtn:hover {
+  border-color: var(--color-primary, #6366f1);
+  color: var(--color-text, #e2e8f0);
+}
+
+.sortBtnActive {
+  border-color: var(--color-primary, #6366f1);
+  background: rgba(99, 102, 241, 0.15);
+  color: #a5b4fc;
+  font-weight: 600;
 }
 
 .tagCloud {
@@ -155,12 +189,7 @@
 
 .card:hover {
   border-color: var(--color-primary, #6366f1);
-  background: var(--color-surface-hover, #1e1e35);
-}
-
-.card:disabled {
-  opacity: 0.6;
-  cursor: wait;
+  background: rgba(99, 102, 241, 0.06);
 }
 
 .cardIcon {
@@ -179,49 +208,116 @@
   font-size: 13px;
   font-weight: 600;
   color: var(--color-text, #e2e8f0);
-  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
 }
 
 .cardDesc {
   font-size: 11px;
   color: var(--color-text-secondary, #94a3b8);
-  line-height: 1.4;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
+/* E5: Rating row */
+.ratingRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 4px;
+}
+
+.starRow {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+}
+
+.starBtn {
+  background: transparent;
+  border: none;
+  padding: 0 1px;
+  font-size: 13px;
+  cursor: pointer;
+  line-height: 1;
+  transition: transform 0.1s;
+}
+
+.starBtn:hover {
+  transform: scale(1.2);
+}
+
+.starFilled {
+  color: #f59e0b;
+}
+
+.starEmpty {
+  color: rgba(255, 255, 255, 0.2);
+}
+
+.ratingCount {
+  font-size: 11px;
+  color: var(--color-text-secondary, #94a3b8);
+  margin-left: 2px;
+}
+
+.favoriteBtn {
+  background: transparent;
+  border: none;
+  padding: 2px 4px;
+  font-size: 16px;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.3);
+  transition: all 0.15s;
+  line-height: 1;
+}
+
+.favoriteBtn:hover {
+  transform: scale(1.2);
+  color: #f59e0b;
+}
+
+.favoriteActive {
+  color: #f59e0b;
+}
+
 .cardFooter {
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
-  margin-top: 2px;
   width: 100%;
+  align-items: center;
 }
 
-.usageBadge {
-  font-size: 10px;
-  color: #f97316;
-  background: rgba(249, 115, 22, 0.12);
+.usageBadge,
+.authorBadge,
+.tagBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
   padding: 2px 6px;
   border-radius: 4px;
-  white-space: nowrap;
-}
-
-.authorBadge {
   font-size: 10px;
   color: var(--color-text-secondary, #94a3b8);
-  background: rgba(255, 255, 255, 0.06);
-  padding: 2px 6px;
-  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .tagBadge {
   font-size: 10px;
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-weight: 500;
-  white-space: nowrap;
+}
+
+
+.cardDisabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }

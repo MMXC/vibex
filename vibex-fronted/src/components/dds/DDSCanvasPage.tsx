@@ -54,6 +54,7 @@ import { HistoryPanel } from '@/components/canvas/features/HistoryPanel';
 import { useConflictStore } from '@/stores/dds/conflictStore';
 import { ConflictDialog } from '@/components/dds/canvas-dashboard/ConflictDialog';
 import { ConflictResolutionDialog } from '@/components/dds/canvas-dashboard/ConflictResolutionDialog';
+import { CollabConflictDialog } from '@/components/dds/collaboration/ConflictResolutionDialog';
 import { PresenceOverlay } from '@/components/dds/presence/PresenceOverlay';
 import { useWebSocketPresence } from '@/lib/collaboration/useWebSocketPresence';
 // S62-E1: Collaboration editing broadcast
@@ -249,6 +250,21 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
   // E1 (Sprint70): Branch merge conflict dialog state
   const [mergeConflictOpen, setMergeConflictOpen] = useState(false);
   const [mergeConflictError, setMergeConflictError] = useState<string | null>(null);
+
+  // E4 (Sprint70): Collaboration conflict dialog state
+  const [collabConflictOpen, setCollabConflictOpen] = useState(false);
+  // E4 (Sprint70): Listen for presenceStore.pendingConflicts changes → auto-open dialog
+  const presencePendingConflicts = usePresenceStore((s) => s.pendingConflicts);
+  useEffect(() => {
+    if (presencePendingConflicts.length > 0) {
+      setCollabConflictOpen(true);
+    }
+  }, [presencePendingConflicts]);
+
+  // E4 (Sprint70): Called after all collab conflicts are resolved
+  const handleCollabConflictResolved = useCallback(() => {
+    setCollabConflictOpen(false);
+  }, []);
 
   // E1 (Sprint70): Set current branch on mount (restore active branch from store)
   const pendingConflicts = useCanvasHistoryStore((s) => s.pendingConflicts);
@@ -1041,6 +1057,13 @@ const { onCursorMove, broadcastCursor } = useWebSocketPresence({
         />
       );
     })()}
+
+    {/* E4 (Sprint70): Collaboration conflict dialog — show when presenceStore.pendingConflicts exist */}
+    <CollabConflictDialog
+      open={collabConflictOpen}
+      onResolved={handleCollabConflictResolved}
+      onClose={() => setCollabConflictOpen(false)}
+    />
 
     {/* P004-E4: History Panel — Ctrl+Z opens for selective undo */}
     <HistoryPanel

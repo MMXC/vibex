@@ -55,7 +55,7 @@ function BatchIcon() {
 
 // ==================== Export types ====================
 
-type ExportFormat = 'JSON' | 'Vibex' | 'PDF' | 'PNG' | 'SVG' | 'Figma';
+type ExportFormat = 'JSON' | 'Vibex' | 'PDF' | 'PNG' | 'SVG' | 'Figma' | 'MultiFormat';
 
 interface ExportOption {
   id: ExportFormat;
@@ -70,6 +70,7 @@ const EXPORT_OPTIONS: ExportOption[] = [
   { id: 'PNG', label: 'PNG', description: '位图格式，适合嵌入文档或报告' },
   { id: 'SVG', label: 'SVG', description: '矢量格式，适合无损缩放' },
   { id: 'Figma', label: 'Figma', description: 'Figma 兼容 JSON，适合导入设计工具' },
+  { id: 'MultiFormat', label: '多格式导出 (ZIP)', description: 'PNG + SVG + PDF 一键打包下载' },
 ];
 
 // ==================== Helpers ====================
@@ -236,6 +237,33 @@ export const ExportMenu = memo(function ExportMenu({
     }
   }, [chapters]);
 
+  // E3: Multi-format batch export — PNG + SVG + PDF bundled as ZIP
+  const handleExportMultiFormat = useCallback(async () => {
+    setLoadingFormat('MultiFormat');
+    try {
+      const { exportMultiFormatZip } = await import('@/services/export/MultiFormatExporter');
+      const { useDDSCanvasStore } = await import('@/stores/dds');
+      const store = useDDSCanvasStore.getState();
+      const blob = await exportMultiFormatZip(
+        {
+          formats: ['png', 'svg', 'pdf'],
+          canvasId: store.canvasId ?? 'canvas',
+          backgroundColor: '#0f0f1a',
+          scale: 2,
+        },
+        store.chapters.boundedContext ?? [],
+        store.chapters.businessFlow ?? [],
+        store.chapters.component ?? []
+      );
+      downloadBlob(blob, `vibex-multiformat-${new Date().toISOString().slice(0, 10)}.zip`);
+    } catch (err) {
+      console.error('[ExportMenu] Multi-format export error:', err);
+    } finally {
+      setLoadingFormat(null);
+      setIsOpen(false);
+    }
+  }, []);
+
   const handleOpenBatchExport = useCallback(() => {
     setIsOpen(false);
     setIsExportDialogOpen(true);
@@ -262,9 +290,12 @@ export const ExportMenu = memo(function ExportMenu({
         case 'Figma':
           await handleExportFigma();
           break;
+        case 'MultiFormat':
+          await handleExportMultiFormat();
+          break;
       }
     },
-    [handleExportJSON, handleExportVibex, handleExportPDF, handleExportPNG, handleExportSVG, handleExportFigma]
+    [handleExportJSON, handleExportVibex, handleExportPDF, handleExportPNG, handleExportSVG, handleExportFigma, handleExportMultiFormat]
   );
 
   return (

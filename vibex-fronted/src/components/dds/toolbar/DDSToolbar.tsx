@@ -33,6 +33,7 @@ import { ExportMenu } from './ExportMenu';
 import { OnlineUsers } from './OnlineUsers';
 import { OfflineIndicator } from './OfflineIndicator';
 import { PresencePanel } from '@/components/presence/PresencePanel';
+import { ViewPresetsPanel } from './ViewPresetsPanel';
 import { useTranslations } from '@/hooks/useTranslations';
 import { useLanguage } from '@/hooks/settings/useLanguage';
 import { LanguageSwitcher } from './LanguageSwitcher';
@@ -46,8 +47,6 @@ import { HistoryPanel } from '@/components/dds/history/HistoryPanel';
 import { BackupPanel } from '@/components/dds/settings/BackupPanel';
 import { CanvasSettingsPanel } from '@/components/dds/settings/CanvasSettingsPanel';
 import { ConflictDialog } from '@/components/dds/canvas-dashboard/ConflictDialog';
-import { NotificationPanel } from '@/components/dds/notifications/NotificationPanel';
-import { useNotificationStore } from '@/stores/notificationStore';
 import styles from './DDSToolbar.module.css';
 
 // ==================== Chapter label keys (mapped to i18n keys) ====================
@@ -265,7 +264,7 @@ export const DDSToolbar = memo(function DDSToolbar({
   const [isHistoryPanelOpen, setIsHistoryPanelOpen] = useState(false);
   const [isBackupOpen, setIsBackupOpen] = useState(false);
   const [isCanvasSettingsOpen, setIsCanvasSettingsOpen] = useState(false);
-  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+  const [isViewPresetsOpen, setIsViewPresetsOpen] = useState(false);
 
   // E3-S3: RBAC for toolbar actions
   const rbac = useCanvasRBAC(projectId);
@@ -520,39 +519,33 @@ export const DDSToolbar = memo(function DDSToolbar({
             className={styles.exportMenuWrapper}
           />
 
-          {/* S68-E2: Notification bell */}
-          <button
-            type="button"
-            className={styles.exportBtn}
-            onClick={() => setIsNotificationOpen(v => !v)}
-            aria-label="通知中心"
-            title="通知中心"
-            data-testid="notification-bell-btn"
-          >
-            🔔
-            {useNotificationStore.getState().getUnreadCount() > 0 && (
-              <span
-                style={{
-                  position: 'absolute',
-                  top: -4,
-                  right: -4,
-                  width: 14,
-                  height: 14,
-                  borderRadius: '50%',
-                  background: '#ef4444',
-                  color: '#fff',
-                  fontSize: 9,
-                  fontWeight: 700,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  lineHeight: 1,
-                }}
-              >
-                {useNotificationStore.getState().getUnreadCount() > 9 ? '9+' : useNotificationStore.getState().getUnreadCount()}
-              </span>
-            )}
-          </button>
+          {/* S69-E5: View Presets dropdown */}
+          <div style={{ position: 'relative' }}>
+            <button
+              type="button"
+              className={styles.exportBtn}
+              onClick={() => setIsViewPresetsOpen((v) => !v)}
+              aria-label="画布视图预设"
+              aria-expanded={isViewPresetsOpen}
+              aria-haspopup="menu"
+              data-testid="view-presets-btn"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="3" />
+                <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+                <path d="M4.93 4.93a10 10 0 0 0 0 14.14" />
+              </svg>
+              <span>预设</span>
+            </button>
+            <ViewPresetsPanel
+              open={isViewPresetsOpen}
+              onClose={() => setIsViewPresetsOpen(false)}
+              onOpenSettings={() => {
+                setIsViewPresetsOpen(false);
+                setIsCanvasSettingsOpen(true);
+              }}
+            />
+          </div>
 
           {/* S46-E3: Copy button */}
           <button
@@ -1032,12 +1025,6 @@ export const DDSToolbar = memo(function DDSToolbar({
       <CanvasSettingsPanel
         isOpen={isCanvasSettingsOpen}
         onClose={() => setIsCanvasSettingsOpen(false)}
-      />
-
-      {/* S68-E2: Notification panel */}
-      <NotificationPanel
-        open={isNotificationOpen}
-        onClose={() => setIsNotificationOpen(false)}
       />
 
       {/* S63-E2: Collaborative undo/redo conflict resolution dialog */}

@@ -15,9 +15,10 @@ import { BackgroundSettings } from './BackgroundSettings';
 import { GridSettings } from './GridSettings';
 import { ZoomSettings } from './ZoomSettings';
 import { ShortcutSettingsPanel } from '@/components/dds/shortcuts/ShortcutSettingsPanel';
+import { ViewPresetsTab } from './ViewPresetsTab';
 import styles from './CanvasSettingsPanel.module.css';
 
-type TabId = 'background' | 'grid' | 'zoom' | 'shortcuts';
+type TabId = 'background' | 'grid' | 'zoom' | 'shortcuts' | 'presets';
 
 interface Tab {
   id: TabId;
@@ -29,6 +30,7 @@ const TABS: Tab[] = [
   { id: 'grid', label: '网格' },
   { id: 'zoom', label: '缩放' },
   { id: 'shortcuts', label: '快捷键' },
+  { id: 'presets', label: '预设' },
 ];
 
 interface CanvasSettingsPanelProps {
@@ -103,6 +105,7 @@ export function CanvasSettingsPanel({ isOpen, onClose }: CanvasSettingsPanelProp
           {activeTab === 'shortcuts' && (
             <ShortcutSettingsPanel onClose={() => setActiveTab('background')} />
           )}
+          {activeTab === 'presets' && <ViewPresetsTab />}
         </div>
       </div>
     </div>

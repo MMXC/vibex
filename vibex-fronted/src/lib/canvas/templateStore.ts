@@ -425,3 +425,165 @@ export async function importFromShareUrl(
     return { success: false, reason: 'error' };
   }
 }
+
+
+// ─── E2: Template Node Import to Canvas ─────────────────────────────────────
+
+export type ImportMode = 'nodes-only' | 'nodes-and-edges';
+
+/** Result of importing a template into the canvas */
+export interface ImportResult {
+  /** All imported nodes (cards) with their new IDs */
+  nodes: ImportedNode[];
+  /** Edges imported (only when mode='nodes-and-edges') */
+  edges: ImportedEdge[];
+  /** ID mapping: original node ID → new UUID */
+  idMap: Record<string, string>;
+  /** Number of nodes imported */
+  nodeCount: number;
+  /** Number of edges imported */
+  edgeCount: number;
+}
+
+export interface ImportedNode {
+  /** Original template node ID */
+  originalId: string;
+  /** New canvas card ID */
+  newId: string;
+  /** Chapter where the node was placed */
+  chapter: 'requirement' | 'context' | 'flow' | 'api' | 'business-rules';
+  /** Original chapter type from template */
+  originalChapterType: string;
+  /** Original node name */
+  name: string;
+  /** Original node type (core/supporting/generic) */
+  nodeType: string;
+}
+
+export interface ImportedEdge {
+  originalId: string;
+  newId: string;
+  sourceId: string;   // new ID
+  targetId: string;   // new ID
+  chapter: 'requirement' | 'context' | 'flow' | 'api' | 'business-rules';
+  originalType: string;
+  label: string;
+}
+
+/**
+ * Import template nodes into the canvas.
+ *
+ * Generates new UUIDs for all nodes, builds an ID mapping table,
+ * and optionally imports edges with updated references.
+ *
+ * @param templateId - ID of the template to import
+ * @param position - Base position offset for imported nodes
+ * @param mode - 'nodes-only' imports nodes only; 'nodes-and-edges' also imports edges
+ * @returns Import result with nodes, edges, and ID mapping
+ */
+export async function importTemplateToCanvas(
+  templateId: string,
+  position: { x: number; y: number } = { x: 0, y: 0 },
+  mode: ImportMode = 'nodes-and-edges'
+): Promise<ImportResult> {
+  const template = await getTemplate(templateId);
+  if (!template) {
+    throw new Error(`Template not found: ${templateId}`);
+  }
+
+  const snapshot = JSON.parse(template.snapshot);
+  const { chapters = [], crossChapterEdges = [] } = snapshot;
+
+  // ID mapping: old → new
+  const idMap: Record<string, string> = {};
+  const nodes: ImportedNode[] = [];
+  const edges: ImportedEdge[] = [];
+
+  let nodeIndex = 0;
+
+  // Map template chapter type to DDS chapter type
+  function mapChapterType(templateType: string): 'requirement' | 'context' | 'flow' | 'api' | 'business-rules' {
+    const typeMap: Record<string, 'requirement' | 'context' | 'flow' | 'api' | 'business-rules'> = {
+      'context': 'context',
+      'flow': 'flow',
+      'requirement': 'requirement',
+      'api': 'api',
+      'business-rules': 'business-rules',
+    };
+    return typeMap[templateType] ?? 'context';
+  }
+
+  for (const chapter of chapters) {
+    const chapterType = mapChapterType(chapter.type);
+
+    // Collect all nodes in this chapter
+    const contextNodes = chapter.contextNodes ?? [];
+    const flowNodes = chapter.flowNodes ?? [];
+
+    for (const node of [...contextNodes, ...flowNodes]) {
+      const newId = `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+      idMap[node.nodeId] = newId;
+
+      nodes.push({
+        originalId: node.nodeId,
+        newId,
+        chapter: chapterType,
+        originalChapterType: chapter.type,
+        name: node.name,
+        nodeType: node.type,
+      });
+
+      nodeIndex++;
+    }
+
+    // Build intra-chapter edges from relationships
+    if (mode === 'nodes-and-edges') {
+      for (const node of [...contextNodes, ...flowNodes]) {
+        const newSourceId = idMap[node.nodeId];
+        for (const rel of node.relationships ?? []) {
+          const newTargetId = idMap[rel.targetId];
+          if (!newTargetId) continue; // Skip if target not in idMap (shouldn't happen)
+
+          const edgeId = `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+          edges.push({
+            originalId: `${node.nodeId}->${rel.targetId}`,
+            newId: edgeId,
+            sourceId: newSourceId,
+            targetId: newTargetId,
+            chapter: chapterType,
+            originalType: rel.type,
+            label: rel.label ?? '',
+          });
+        }
+      }
+    }
+  }
+
+  // Cross-chapter edges
+  if (mode === 'nodes-and-edges') {
+    for (const edge of crossChapterEdges) {
+      const newSourceId = idMap[edge.sourceId];
+      const newTargetId = idMap[edge.targetId];
+      if (!newSourceId || !newTargetId) continue;
+
+      const edgeId = `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+      edges.push({
+        originalId: edge.id ?? `${edge.sourceId}->${edge.targetId}`,
+        newId: edgeId,
+        sourceId: newSourceId,
+        targetId: newTargetId,
+        chapter: 'context',
+        originalType: edge.type ?? 'dependency',
+        label: edge.label ?? '',
+      });
+    }
+  }
+
+  return {
+    nodes,
+    edges,
+    idMap,
+    nodeCount: nodes.length,
+    edgeCount: edges.length,
+  };
+}

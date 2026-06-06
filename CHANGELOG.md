@@ -1,4 +1,12 @@
 
+## [Unreleased] S69-E4: 节点评论系统 — 2026-06-06
+
+- **E4.1**: `commentStore.ts` — `addComment()` 触发 `useNotificationStore.addNotification()` 发送评论通知
+- **E4.2**: `DDSDanvasPage.tsx` / `DDSFlow.tsx` — 右键节点上下文菜单"查看评论"，打开 CommentThread 浮层
+- **E4.3**: `components/dds/comments/CommentThread.tsx` — 评论浮层组件，显示评论列表 + MentionInput 回复
+- **E4.4**: `components/dds/comments/NodeCommentBadge.tsx` — 节点未读评论红色徽章 (`getUnreadCount(nodeId)`)
+- **vitest**: `commentStore.test.ts` 22/22 通过
+
 ## [Unreleased] S68-E5: 协作光标同步 — 2026-06-06
 - **E5.1**: `presenceStore.ts` — 新增 `cursors` 独立字段 (Record<userId, CursorState>) + `broadcastCursor()` + `clearCursor()` + `clearAllCursors()`
 - **E5.2**: `wsCursorHandler.ts` — cursor:move / cursor:clear WebSocket 消息处理

@@ -6345,3 +6345,8 @@ See git history for complete changelog.
 - **Test**: 5/5 vitest ✅
 
 ---
+## [Unreleased] S67-E5: 画布导出增强PDF/SVG — 2026-06-06
+- **E5.1**: `PdfExporter.ts` — exportPdf(canvasId, options) 服务函数，支持 A4/Letter、单页/多页、scale 质量、abort 信号
+- **E5.2**: `SvgExporter.ts` — exportSvg(canvasId) 服务函数，生成 SVG 向量格式含章节分组、节点关系箭头、特殊字符转义
+- **E5.3**: `PdfExporter.test.ts` — 11 项测试覆盖 MIME type、A4/Letter、单页/多页、progress callback、abort
+- **E5.4**: `SvgExporter.test.ts` — 11 项测试覆盖 SVG 结构、节点数、章节 ID、空数组、特殊字符转义

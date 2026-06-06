@@ -1250,3 +1250,8 @@
 - **E4.2**: `AnalyticsPanel.tsx` — HistoryPanel Tab5，显示编辑最多节点排行 + 导出 CSV
 - **E4.3**: `AnalyticsPanel.module.css` — Tab5 样式
 - **vitest**: `canvasAnalyticsStore.test.ts` + `AnalyticsPanel.test.tsx` 9/9 通过
+---
+
+## [Unreleased] S72-E1: 画布历史管理面板快照测试 — 2026-06-07
+- **E1.4**: `canvasHistoryStore.snapshots.test.ts` — saveSnapshot/restoreSnapshot/renameSnapshot/deleteSnapshot + LRU eviction vitest 14/14
+- **E1.5**: `TimelineView.test.tsx` — 快照时间线组件测试：空状态/列表渲染/操作回调/键盘交互/相对时间格式化 vitest 16/16

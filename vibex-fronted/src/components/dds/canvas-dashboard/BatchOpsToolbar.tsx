@@ -5,6 +5,7 @@
  * S61-E3 i18n: All hardcoded Chinese strings replaced with useTranslations('batchOps').
  * S63-E5: Add "移动到文件夹" button + FolderPickerDialog.
  * S64-E4: Advanced BatchRenameDialog (sequence + regex mode) + batchArchive/batchUnarchive.
+ * S68-E4: Add "复制到画布" button + CrossCanvasCopyDialog, "批量模板化" button + BatchDeleteConfirmDialog.
  *
  * Displays at the top of CanvasListPanel when multiple canvases are selected.
  * Provides batch delete, batch rename, batch archive, and batch move-to-folder entry points.
@@ -17,6 +18,8 @@ import { useCanvasFolderStore } from '@/stores/dds/canvasFolderStore';
 import { useTranslations } from '@/hooks/useTranslations';
 import { FolderPickerDialog } from './FolderPickerDialog';
 import { BatchRenameDialog } from './BatchRenameDialog';
+import { CrossCanvasCopyDialog } from './CrossCanvasCopyDialog';
+import { BatchDeleteConfirmDialog } from './BatchDeleteConfirmDialog';
 import styles from './BatchOpsToolbar.module.css';
 
 interface BatchOpsToolbarProps {
@@ -47,6 +50,13 @@ export function BatchOpsToolbar({ selectedCount }: BatchOpsToolbarProps) {
 
   // S64-E4: advanced rename dialog state
   const [showAdvancedRename, setShowAdvancedRename] = useState(false);
+
+  // S68-E4: copy-to-canvas dialog state
+  const [showCrossCanvasCopy, setShowCrossCanvasCopy] = useState(false);
+  const { activeCanvasId, copyNodesBetweenCanvases } = useCanvasListStore();
+
+  // S68-E4: batch delete confirm dialog state
+  const [showBatchDeleteConfirm, setShowBatchDeleteConfirm] = useState(false);
 
   const handleMoveToFolder = useCallback(() => {
     setShowFolderPicker(true);
@@ -118,6 +128,57 @@ export function BatchOpsToolbar({ selectedCount }: BatchOpsToolbarProps) {
     }
   }, [selectedCanvasIds, batchUnarchive, clearSelection, setIsOperating]);
 
+  // S68-E4: copy-to-canvas handler
+  const handleCopyToCanvas = useCallback(() => {
+    setShowCrossCanvasCopy(true);
+  }, []);
+
+  const handleCrossCanvasCopyConfirm = useCallback(
+    async (destCanvasId: string) => {
+      setShowCrossCanvasCopy(false);
+      if (selectedCanvasIds.size === 0) return;
+      setIsOperating(true);
+      try {
+        await copyNodesBetweenCanvases(
+          activeCanvasId ?? '',
+          Array.from(selectedCanvasIds),
+          destCanvasId
+        );
+        clearSelection();
+      } finally {
+        setIsOperating(false);
+      }
+    },
+    [selectedCanvasIds, copyNodesBetweenCanvases, activeCanvasId, clearSelection, setIsOperating]
+  );
+
+  // S68-E4: batch template export handler
+  const handleBatchTemplateExport = useCallback(async () => {
+    if (selectedCanvasIds.size === 0) return;
+    setIsOperating(true);
+    try {
+      const { batchTemplateExport } = useCanvasListStore.getState();
+      await batchTemplateExport(Array.from(selectedCanvasIds));
+      clearSelection();
+    } finally {
+      setIsOperating(false);
+    }
+  }, [selectedCanvasIds, clearSelection, setIsOperating]);
+
+  // S68-E4: batch delete with dedicated confirm dialog
+  const handleBatchDeleteConfirm = useCallback(async () => {
+    if (selectedCanvasIds.size === 0) return;
+    setIsOperating(true);
+    try {
+      const { batchDeleteCanvas } = useCanvasListStore.getState();
+      await batchDeleteCanvas();
+      clearSelection();
+    } finally {
+      setIsOperating(false);
+      setShowBatchDeleteConfirm(false);
+    }
+  }, [selectedCanvasIds, clearSelection, setIsOperating]);
+
   if (selectedCount === 0) return null;
 
   return (
@@ -171,6 +232,26 @@ export function BatchOpsToolbar({ selectedCount }: BatchOpsToolbarProps) {
           aria-label={t('unarchive')}
         >
           📤 {t('unarchive')}
+        </button>
+
+        {/* S68-E4: Copy to canvas */}
+        <button
+          className={styles['batch-ops-toolbar__btn']}
+          onClick={handleCopyToCanvas}
+          disabled={isOperating}
+          aria-label={t('copyToCanvas')}
+        >
+          📋 {t('copyToCanvas')}
+        </button>
+
+        {/* S68-E4: Batch template export */}
+        <button
+          className={styles['batch-ops-toolbar__btn']}
+          onClick={handleBatchTemplateExport}
+          disabled={isOperating}
+          aria-label={t('batchTemplateExport')}
+        >
+          📥 {t('batchTemplateExport')}
         </button>
 
         <button
@@ -233,6 +314,20 @@ export function BatchOpsToolbar({ selectedCount }: BatchOpsToolbarProps) {
           onCancel={() => setShowFolderPicker(false)}
         />
       )}
+
+      {/* S68-E4: Cross-canvas copy dialog */}
+      <CrossCanvasCopyDialog
+        currentCanvasId={activeCanvasId}
+        sourceCanvasIds={Array.from(selectedCanvasIds)}
+        onConfirm={handleCrossCanvasCopyConfirm}
+        onCancel={() => setShowCrossCanvasCopy(false)}
+      />
+
+      {/* S68-E4: Dedicated batch delete confirm dialog */}
+      <BatchDeleteConfirmDialog
+        onConfirm={handleBatchDeleteConfirm}
+        onCancel={() => setShowBatchDeleteConfirm(false)}
+      />
     </>
   );
 }

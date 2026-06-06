@@ -417,6 +417,13 @@
     "enterNewPrefix": "Enter new prefix",
     "enterNewSuffix": "Enter new suffix",
     "confirmRename": "Confirm Rename",
-    "renaming": "Renaming..."
+    "renaming": "Renaming...",
+    "copyToCanvas": "Copy to Canvas",
+    "batchTemplateExport": "Batch Template Export",
+    "copyToCanvasDesc": "Copy {count} canvases to target canvas",
+    "selectedForCopy": "Selected for Copy",
+    "confirmBatchDelete": "Confirm Batch Delete",
+    "batchDeleteWarning": "You are about to delete {count} canvases. This action cannot be undone.",
+    "confirmBatchDeleteBtn": "Confirm Delete"
   }
 }

@@ -4,10 +4,18 @@
  * 职责：管理画布列表元数据（名称、创建时间、修改时间、缩略图）。
  * 持久化：IndexedDB (ddsPersistence service) + localStorage index。
  *
+ * S68-E4 扩展：
+ * - copyNodesBetweenCanvases: 将选中的画布元数据条目复制到目标画布（ID 重映射）
+ * - batchTemplateExport: 将选中的画布元数据导出为 .vbtmpl 下载文件
  */
 
 import { create } from 'zustand';
-import { generateId } from '@/lib/canvas/id';
+import { generateId, generatePrefixedId } from '@/lib/canvas/id';
+import type { DDSCard, DDSEdge, ChapterType } from '@/types/dds';
+import type { RequirementTemplate } from '@/data/templates';
+import type { CanvasChapterData } from '@/lib/canvas/canvasStoreRegistry';
+import { canvasStoreRegistry } from '@/lib/canvas/canvasStoreRegistry';
+import { quickSave, quickLoad } from '@/services/dds/ddsPersistence';
 
 // ============================================
 // Types
@@ -75,6 +83,19 @@ export interface CanvasListState {
   batchUnarchive: (canvasIds: string[]) => Promise<void>;
   /** Set archive filter mode (S64-E4) */
   setArchiveFilterMode: (mode: 'all' | 'active' | 'archived') => void;
+  /**
+   * S68-E4: 复制选中的画布元数据条目到目标画布。
+   * srcId — 来源画布 ID（用于上下文，无实际用途）
+   * nodeIds — 要复制的画布 ID 列表
+   * destId — 目标画布 ID
+   * 为每个条目生成新 ID 和新创建时间，名称追加 " (副本)"。
+   */
+  copyNodesBetweenCanvases: (srcId: string, nodeIds: string[], destId: string) => Promise<void>;
+  /**
+   * S68-E4: 批量导出选中的画布元数据为 .vbtmpl JSON 文件。
+   * nodeIds — 要导出的画布 ID 列表
+   */
+  batchTemplateExport: (canvasIds: string[]) => Promise<void>;
 
 }
 
@@ -498,6 +519,80 @@ export const useCanvasListStore = create<CanvasListState>((set, get) => ({
    */
   setArchiveFilterMode: (mode) => {
     set({ archiveFilterMode: mode });
+  },
+
+  // ============================================================
+  // S68-E4: Copy between canvases + Batch template export
+  // ============================================================
+
+  /**
+   * S68-E4: copyNodesBetweenCanvases
+   * 复制选中的画布元数据条目到目标画布区域，ID 重映射，名称追加 " (副本)"。
+   */
+  copyNodesBetweenCanvases: async (srcId, nodeIds, destId) => {
+    if (nodeIds.length === 0) return;
+    const { canvases } = get();
+    const now = new Date().toISOString();
+
+    const copies: CanvasMeta[] = nodeIds.map((id) => {
+      const original = canvases.find((c) => c.id === id);
+      if (!original) return null;
+      const newId = generatePrefixedId('canvas');
+      return {
+        ...original,
+        id: newId,
+        name: `${original.name} (副本)`,
+        createdAt: now,
+        updatedAt: now,
+        archivedAt: undefined,
+        thumbnail: null, // thumbnails are canvas-specific; clear for copies
+      };
+    }).filter((c): c is CanvasMeta => c !== null);
+
+    if (copies.length === 0) return;
+
+    set((state) => ({
+      canvases: [...state.canvases, ...copies],
+      selectedCanvasIds: new Set(),
+    }));
+
+    // Persist each copy to IndexedDB
+    for (const copy of copies) {
+      await idbPut('canvases', copy);
+    }
+  },
+
+  /**
+   * S68-E4: batchTemplateExport
+   * 将选中的画布元数据导出为 .vbtmpl JSON 文件并触发浏览器下载。
+   */
+  batchTemplateExport: async (canvasIds) => {
+    if (canvasIds.length === 0) return;
+    const { canvases } = get();
+
+    const selected = canvasIds
+      .map((id) => canvases.find((c) => c.id === id))
+      .filter((c): c is CanvasMeta => c !== null);
+
+    if (selected.length === 0) return;
+
+    const payload = {
+      version: '1.0' as const,
+      exportedAt: new Date().toISOString(),
+      exportedBy: 'VibeX',
+      type: 'canvas-meta-template' as const,
+      canvases: selected.map(({ id: _id, ...meta }) => meta),
+    };
+
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `vibex-canvas-template-${Date.now()}.vbtmpl`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   },
 
   // ============================================================

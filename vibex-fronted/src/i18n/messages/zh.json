@@ -419,6 +419,13 @@
     "enterNewPrefix": "输入新的前缀",
     "enterNewSuffix": "输入新的后缀",
     "confirmRename": "确认重命名",
-    "renaming": "重命名中…"
+    "renaming": "重命名中…",
+    "copyToCanvas": "复制到画布",
+    "batchTemplateExport": "批量模板化",
+    "copyToCanvasDesc": "将 {count} 个画布复制到目标画布",
+    "selectedForCopy": "已选择",
+    "confirmBatchDelete": "确认批量删除",
+    "batchDeleteWarning": "即将删除 {count} 个画布，此操作不可撤销。",
+    "confirmBatchDeleteBtn": "确认删除"
   }
 }

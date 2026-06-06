@@ -56,6 +56,8 @@ export interface CanvasSearchState {
   isPanelOpen: boolean;
   /** Current search query */
   query: string;
+  /** E2: Recent search queries (max 10, localStorage persisted) */
+  searchHistory: string[];
 
   // Actions
   buildIndex: (canvases: CanvasMeta[], canvasNodes: Record<string, string[]>) => void;
@@ -64,6 +66,14 @@ export interface CanvasSearchState {
   search: (query: string) => void;
   clearResults: () => void;
   setPanelOpen: (open: boolean) => void;
+  /** E2: Add query to search history (dedup + max 10) */
+  addToSearchHistory: (query: string) => void;
+  /** E2: Remove a query from search history */
+  removeFromSearchHistory: (query: string) => void;
+  /** E2: Clear all search history */
+  clearSearchHistory: () => void;
+  /** E2: Load search history from localStorage */
+  loadSearchHistory: () => void;
   $reset: () => void;
 }
 
@@ -83,6 +93,9 @@ const FUSE_OPTIONS: Fuse.IFuseOptions<CanvasIndexEntry> = {
   ignoreLocation: true,
 };
 
+const SEARCH_HISTORY_KEY = 'vibex-search-history';
+const MAX_SEARCH_HISTORY = 10;
+
 // =============================================================================
 // Store
 // =============================================================================
@@ -96,6 +109,7 @@ export const useCanvasSearchStore = create<CanvasSearchState>()(
       isIndexBuilt: false,
       isPanelOpen: false,
       query: '',
+      searchHistory: [],
 
       buildIndex: (canvases, canvasNodes) => {
         const entries: CanvasIndexEntry[] = canvases.map((canvas) => {
@@ -173,6 +187,54 @@ export const useCanvasSearchStore = create<CanvasSearchState>()(
 
       setPanelOpen: (open) => set({ isPanelOpen: open, results: open ? get().results : [] }, false, 'setPanelOpen'),
 
+      loadSearchHistory: () => {
+        try {
+          const stored = localStorage.getItem(SEARCH_HISTORY_KEY);
+          if (stored) {
+            const parsed = JSON.parse(stored) as string[];
+            if (Array.isArray(parsed)) {
+              set({ searchHistory: parsed.slice(0, MAX_SEARCH_HISTORY) }, false, 'loadSearchHistory');
+            }
+          }
+        } catch {
+          // ignore localStorage errors
+        }
+      },
+
+      addToSearchHistory: (query: string) => {
+        const trimmed = query.trim();
+        if (!trimmed) return;
+        const { searchHistory } = get();
+        const filtered = searchHistory.filter((q) => q !== trimmed);
+        const updated = [trimmed, ...filtered].slice(0, MAX_SEARCH_HISTORY);
+        set({ searchHistory: updated }, false, 'addToSearchHistory');
+        try {
+          localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(updated));
+        } catch {
+          // ignore localStorage errors
+        }
+      },
+
+      removeFromSearchHistory: (query: string) => {
+        const { searchHistory } = get();
+        const updated = searchHistory.filter((q) => q !== query);
+        set({ searchHistory: updated }, false, 'removeFromSearchHistory');
+        try {
+          localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(updated));
+        } catch {
+          // ignore localStorage errors
+        }
+      },
+
+      clearSearchHistory: () => {
+        set({ searchHistory: [] }, false, 'clearSearchHistory');
+        try {
+          localStorage.removeItem(SEARCH_HISTORY_KEY);
+        } catch {
+          // ignore localStorage errors
+        }
+      },
+
       $reset: () =>
         set(
           {
@@ -182,6 +244,7 @@ export const useCanvasSearchStore = create<CanvasSearchState>()(
             isIndexBuilt: false,
             isPanelOpen: false,
             query: '',
+            searchHistory: [],
           },
           false,
           '$reset'

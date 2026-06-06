@@ -44,6 +44,7 @@ import { useDDSCanvasSearch } from '@/hooks/dds/useDDSCanvasSearch';
 import { DDSSearchPanel } from '@/components/dds/DDSSearchPanel';
 import { SearchPanel } from '@/components/dds/SearchPanel';
 import { GlobalSearchPanel } from '@/components/dds/search/GlobalSearchPanel';
+import { CanvasSearchPanel } from '@/components/dds/canvas/CanvasSearchPanel';
 import { useSearchIndex } from '@/hooks/useSearchIndex';
 import { useCanvasSearchStore } from '@/stores/canvasSearchStore';
 import { useAutoLayout } from '@/hooks/dds/useAutoLayout';
@@ -590,6 +591,7 @@ const { onCursorMove, broadcastCursor } = useWebSocketPresence({
   // P001: useKeyboardShortcuts wired to canvasHistoryStore for DDS canvas undo/redo.
   const [searchPanelOpen, setSearchPanelOpen] = useState(false);
   const [canvasSearchPanelOpen, setCanvasSearchPanelOpen] = useState(false);
+  const [fulltextSearchOpen, setFulltextSearchOpen] = useState(false); // S73-E1: Cmd/Ctrl+F
   const [globalSearchPanelOpen, setGlobalSearchPanelOpen] = useState(false);
   const [historyPanelOpen, setHistoryPanelOpen] = useState(false);
   const { query: searchQuery, setQuery: setSearchQuery, results: searchResults, clearResults } =
@@ -615,6 +617,40 @@ const { onCursorMove, broadcastCursor } = useWebSocketPresence({
     }
     document.addEventListener('keydown', handleCtrlK);
     return () => document.removeEventListener('keydown', handleCtrlK);
+  }, []);
+
+  // S73-E1: Ctrl+F / Cmd+F — toggle canvas full-text search panel
+  useEffect(() => {
+    function handleCtrlF(e: KeyboardEvent) {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'f') {
+        // Only open if not already focused in an input
+        const target = e.target as HTMLElement;
+        const isEditable = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable;
+        if (!isEditable) {
+          e.preventDefault();
+          setFulltextSearchOpen((v) => !v);
+        }
+      }
+    }
+    document.addEventListener('keydown', handleCtrlF);
+    return () => document.removeEventListener('keydown', handleCtrlF);
+  }, []);
+
+  // S73-E1: Listen for canvas:scroll-to-node events from CanvasSearchPanel
+  useEffect(() => {
+    function handleScrollToNode(e: Event) {
+      const { nodeId } = (e as CustomEvent).detail;
+      if (!nodeId) return;
+      // Find the React Flow node element by data attribute
+      const el = document.querySelector(`[data-id="${nodeId}"]`) as HTMLElement | null;
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        el.classList.add('search-highlight');
+        setTimeout(() => el.classList.remove('search-highlight'), 2000);
+      }
+    }
+    window.addEventListener('canvas:scroll-to-node', handleScrollToNode);
+    return () => window.removeEventListener('canvas:scroll-to-node', handleScrollToNode);
   }, []);
 
   // S65-E4: Ctrl+Shift+K / Cmd+Shift+K: toggle GlobalSearchPanel (canvas name fuzzy search)
@@ -977,6 +1013,12 @@ const { onCursorMove, broadcastCursor } = useWebSocketPresence({
       <GlobalSearchPanel
         open={globalSearchPanelOpen}
         onClose={() => setGlobalSearchPanelOpen(false)}
+      />
+
+      {/* S73-E1: Canvas Full-Text Search Panel — Cmd/Ctrl+F */}
+      <CanvasSearchPanel
+        open={fulltextSearchOpen}
+        onClose={() => setFulltextSearchOpen(false)}
       />
 
       {/* S43-E1: WebSocket PresenceOverlay — replaces Firebase PresenceAvatars + RemoteCursor */}

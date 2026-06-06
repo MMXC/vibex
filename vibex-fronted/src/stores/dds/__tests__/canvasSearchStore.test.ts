@@ -161,4 +161,46 @@ describe('canvasSearchStore — Sprint68 E3: fulltext search', () => {
       expect(history.length).toBeLessThanOrEqual(10);
     });
   });
+
+  // S73-E1: 画布内容全文搜索 — searchNodes 同步方法
+  describe('searchNodes — S73-E1 D1.1: 同步全文搜索查询', () => {
+    it('returns current fulltextResults synchronously', () => {
+      const mockResults = [
+        { nodeId: 'node-1', canvasId: 'canvas-1', canvasName: 'Test Canvas', matchedText: 'test content', score: 0.5 },
+        { nodeId: 'node-2', canvasId: 'canvas-1', canvasName: 'Test Canvas', matchedText: 'another match', score: 0.3 },
+      ];
+      useCanvasSearchStore.getState().setFulltextResults(mockResults);
+
+      // searchNodes returns whatever is in fulltextResults at call time
+      const results = useCanvasSearchStore.getState().searchNodes('test');
+      expect(results).toHaveLength(2);
+      expect(results[0].nodeId).toBe('node-1');
+      expect(results[1].nodeId).toBe('node-2');
+    });
+
+    it('returns empty array when fulltextResults is empty', () => {
+      useCanvasSearchStore.getState().setFulltextResults([]);
+      const results = useCanvasSearchStore.getState().searchNodes('anything');
+      expect(results).toEqual([]);
+    });
+
+    it('returns empty array by default (no search performed)', () => {
+      // Fresh state has empty fulltextResults
+      const results = useCanvasSearchStore.getState().searchNodes('query');
+      expect(results).toEqual([]);
+    });
+
+    it('ignores the query parameter — returns current state', () => {
+      const mockResults = [
+        { nodeId: 'n1', canvasId: 'c1', canvasName: 'Canvas', matchedText: 'hello world', score: 0.8 },
+      ];
+      useCanvasSearchStore.getState().setFulltextResults(mockResults);
+
+      // Query parameter is ignored — always returns fulltextResults
+      const r1 = useCanvasSearchStore.getState().searchNodes('ignored');
+      const r2 = useCanvasSearchStore.getState().searchNodes('also-ignored');
+      expect(r1).toEqual(mockResults);
+      expect(r2).toEqual(mockResults);
+    });
+  });
 });

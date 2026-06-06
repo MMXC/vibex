@@ -58,7 +58,18 @@ export interface CanvasSearchState {
 
   /** 执行全文节点搜索（E3） — 调用 canvasFulltextIndex.searchNodes */
   searchNodeContent: (query: string) => Promise<void>;
+
+  /**
+   * S73-E1 D1.1: 同步全文搜索查询
+   * 返回当前 fulltextResults 中的节点搜索结果。
+   * 搜索本身由 searchNodeContent 异步执行，结果通过 fulltextResults 暴露。
+   * 此方法用于同步获取最近一次搜索的结果。
+   */
+  searchNodes: (query: string) => NodeSearchResult[];
 }
+
+// re-export type for convenience
+export type { NodeSearchResult } from '@/services/canvasFulltextIndex';
 
 export const useCanvasSearchStore = create<CanvasSearchState>()(
   persist(
@@ -127,6 +138,12 @@ export const useCanvasSearchStore = create<CanvasSearchState>()(
           console.error('[canvasSearchStore] searchNodeContent error:', err);
           set({ fulltextResults: [], fulltextLoading: false });
         }
+      },
+
+      // S73-E1 D1.1: 同步全文搜索查询
+      // 直接返回当前 fulltextResults（searchNodeContent 异步执行后的结果）
+      searchNodes: (_query: string) => {
+        return get().fulltextResults;
       },
     }),
     {

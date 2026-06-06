@@ -66,6 +66,14 @@ export interface NodeSearchResult {
   nodeType?: string;
 }
 
+/** E2 (Sprint69): Search result with surrounding context snippets */
+export interface ContextSearchResult extends NodeSearchResult {
+  /** Context before the matched text (up to maxContext chars) */
+  before: string;
+  /** Context after the matched text (up to maxContext chars) */
+  after: string;
+}
+
 export interface CanvasData {
   id: string;
   name: string;
@@ -237,4 +245,31 @@ export async function searchNodes(
   idbPutCache(query, results).catch(() => {/* ignore cache errors */});
 
   return results;
+}
+
+/**
+ * E2 (Sprint69): Search with context snippets.
+ * Extracts up to maxContext chars before and after each match for display.
+ */
+export async function searchWithContext(
+  query: string,
+  maxResults: number = 30,
+  maxContext: number = 30
+): Promise<ContextSearchResult[]> {
+  if (!query.trim()) return [];
+
+  const results = await searchNodes(query, maxResults);
+  return results.map((r) => {
+    const text = r.matchedText;
+    const matchIdx = text.toLowerCase().indexOf(query.toLowerCase());
+
+    if (matchIdx === -1) {
+      return { ...r, before: '', after: '' };
+    }
+
+    const before = text.slice(Math.max(0, matchIdx - maxContext), matchIdx);
+    const after = text.slice(matchIdx + query.length, matchIdx + query.length + maxContext);
+
+    return { ...r, before, after };
+  });
 }

@@ -1,3 +1,13 @@
+
+## [Unreleased] S68-E5: 协作光标同步 — 2026-06-06
+- **E5.1**: `presenceStore.ts` — 新增 `cursors` 独立字段 (Record<userId, CursorState>) + `broadcastCursor()` + `clearCursor()` + `clearAllCursors()`
+- **E5.2**: `wsCursorHandler.ts` — cursor:move / cursor:clear WebSocket 消息处理
+- **E5.3**: `RemoteCursorsLayer.tsx` — 升级为订阅 `presenceStore.cursors`（独立于 remoteUsers）
+- **E5.4**: `useWebSocketPresence.ts` — hook 写两路：remoteUsers + cursors
+- **E5.5**: `DDSCanvasPage.tsx` — broadcastCursor 集成，≥3 协作者光标共存
+- **vitest**: `presenceStore.test.ts` +9 E5 测试（66/66 总通过）
+
+
 ---
 
 ## [Unreleased] S67-E4: 画布快捷键可配置化 — 2026-06-06

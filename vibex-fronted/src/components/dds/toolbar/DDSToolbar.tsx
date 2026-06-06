@@ -46,6 +46,8 @@ import { HistoryPanel } from '@/components/dds/history/HistoryPanel';
 import { BackupPanel } from '@/components/dds/settings/BackupPanel';
 import { CanvasSettingsPanel } from '@/components/dds/settings/CanvasSettingsPanel';
 import { ConflictDialog } from '@/components/dds/canvas-dashboard/ConflictDialog';
+import { NotificationPanel } from '@/components/dds/notifications/NotificationPanel';
+import { useNotificationStore } from '@/stores/notificationStore';
 import styles from './DDSToolbar.module.css';
 
 // ==================== Chapter label keys (mapped to i18n keys) ====================
@@ -263,6 +265,7 @@ export const DDSToolbar = memo(function DDSToolbar({
   const [isHistoryPanelOpen, setIsHistoryPanelOpen] = useState(false);
   const [isBackupOpen, setIsBackupOpen] = useState(false);
   const [isCanvasSettingsOpen, setIsCanvasSettingsOpen] = useState(false);
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
 
   // E3-S3: RBAC for toolbar actions
   const rbac = useCanvasRBAC(projectId);
@@ -516,6 +519,40 @@ export const DDSToolbar = memo(function DDSToolbar({
             disabled={!rbac.canShare && !rbac.loading}
             className={styles.exportMenuWrapper}
           />
+
+          {/* S68-E2: Notification bell */}
+          <button
+            type="button"
+            className={styles.exportBtn}
+            onClick={() => setIsNotificationOpen(v => !v)}
+            aria-label="通知中心"
+            title="通知中心"
+            data-testid="notification-bell-btn"
+          >
+            🔔
+            {useNotificationStore.getState().getUnreadCount() > 0 && (
+              <span
+                style={{
+                  position: 'absolute',
+                  top: -4,
+                  right: -4,
+                  width: 14,
+                  height: 14,
+                  borderRadius: '50%',
+                  background: '#ef4444',
+                  color: '#fff',
+                  fontSize: 9,
+                  fontWeight: 700,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  lineHeight: 1,
+                }}
+              >
+                {useNotificationStore.getState().getUnreadCount() > 9 ? '9+' : useNotificationStore.getState().getUnreadCount()}
+              </span>
+            )}
+          </button>
 
           {/* S46-E3: Copy button */}
           <button
@@ -995,6 +1032,12 @@ export const DDSToolbar = memo(function DDSToolbar({
       <CanvasSettingsPanel
         isOpen={isCanvasSettingsOpen}
         onClose={() => setIsCanvasSettingsOpen(false)}
+      />
+
+      {/* S68-E2: Notification panel */}
+      <NotificationPanel
+        open={isNotificationOpen}
+        onClose={() => setIsNotificationOpen(false)}
       />
 
       {/* S63-E2: Collaborative undo/redo conflict resolution dialog */}

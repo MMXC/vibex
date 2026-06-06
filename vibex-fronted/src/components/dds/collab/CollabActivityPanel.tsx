@@ -1,8 +1,9 @@
 'use client';
 
-import React, { memo, useCallback } from 'react';
+import React, { memo, useCallback, useState } from 'react';
 import { useActivityStore, activityLabel, formatActivityTime } from '@/lib/collaboration/activityStore';
 import type { ActivityEntry, ActivityType } from '@/lib/collaboration/types';
+import { MentionInput } from './MentionInput';
 import styles from './CollabActivityPanel.module.css';
 
 interface CollabActivityPanelProps {
@@ -50,6 +51,21 @@ const CollabActivityPanel = memo(function CollabActivityPanel({
   const handleClear = useCallback(() => {
     useActivityStore.getState().clearEntries();
   }, []);
+
+  const handleSend = useCallback((text: string, mentions: string[]) => {
+    // Add a local activity entry for the sent message
+    const newEntry: ActivityEntry = {
+      id: `local-${Date.now()}`,
+      userId: currentUserId ?? 'local-user',
+      userName: '你',
+      type: 'edit' as ActivityType,
+      timestamp: Date.now(),
+    };
+    useActivityStore.setState((s) => ({
+      entries: [newEntry, ...s.entries].slice(0, 20),
+    }));
+    void text; void mentions; // consumed locally
+  }, [currentUserId]);
 
   if (!open) return null;
 
@@ -117,6 +133,15 @@ const CollabActivityPanel = memo(function CollabActivityPanel({
             })}
           </ul>
         )}
+      </div>
+
+      {/* S68-E2: Message input with @mention support */}
+      <div className={styles.inputSection}>
+        <MentionInput
+          currentUserId={currentUserId}
+          placeholder="说点什么... @提及其他人"
+          onSend={handleSend}
+        />
       </div>
 
       <footer className={styles.footer}>

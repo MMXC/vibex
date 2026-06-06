@@ -147,6 +147,12 @@
   white-space: nowrap;
 }
 
+.inputSection {
+  padding: 8px 14px;
+  border-top: 1px solid var(--color-border, #e5e7eb);
+  flex-shrink: 0;
+}
+
 .footer {
   padding: 8px 14px;
   border-top: 1px solid var(--color-border, #e5e7eb);

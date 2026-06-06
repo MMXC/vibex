@@ -18,6 +18,7 @@ import {
 import { useTemplateStore } from '@/stores/templateStore';
 import { downloadTemplatesAsFile } from '@/lib/canvas/templateExport';
 import { TemplateImportDialog } from './TemplateImportDialog';
+import { TemplateAnalytics } from './TemplateAnalytics';
 import { CategoryTab, type CanvasCategory } from './CategoryTab';
 import { TagSelector } from './TagSelector';
 import { DateRangePicker } from './DateRangePicker';
@@ -58,6 +59,8 @@ export function TemplateGallery({ isOpen, onClose, onTemplateApplied }: Template
   const [loading, setLoading] = useState(false);
   const [applying, setApplying] = useState<string | null>(null);
   const [importDialogOpen, setImportDialogOpen] = useState(false);
+  // ---- E3: 模板分析面板 ----
+  const [showAnalytics, setShowAnalytics] = useState(false);
 
   const templateStore = useTemplateStore();
 
@@ -189,6 +192,14 @@ export function TemplateGallery({ isOpen, onClose, onTemplateApplied }: Template
             </button>
             <button
               type="button"
+              className={`${styles.actionBtn} ${showAnalytics ? styles.actionBtnActive : ''}`}
+              onClick={() => setShowAnalytics(v => !v)}
+              title="使用分析"
+            >
+              📊 分析
+            </button>
+            <button
+              type="button"
               className={styles.closeBtn}
               onClick={onClose}
               aria-label="关闭"
@@ -273,8 +284,23 @@ export function TemplateGallery({ isOpen, onClose, onTemplateApplied }: Template
         {/* Category tabs (E4: CategoryTab component) */}
         <CategoryTab
           selected={selectedCategory as CanvasCategory | 'all' | 'favorites'}
-          onSelect={(cat) => setSelectedCategory(cat)}
+          onSelect={(cat) => {
+            setSelectedCategory(cat);
+            if (showAnalytics) setShowAnalytics(false);
+          }}
         />
+
+        {/* ---- E3: Analytics Panel ---- */}
+        {showAnalytics && (
+          <div className={styles.analyticsWrapper}>
+            <TemplateAnalytics
+              onTemplateSelect={(templateId) => {
+                applyTemplate(templateId);
+                setShowAnalytics(false);
+              }}
+            />
+          </div>
+        )}
 
         {/* Template grid */}
         <div className={styles.grid}>
@@ -296,6 +322,12 @@ export function TemplateGallery({ isOpen, onClose, onTemplateApplied }: Template
                 <span className={styles.cardName}>{t.name}</span>
                 <span className={styles.cardDesc}>{t.description}</span>
                 <div className={styles.cardTags}>
+                  {/* ---- E3: usageCount badge ---- */}
+                  {templateStore.stats.usageCount[t.id] ? (
+                    <span className={styles.usageBadge} title="使用次数">
+                      🔥 {templateStore.stats.usageCount[t.id]}
+                    </span>
+                  ) : null}
                   {t.isPreset && <span className={styles.presetBadge}>预设</span>}
                   {t.tags.slice(0, 2).map((tag) => (
                     <span

@@ -1,0 +1,229 @@
+/**
+ * TemplateAnalytics.module.css — Template Analytics styles
+ * Sprint67 E3: 模板画廊使用分析 + AI推荐
+ */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 4px 0;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sectionTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text, #e2e8f0);
+  margin: 0;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--color-border, #2a2a4a);
+}
+
+.empty {
+  color: var(--color-text-secondary, #94a3b8);
+  font-size: 13px;
+  text-align: center;
+  padding: 16px 0;
+}
+
+/* Leaderboard */
+.leaderboard {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.leaderboardItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.leaderboardItem:hover {
+  background: var(--color-border, #2a2a4a);
+}
+
+.rank {
+  font-size: 13px;
+  width: 28px;
+  text-align: center;
+  flex-shrink: 0;
+  color: var(--color-text-secondary, #94a3b8);
+}
+
+.leaderboardContent {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.templateName {
+  font-size: 12px;
+  color: var(--color-text, #e2e8f0);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.usageBar {
+  height: 4px;
+  background: var(--color-border, #2a2a4a);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.usageFill {
+  height: 100%;
+  border-radius: 2px;
+  background: var(--color-primary, #6366f1);
+  transition: width 0.3s;
+}
+
+.usageCount {
+  font-size: 11px;
+  color: var(--color-text-secondary, #94a3b8);
+  flex-shrink: 0;
+  width: 40px;
+  text-align: right;
+}
+
+/* Category Chart */
+.categoryChart {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.categoryRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.categoryLabel {
+  font-size: 12px;
+  color: var(--color-text-secondary, #94a3b8);
+  width: 52px;
+  flex-shrink: 0;
+}
+
+.categoryBarWrapper {
+  flex: 1;
+  height: 6px;
+  background: var(--color-border, #2a2a4a);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.categoryBar {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.3s;
+  opacity: 0.8;
+}
+
+.categoryCount {
+  font-size: 11px;
+  color: var(--color-text, #e2e8f0);
+  width: 24px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.categoryAvg {
+  font-size: 10px;
+  color: var(--color-text-secondary, #94a3b8);
+  width: 36px;
+  flex-shrink: 0;
+}
+
+/* AI Recommendations */
+.recommendSubtitle {
+  font-size: 11px;
+  color: var(--color-text-secondary, #94a3b8);
+  margin: -4px 0 4px;
+}
+
+.recommendList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.recommendItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.recommendItem:hover {
+  background: var(--color-border, #2a2a4a);
+}
+
+.recommendRank {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-primary, #6366f1);
+  width: 20px;
+  flex-shrink: 0;
+  text-align: center;
+}
+
+.recommendContent {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.categoryBadge {
+  font-size: 10px;
+}
+
+.scoreBar {
+  width: 60px;
+  height: 4px;
+  background: var(--color-border, #2a2a4a);
+  border-radius: 2px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.scoreFill {
+  height: 100%;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #6366f1, #8b5cf6);
+  transition: width 0.3s;
+}
+
+.scoreLabel {
+  font-size: 11px;
+  color: var(--color-primary, #6366f1);
+  font-weight: 600;
+  width: 28px;
+  text-align: right;
+  flex-shrink: 0;
+}

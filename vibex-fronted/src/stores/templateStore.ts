@@ -60,7 +60,15 @@ interface TemplateState {
   getTemplateStats: (templateId: string) => { usageCount: number; avgRating: number; ratingCount: number };
   getPopularTemplates: (limit?: number) => RequirementTemplate[];
   getTopRatedTemplates: (limit?: number) => RequirementTemplate[];
-  
+
+  // ---- E3: 模板使用分析与AI推荐 ----
+  // 按使用量排序（前N）
+  topTemplates: (limit: number) => RequirementTemplate[];
+  // 分类维度统计
+  getCategoryStats: () => Record<TemplateCategory | 'all', { count: number; avgUsage: number }>;
+  // AI推荐评分 (usage×0.5 + tagMatch×0.3 + recency×0.2)
+  calcRecommendScore: (templateId: string) => number;
+
   // 操作 - 收藏功能
   toggleFavorite: (templateId: string) => void;
   inferCategory: (template: RequirementTemplate) => TemplateCategory;
@@ -293,7 +301,66 @@ export const useTemplateStore = create<TemplateState>()(
           .slice(0, limit)
           .map(t => t.template);
       },
-      
+
+      // ---- E3: 模板使用分析与AI推荐 ----
+      // 按使用量排序（前N）
+      topTemplates: (limit) => {
+        const { templates, stats } = get();
+        return [...templates]
+          .sort((a, b) => {
+            const aCount = stats.usageCount[a.id] || 0;
+            const bCount = stats.usageCount[b.id] || 0;
+            return bCount - aCount;
+          })
+          .slice(0, limit);
+      },
+
+      // 分类维度统计
+      getCategoryStats: () => {
+        const { templates, stats } = get();
+        const categories: (TemplateCategory | 'all')[] = ['all', 'flowchart', 'mindmap', 'uml', 'other'];
+        const result = {} as Record<TemplateCategory | 'all', { count: number; avgUsage: number }>;
+
+        for (const cat of categories) {
+          const filtered = cat === 'all'
+            ? templates
+            : templates.filter(t => t.category === cat);
+          const counts = filtered.map(t => stats.usageCount[t.id] || 0);
+          const avgUsage = counts.length > 0
+            ? counts.reduce((a, b) => a + b, 0) / counts.length
+            : 0;
+          result[cat] = { count: filtered.length, avgUsage };
+        }
+        return result;
+      },
+
+      // AI推荐评分 (usage×0.5 + tagMatch×0.3 + recency×0.2)
+      calcRecommendScore: (templateId) => {
+        const { templates, stats, selectedTags } = get();
+        const template = templates.find(t => t.id === templateId);
+        if (!template) return 0;
+
+        const usageCount = stats.usageCount[templateId] || 0;
+        const maxUsage = Math.max(1, ...Object.values(stats.usageCount));
+        const usageScore = (usageCount / maxUsage) * 0.5;
+
+        // Tag match score: overlap with selectedTags
+        const templateTags: string[] = template.metadata?.tags ?? [];
+        const tagOverlap = selectedTags.length > 0
+          ? templateTags.filter(tag => selectedTags.includes(tag)).length / selectedTags.length
+          : 0;
+        const tagScore = tagOverlap * 0.3;
+
+        // Recency score: favor newer templates
+        const createdAt = (template as { createdAt?: number }).createdAt || Date.now();
+        const now = Date.now();
+        const ageMs = now - createdAt;
+        const ageDays = ageMs / (1000 * 60 * 60 * 24);
+        const recencyScore = Math.max(0, 1 - ageDays / 90) * 0.2;
+
+        return usageScore + tagScore + recencyScore;
+      },
+
       // 切换收藏状态
       toggleFavorite: (templateId) => {
         const { favoriteTemplateIds } = get();

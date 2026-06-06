@@ -35,6 +35,17 @@ export interface SearchOptions {
   filters?: Partial<Omit<FilterOptions, 'searchQuery'>>;
 }
 
+/** ---- E5: 模板节点（用于预览面板） ---- */
+export interface TemplateNode {
+  id: string;
+  title: string;
+  type: string;
+  description: string;
+  priority: string;
+  inboundCount: number;   // 指向该节点的其他节点数
+  outboundCount: number;  // 该节点指向的其他节点数
+}
+
 interface TemplateState {
   // 状态
   templates: RequirementTemplate[];
@@ -155,6 +166,10 @@ interface TemplateState {
   importTemplates: (json: string, strategy?: 'skip' | 'overwrite' | 'rename') => {
     success: boolean; imported: number; skipped: number; error?: string;
   };
+
+  // ---- E5: 模板预览 ----
+  /** 获取模板节点列表（含出入边数量） */
+  getTemplateNodes: (templateId: string) => TemplateNode[];
 }
 
 // 初始统计数据
@@ -691,6 +706,36 @@ export const useTemplateStore = create<TemplateState>()(
           });
         }
         return { success: true, imported: toAdd.length, skipped };
+      },
+
+      // ---- E5: 模板预览节点列表 ----
+      getTemplateNodes: (templateId) => {
+        const { templates } = get();
+        const template = templates.find((t) => t.id === templateId);
+        if (!template || !template.items) return [];
+
+        const items = template.items;
+        // Build outbound map: itemId -> count of items it depends on (outbound)
+        const outboundMap: Record<string, number> = {};
+        // Build inbound map: itemId -> count of items that depend on it (inbound)
+        const inboundMap: Record<string, number> = {};
+
+        for (const item of items) {
+          outboundMap[item.id] = item.dependencies.length;
+          for (const depId of item.dependencies) {
+            inboundMap[depId] = (inboundMap[depId] ?? 0) + 1;
+          }
+        }
+
+        return items.map((item) => ({
+          id: item.id,
+          title: item.title,
+          type: item.type,
+          description: item.description,
+          priority: item.priority,
+          inboundCount: inboundMap[item.id] ?? 0,
+          outboundCount: outboundMap[item.id] ?? 0,
+        }));
       },
     }),
     {

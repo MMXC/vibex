@@ -10,6 +10,9 @@ import Fuse from 'fuse.js';
 import { RequirementTemplate, TemplateCategory, templates as defaultTemplates } from '@/data/templates';
 
 import { canvasLogger } from '@/lib/canvas/canvasLogger';
+import { importTemplateToCanvas as importTemplateNodes, type ImportMode } from '@/lib/canvas/templateStore';
+import { useDDSCanvasStore } from '@/stores/dds/DDSCanvasStore';
+import { generateId } from '@/lib/canvas/id';
 
 interface TemplateStats {
   usageCount: Record<string, number>;    // 模板ID -> 使用次数
@@ -170,6 +173,12 @@ interface TemplateState {
   // ---- E5: 模板预览 ----
   /** 获取模板节点列表（含出入边数量） */
   getTemplateNodes: (templateId: string) => TemplateNode[];
+  /** S73-E2: 导入模板节点到画布（含ID映射表） */
+  importTemplateToCanvas: (
+    templateId: string,
+    position?: { x: number; y: number },
+    mode?: ImportMode
+  ) => Promise<{ nodeCount: number; edgeCount: number }>;
 }
 
 // 初始统计数据
@@ -736,6 +745,88 @@ export const useTemplateStore = create<TemplateState>()(
           inboundCount: inboundMap[item.id] ?? 0,
           outboundCount: outboundMap[item.id] ?? 0,
         }));
+      },
+
+      // S73-E2: 导入模板节点到画布
+      importTemplateToCanvas: async (templateId, position = { x: 0, y: 0 }, mode = 'nodes-and-edges') => {
+        const { templates } = get();
+        const template = templates.find((t) => t.id === templateId);
+        if (!template) {
+          throw new Error(`Template not found: ${templateId}`);
+        }
+
+        // Delegate to the pure lib/canvas templateStore (IndexedDB-backed)
+        const { importTemplateToCanvas: doImport } = await import('@/lib/canvas/templateStore');
+        const result = await doImport(templateId, position, mode);
+
+        const canvasStore = useDDSCanvasStore.getState();
+
+        // Group imported nodes by their target chapter
+        const nodesByChapter: Record<string, typeof result.nodes> = {};
+        for (const node of result.nodes) {
+          if (!nodesByChapter[node.chapter]) nodesByChapter[node.chapter] = [];
+          nodesByChapter[node.chapter].push(node);
+        }
+
+        let nodeCount = 0;
+        let edgeCount = 0;
+
+        function nodeTypeToCardType(nodeType: string): string {
+          const map: Record<string, string> = {
+            'core': 'bounded-context',
+            'supporting': 'bounded-context',
+            'generic': 'bounded-context',
+            'user-story': 'user-story',
+            'flow-step': 'flow-step',
+          };
+          return map[nodeType] ?? 'bounded-context';
+        }
+
+        // Add nodes as cards in their target chapters
+        for (const [chapter, chapterNodes] of Object.entries(nodesByChapter)) {
+          for (const node of chapterNodes) {
+            const cardType = nodeTypeToCardType(node.nodeType);
+            const baseCard = {
+              id: node.newId,
+              type: cardType,
+              name: node.name,
+              description: node.name,
+              responsibility: node.name,
+              relations: [] as string[],
+              createdAt: Date.now(),
+              updatedAt: Date.now(),
+            };
+            try {
+              canvasStore.addCard(chapter as Parameters<typeof canvasStore.addCard>[0], baseCard as Parameters<typeof canvasStore.addCard>[1]);
+              nodeCount++;
+            } catch (e) {
+              canvasLogger.default.error('[TemplateStore] importTemplateToCanvas addCard failed:', e);
+            }
+          }
+        }
+
+        // Add edges (optional)
+        if (mode === 'nodes-and-edges') {
+          for (const edge of result.edges) {
+            try {
+              canvasStore.addEdge(edge.chapter as Parameters<typeof canvasStore.addEdge>[0], {
+                id: edge.newId,
+                sourceId: edge.sourceId,
+                targetId: edge.targetId,
+                type: edge.originalType,
+                label: edge.label,
+              } as Parameters<typeof canvasStore.addEdge>[1]);
+              edgeCount++;
+            } catch (e) {
+              canvasLogger.default.error('[TemplateStore] importTemplateToCanvas addEdge failed:', e);
+            }
+          }
+        }
+
+        // Record usage
+        get().recordUsage(templateId);
+
+        return { nodeCount, edgeCount };
       },
     }),
     {

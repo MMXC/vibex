@@ -1,3 +1,12 @@
+
+## [Unreleased] S67-E2: 实时协作活动流面板 — 2026-06-06
+
+- **E2.1**: `CollabActivityPanel.tsx` — React panel 组件，auto-scroll activity list，支持 add/remove/focus/blur 类型，显示用户名称 + "你" 自标签，header 含清空按钮
+- **E2.2**: `activityStore.ts` — 扩展至 20 条缓冲（ring buffer），新增 focus/blur ActivityType，新增 recentActivity getter
+- **E2.3**: `wsActivityHandler.ts` — incoming `user:activity` WebSocket handler + throttle broadcaster (1 msg/sec per userId)
+- **E2.4**: `useCollaboration.ts` — 注册 wsActivityHandler，导出 sendRaw
+- **E2.5**: `DDSFlow.tsx` — handleNodesChange 包装 broadcastActivity，广播 add/remove/focus/blur (throttled)
+- **E2.6**: `CollabActivityPanel.test.tsx` — 7 tests ✅，activityStore.test.ts 13 tests ✅
 ## [Unreleased] S67-E1: 画布分支快照视觉对比 — 2026-06-06
 
 - **E1.1**: `historyDB.ts` — 新增 `getLatestSnapshotFromDB(canvasId, branchName)` 从 IndexedDB 查找指定分支的最新快照

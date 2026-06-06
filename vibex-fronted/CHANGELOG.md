@@ -1228,3 +1228,11 @@
 - **E5.4**: ESC 键盘关闭 — `useEffect` + `keydown` 监听器
 - **E5.5**: `CanvasSettingsDrawer.test.tsx` — vitest 9/9 ✅（抽屉开关/tab切换/ESC/close button）
 - **vitest**: `CanvasSettingsDrawer.test.tsx` 9/9 通过
+
+---
+
+## [Unreleased] S71-E4: 画布使用统计分析 — 2026-06-07
+- **E4.1**: `canvasAnalyticsStore.ts` — Zustand + localStorage persist，记录 totalEdits / nodeEdits / lastEdit，支持 recordEdit / getStats / getTopNodes / exportAnalytics / clearStats
+- **E4.2**: `AnalyticsPanel.tsx` — HistoryPanel Tab5，显示编辑最多节点排行 + 导出 CSV，支持全量/折叠切换
+- **E4.3**: `AnalyticsPanel.module.css` — Tab5 样式，summary cards + bar chart
+- **vitest**: `canvasAnalyticsStore.test.ts` + `AnalyticsPanel.test.tsx` 9/9 通过

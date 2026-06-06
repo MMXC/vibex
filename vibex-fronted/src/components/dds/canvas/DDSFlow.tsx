@@ -260,6 +260,8 @@ function DDSFlowInner({
           snapToGrid={snapToGrid}
           snapGrid={[gridSize, gridSize]}
           proOptions={{ hideAttribution: true }}
+          // S71-E3: Limit node positions to canvas bounds for large canvas performance
+          nodeExtent={[[-10000, -10000], [10000, 10000]]}
         >
           <Background
             variant={bgVariant}

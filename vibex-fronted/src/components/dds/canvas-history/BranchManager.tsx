@@ -108,6 +108,10 @@ const BranchManager = memo(function BranchManager({
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
 
+  // S71-E3: Lazy loading — show only 50 snapshots initially
+  const [visibleSnapshotCount, setVisibleSnapshotCount] = useState(50);
+  const displayedSnapshots = branchSnapshots.slice(0, visibleSnapshotCount);
+
   // Load branches whenever panel opens or canvasId changes
   useEffect(() => {
     if (!open) return;
@@ -121,6 +125,9 @@ const BranchManager = memo(function BranchManager({
     });
     setBranches(sorted.length > 0 ? sorted : ['main']);
   }, [open, snapshots]);
+
+  // Reset visible count when branch changes
+  useEffect(() => { setVisibleSnapshotCount(50); }, [activeBranch]);
 
   // Load snapshots for selected branch
   useEffect(() => {
@@ -360,13 +367,23 @@ const BranchManager = memo(function BranchManager({
               onChange={(e) => setSelectedSnapshotId(e.target.value)}
             >
               <option value="">当前画布状态</option>
-              {branchSnapshots.map((snap) => (
+              {displayedSnapshots.map((snap) => (
                 <option key={snap.id} value={snap.id}>
                   {snap.name} —{' '}
                   {new Date(snap.timestamp).toLocaleString('zh-CN')}
                 </option>
               ))}
             </select>
+            {/* S71-E3: Lazy loading — load more snapshots */}
+            {branchSnapshots.length > visibleSnapshotCount && (
+              <button
+                type="button"
+                className="branch-load-more"
+                onClick={() => setVisibleSnapshotCount((c) => c + 50)}
+              >
+                加载更多（{branchSnapshots.length - visibleSnapshotCount} 条剩余）
+              </button>
+            )}
 
             {createError && (
               <div className="branch-form-error" role="alert">

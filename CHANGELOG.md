@@ -6438,3 +6438,14 @@ See git history for complete changelog.
 - **S69-E5.4**: `DDSToolbar.tsx` — 预设按钮集成（ExportMenu 右侧）+ ViewPresetsPanel 渲染
 - **S69-E5.5**: `CanvasSettingsPanel.tsx` — 预设 Tab（第5个 Tab，重用 S66-E3 ViewPresetsTab）
 - **S69-E5.6**: `settingsStore.test.ts` — E5 测试 34/34 通过
+
+
+---
+
+## [Unreleased] S70-E1: 画布分支合并与冲突处理 — 2026-06-06
+- **E1.1**: `canvasHistoryStore.ts` — `mergeBranch(canvasId, source, target)` action + `pendingConflicts` state + `resolveBranchConflict` + `clearPendingConflicts`
+- **E1.2**: `BranchManager.tsx` — `MergeBranchButton` 组件（非主分支显示）+ 合并确认对话框
+- **E1.3**: `SnapshotCompareDialog.tsx` — `mode="merge"` prop，侧-by-side 对比 + 逐节点保留/忽略
+- **E1.4**: `ConflictResolutionDialog.tsx` — 冲突解决对话框（保留我的/采用对方/合并内容）三按钮
+- **E1.5**: `DDSCanvasPage.tsx` — 合并成功后调用 `reloadFromSnapshot` 刷新画布
+- **E1.6**: `canvasHistoryStore.e1-merge.test.ts` — E1 测试：mergeBranch + pendingConflicts + resolveBranchConflict

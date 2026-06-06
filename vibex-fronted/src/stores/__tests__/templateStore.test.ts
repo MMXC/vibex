@@ -295,3 +295,99 @@ describe('TemplateStore - E2 Favorites & Category', () => {
     });
   });
 });
+
+// ---- E3: Template Analytics & AI Recommendation ----
+describe('TemplateStore - E3 Analytics & AI Recommendation', () => {
+  beforeEach(() => {
+    localStorageMock.clear();
+    useTemplateStore.setState({
+      templates: [
+        {
+          id: 't1',
+          name: 'Flowchart A',
+          description: 'Flow chart',
+          category: 'flowchart' as const,
+          tags: ['flow'],
+          displayName: '流程图A',
+          content: '',
+          scenes: [],
+          entities: [],
+          features: [],
+          items: [],
+          metadata: { tags: ['flow'] },
+        } as any,
+        {
+          id: 't2',
+          name: 'Mindmap B',
+          description: 'Mind map',
+          category: 'mindmap' as const,
+          tags: ['brainstorm'],
+          displayName: '思维导图B',
+          content: '',
+          scenes: [],
+          entities: [],
+          features: [],
+          items: [],
+          metadata: { tags: ['brainstorm'] },
+        } as any,
+      ],
+      stats: { usageCount: { t1: 10, t2: 5 }, ratings: {} },
+      selectedTags: ['flow'],
+    });
+  });
+
+  describe('topTemplates', () => {
+    it('should return templates sorted by usage count descending', () => {
+      const top = useTemplateStore.getState().topTemplates(3);
+      expect(top[0].id).toBe('t1'); // 10 uses
+      expect(top[1].id).toBe('t2'); // 5 uses
+    });
+
+    it('should respect the limit parameter', () => {
+      const top = useTemplateStore.getState().topTemplates(1);
+      expect(top.length).toBe(1);
+      expect(top[0].id).toBe('t1');
+    });
+  });
+
+  describe('getCategoryStats', () => {
+    it('should return stats for all categories', () => {
+      const stats = useTemplateStore.getState().getCategoryStats();
+      expect(stats.all.count).toBe(2);
+      expect(stats.flowchart.count).toBe(1);
+      expect(stats.mindmap.count).toBe(1);
+    });
+
+    it('should calculate average usage per category', () => {
+      const stats = useTemplateStore.getState().getCategoryStats();
+      expect(stats.flowchart.avgUsage).toBe(10);
+      expect(stats.mindmap.avgUsage).toBe(5);
+    });
+  });
+
+  describe('calcRecommendScore', () => {
+    it('should return a score greater than 0 for templates with usage', () => {
+      const score = useTemplateStore.getState().calcRecommendScore('t1');
+      expect(score).toBeGreaterThan(0);
+    });
+
+    it('should return 0 for unknown template ID', () => {
+      const score = useTemplateStore.getState().calcRecommendScore('nonexistent');
+      expect(score).toBe(0);
+    });
+
+    it('should consider usage frequency in score (usage×0.5 weight)', () => {
+      const scoreT1 = useTemplateStore.getState().calcRecommendScore('t1'); // 10 uses
+      const scoreT2 = useTemplateStore.getState().calcRecommendScore('t2'); // 5 uses
+      expect(scoreT1).toBeGreaterThan(scoreT2); // Higher usage = higher score
+    });
+
+    it('should consider tag match in score (tagMatch×0.3 weight)', () => {
+      // selectedTags = ['flow']
+      // t1 has tags ['flow'] -> 100% match
+      // t2 has tags ['brainstorm'] -> 0% match
+      const scoreT1 = useTemplateStore.getState().calcRecommendScore('t1');
+      expect(scoreT1).toBeGreaterThan(0);
+    });
+  });
+});

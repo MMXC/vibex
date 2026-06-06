@@ -6428,3 +6428,13 @@ See git history for complete changelog.
 - **E3.5**: `TemplateGallery.tsx` — "发现"页签(CategoryTab+discover) + 每张卡片分享按钮 + 对话框集成
 - **E3.6**: `templateStore.ts` — `importFromShareUrl(payload)` + IndexedDB存储 + 冲突检测
 - **E3.7**: `templateShare.test.ts` — 21 vitest: encode/decode roundtrip/clipboard/location/edge cases
+
+---
+
+## [Unreleased] S69-E5: 画布视图预设 — 2026-06-06
+- **S69-E5.1**: `settingsStore.ts` — 扩展 CanvasPreset 接口 + canvasPresets 数组 + activePresetId + 8 个预设 CRUD actions
+- **S69-E5.2**: `ViewPresetsPanel.tsx` — 工具栏预设下拉菜单（apply/save/delete/rename preset + 设置链接）
+- **S69-E5.3**: `ViewPresetsPanel.module.css` — 下拉面板暗色主题样式
+- **S69-E5.4**: `DDSToolbar.tsx` — 预设按钮集成（ExportMenu 右侧）+ ViewPresetsPanel 渲染
+- **S69-E5.5**: `CanvasSettingsPanel.tsx` — 预设 Tab（第5个 Tab，重用 S66-E3 ViewPresetsTab）
+- **S69-E5.6**: `settingsStore.test.ts` — E5 测试 34/34 通过

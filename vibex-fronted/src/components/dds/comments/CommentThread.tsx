@@ -1,17 +1,22 @@
 'use client';
 
 /**
- * CommentThread — S69-E4: 节点评论系统
+ * CommentThread — S69-E4 + S71-E2: 节点评论系统
  *
  * 右键节点 → 上下文菜单"查看评论" → 浮层显示评论列表
  * 区别于 S49-E5 CommentPanel:
  * - 浮层模式（跟随节点位置），非侧边栏模式
  * - 显示特定节点的评论，而非整个画布
  * - 支持 @提及回复 (MentionInput)
+ *
+ * S71-E2: 实时协作评论系统
+ * - WS 事件监听：comment:created / comment:resolved / comment:deleted 实时刷新
+ * - Emoji 反应按钮 (👍❤️😂)：addReaction / removeReaction
+ * - addListener 订阅 commentStore 事件
  */
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useCommentStore } from '@/stores/dds/commentStore';
-import type { Comment } from '@/stores/dds/commentStore';
+import type { Comment, ReactionType } from '@/stores/dds/commentStore';
 import { MentionInput } from '@/components/dds/collaboration/MentionInput';
 import styles from './CommentThread.module.css';
 
@@ -47,6 +52,13 @@ function extractMentions(text: string): string[] {
   return matches ? matches.map(m => m.slice(1)) : [];
 }
 
+/** Emoji reaction type mapping */
+const REACTION_EMOJI: Record<ReactionType, string> = {
+  thumbsup: '👍',
+  heart: '❤️',
+  laugh: '😂',
+};
+
 export function CommentThread({
   nodeId,
   onClose,
@@ -54,11 +66,24 @@ export function CommentThread({
   currentUserId = 'User',
 }: CommentThreadProps) {
   const overlayRef = useRef<HTMLDivElement>(null);
+  const [, forceUpdate] = useState(0);
   const comments = useCommentStore(s => s.getCommentsByNode(nodeId));
   const addComment = useCommentStore(s => s.addComment);
   const resolveComment = useCommentStore(s => s.resolveComment);
   const unresolveComment = useCommentStore(s => s.unresolveComment);
   const deleteComment = useCommentStore(s => s.deleteComment);
+  const addReaction = useCommentStore(s => s.addReaction);
+  const removeReaction = useCommentStore(s => s.removeReaction);
+  const getReactionCounts = useCommentStore(s => s.getReactionCounts);
+  const getReactionsByComment = useCommentStore(s => s.getReactionsByComment);
+  const addListener = useCommentStore(s => s.addListener);
+
+  // S71-E2: Subscribe to commentStore events for real-time updates
+  useEffect(() => {
+    const forceRerender = () => forceUpdate(n => n + 1);
+    const cleanup = addListener(forceRerender);
+    return cleanup;
+  }, [addListener]);
 
   // Close on click outside overlay
   useEffect(() => {
@@ -82,6 +107,21 @@ export function CommentThread({
     },
     [onClose]
   );
+
+  const handleReaction = useCallback((
+    commentId: string,
+    type: ReactionType
+  ) => {
+    const reactions = getReactionsByComment(commentId);
+    const alreadyReacted = reactions.some(
+      r => r.type === type && r.userId === currentUserId
+    );
+    if (alreadyReacted) {
+      removeReaction(commentId, type, currentUserId);
+    } else {
+      addReaction(commentId, type, currentUserId);
+    }
+  }, [currentUserId, addReaction, removeReaction, getReactionsByComment]);
 
   // Auto-position: keep within viewport
   const style: React.CSSProperties = {
@@ -117,15 +157,23 @@ export function CommentThread({
         {comments.length === 0 ? (
           <div className={styles.empty}>暂无评论，点击下方输入框添加</div>
         ) : (
-          comments.map(comment => (
-            <CommentItem
-              key={comment.commentId}
-              comment={comment}
-              onResolve={() => resolveComment(comment.commentId)}
-              onUnresolve={() => unresolveComment(comment.commentId)}
-              onDelete={() => deleteComment(comment.commentId)}
-            />
-          ))
+          comments.map(comment => {
+            const counts = getReactionCounts(comment.commentId);
+            const reactions = getReactionsByComment(comment.commentId);
+            const myReaction = reactions.find(r => r.userId === currentUserId);
+            return (
+              <CommentItem
+                key={comment.commentId}
+                comment={comment}
+                counts={counts}
+                myReaction={myReaction}
+                onResolve={() => resolveComment(comment.commentId)}
+                onUnresolve={() => unresolveComment(comment.commentId)}
+                onDelete={() => deleteComment(comment.commentId)}
+                onReaction={(type) => handleReaction(comment.commentId, type)}
+              />
+            );
+          })
         )}
       </div>
 
@@ -145,15 +193,23 @@ export function CommentThread({
 
 function CommentItem({
   comment,
+  counts,
+  myReaction,
   onResolve,
   onUnresolve,
   onDelete,
+  onReaction,
 }: {
   comment: Comment;
+  counts: Record<ReactionType, number>;
+  myReaction?: { type: ReactionType; userId: string };
   onResolve: () => void;
   onUnresolve: () => void;
   onDelete: () => void;
+  onReaction: (type: ReactionType) => void;
 }) {
+  const REACTION_TYPES: ReactionType[] = ['thumbsup', 'heart', 'laugh'];
+
   return (
     <div className={`${styles.commentItem} ${comment.resolved ? styles.resolved : ''}`}>
       <div className={styles.commentHeader}>
@@ -168,6 +224,27 @@ function CommentItem({
         </button>
       </div>
       <div className={styles.commentText}>{comment.text}</div>
+
+      {/* S71-E2: Emoji reaction bar */}
+      <div className={styles.reactionBar}>
+        {REACTION_TYPES.map(type => {
+          const count = counts[type] ?? 0;
+          const isActive = myReaction?.type === type;
+          return (
+            <button
+              key={type}
+              className={`${styles.reactionBtn} ${isActive ? styles.reactionActive : ''}`}
+              onClick={() => onReaction(type)}
+              aria-label={`${REACTION_EMOJI[type]} 反应 (${count})`}
+              aria-pressed={isActive}
+            >
+              {REACTION_EMOJI[type]}
+              {count > 0 && <span className={styles.reactionCount}>{count}</span>}
+            </button>
+          );
+        })}
+      </div>
+
       <div className={styles.commentActions}>
         {comment.resolved ? (
           <button className={styles.actionBtn} onClick={onUnresolve}>

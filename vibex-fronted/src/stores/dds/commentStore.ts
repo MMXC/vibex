@@ -1,9 +1,10 @@
 /**
- * commentStore — Sprint49 E5 + Sprint50 E3: 协作评论系统
+ * commentStore — Sprint49 E5 + Sprint50 E3 + S69-E4 + S71-E2
  *
  * S49-E5: commentStore + IndexedDB 持久化 + CommentBadge + CommentPanel
  * S50-E3: addListener/removeListener 事件订阅 + unreadCount 追踪 + WebSocket 集成
  * S69-E4: 评论后触发 notificationStore 通知 (addCommentNotification)
+ * S71-E2: subscribeToCanvas(canvasId) + broadcastComment() + Reaction 系统
  *
  * 设计决策：
  * - commentId 使用 crypto.randomUUID() 生成，确保全局唯一
@@ -12,6 +13,7 @@
  * - resolved 评论默认折叠，支持展开查看
  * - 事件订阅机制：listeners Set 在 store 外维护，通过 emit() 触发
  * - unreadCount：全局计数器，addComment++ / resolveComment-- / markAllAsRead=0
+ * - S71-E2: canvasScope 用于 WS 消息路由；reactions map 存储评论 Reactions
  */
 import { create } from 'zustand';
 import { openDB } from 'idb';
@@ -34,11 +36,31 @@ export interface CommentEvent {
   comment: Comment;
 }
 
+/** S71-E2: Reaction 类型 */
+export type ReactionType = 'thumbsup' | 'heart' | 'laugh';
+
+export interface Reaction {
+  reactionId: string;
+  commentId: string;
+  type: ReactionType;
+  userId: string;
+  timestamp: number;
+}
+
+export interface ReactionEvent {
+  type: 'reaction:added' | 'reaction:removed';
+  reaction: Reaction;
+}
+
 export interface CommentStoreState {
   comments: Comment[];
   initialized: boolean;
   // S50-E3: unread count (counter-based — addComment++, resolveComment--)
   unreadCount: number;
+  // S71-E2: canvas subscription (active canvas ID for WS routing)
+  subscribedCanvasId: string | null;
+  // S71-E2: reactions map — keyed by commentId
+  reactions: Record<string, Reaction[]>;
 
   // CRUD
   addComment: (nodeId: string, text: string, author?: string) => Comment;
@@ -58,12 +80,24 @@ export interface CommentStoreState {
   removeListener: (listener: (event: CommentEvent) => void) => void;
   // S50-E3: Mark all as read
   markAllAsRead: () => void;
+
+  // S71-E2: Canvas subscription (for WS routing)
+  subscribeToCanvas: (canvasId: string) => void;
+  unsubscribeFromCanvas: () => void;
+  broadcastComment: (comment: Comment) => void;
+
+  // S71-E2: Reaction system
+  addReaction: (commentId: string, type: ReactionType, userId: string) => Reaction;
+  removeReaction: (commentId: string, type: ReactionType, userId: string) => void;
+  getReactionsByComment: (commentId: string) => Reaction[];
+  getReactionCounts: (commentId: string) => Record<ReactionType, number>;
 }
 
 // ==================== Event System (S50-E3) ====================
 
 // Module-level listeners set — persists across Zustand re-renders
 const _commentListeners: Set<(event: CommentEvent) => void> = new Set();
+const _reactionListeners: Set<(event: ReactionEvent) => void> = new Set();
 
 function emitCommentEvent(event: CommentEvent): void {
   _commentListeners.forEach(listener => {
@@ -75,22 +109,37 @@ function emitCommentEvent(event: CommentEvent): void {
   });
 }
 
+function emitReactionEvent(event: ReactionEvent): void {
+  _reactionListeners.forEach(listener => {
+    try {
+      listener(event);
+    } catch (err) {
+      console.error('[commentStore] Reaction listener error:', err);
+    }
+  });
+}
+
 // ==================== IndexedDB ====================
 
 const DB_NAME = 'vibex-comments';
-const DB_VERSION = 2; // Bump version for S50-E3 schema
+const DB_VERSION = 3; // Bump version for S71-E2 reactions schema
 const STORE = 'comments';
+const REACTIONS_STORE = 'reactions';
 
 let _db: Awaited<ReturnType<typeof openDB>> | null = null;
 
 async function initDB() {
   if (_db) return _db;
   _db = await openDB(DB_NAME, DB_VERSION, {
-    upgrade(db) {
+    upgrade(db, oldVersion) {
       if (!db.objectStoreNames.contains(STORE)) {
         const store = db.createObjectStore(STORE, { keyPath: 'commentId' });
         store.createIndex('by-node', 'nodeId');
         store.createIndex('by-timestamp', 'timestamp');
+      }
+      if (!db.objectStoreNames.contains(REACTIONS_STORE) && oldVersion < 3) {
+        const rStore = db.createObjectStore(REACTIONS_STORE, { keyPath: 'reactionId' });
+        rStore.createIndex('by-comment', 'commentId');
       }
     },
   });
@@ -101,6 +150,17 @@ async function loadFromDB(): Promise<Comment[]> {
   const db = await initDB();
   const all = await db.getAll(STORE);
   return all.sort((a, b) => a.timestamp - b.timestamp);
+}
+
+async function loadReactionsFromDB(): Promise<Record<string, Reaction[]>> {
+  const db = await initDB();
+  const all = await db.getAll(REACTIONS_STORE);
+  const map: Record<string, Reaction[]> = {};
+  for (const r of all) {
+    if (!map[r.commentId]) map[r.commentId] = [];
+    map[r.commentId].push(r);
+  }
+  return map;
 }
 
 async function saveComment(comment: Comment): Promise<void> {
@@ -123,12 +183,35 @@ async function saveAll(comments: Comment[]): Promise<void> {
   ]);
 }
 
+async function saveReaction(reaction: Reaction): Promise<void> {
+  const db = await initDB();
+  await db.put(REACTIONS_STORE, reaction);
+}
+
+async function deleteReaction(reactionId: string): Promise<void> {
+  const db = await initDB();
+  await db.delete(REACTIONS_STORE, reactionId);
+}
+
+// S71-E2: Broadcast function — called by wsCommentHandler when a comment is published
+let _broadcastFn: ((comment: Comment) => void) | null = null;
+
+export function setCommentBroadcastFn(fn: (comment: Comment) => void): void {
+  _broadcastFn = fn;
+}
+
+export function getCommentBroadcastFn(): ((comment: Comment) => void) | null {
+  return _broadcastFn;
+}
+
 // ==================== Store ====================
 
 export const useCommentStore = create<CommentStoreState>((set, get) => ({
   comments: [],
   initialized: false,
   unreadCount: 0,
+  subscribedCanvasId: null,
+  reactions: {},
 
   addComment: (nodeId, text, author = 'User') => {
     const comment: Comment = {
@@ -146,6 +229,15 @@ export const useCommentStore = create<CommentStoreState>((set, get) => ({
       return { comments, unreadCount: state.unreadCount + 1 };
     });
     emitCommentEvent({ type: 'comment:created', comment });
+
+    // S71-E2: Broadcast to other collaborators via WS
+    if (_broadcastFn) {
+      try {
+        _broadcastFn(comment);
+      } catch (err) {
+        console.error('[commentStore] Broadcast error:', err);
+      }
+    }
 
     // S69-E4: Trigger notification when a comment is added
     try {
@@ -263,16 +355,100 @@ export const useCommentStore = create<CommentStoreState>((set, get) => ({
   markAllAsRead: () => {
     set({ unreadCount: 0 });
   },
+
+  // S71-E2: Canvas subscription
+  subscribeToCanvas: (canvasId) => {
+    set({ subscribedCanvasId: canvasId });
+  },
+
+  unsubscribeFromCanvas: () => {
+    set({ subscribedCanvasId: null });
+  },
+
+  // S71-E2: Broadcast comment to other collaborators via WS
+  broadcastComment: (comment) => {
+    if (_broadcastFn) {
+      try {
+        _broadcastFn(comment);
+      } catch (err) {
+        console.error('[commentStore] Broadcast error:', err);
+      }
+    }
+  },
+
+  // S71-E2: Reaction — add a reaction to a comment
+  addReaction: (commentId, type, userId) => {
+    const reaction: Reaction = {
+      reactionId: crypto.randomUUID(),
+      commentId,
+      type,
+      userId,
+      timestamp: Date.now(),
+    };
+    set(state => {
+      const existing = state.reactions[commentId] ?? [];
+      // Prevent duplicate: same user + same type on same comment
+      if (existing.some(r => r.type === type && r.userId === userId)) {
+        return state;
+      }
+      const reactions = {
+        ...state.reactions,
+        [commentId]: [...existing, reaction],
+      };
+      saveReaction(reaction).catch(console.error);
+      return { reactions };
+    });
+    emitReactionEvent({ type: 'reaction:added', reaction });
+    return reaction;
+  },
+
+  // S71-E2: Reaction — remove a reaction from a comment
+  removeReaction: (commentId, type, userId) => {
+    const state = get();
+    const existing = state.reactions[commentId] ?? [];
+    const target = existing.find(r => r.type === type && r.userId === userId);
+    if (!target) return;
+    set(state => {
+      const reactions = {
+        ...state.reactions,
+        [commentId]: existing.filter(r => r.reactionId !== target.reactionId),
+      };
+      deleteReaction(target.reactionId).catch(console.error);
+      return { reactions };
+    });
+    emitReactionEvent({ type: 'reaction:removed', reaction: target });
+  },
+
+  getReactionsByComment: (commentId) => {
+    return get().reactions[commentId] ?? [];
+  },
+
+  getReactionCounts: (commentId) => {
+    const reactions = get().reactions[commentId] ?? [];
+    const counts: Record<ReactionType, number> = { thumbsup: 0, heart: 0, laugh: 0 };
+    for (const r of reactions) {
+      counts[r.type]++;
+    }
+    return counts;
+  },
 }));
+
+// S71-E2: Add reaction listener
+export function addReactionListener(listener: (event: ReactionEvent) => void): () => void {
+  _reactionListeners.add(listener);
+  return () => _reactionListeners.delete(listener);
+}
 
 // Initialize from IndexedDB
 export async function initCommentStore(): Promise<void> {
   try {
     const comments = await loadFromDB();
+    const reactions = await loadReactionsFromDB();
     useCommentStore.setState({
       comments,
       initialized: true,
       unreadCount: 0,
+      reactions,
     });
   } catch (err) {
     console.error('[commentStore] Failed to load from IndexedDB:', err);

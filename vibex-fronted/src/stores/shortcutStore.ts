@@ -1,6 +1,8 @@
 /**
  * Shortcut Store
  * 快捷键个性化配置状态管理
+ * S67-E4: 画布快捷键可配置化
+ * 扩展: addBinding/removeBinding/importBindings/exportBindings
  */
 
 import { create } from 'zustand';
@@ -24,6 +26,12 @@ export interface ConflictCheckResult {
   conflictingDescription?: string;
 }
 
+export interface ImportResult {
+  success: boolean;
+  imported: number;
+  errors: string[];
+}
+
 export interface ShortcutState {
   // Shortcuts
   shortcuts: ShortcutConfig[];
@@ -42,6 +50,12 @@ export interface ShortcutState {
   resetToDefault: (action: string) => void;
   resetAll: () => void;
   getShortcutKey: (action: string) => string;
+
+  // E4: custom binding API (S67)
+  addBinding: (action: string, key: string) => { success: boolean; error?: string };
+  removeBinding: (action: string) => void;
+  exportBindings: () => string;
+  importBindings: (json: string) => ImportResult;
 }
 
 // ==================== Default Shortcuts ====================
@@ -185,6 +199,105 @@ export const useShortcutStore = create<ShortcutState>()(
         const state = get();
         const shortcut = state.shortcuts.find((s) => s.action === action);
         return shortcut?.currentKey || '';
+      },
+
+      // E4: custom binding API (S67)
+      addBinding: (action, key) => {
+        const state = get();
+        
+        // Find the action
+        const shortcut = state.shortcuts.find(s => s.action === action);
+        if (!shortcut) {
+          return { success: false, error: `Unknown action: ${action}` };
+        }
+        
+        // Check for duplicate key (not involving the same action)
+        const conflict = state.shortcuts.find(
+          s => s.currentKey === key && s.action !== action
+        );
+        if (conflict) {
+          return {
+            success: false,
+            error: `Duplicate key "${key}" already assigned to "${conflict.description}"`,
+          };
+        }
+        
+        set({
+          shortcuts: state.shortcuts.map(s =>
+            s.action === action ? { ...s, currentKey: key } : s
+          ),
+        });
+        return { success: true };
+      },
+
+      removeBinding: (action) => {
+        const state = get();
+        const defaultShortcut = DEFAULT_SHORTCUTS.find(s => s.action === action);
+        if (!defaultShortcut) return;
+        
+        set({
+          shortcuts: state.shortcuts.map(s =>
+            s.action === action ? { ...s, currentKey: defaultShortcut.defaultKey } : s
+          ),
+        });
+      },
+
+      exportBindings: () => {
+        const state = get();
+        // Export only custom bindings (where currentKey differs from defaultKey)
+        const customBindings = state.shortcuts
+          .filter(s => s.currentKey !== s.defaultKey)
+          .map(s => ({
+            action: s.action,
+            key: s.currentKey,
+          }));
+        return JSON.stringify({ version: 1, bindings: customBindings }, null, 2);
+      },
+
+      importBindings: (json) => {
+        const state = get();
+        const errors: string[] = [];
+        let imported = 0;
+
+        try {
+          const data = JSON.parse(json);
+          if (!data.bindings || !Array.isArray(data.bindings)) {
+            return { success: false, imported: 0, errors: ['Invalid format: missing bindings array'] };
+          }
+
+          const newShortcuts = [...state.shortcuts];
+          
+          for (const binding of data.bindings) {
+            if (!binding.action || !binding.key) {
+              errors.push(`Invalid binding (missing action or key): ${JSON.stringify(binding)}`);
+              continue;
+            }
+
+            // Check if action exists
+            const idx = newShortcuts.findIndex(s => s.action === binding.action);
+            if (idx === -1) {
+              errors.push(`Unknown action: ${binding.action}`);
+              continue;
+            }
+
+            // Check for conflict (key already taken by another action)
+            const conflict = newShortcuts.find(
+              s => s.currentKey === binding.key && s.action !== binding.action
+            );
+            if (conflict) {
+              errors.push(`Conflict: "${binding.key}" already assigned to "${conflict.description}"`);
+              continue;
+            }
+
+            newShortcuts[idx] = { ...newShortcuts[idx], currentKey: binding.key };
+            imported++;
+          }
+
+          set({ shortcuts: newShortcuts });
+          return { success: errors.length === 0, imported, errors };
+        } catch (e) {
+          return { success: false, imported: 0, errors: [`JSON parse error: ${e instanceof Error ? e.message : String(e)}`] };
+        }
       },
     }),
     {

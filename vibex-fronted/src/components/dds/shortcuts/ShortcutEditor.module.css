@@ -1,0 +1,191 @@
+/**
+ * ShortcutEditor.module.css
+ * S67-E4: 画布快捷键可配置化
+ */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  width: 380px;
+  max-width: 90vw;
+  overflow: hidden;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid #e5e7eb;
+  background: #f9fafb;
+}
+
+.title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  color: #6b7280;
+  padding: 4px;
+  border-radius: 4px;
+  line-height: 1;
+}
+
+.closeBtn:hover {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.body {
+  padding: 24px 20px;
+  text-align: center;
+}
+
+.actionLabel {
+  margin: 0 0 16px;
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.keyDisplay {
+  background: #f9fafb;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 12px;
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.listening {
+  font-size: 16px;
+  color: #9ca3af;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.keyRecorded {
+  font-size: 20px;
+  font-weight: 600;
+  color: #2563eb;
+  font-family: ui-monospace, monospace;
+  letter-spacing: 2px;
+}
+
+.keyConflict {
+  font-size: 20px;
+  font-weight: 600;
+  color: #dc2626;
+  font-family: ui-monospace, monospace;
+  letter-spacing: 2px;
+}
+
+.keyDefault {
+  font-size: 20px;
+  color: #9ca3af;
+  font-family: ui-monospace, monospace;
+  letter-spacing: 2px;
+}
+
+.conflictWarning {
+  color: #dc2626;
+  font-size: 13px;
+  margin: 0 0 8px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 6px;
+  padding: 8px 12px;
+}
+
+.customNote {
+  color: #2563eb;
+  font-size: 13px;
+  margin: 0;
+}
+
+.footer {
+  display: flex;
+  gap: 8px;
+  padding: 16px 20px;
+  border-top: 1px solid #e5e7eb;
+  justify-content: flex-end;
+}
+
+.hiddenInput {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  width: 1px;
+  height: 1px;
+}
+
+.clearBtn,
+.resetBtn,
+.saveBtn {
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.15s;
+}
+
+.clearBtn {
+  background: #fff;
+  color: #374151;
+}
+
+.clearBtn:hover {
+  background: #f3f4f6;
+}
+
+.resetBtn {
+  background: #fff;
+  color: #6b7280;
+  border-color: #e5e7eb;
+}
+
+.resetBtn:hover {
+  background: #f9fafb;
+  color: #374151;
+}
+
+.saveBtn {
+  background: #2563eb;
+  color: #fff;
+  border-color: #2563eb;
+}
+
+.saveBtn:hover:not(:disabled) {
+  background: #1d4ed8;
+}
+
+.saveBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

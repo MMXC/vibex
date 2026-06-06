@@ -71,9 +71,11 @@ export function useWebSocketPresence({
         const m = msg as { type: 'collab:editing:end'; nodeId: string; userId: string };
         usePresenceStore.getState().handleEditingEndedMessage(m.nodeId);
       } else if (msg.type === 'cursor:move') {
-        // S63-E1: cursor:move — update remote cursor in presenceStore
+        // S63-E1: cursor:move — update remoteUsers
+        // S68-E5: also update dedicated cursors field
         const m = msg as CursorMoveMessage;
         usePresenceStore.getState().updateCursor(m.userId, m.x, m.y);
+        usePresenceStore.getState().broadcastCursor(m.userId, m.x, m.y);
       }
     });
     return unsubscribe;
@@ -113,10 +115,16 @@ export function useWebSocketPresence({
 
   const remoteUsers = usePresenceStore((s) => s.remoteUsers);
 
+  // S68-E5: Expose broadcastCursor from presenceStore for DDSCanvasPage to call
+  const { broadcastCursor: storeBroadcastCursor, clearCursor: storeClearCursor } =
+    usePresenceStore();
+
   return {
     remoteUsers,
     isConnected,
     onCursorMove,
     updateCursor: updateCursorInStore,
+    broadcastCursor: storeBroadcastCursor,
+    clearCursor: storeClearCursor,
   };
 }

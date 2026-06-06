@@ -65,6 +65,20 @@ export interface NodeLockInfo {
   lockedAt: number;
 }
 
+
+/** S68-E5: Cursor state for the dedicated cursors field */
+export interface CursorState {
+  userId: string;
+  userName: string;
+  avatar: string;
+  /** Flow-space X coordinate */
+  x: number;
+  /** Flow-space Y coordinate */
+  y: number;
+  /** Last update timestamp */
+  lastSeen: number;
+}
+
 /** Heartbeat timeout in milliseconds (30s) */
 const HEARTBEAT_TIMEOUT_MS = 30_000;
 
@@ -95,6 +109,19 @@ interface PresenceState {
 
   /** S66-E2: Node locks: nodeId → NodeLockInfo */
   nodeLocks: Map<string, NodeLockInfo>;
+
+  // S68-E5: Dedicated cursors field
+  /** S68-E5: Dedicated cursor tracking: userId → CursorState */
+  cursors: Record<string, CursorState>;
+
+  /** S68-E5: Update a user's cursor position in the cursors map */
+  broadcastCursor: (userId: string, x: number, y: number) => void;
+
+  /** S68-E5: Remove a user's cursor (e.g., on disconnect) */
+  clearCursor: (userId: string) => void;
+
+  /** S68-E5: Clear all cursors */
+  clearAllCursors: () => void;
 
   /** Update remote users from WebSocket presence message */
   setRemoteUsers: (users: CollabUser[]) => void;
@@ -282,6 +309,9 @@ export const usePresenceStore = create<PresenceState>((set, get) => {
     focusedNodes: {},
     focusedNodeInfos: new Map(),
 
+    // S68-E5: Dedicated cursors field
+    cursors: {},
+
     setRemoteUsers: (users: CollabUser[]) =>
       set((state) => {
         const next = new Map<string, RemoteUser>();
@@ -312,7 +342,8 @@ export const usePresenceStore = create<PresenceState>((set, get) => {
       set((state) => {
         const updated = new Map(state.remoteUsers);
         updated.delete(userId);
-        return { remoteUsers: updated };
+        const { [userId]: _c, ...restCursors } = state.cursors;
+        return { remoteUsers: updated, cursors: restCursors };
       }),
 
     removeCursor: (userId: string) =>
@@ -332,6 +363,7 @@ export const usePresenceStore = create<PresenceState>((set, get) => {
         onlineUsers: [],
         focusedNodes: {},
         focusedNodeInfos: new Map(),
+        cursors: {},
       }),
 
     lockNode: (nodeId: string, userId: string) =>
@@ -531,6 +563,33 @@ export const usePresenceStore = create<PresenceState>((set, get) => {
       }
       set({ focusedNodes: {}, focusedNodeInfos: new Map() });
     },
+
+    // S68-E5: Dedicated cursor actions
+    broadcastCursor: (userId: string, x: number, y: number) =>
+      set((state) => {
+        const remoteUser = state.remoteUsers.get(userId);
+        return {
+          cursors: {
+            ...state.cursors,
+            [userId]: {
+              userId,
+              userName: remoteUser?.name ?? userId,
+              avatar: remoteUser?.avatar ?? '',
+              x,
+              y,
+              lastSeen: Date.now(),
+            },
+          },
+        };
+      }),
+
+    clearCursor: (userId: string) =>
+      set((state) => {
+        const { [userId]: _removed, ...rest } = state.cursors;
+        return { cursors: rest };
+      }),
+
+    clearAllCursors: () => set({ cursors: {} }),
 
     // S66-E2: Node Lock actions
 

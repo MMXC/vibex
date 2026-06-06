@@ -3,12 +3,12 @@
 /**
  * RemoteCursorsLayer — Collaborative cursor overlay for DDS Canvas
  * S63-E1: 协作者实时游标追踪
+ * S68-E5: 协作光标同步 — 升级为独立 cursors 字段
  *
- * Mounted inside <ReactFlow> in DDSFlow. Uses useReactFlow's screenToFlowPosition
- * to convert flow coordinates and renders all remote users' cursors with smooth SVG
- * cursor icons + username labels.
+ * Mounted inside <ReactFlow> in DDSFlow. Renders all remote users' cursors with
+ * smooth SVG cursor icons + username labels.
  *
- * Reads from usePresenceStore.remoteUsers (cursorX, cursorY).
+ * Reads from usePresenceStore.cursors (S68-E5 dedicated field, flow-space coords).
  * Cursor positions in presenceStore are in flow-space coordinates.
  */
 
@@ -92,25 +92,24 @@ interface RemoteCursorsLayerProps {
  * matching the canvas coordinate system — no screenToFlowPosition conversion needed.
  */
 export function RemoteCursorsLayer({ currentUserId }: RemoteCursorsLayerProps) {
-  const remoteUsers = usePresenceStore((s) => s.remoteUsers);
+  // S68-E5: Read from dedicated cursors field (separate from remoteUsers)
+  const cursorsMap = usePresenceStore((s) => s.cursors);
 
   const cursors = useMemo(() => {
     const result: CursorInstanceProps[] = [];
-    for (const [uid, user] of remoteUsers) {
+    for (const [uid, cursor] of Object.entries(cursorsMap)) {
       if (uid === currentUserId) continue;
-      const x = user.cursorX ?? 0;
-      const y = user.cursorY ?? 0;
-      if (x === 0 && y === 0) continue; // no position yet
+      if (cursor.x === 0 && cursor.y === 0) continue; // no position yet
       result.push({
         userId: uid,
-        userName: user.name || uid,
-        x,
-        y,
+        userName: cursor.userName || uid,
+        x: cursor.x,
+        y: cursor.y,
         color: hashUserColor(uid),
       });
     }
     return result;
-  }, [remoteUsers, currentUserId]);
+  }, [cursorsMap, currentUserId]);
 
   if (cursors.length === 0) return null;
 

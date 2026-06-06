@@ -593,4 +593,96 @@ describe('presenceStore', () => {
     expect(state.getFocusInfo('node-1')).toBeUndefined();
     expect(state.focusedNodes['node-1']).toBeUndefined();
   });
+
+  // ===== S68-E5: 协作光标同步 — dedicated cursors field =====
+  // E5 DoD: cursors field (Record<userId, CursorState>), broadcastCursor, clearCursor
+
+  describe('S68-E5: cursors field', () => {
+    it('cursors initialises as empty object', () => {
+      const { cursors } = usePresenceStore.getState();
+      expect(cursors).toEqual({});
+    });
+
+    it('broadcastCursor adds a cursor to the cursors map', () => {
+      const state = usePresenceStore.getState();
+      state.broadcastCursor('u1', 100, 200);
+      const cursors = usePresenceStore.getState().cursors;
+      expect(cursors['u1']).toMatchObject({
+        userId: 'u1',
+        x: 100,
+        y: 200,
+      });
+      expect(cursors['u1'].lastSeen).toBeGreaterThan(0);
+    });
+
+    it('broadcastCursor overwrites previous position for same userId', () => {
+      const state = usePresenceStore.getState();
+      state.broadcastCursor('u1', 100, 200);
+      state.broadcastCursor('u1', 300, 400);
+      const cursors = usePresenceStore.getState().cursors;
+      expect(cursors['u1'].x).toBe(300);
+      expect(cursors['u1'].y).toBe(400);
+    });
+
+    it('broadcastCursor from multiple users coexists without overwriting', () => {
+      const state = usePresenceStore.getState();
+      state.broadcastCursor('u1', 100, 200);
+      state.broadcastCursor('u2', 300, 400);
+      state.broadcastCursor('u3', 500, 600);
+      const cursors = usePresenceStore.getState().cursors;
+      expect(Object.keys(cursors)).toHaveLength(3);
+      expect(cursors['u1']).toMatchObject({ userId: 'u1', x: 100, y: 200 });
+      expect(cursors['u2']).toMatchObject({ userId: 'u2', x: 300, y: 400 });
+      expect(cursors['u3']).toMatchObject({ userId: 'u3', x: 500, y: 600 });
+    });
+
+    it('clearCursor removes only that user from cursors', () => {
+      const state = usePresenceStore.getState();
+      state.broadcastCursor('u1', 100, 200);
+      state.broadcastCursor('u2', 300, 400);
+      state.clearCursor('u1');
+      const cursors = usePresenceStore.getState().cursors;
+      expect(Object.keys(cursors)).toHaveLength(1);
+      expect(cursors['u2']).toMatchObject({ userId: 'u2', x: 300, y: 400 });
+      expect(cursors['u1']).toBeUndefined();
+    });
+
+    it('clearCursor on non-existent user is a no-op', () => {
+      const state = usePresenceStore.getState();
+      const cursorsBefore = usePresenceStore.getState().cursors;
+      state.clearCursor('non-existent');
+      expect(usePresenceStore.getState().cursors).toEqual(cursorsBefore);
+    });
+
+    it('clearAllCursors removes all cursors', () => {
+      const state = usePresenceStore.getState();
+      state.broadcastCursor('u1', 100, 200);
+      state.broadcastCursor('u2', 300, 400);
+      state.clearAllCursors();
+      expect(usePresenceStore.getState().cursors).toEqual({});
+    });
+
+    it('removeUser also clears from cursors', () => {
+      const state = usePresenceStore.getState();
+      state.setRemoteUsers([
+        { userId: 'u1', name: 'Alice', avatar: 'A' },
+        { userId: 'u2', name: 'Bob', avatar: 'B' },
+      ]);
+      state.broadcastCursor('u1', 100, 200);
+      state.broadcastCursor('u2', 300, 400);
+      state.removeUser('u1');
+      const cursors = usePresenceStore.getState().cursors;
+      expect(cursors['u1']).toBeUndefined();
+      expect(cursors['u2']).toMatchObject({ userId: 'u2', x: 300, y: 400 });
+    });
+
+    it('clearAll also clears cursors', () => {
+      const state = usePresenceStore.getState();
+      state.broadcastCursor('u1', 100, 200);
+      state.broadcastCursor('u2', 300, 400);
+      state.clearAll();
+      expect(usePresenceStore.getState().cursors).toEqual({});
+    });
+  });
+
 });

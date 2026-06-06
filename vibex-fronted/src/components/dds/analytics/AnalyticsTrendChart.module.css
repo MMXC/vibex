@@ -1,0 +1,113 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  background: #fff;
+  border-radius: 8px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.controls {
+  display: flex;
+  gap: 4px;
+}
+
+.rangeBtn {
+  padding: 4px 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  background: #fff;
+  color: #6b7280;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.rangeBtn:hover {
+  background: #f3f4f6;
+}
+
+.rangeBtn.active {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: #fff;
+}
+
+.shareBtn {
+  padding: 4px 8px;
+  border: 1px solid #2563eb;
+  border-radius: 4px;
+  background: #fff;
+  color: #2563eb;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.shareBtn:hover {
+  background: #eff6ff;
+}
+
+.chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 100px;
+  padding: 4px 0;
+}
+
+.barColumn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
+}
+
+.barWrapper {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+}
+
+.bar {
+  width: 100%;
+  min-height: 2px;
+  background: #2563eb;
+  border-radius: 2px 2px 0 0;
+  transition: height 0.3s ease;
+}
+
+.dateLabel {
+  font-size: 10px;
+  color: #9ca3af;
+  white-space: nowrap;
+}
+
+.empty {
+  text-align: center;
+  color: #9ca3af;
+  font-size: 13px;
+  padding: 20px 0;
+}
+
+.noData {
+  text-align: center;
+  color: #9ca3af;
+  font-size: 12px;
+}

@@ -345,7 +345,8 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
   const userId = user?.id ?? null;
   // S43-E1: WebSocket Presence integration (replaces Firebase usePresence)
   // S63-E1: returns onCursorMove for DDSFlow to wire mouse events
-  const { onCursorMove } = useWebSocketPresence({
+  // S68-E5: broadcastCursor — dedicated cursor field write (separate from remoteUsers)
+const { onCursorMove, broadcastCursor } = useWebSocketPresence({
     projectId,
     userId,
     userName: user?.name ?? 'Anonymous',

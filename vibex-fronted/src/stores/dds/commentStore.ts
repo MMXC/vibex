@@ -3,6 +3,7 @@
  *
  * S49-E5: commentStore + IndexedDB 持久化 + CommentBadge + CommentPanel
  * S50-E3: addListener/removeListener 事件订阅 + unreadCount 追踪 + WebSocket 集成
+ * S69-E4: 评论后触发 notificationStore 通知 (addCommentNotification)
  *
  * 设计决策：
  * - commentId 使用 crypto.randomUUID() 生成，确保全局唯一
@@ -12,9 +13,9 @@
  * - 事件订阅机制：listeners Set 在 store 外维护，通过 emit() 触发
  * - unreadCount：全局计数器，addComment++ / resolveComment-- / markAllAsRead=0
  */
-
 import { create } from 'zustand';
 import { openDB } from 'idb';
+import { useNotificationStore } from '@/stores/notificationStore';
 
 // ==================== Types ====================
 
@@ -145,6 +146,23 @@ export const useCommentStore = create<CommentStoreState>((set, get) => ({
       return { comments, unreadCount: state.unreadCount + 1 };
     });
     emitCommentEvent({ type: 'comment:created', comment });
+
+    // S69-E4: Trigger notification when a comment is added
+    try {
+      useNotificationStore.getState().addNotification({
+        type: 'info',
+        title: '新评论',
+        message: `${author} 在节点 ${nodeId} 评论：${text.slice(0, 50)}${text.length > 50 ? '...' : ''}`,
+        senderId: 'system',
+        senderName: author,
+        targetUserId: 'current-user',
+        nodeId,
+        timestamp: Date.now(),
+      });
+    } catch (err) {
+      console.error('[commentStore] Failed to send notification:', err);
+    }
+
     return comment;
   },
 

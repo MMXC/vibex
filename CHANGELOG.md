@@ -6506,3 +6506,12 @@ See git history for complete changelog.
 ## [Unreleased] S72-E1: 画布历史管理面板快照测试 — 2026-06-07
 - **E1.4**: `canvasHistoryStore.snapshots.test.ts` — saveSnapshot/restoreSnapshot/renameSnapshot/deleteSnapshot + LRU eviction vitest 14/14
 - **E1.5**: `TimelineView.test.tsx` — 快照时间线组件测试：空状态/列表渲染/操作回调/键盘交互/相对时间格式化 vitest 16/16
+
+---
+
+## [Unreleased] S72-E3: 协作presence统一store — 2026-06-07
+- **E3.1**: `src/lib/collaboration/presenceStore.ts` — Zustand store: `remoteUsers` + `cursors` (Map/Record) + `broadcastCursor`/`clearCursor`/`updateCursor`/`removeUser` actions
+- **E3.2**: `src/lib/collaboration/useWebSocketPresence.ts` — WS integration: `onCursorMove` → `presenceStore.broadcastCursor`, `onUserJoin` → `presenceStore.setRemoteUsers`, `onUserLeave` → `presenceStore.removeUser`
+- **E3.3**: `src/components/dds/canvas-dashboard/RemoteCursorsLayer.tsx` — 重构为 `usePresenceStore(s => s.cursors)` 驱动 (S63-E1 + S68-E5)
+- **E3.4**: `src/lib/collaboration/__tests__/presenceStore.test.ts` — 91 tests (84 原有 + 7 E3专项)
+- **E3.5**: `src/components/dds/canvas-dashboard/__tests__/RemoteCursorsLayer.test.tsx` — 7 tests

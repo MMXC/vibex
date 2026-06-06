@@ -6518,6 +6518,13 @@ See git history for complete changelog.
 
 ---
 
+## [Unreleased] S72-E5: 模板预览模式 — 2026-06-07
+- **E5.1**: `vibex-fronted/src/components/dds/templates/TemplatePreviewPanel.tsx` — Drawer面板, 节点列表+详情双栏布局, 入边/出边数量显示
+- **E5.2**: `vibex-fronted/src/components/dds/templates/TemplatePreviewPanel.module.css` — 面板样式
+- **E5.3**: `vibex-fronted/src/stores/templateStore.ts` — `getTemplateNodes(templateId)` + `TemplateNode` interface: 返回含入边/出边计数的节点数组
+- **E5.4**: `vibex-fronted/src/components/dds/templates/__tests__/TemplatePreviewPanel.test.tsx` — 9 tests: open/close/node list/detail/import/edge counts
+- **vitest**: `TemplatePreviewPanel.test.tsx` 9/9 通过
+
 ## [Unreleased] S72-E4: 画布数据趋势分析图表 — 2026-06-07
 - **E4.1**: `vibex-fronted/src/components/dds/analytics/AnalyticsTrendChart.tsx` — 7天/30天切换柱状图, 历史记录列表, 分享按钮
 - **E4.2**: `vibex-fronted/src/stores/dds/canvasAnalyticsStore.ts` — `archiveHistory`/`getHistory`/`shareAnalytics`/`exportAnalytics` 扩展

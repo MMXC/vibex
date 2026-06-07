@@ -1308,3 +1308,12 @@
 - **E2.3**: `ImportMode` / `ImportResult` / `ImportedNode` / `ImportedEdge` 类型导出
 - **E2.4**: `stores/templateStore.ts` — 新增导入: `@/lib/canvas/templateStore`, `@/stores/dds/DDSCanvasStore`, `@/lib/canvas/id`
 
+
+---
+
+## [Unreleased] S73-E3: 通知管理与历史 — 2026-06-07
+- **E3.1**: `notificationStore.ts` — 扩展 `preferences` 状态、`setChannelEnabled`/`setTypeEnabled`/`resetPreferences` actions
+- **E3.2**: `NotificationPanel.tsx` — header 新增「全部已读」+「清空历史」+「设置」按钮
+- **E3.3**: `NotificationSettingsDrawer.tsx` — 新建通知偏好设置抽屉（推送渠道开关 + 通知类型开关 grid）
+- **E3.4**: `NotificationPanel.module.css` + `NotificationSettingsDrawer.module.css` — 新建样式
+- **E3.5**: `notificationStore.test.ts` — E3.1–E3.3 扩展测试 9/9

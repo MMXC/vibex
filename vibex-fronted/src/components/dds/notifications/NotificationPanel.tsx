@@ -3,6 +3,7 @@
 /**
  * NotificationPanel — S68-E2: @提及通知系统
  * 扩展 S73-E3: 清空历史按钮 + 设置抽屉入口
+ * 扩展 S74-E5: 键盘导航（Tab + Enter）
  *
  * 通知中心抽屉面板，支持：
  * - 未读红点 + 角标数字
@@ -10,6 +11,7 @@
  * - 标记已读、全部已读、清空历史
  * - 分页加载
  * - 通知偏好设置（S73-E3）
+ * - 键盘导航：Tab 聚焦通知项，Enter 标记已读（S74-E5）
  *
  * 设计决策（来自 PRD E2 架构决策 3）：
  * - 独立 Panel（抽屉式），与 CollabActivityPanel 并列
@@ -68,10 +70,24 @@ const NotificationItem = memo(function NotificationItem({
   notification: Notification;
   onRead: (id: string) => void;
 }) {
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLLIElement>) => {
+      // S74-E5: Enter 键标记已读
+      if (e.key === 'Enter' && !notification.isRead) {
+        e.preventDefault();
+        onRead(notification.id);
+      }
+    },
+    [notification.id, notification.isRead, onRead]
+  );
+
   return (
     <li
       className={`${styles.item} ${notification.isRead ? styles.read : styles.unread}`}
       role="listitem"
+      tabIndex={0} // S74-E5: 使通知项可通过 Tab 聚焦
+      onKeyDown={handleKeyDown}
+      aria-label={`${NOTIFICATION_TYPE_LABELS[notification.type] ?? '通知'}: ${notification.message}`}
     >
       <div className={styles.iconWrap} aria-hidden="true">
         <span className={styles.typeIcon}>

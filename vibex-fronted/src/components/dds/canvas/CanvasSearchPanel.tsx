@@ -62,6 +62,7 @@ export const CanvasSearchPanel = React.memo(function CanvasSearchPanel({
 }: CanvasSearchPanelProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const selectedIndexRef = useRef(0);
+  const [activeIndex, setActiveIndex] = useState(0);
   const [activeTab, setActiveTab] = useState<'results' | 'history'>('results');
 
   // Store state
@@ -81,6 +82,7 @@ export const CanvasSearchPanel = React.memo(function CanvasSearchPanel({
     if (open) {
       setTimeout(() => inputRef.current?.focus(), 50);
       selectedIndexRef.current = 0;
+      setActiveIndex(0);
       setActiveTab('results');
     }
   }, [open]);
@@ -124,9 +126,11 @@ export const CanvasSearchPanel = React.memo(function CanvasSearchPanel({
           selectedIndexRef.current + 1,
           currentItems.length - 1
         );
+        setActiveIndex(selectedIndexRef.current);
       } else if (e.key === 'ArrowUp') {
         e.preventDefault();
         selectedIndexRef.current = Math.max(selectedIndexRef.current - 1, 0);
+        setActiveIndex(selectedIndexRef.current);
       } else if (e.key === 'Enter') {
         e.preventDefault();
         if (activeTab === 'history') {
@@ -229,6 +233,11 @@ export const CanvasSearchPanel = React.memo(function CanvasSearchPanel({
               fontFamily: 'inherit',
             }}
             aria-label={t('canvasSearchInputLabel') ?? 'Search canvas nodes'}
+            aria-activedescendant={
+              activeTab === 'history'
+                ? `canvas-search-history-${activeIndex}`
+                : `canvas-search-result-${activeIndex}`
+            }
             autoComplete="off"
             spellCheck={false}
           />
@@ -334,6 +343,7 @@ export const CanvasSearchPanel = React.memo(function CanvasSearchPanel({
             onClick={() => {
               setActiveTab('results');
               selectedIndexRef.current = 0;
+              setActiveIndex(0);
             }}
             style={{
               flex: 1,
@@ -374,6 +384,7 @@ export const CanvasSearchPanel = React.memo(function CanvasSearchPanel({
             onClick={() => {
               setActiveTab('history');
               selectedIndexRef.current = 0;
+              setActiveIndex(0);
             }}
             style={{
               flex: 1,
@@ -438,6 +449,7 @@ export const CanvasSearchPanel = React.memo(function CanvasSearchPanel({
               fulltextResults.map((result, idx) => (
                 <button
                   key={`${result.nodeId}-${result.canvasId}-${idx}`}
+                  id={`canvas-search-result-${idx}`}
                   type="button"
                   onClick={() => handleSelectResult(result)}
                   style={{
@@ -458,6 +470,7 @@ export const CanvasSearchPanel = React.memo(function CanvasSearchPanel({
                   aria-selected={idx === selectedIndexRef.current}
                   onMouseEnter={() => {
                     selectedIndexRef.current = idx;
+                    setActiveIndex(idx);
                   }}
                   data-testid={`canvas-search-result-${idx}`}
                 >
@@ -546,6 +559,7 @@ export const CanvasSearchPanel = React.memo(function CanvasSearchPanel({
                   {recentSearches.map((item, idx) => (
                   <button
                     key={item}
+                    id={`canvas-search-history-${idx}`}
                     type="button"
                     onClick={() => {
                       handleQueryChange(item);
@@ -569,6 +583,7 @@ export const CanvasSearchPanel = React.memo(function CanvasSearchPanel({
                     aria-selected={idx === selectedIndexRef.current}
                     onMouseEnter={() => {
                       selectedIndexRef.current = idx;
+                      setActiveIndex(idx);
                     }}
                     data-testid={`canvas-search-history-${idx}`}
                   >

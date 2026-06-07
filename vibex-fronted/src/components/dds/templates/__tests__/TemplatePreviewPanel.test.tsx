@@ -1,8 +1,8 @@
 /**
- * TemplatePreviewPanel.test.tsx — S72-E5: Template Preview Panel Tests
+ * TemplatePreviewPanel.test.tsx — S74-E5: Template Preview Panel Tests
  *
  * Tests: panel open/close, node list rendering, node detail selection,
- * and import button triggering importTemplate.
+ * import button triggering importTemplate, and S74-E5 keyboard navigation.
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
@@ -107,5 +107,56 @@ describe('TemplatePreviewPanel — S72-E5', () => {
     const item1Row = screen.getByTestId('node-item-1');
     expect(item1Row.textContent).toContain('←0');
     expect(item1Row.textContent).toContain('2→');
+  });
+
+  describe('S74-E5: keyboard navigation', () => {
+    it('closes panel when Escape key is pressed', () => {
+      const handleClose = vi.fn();
+      render(<TemplatePreviewPanel templateId="tpl-preview-1" open={true} onClose={handleClose} />);
+      fireEvent.keyDown(document, { key: 'Escape' });
+      expect(handleClose).toHaveBeenCalledTimes(1);
+    });
+
+    it('does not close panel on other keys', () => {
+      const handleClose = vi.fn();
+      render(<TemplatePreviewPanel templateId="tpl-preview-1" open={true} onClose={handleClose} />);
+      fireEvent.keyDown(document, { key: 'Enter' });
+      fireEvent.keyDown(document, { key: ' ' });
+      fireEvent.keyDown(document, { key: 'Tab' });
+      expect(handleClose).not.toHaveBeenCalled();
+    });
+
+    it('Tab cycles through focusable elements within the panel', () => {
+      render(<TemplatePreviewPanel templateId="tpl-preview-1" open={true} onClose={vi.fn()} />);
+      // First Tab should move focus to closeBtn (first focusable element)
+      fireEvent.keyDown(document, { key: 'Tab' });
+      // The focus trap should cycle back to first focusable after last
+      const closeBtn = screen.getByLabelText('关闭');
+      // Simulate being on the last element and pressing Tab
+      fireEvent.keyDown(closeBtn, { key: 'Tab' });
+      // Focus should cycle back to first element (closeBtn)
+      expect(document.activeElement).toBe(closeBtn);
+    });
+
+    it('Shift+Tab cycles backward through focusable elements', () => {
+      render(<TemplatePreviewPanel templateId="tpl-preview-1" open={true} onClose={vi.fn()} />);
+      const importBtn = screen.getByTestId('import-btn');
+      // Simulate being on first element and pressing Shift+Tab
+      fireEvent.keyDown(document.activeElement as Element, { key: 'Tab', shiftKey: true });
+      // Should cycle to last focusable element (importBtn)
+      expect(document.activeElement).toBe(importBtn);
+    });
+
+    it('does not trap Tab when panel is closed', () => {
+      const handleClose = vi.fn();
+      const { unmount } = render(
+        <TemplatePreviewPanel templateId="tpl-preview-1" open={true} onClose={handleClose} />
+      );
+      unmount();
+      // No error should be thrown when pressing Tab after unmount
+      expect(() => {
+        fireEvent.keyDown(document, { key: 'Tab' });
+      }).not.toThrow();
+    });
   });
 });

@@ -1,14 +1,17 @@
 'use client';
 
 /**
- * TemplatePreviewPanel.tsx — S72-E5: Template Preview Mode
+ * TemplatePreviewPanel.tsx — S74-E5: Template Preview Mode
  *
  * Drawer panel showing template node tree with node details.
  * Displays node name/type/connection relationships and supports
  * importing the template into the canvas.
+ *
+ * S74-E5: Adds keyboard navigation — Escape closes the panel,
+ * Tab cycles through interactive elements within the panel.
  */
 
-import React, { useMemo, useState, useCallback } from 'react';
+import React, { useMemo, useState, useCallback, useEffect, useRef } from 'react';
 import { useTemplateStore, TemplateNode } from '@/stores/templateStore';
 import styles from './TemplatePreviewPanel.module.css';
 
@@ -44,6 +47,67 @@ export function TemplatePreviewPanel({ templateId, open, onClose }: TemplatePrev
 
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [isImporting, setIsImporting] = useState(false);
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  // Escape key closes the panel
+  useEffect(() => {
+    if (!open) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        onClose();
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [open, onClose]);
+
+  // Focus the panel when it opens and manage focus trap for Tab navigation
+  useEffect(() => {
+    if (!open) return;
+    const panel = panelRef.current;
+    if (!panel) return;
+
+    // Focus the first focusable element inside the panel
+    const focusableSelectors = [
+      'button:not([disabled])',
+      '[tabindex]:not([tabindex="-1"])',
+      'input:not([disabled])',
+      'select:not([disabled])',
+      'textarea:not([disabled])',
+      'a[href]',
+    ].join(', ');
+    const focusable = panel.querySelectorAll<HTMLElement>(focusableSelectors);
+    if (focusable.length > 0) {
+      focusable[0].focus();
+    } else {
+      panel.focus();
+    }
+
+    // Focus trap: keep Tab navigation inside the panel
+    const handleTabKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Tab') return;
+      const focusables = Array.from(
+        panel.querySelectorAll<HTMLElement>(focusableSelectors)
+      );
+      if (focusables.length === 0) return;
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      if (e.shiftKey) {
+        if (document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        }
+      } else {
+        if (document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    };
+    panel.addEventListener('keydown', handleTabKey);
+    return () => panel.removeEventListener('keydown', handleTabKey);
+  }, [open]);
 
   const template = useMemo(
     () => templates.find((t) => t.id === templateId),
@@ -79,7 +143,13 @@ export function TemplatePreviewPanel({ templateId, open, onClose }: TemplatePrev
       <div className={styles.backdrop} onClick={onClose} aria-hidden="true" />
 
       {/* Panel */}
-      <div className={styles.panel} role="dialog" aria-label="模板预览">
+      <div
+        className={styles.panel}
+        ref={panelRef}
+        role="dialog"
+        aria-label="模板预览"
+        tabIndex={-1}
+      >
         {/* Header */}
         <div className={styles.header}>
           <div className={styles.headerContent}>

@@ -6567,3 +6567,13 @@ See git history for complete changelog.
 - **E4.5**: `History.module.css` — 新增分支行内编辑/保护样式
 - **E4.6**: `historyDB.e4-branchMeta.test.ts` — 7/7 (getBranchMeta + setBranchMeta + listBranchMetas)
 - **E4.7**: `canvasHistoryStore.sprint73-e4.test.ts` — 7/7 (setBranchName + setBranchProtected + getBranchMeta)
+
+
+---
+
+## [Unreleased] S73-E5: AI会话导出与分享 — 2026-06-07
+- **E5.1**: `collabSessionStore.ts` — 新增 `exportSessionMarkdown(sessionId)` action，返回含元数据+事件的 Markdown 字符串
+- **E5.2**: `collabSessionStore.ts` — 新增 `exportSessionPDF(sessionId)` action，调用 `window.print()`
+- **E5.3**: `SessionReplayPanel.tsx` — header 新增导出下拉菜单（Markdown下载/PDF打印/剪贴板复制）
+- **E5.4**: `SessionReplayPanel.module.css` — 导出下拉菜单样式 + hover 反馈
+- **E5.5**: `collabSessionStore.test.ts` — 扩展覆盖 `exportSessionMarkdown`/`exportSessionPDF`（vitest 11/11）

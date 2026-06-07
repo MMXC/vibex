@@ -685,4 +685,62 @@ describe('presenceStore', () => {
     });
   });
 
+
+  // === S76-E5: Remote editing tracking ===
+
+  describe('remoteEditing', () => {
+    it('setRemoteEditing adds a remote user editing a node', () => {
+      usePresenceStore.getState().setRemoteEditing('u1', 'node-1', 'Alice');
+      const remoteEditing = usePresenceStore.getState().remoteEditing;
+      expect(remoteEditing.get('u1')).toEqual({ nodeId: 'node-1', userName: 'Alice' });
+    });
+
+    it('setRemoteEditing updates existing user editing a different node', () => {
+      usePresenceStore.getState().setRemoteEditing('u1', 'node-1', 'Alice');
+      usePresenceStore.getState().setRemoteEditing('u1', 'node-2', 'Alice');
+      const remoteEditing = usePresenceStore.getState().remoteEditing;
+      expect(remoteEditing.get('u1')).toEqual({ nodeId: 'node-2', userName: 'Alice' });
+    });
+
+    it('clearRemoteEditing removes a user from remoteEditing', () => {
+      usePresenceStore.getState().setRemoteEditing('u1', 'node-1', 'Alice');
+      usePresenceStore.getState().clearRemoteEditing('u1');
+      expect(usePresenceStore.getState().remoteEditing.has('u1')).toBe(false);
+    });
+
+    it('getRemoteEditors returns all users editing a specific node', () => {
+      usePresenceStore.getState().setRemoteEditing('u1', 'node-1', 'Alice');
+      usePresenceStore.getState().setRemoteEditing('u2', 'node-1', 'Bob');
+      usePresenceStore.getState().setRemoteEditing('u3', 'node-2', 'Carol');
+      const editors = usePresenceStore.getState().getRemoteEditors('node-1');
+      expect(editors).toHaveLength(2);
+      expect(editors.map((e) => e.userId).sort()).toEqual(['u1', 'u2']);
+    });
+
+    it('getRemoteEditors returns empty array when no users are editing a node', () => {
+      usePresenceStore.getState().setRemoteEditing('u1', 'node-1', 'Alice');
+      const editors = usePresenceStore.getState().getRemoteEditors('node-2');
+      expect(editors).toHaveLength(0);
+    });
+
+    it('clearAllRemoteEditing clears all remote editing state', () => {
+      usePresenceStore.getState().setRemoteEditing('u1', 'node-1', 'Alice');
+      usePresenceStore.getState().setRemoteEditing('u2', 'node-2', 'Bob');
+      usePresenceStore.getState().clearAllRemoteEditing();
+      expect(usePresenceStore.getState().remoteEditing.size).toBe(0);
+    });
+
+    it('clearAll clears remoteEditing along with other state', () => {
+      usePresenceStore.getState().setRemoteEditing('u1', 'node-1', 'Alice');
+      usePresenceStore.getState().clearAll();
+      expect(usePresenceStore.getState().remoteEditing.size).toBe(0);
+    });
+
+    it('removeUser removes user from remoteEditing', () => {
+      usePresenceStore.getState().setRemoteEditing('u1', 'node-1', 'Alice');
+      usePresenceStore.getState().removeUser('u1');
+      expect(usePresenceStore.getState().remoteEditing.has('u1')).toBe(false);
+    });
+  });
+
 });

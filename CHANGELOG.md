@@ -6617,3 +6617,12 @@ See git history for complete changelog.
 - **E3.4**: `BranchDiffDialog.module.css` — 历史 Tab 导航 + 历史列表样式（边框/时间戳/空状态）
 - **vitest**: `BranchDiffDialog.test.tsx` E3 扩展测试 6个新用例通过
 
+
+---
+
+## [Unreleased] S75-E4: 协作活动流消息发送 — 2026-06-07
+- **E4.1**: `types.ts` — `ActivityType` 新增 `'comment'` 类型 + `ActivityEntry` 新增 `message?: string` + `canvasId?: string` 字段
+- **E4.2**: `activityStore.ts` — `activityLabel('comment')` = `'发送了评论'`
+- **E4.3**: `CollabActivityPanel.tsx` — `handleSend` 调用 `activityStore.addEntry({type:'comment', message, canvasId})` + `canvasId` prop + MentionInput import 路径修正
+- **E4.4**: `MentionInput.tsx` — ESC 同时清空下拉框和输入框内容
+- **vitest**: `CollabActivityPanel.test.tsx` 14/14 测试通过（+4 新增测试）

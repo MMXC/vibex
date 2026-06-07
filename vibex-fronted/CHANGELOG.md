@@ -1405,3 +1405,10 @@
 - **vitest**: `BranchDiffDialog.test.tsx` E3 扩展测试 6个新用例通过
 
 
+
+
+---
+
+## [Unreleased] S76-E2: 批量画布PNG导出ZIP — 2026-06-07
+- **feat(S76-E2)**: BatchOpsToolbar export button + ZipExporter + canvasListStore.batchExport
+- **test(S76-E2)**: add batch export tests (Esc/click-outside/confirm)

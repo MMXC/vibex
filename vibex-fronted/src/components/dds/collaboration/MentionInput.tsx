@@ -132,8 +132,17 @@ const MentionInput = memo(function MentionInput({
     [value, mentionStart, autoResize]
   );
 
+  // S75-E4: ESC always clears input + dropdown
   const handleKeyDown = useCallback(
     (e: KeyboardEvent<HTMLTextAreaElement>) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        setShowDropdown(false);
+        setMentionQuery('');
+        setValue('');
+        autoResize();
+        return;
+      }
       if (!showDropdown) {
         if (e.key === 'Enter' && !e.shiftKey) {
           e.preventDefault();
@@ -163,7 +172,7 @@ const MentionInput = memo(function MentionInput({
           break;
       }
     },
-    [showDropdown, users, selectedIndex, insertMention]
+    [showDropdown, users, selectedIndex, insertMention, autoResize]
   );
 
   const handleSend = useCallback(() => {

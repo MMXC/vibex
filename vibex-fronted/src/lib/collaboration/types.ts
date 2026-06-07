@@ -85,7 +85,8 @@ export type ActivityType =
   | 'unlock'     // User unlocked a node
   | 'focus'      // User focused on a node
   | 'blur'       // User blurred from a node
-  | 'cursor_move'; // User moved cursor (throttled — not broadcast on every move)
+  | 'cursor_move' // User moved cursor (throttled — not broadcast on every move)
+  | 'comment';   // S75-E4: User sent a comment message
 
 /** Single activity entry for the activity feed */
 export interface ActivityEntry {

@@ -3,7 +3,7 @@
 import React, { memo, useCallback, useState } from 'react';
 import { useActivityStore, activityLabel, formatActivityTime } from '@/lib/collaboration/activityStore';
 import type { ActivityEntry, ActivityType } from '@/lib/collaboration/types';
-import { MentionInput } from './MentionInput';
+import { MentionInput } from '../collaboration/MentionInput';
 import styles from './CollabActivityPanel.module.css';
 
 interface CollabActivityPanelProps {
@@ -12,6 +12,8 @@ interface CollabActivityPanelProps {
   onClose: () => void;
   /** Current user ID (for filtering own activities) */
   currentUserId?: string;
+  /** Canvas ID for notification routing */
+  canvasId?: string;
 }
 
 /** Icon map for activity types */
@@ -26,6 +28,7 @@ const ActivityIcon: Record<ActivityType, string> = {
   focus: '🎯',
   blur: '⊙',
   cursor_move: '🖱️',
+  comment: '💬',
 };
 
 /**
@@ -40,6 +43,7 @@ const CollabActivityPanel = memo(function CollabActivityPanel({
   open,
   onClose,
   currentUserId,
+  canvasId,
 }: CollabActivityPanelProps) {
   const recentActivity = useActivityStore((s) => s.recentActivity);
   const entries = useActivityStore((s) => s.entries);
@@ -52,20 +56,18 @@ const CollabActivityPanel = memo(function CollabActivityPanel({
     useActivityStore.getState().clearEntries();
   }, []);
 
+  // S75-E4: handleSend calls activityStore.addEntry with type='comment' + message
   const handleSend = useCallback((text: string, mentions: string[]) => {
-    // Add a local activity entry for the sent message
-    const newEntry: ActivityEntry = {
-      id: `local-${Date.now()}`,
+    useActivityStore.getState().addEntry({
       userId: currentUserId ?? 'local-user',
       userName: '你',
-      type: 'edit' as ActivityType,
+      type: 'comment',
+      message: text,
+      canvasId,
       timestamp: Date.now(),
-    };
-    useActivityStore.setState((s) => ({
-      entries: [newEntry, ...s.entries].slice(0, 20),
-    }));
-    void text; void mentions; // consumed locally
-  }, [currentUserId]);
+    });
+    void mentions; // consumed by addEntry's @mention parsing
+  }, [currentUserId, canvasId]);
 
   if (!open) return null;
 

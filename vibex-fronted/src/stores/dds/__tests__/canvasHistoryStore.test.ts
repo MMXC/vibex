@@ -235,12 +235,13 @@ Object.defineProperty(globalThis, 'indexedDB', {
 // the store's dynamic `await import('@/lib/canvas/historyDB')` inside action bodies.
 // Plain vi.mock factory `vi.fn()` creates local refs invisible to test body.
 // vi.hoisted() makes refs accessible from both mock factory AND test code.
-const { mockSaveSnapshotToDB, mockLoadSnapshotFromDB, mockListSnapshotsFromDB, mockDeleteSnapshotFromDB } =
+const { mockSaveSnapshotToDB, mockLoadSnapshotFromDB, mockListSnapshotsFromDB, mockDeleteSnapshotFromDB, mockGetLatestSnapshotFromDB } =
   vi.hoisted(() => ({
     mockSaveSnapshotToDB: vi.fn().mockResolvedValue(undefined),
     mockLoadSnapshotFromDB: vi.fn().mockResolvedValue(null),
     mockListSnapshotsFromDB: vi.fn().mockResolvedValue([]),
     mockDeleteSnapshotFromDB: vi.fn().mockResolvedValue(undefined),
+    mockGetLatestSnapshotFromDB: vi.fn().mockResolvedValue(null),
   }));
 
 // Mock the historyDB module — vi.hoisted refs are used inside the factory so
@@ -250,6 +251,7 @@ vi.mock('@/lib/canvas/historyDB', () => ({
   loadSnapshotFromDB: mockLoadSnapshotFromDB,
   listSnapshotsFromDB: mockListSnapshotsFromDB,
   deleteSnapshotFromDB: mockDeleteSnapshotFromDB,
+  getLatestSnapshotFromDB: mockGetLatestSnapshotFromDB,
 }));
 
 describe('canvasHistoryStore — E1 Snapshots (Sprint58)', () => {
@@ -571,5 +573,99 @@ describe('canvasHistoryStore — E2 Auto-Snapshot (Sprint64)', () => {
     startAutoSnapshot('canvas-1', () => ({ nodes: [], edges: [] }), 300000);
     stopAutoSnapshot();
     expect(useCanvasHistoryStore.getState().autoSnapshotMs).toBeNull();
+  });
+});
+
+
+// S74-E3: Branch comparison tests
+describe('canvasHistoryStore — E3 Branch Compare (Sprint74)', () => {
+  beforeEach(() => {
+    useCanvasHistoryStore.setState({
+      past: [],
+      future: [],
+      isPerforming: false,
+      snapshots: [],
+      restoringSnapshotId: null,
+      autoSnapshotMs: null,
+    });
+    vi.clearAllMocks();
+  });
+
+  // Helper to build correctly-structured snapshots (data.nodes, not direct nodes)
+  const makeSnap = (id: string, branchName: string, nodes: any[], edges: any[] = []) => ({
+    id,
+    name: `Snap ${id}`,
+    timestamp: 1000,
+    data: { nodes, edges },
+    branchName,
+    canvasId: 'c1',
+    parentSnapshotId: null,
+    isStarred: false,
+  });
+
+  it('compareBranches returns empty diff when both branches identical', async () => {
+    const snap = makeSnap('snap-a', 'main', [{ id: 'n1', type: 'input' }], []);
+    mockGetLatestSnapshotFromDB.mockResolvedValueOnce(snap).mockResolvedValueOnce(snap);
+    const result = await useCanvasHistoryStore.getState().compareBranches('c1', 'main', 'main');
+    expect(result.error).toBeUndefined();
+    expect(result.diffs.added).toHaveLength(0);
+    expect(result.diffs.removed).toHaveLength(0);
+    expect(result.diffs.modified).toHaveLength(0);
+  });
+
+  it('compareBranches returns added nodes when branchB has new nodes', async () => {
+    const snapA = makeSnap('snap-a', 'main', [{ id: 'n1', type: 'input' }], []);
+    const snapB = makeSnap('snap-b', 'feature', [{ id: 'n1', type: 'input' }, { id: 'n2', type: 'output' }], []);
+    mockGetLatestSnapshotFromDB.mockResolvedValueOnce(snapA).mockResolvedValueOnce(snapB);
+    const result = await useCanvasHistoryStore.getState().compareBranches('c1', 'main', 'feature');
+    expect(result.error).toBeUndefined();
+    expect(result.diffs.added).toHaveLength(1);
+    expect(result.diffs.added[0].id).toBe('n2');
+  });
+
+  it('compareBranches returns removed nodes when branchB is missing nodes', async () => {
+    const snapA = makeSnap('snap-a', 'main', [{ id: 'n1', type: 'input' }, { id: 'n2', type: 'output' }], []);
+    const snapB = makeSnap('snap-b', 'feature', [{ id: 'n1', type: 'input' }], []);
+    mockGetLatestSnapshotFromDB.mockResolvedValueOnce(snapA).mockResolvedValueOnce(snapB);
+    const result = await useCanvasHistoryStore.getState().compareBranches('c1', 'main', 'feature');
+    expect(result.error).toBeUndefined();
+    expect(result.diffs.removed).toHaveLength(1);
+    expect(result.diffs.removed[0].id).toBe('n2');
+  });
+
+  it('compareBranches returns modified nodes when branchB has changed node properties', async () => {
+    const snapA = makeSnap('snap-a', 'main', [{ id: 'n1', type: 'input', data: { label: 'A' } }], []);
+    const snapB = makeSnap('snap-b', 'feature', [{ id: 'n1', type: 'input', data: { label: 'B (modified)' } }], []);
+    mockGetLatestSnapshotFromDB.mockResolvedValueOnce(snapA).mockResolvedValueOnce(snapB);
+    const result = await useCanvasHistoryStore.getState().compareBranches('c1', 'main', 'feature');
+    expect(result.error).toBeUndefined();
+    expect(result.diffs.modified).toHaveLength(1);
+    expect(result.diffs.modified[0].id).toBe('n1');
+  });
+
+  it('compareBranches returns error when snapA is null', async () => {
+    const snapB = makeSnap('snap-b', 'feature', [], []);
+    mockGetLatestSnapshotFromDB.mockResolvedValueOnce(null).mockResolvedValueOnce(snapB);
+    const result = await useCanvasHistoryStore.getState().compareBranches('c1', 'main', 'feature');
+    expect(result.error).toContain('No snapshot found');
+  });
+
+  it('compareBranches returns error when snapB is null', async () => {
+    const snapA = makeSnap('snap-a', 'main', [], []);
+    mockGetLatestSnapshotFromDB.mockResolvedValueOnce(snapA).mockResolvedValueOnce(null);
+    const result = await useCanvasHistoryStore.getState().compareBranches('c1', 'main', 'feature');
+    expect(result.error).toContain('No snapshot found');
+  });
+
+  it('compareBranches includes summary stats with correct counts', async () => {
+    const snapA = makeSnap('snap-a', 'main', [{ id: 'n1', type: 'input' }, { id: 'n2', type: 'input' }], []);
+    const snapB = makeSnap('snap-b', 'feature', [{ id: 'n1', type: 'input' }, { id: 'n3', type: 'output' }], []);
+    mockGetLatestSnapshotFromDB.mockResolvedValueOnce(snapA).mockResolvedValueOnce(snapB);
+    const result = await useCanvasHistoryStore.getState().compareBranches('c1', 'main', 'feature');
+    expect(result.error).toBeUndefined();
+    expect(result.summary.totalChanges).toBe(2);
+    expect(result.summary.contextsAdded).toBe(1);   // n3
+    expect(result.summary.contextsRemoved).toBe(1); // n2
+    expect(result.summary.contextsModified).toBe(0);
   });
 });

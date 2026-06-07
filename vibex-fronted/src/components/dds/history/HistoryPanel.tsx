@@ -7,6 +7,7 @@ import TimelineView from './TimelineView';
 import SnapshotDiffDialog from './SnapshotDiffDialog';
 import SnapshotPreview from './SnapshotPreview';
 import BranchDiffPanel from '../canvas-history/BranchDiffPanel';
+import BranchDiffDialog from './BranchDiffDialog';
 
 /** E1 (Sprint66): Branch merge dialog props */
 export interface BranchMergeDialogProps {
@@ -113,7 +114,49 @@ const HistoryPanel = React.memo(function HistoryPanel({
   const [editingBranch, setEditingBranch] = useState<string | null>(null);
   const [editingBranchName, setEditingBranchName] = useState('');
 
-  // Reset state when panel opens
+  // S74-E3: Branch multi-select state for Ctrl+Click comparison
+  const [selectedBranches, setSelectedBranches] = useState<Set<string>>(new Set());
+  const [branchDiffDialogOpen, setBranchDiffDialogOpen] = useState(false);
+  const [branchDiffDialogBranches, setBranchDiffDialogBranches] = useState<{ branchA: string; branchB: string } | null>(null);
+
+  // S74-E3: Ctrl+Click branch selection for comparison
+  const handleBranchSelect = useCallback((branch: string, ctrlKey: boolean) => {
+    if (!ctrlKey) {
+      // Plain click: filter and clear selection
+      setBranchFilter(branch);
+      setSelectedBranches(new Set());
+      return;
+    }
+    // Ctrl+Click: toggle branch in multi-selection
+    setBranchFilter('all'); // clear filter when selecting for comparison
+    setSelectedBranches((prev) => {
+      const next = new Set(prev);
+      if (next.has(branch)) {
+        next.delete(branch);
+      } else {
+        next.add(branch);
+      }
+      return next;
+    });
+  }, []);
+
+  const handleCompareSelectedBranches = useCallback(() => {
+    const branchesArr = Array.from(selectedBranches);
+    if (branchesArr.length === 2) {
+      setBranchDiffDialogBranches({ branchA: branchesArr[0], branchB: branchesArr[1] });
+      setBranchDiffDialogOpen(true);
+    }
+  }, [selectedBranches]);
+
+  // S74-E3: Reset multi-select when panel closes
+  useEffect(() => {
+    if (!open) {
+      setSelectedBranches(new Set());
+      setBranchDiffDialogOpen(false);
+    }
+  }, [open]);
+
+  // Reset snapshot state when panel opens
   useEffect(() => {
     if (open) {
       setSelectedSnap(null);
@@ -333,13 +376,40 @@ const HistoryPanel = React.memo(function HistoryPanel({
         {/* E1 (Sprint66): Branch operation menus */}
         {branches.length > 1 && (
           <div className="branch-ops-list" aria-label="分支管理">
+            {/* S74-E3: Multi-select toolbar */}
+            {selectedBranches.size > 0 && (
+              <div className="branch-compare-toolbar" aria-live="polite">
+                <span className="branch-compare-count">
+                  已选中 {selectedBranches.size} 个分支
+                  <span className="branch-compare-hint">（Ctrl+点击选择）</span>
+                </span>
+                {selectedBranches.size === 2 && (
+                  <button
+                    className="branch-compare-btn"
+                    onClick={handleCompareSelectedBranches}
+                    aria-label="对比选中的两个分支"
+                    title="对比选中的两个分支"
+                  >
+                    对比
+                  </button>
+                )}
+              </div>
+            )}
             {branches.map((branch) => (
-              <div key={branch} className={`branch-ops-item ${branchFilter === branch ? 'active' : ''}`}>
+              <div
+                key={branch}
+                className={`branch-ops-item ${branchFilter === branch ? 'active' : ''} ${selectedBranches.has(branch) ? 'branch-selected' : ''}`}
+              >
                 <span
                   className="branch-ops-name"
-                  onClick={() => handleBranchFilter(branch)}
-                  title={`筛选到分支: ${branch}`}
+                  onClick={(e) => { e.ctrlKey || e.metaKey ? handleBranchSelect(branch, true) : handleBranchFilter(branch); }}
+                  title={`${branch}${selectedBranches.has(branch) ? '（已选中，按Ctrl+点击取消）' : '（Ctrl+点击选择）'}`}
+                  aria-pressed={selectedBranches.has(branch)}
                 >
+                  {/* S74-E3: Selection indicator */}
+                  {selectedBranches.has(branch) && (
+                    <span className="branch-select-indicator" aria-hidden="true">✓</span>
+                  )}
                   {branch === 'main' ? '🌿' : '📂'}{' '}
                   {editingBranch === branch ? (
                     <input
@@ -636,6 +706,15 @@ const HistoryPanel = React.memo(function HistoryPanel({
           onRestore={handleRestore}
         />
       )}
+
+      {/* S74-E3: Branch comparison dialog */}
+      <BranchDiffDialog
+        open={branchDiffDialogOpen}
+        branchA={branchDiffDialogBranches?.branchA ?? ''}
+        branchB={branchDiffDialogBranches?.branchB ?? ''}
+        onClose={() => setBranchDiffDialogOpen(false)}
+        onRestore={onRestore}
+      />
 
       {/* E1 (Sprint67): Branch comparison panel */}
       <BranchDiffPanel

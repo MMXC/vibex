@@ -1,0 +1,167 @@
+/* BranchDiffDialog — Modal dialog for branch comparison */
+/* S74-E3: 画布分支对比视图 */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.dialog {
+  background: var(--color-surface-elevated, #1e1e2e);
+  border: 1px solid var(--color-border-subtle, #3a3a5c);
+  border-radius: 12px;
+  padding: 16px;
+  max-width: 640px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Header */
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text-primary, #e0e0e0);
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.headerBranch {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--color-text-secondary, #888);
+  font-family: 'SF Mono', 'Fira Code', monospace;
+}
+
+.closeBtn {
+  padding: 4px 8px;
+  background: transparent;
+  border: none;
+  color: var(--color-text-secondary, #888);
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.closeBtn:hover {
+  background: var(--color-surface-hover, #2a2a3e);
+  color: var(--color-text-primary, #e0e0e0);
+}
+
+/* Toolbar */
+.toolbar {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.mainActionBtn {
+  padding: 5px 12px;
+  background: transparent;
+  border: 1px solid var(--color-border-subtle, #3a3a5c);
+  color: var(--color-text-secondary, #888);
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.mainActionBtn:hover {
+  background: var(--color-surface-hover, #2a2a3e);
+  color: var(--color-text-primary, #e0e0e0);
+  border-color: var(--color-accent-primary, #6366f1);
+}
+
+/* Stats bar */
+.statsBar {
+  display: flex;
+  gap: 16px;
+  padding: 10px 14px;
+  background: var(--color-surface-hover, #2a2a3e);
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.statItem {
+  display: flex;
+  gap: 4px;
+  align-items: baseline;
+}
+
+.statItem strong {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+/* Loading / error / empty states */
+.loadingState {
+  padding: 32px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--color-text-secondary, #888);
+}
+
+.errorState {
+  padding: 12px 14px;
+  background: rgba(248, 113, 113, 0.1);
+  border: 1px solid rgba(248, 113, 113, 0.3);
+  border-radius: 6px;
+  color: #f87171;
+  font-size: 13px;
+}
+
+.emptyState {
+  padding: 32px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--color-text-muted, #555);
+}
+
+/* Content */
+.content {
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* Footer */
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding-top: 4px;
+  border-top: 1px solid var(--color-border-subtle, #3a3a5c);
+}
+
+.cancelBtn {
+  padding: 6px 16px;
+  background: transparent;
+  border: 1px solid var(--color-border-subtle, #3a3a5c);
+  color: var(--color-text-secondary, #888);
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.cancelBtn:hover {
+  background: var(--color-surface-hover, #2a2a3e);
+  color: var(--color-text-primary, #e0e0e0);
+}

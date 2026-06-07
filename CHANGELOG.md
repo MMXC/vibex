@@ -6653,3 +6653,10 @@ See git history for complete changelog.
 - **E3.5**: `canvasListStore.ts` — 新增 `indexedSearch(query)` 方法，返回 `IndexedSearchResult[]`（含 score + matchedField）
 - **E3.6**: `canvasListStore.ts` — `loadCanvases` / `createCanvas` / `deleteCanvas` / `renameCanvas` / `copyNodesBetweenCanvases` 自动触发 `rebuildIndex()`
 - **E3.7**: `canvasListStore.e3.test.ts` — 18 个测试用例覆盖 rebuildIndex + indexedSearch
+
+
+## [Unreleased] S76-E4: Canvas Batch Import/Export — 2026-06-08
+
+- **CanvasImportPanel**: Drag-drop .vibex/.json/.yaml files with validation, progress bar, and canvasListStore write
+- **Batch Export Menu**: "导出选中画布" and "导出全部画布" in DDSToolbar ExportMenu using ZipExporter.exportCanvases
+- **Tests**: ZipExporter.multi-format.test.ts 16/16 (exportCanvases interface, options, skip behavior)

@@ -138,7 +138,7 @@ export class CollabWebSocket {
 
     this.ws.onclose = () => {
       console.log('[CollabWS] disconnected');
-      this.stopHeartbeat();
+      this.stopHeartbeat(); // Stop BEFORE scheduleReconnect so old pending pong fires first
       this.onClose?.();
       this.scheduleReconnect();
     };
@@ -201,15 +201,16 @@ export class CollabWebSocket {
       console.warn('[CollabWS] max retries reached, giving up');
       return;
     }
+    const attemptNumber = this.retryCount + 1;
     // S77-E2: exponential backoff with max cap
     const delay = Math.min(
       DEFAULT_BASE_RETRY_DELAY_MS * Math.pow(2, this.retryCount),
       DEFAULT_MAX_RETRY_DELAY_MS
     );
     this.retryCount++;
-    console.log(`[CollabWS] reconnecting in ${delay}ms (attempt ${this.retryCount}/${this.maxRetries})`);
+    console.log(`[CollabWS] reconnecting in ${delay}ms (attempt ${attemptNumber}/${this.maxRetries})`);
     // S77-E2: notify about reconnecting state
-    this.onReconnecting?.(this.retryCount);
+    this.onReconnecting?.(attemptNumber);
     this.retryTimer = setTimeout(() => this.connect(), delay);
   }
 

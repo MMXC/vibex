@@ -1,10 +1,12 @@
 /**
  * notificationStore — S68-E2: @提及通知系统
+ * 扩展 S73-E3: 通知偏好设置
  *
  * 职责：
- * - 管理通用通知列表（mention / reply / system 类型）
- * - 持久化到 localStorage（IndexedDB 未来扩展）
+ * - 管理通用通知列表（mention / reply / system / info 类型）
+ * - 持久化到 localStorage（notifications + preferences）
  * - 未读计数 + 广播事件
+ * - 通知偏好设置（推送渠道开关 + 类型开关）
  *
  * 设计决策（来自 PRD E2 架构决策 1）：
  * - 与 mentionsStore.ts 分离：mentionsStore 仅负责 @输入时用户列表 UI 状态
@@ -34,6 +36,27 @@ export interface Notification {
   timestamp: number;
 }
 
+/** S73-E3: 通知偏好设置 */
+export interface NotificationPreferences {
+  /** 推送渠道开关 */
+  channels: {
+    inApp: boolean;   // 应用内通知
+    browser: boolean; // 浏览器推送
+  };
+  /** 通知类型开关 */
+  types: {
+    mention: boolean;
+    reply: boolean;
+    system: boolean;
+    info: boolean;
+  };
+}
+
+const DEFAULT_PREFERENCES: NotificationPreferences = {
+  channels: { inApp: true, browser: true },
+  types: { mention: true, reply: true, system: true, info: true },
+};
+
 // Module-level listeners for cross-component notification events
 const _notificationListeners: Set<(event: NotificationEvent) => void> = new Set();
 
@@ -59,6 +82,8 @@ function generateId(): string {
 
 export interface NotificationStoreState {
   notifications: Notification[];
+  /** S73-E3: 通知偏好设置 */
+  preferences: NotificationPreferences;
 
   // Actions
   addNotification: (data: Omit<Notification, 'id' | 'isRead'>) => Notification;
@@ -71,14 +96,30 @@ export interface NotificationStoreState {
   getUnreadCount: () => number;
   getByCanvas: (canvasId: string) => Notification[];
   getByType: (type: NotificationType) => Notification[];
+
+  // S73-E3: Preference actions
+  setChannelEnabled: (channel: keyof NotificationPreferences['channels'], enabled: boolean) => void;
+  setTypeEnabled: (type: keyof NotificationPreferences['types'], enabled: boolean) => void;
+  resetPreferences: () => void;
 }
 
 export const useNotificationStore = create<NotificationStoreState>()(
   persist(
     (set, get) => ({
       notifications: [],
+      preferences: DEFAULT_PREFERENCES,
 
       addNotification: (data) => {
+        // S73-E3: respect type toggle — skip if type is disabled
+        const typeEnabled = get().preferences.types[data.type] ?? true;
+        if (!typeEnabled) {
+          // Return a dummy notification for compatibility but don't store
+          return {
+            ...data,
+            id: generateId(),
+            isRead: true,
+          } as Notification;
+        }
         const notification: Notification = {
           ...data,
           id: generateId(),
@@ -130,11 +171,37 @@ export const useNotificationStore = create<NotificationStoreState>()(
       getByType: (type) => {
         return get().notifications.filter(n => n.type === type);
       },
+
+      // S73-E3: Preference actions
+      setChannelEnabled: (channel, enabled) => {
+        set(state => ({
+          preferences: {
+            ...state.preferences,
+            channels: { ...state.preferences.channels, [channel]: enabled },
+          },
+        }));
+      },
+
+      setTypeEnabled: (type, enabled) => {
+        set(state => ({
+          preferences: {
+            ...state.preferences,
+            types: { ...state.preferences.types, [type]: enabled },
+          },
+        }));
+      },
+
+      resetPreferences: () => {
+        set({ preferences: DEFAULT_PREFERENCES });
+      },
     }),
     {
       name: 'vibex-notifications',
-      // Only persist essential fields
-      partialize: (state) => ({ notifications: state.notifications }),
+      // Persist both notifications and preferences
+      partialize: (state) => ({
+        notifications: state.notifications,
+        preferences: state.preferences,
+      }),
     }
   )
 );

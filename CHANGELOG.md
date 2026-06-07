@@ -6626,3 +6626,12 @@ See git history for complete changelog.
 - **E4.3**: `CollabActivityPanel.tsx` — `handleSend` 调用 `activityStore.addEntry({type:'comment', message, canvasId})` + `canvasId` prop + MentionInput import 路径修正
 - **E4.4**: `MentionInput.tsx` — ESC 同时清空下拉框和输入框内容
 - **vitest**: `CollabActivityPanel.test.tsx` 14/14 测试通过（+4 新增测试）
+
+---
+
+## [Unreleased] S75-E5: Canvas Snapshot Management — 2026-06-07
+- **E5.1**: SnapshotManagerPanel 组件 — 多选批量删除画布快照（header checkbox + 全选 + footer 批量删除按钮）
+- **E5.2**: CanvasSettingsDrawer 集成 — 添加"快照管理" Tab（第5个 Tab）
+- **E5.3**: historyDB deleteSnapshotsFromDB() — 批量删除 IndexedDB 快照记录
+- **E5.4**: canvasHistoryStore deleteSnapshots() — 批量删除 store action
+- **Tests**: 27/27 passing（SnapshotManagerPanel 12 tests + CanvasSettingsDrawer 15 tests）

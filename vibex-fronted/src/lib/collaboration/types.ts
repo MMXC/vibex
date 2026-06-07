@@ -95,6 +95,10 @@ export interface ActivityEntry {
   type: ActivityType;
   nodeId?: string;
   nodeName?: string;
+  /** S74-E4: Optional message text for @mention parsing */
+  message?: string;
+  /** S74-E4: Canvas ID for notification routing */
+  canvasId?: string;
   timestamp: number;
 }
 

@@ -6556,3 +6556,14 @@ See git history for complete changelog.
 - **E3.4**: `NotificationPanel.module.css` — 新增 `.settingsBtn` / `.clearAllBtn` / `.itemHeader` 样式
 - **E3.5**: `NotificationSettingsDrawer.module.css` — 新建设置抽屉样式（toggle switch + type grid）
 - **E3.6**: `notificationStore.test.ts` — 扩展 E3.1–E3.3 preference 测试（9 个新用例）
+
+---
+
+## [Unreleased] S73-E4: 画布分支命名与保护 — 2026-06-07
+- **E4.1**: `historyDB.ts` — DB_VERSION=5, 新增 branchMeta objectStore (canvasId+branchName compound key), getBranchMeta/setBranchMeta/listBranchMetas/deleteBranchMeta CRUD
+- **E4.2**: `canvasHistoryStore.ts` — 扩展 setBranchName/setBranchProtected/getBranchMeta (get-before-set 保留现有字段)
+- **E4.3**: `HistoryPanel.tsx` — 分支列表 inline 重命名 + 🔒 保护徽章 + toggle 按钮
+- **E4.4**: `HistoryPanel.tsx` — 删除保护分支前弹窗确认
+- **E4.5**: `History.module.css` — 新增分支行内编辑/保护样式
+- **E4.6**: `historyDB.e4-branchMeta.test.ts` — 7/7 (getBranchMeta + setBranchMeta + listBranchMetas)
+- **E4.7**: `canvasHistoryStore.sprint73-e4.test.ts` — 7/7 (setBranchName + setBranchProtected + getBranchMeta)

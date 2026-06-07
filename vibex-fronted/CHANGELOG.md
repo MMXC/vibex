@@ -1425,3 +1425,14 @@
 ## [Unreleased] S76-E2: 批量画布PNG导出ZIP — 2026-06-07
 - **feat(S76-E2)**: BatchOpsToolbar export button + ZipExporter + canvasListStore.batchExport
 - **test(S76-E2)**: add batch export tests (Esc/click-outside/confirm)
+
+
+## [Unreleased] S76-E3: Canvas Fuse.js Weighted Indexed Search — 2026-06-08
+
+- **E3.1**: `canvasListStore.ts` — 新增 `CanvasMeta.description?: string` 和 `CanvasMeta.tags?: string[]` 字段
+- **E3.2**: `canvasListStore.ts` — 新增 `CanvasIndexEntry` 和 `IndexedSearchResult` 类型，`canvasIndex[]` + `canvasFuseIndex` 状态
+- **E3.3**: `canvasListStore.ts` — 新增 `CANVAS_SEARCH_FUSE_OPTIONS`（name:2, description:1, tags:1）
+- **E3.4**: `canvasListStore.ts` — 新增 `rebuildIndex()` 方法，从 canvases 重建 Fuse.js 搜索索引
+- **E3.5**: `canvasListStore.ts` — 新增 `indexedSearch(query)` 方法，返回 `IndexedSearchResult[]`（含 score + matchedField）
+- **E3.6**: `canvasListStore.ts` — `loadCanvases` / `createCanvas` / `deleteCanvas` / `renameCanvas` / `copyNodesBetweenCanvases` 自动触发 `rebuildIndex()`
+- **E3.7**: `canvasListStore.e3.test.ts` — 18 个测试用例覆盖 rebuildIndex + indexedSearch

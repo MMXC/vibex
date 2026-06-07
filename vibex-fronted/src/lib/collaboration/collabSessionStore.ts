@@ -140,6 +140,10 @@ export interface CollabSessionState {
   resumeReplay: () => void;
   setReplaySpeed: (speed: ReplaySpeed) => void;
   stopReplay: () => void;
+
+  // Export actions (S73-E5)
+  exportSessionMarkdown: (sessionId: string) => Promise<string>;
+  exportSessionPDF: (sessionId: string) => Promise<void>;
 }
 
 // ==================== Store Implementation ====================
@@ -317,6 +321,103 @@ export const useCollabSessionStore = create<CollabSessionState>()((set, get) => 
       },
       replayEvents: [],
     });
+  },
+
+  // ==================== Export (S73-E5) ====================
+
+  async exportSessionMarkdown(sessionId: string): Promise<string> {
+    const session = await get().getSession(sessionId);
+    const events = await get().getSessionEvents(sessionId);
+
+    if (!session) {
+      return `# Session: ${sessionId}\n\n_Session not found._`;
+    }
+
+    const lines: string[] = [];
+    lines.push(`# Session: ${session.name}`);
+    lines.push('');
+    lines.push('## Metadata');
+    lines.push(`- **Session ID**: ${session.sessionId}`);
+    lines.push(`- **Canvas ID**: ${session.canvasId}`);
+    lines.push(`- **Start Time**: ${new Date(session.startTime).toLocaleString('zh-CN')}`);
+    if (session.endTime) {
+      lines.push(`- **End Time**: ${new Date(session.endTime).toLocaleString('zh-CN')}`);
+    }
+    lines.push(`- **Participants**: ${session.participantNames.join(', ') || 'None'}`);
+    lines.push(`- **Event Count**: ${session.eventCount}`);
+    lines.push('');
+
+    lines.push('## Events');
+    lines.push('');
+
+    for (const event of events) {
+      const ts = new Date(event.timestamp).toLocaleString('zh-CN');
+      const label = SESSION_EVENT_LABELS[event.type] ?? event.type;
+      lines.push(`### [${ts}] ${label}`);
+      lines.push(`- **User**: ${event.userName} (${event.userId})`);
+      if (event.nodeId) {
+        lines.push(`- **Node**: ${event.nodeId}`);
+      }
+      if (event.x !== undefined && event.y !== undefined) {
+        lines.push(`- **Position**: (${event.x}, ${event.y})`);
+      }
+      lines.push('');
+    }
+
+    return lines.join('\n');
+  },
+
+  async exportSessionPDF(sessionId: string): Promise<void> {
+    // Load session metadata into a temporary element for print styling
+    const session = await get().getSession(sessionId);
+    if (!session) return;
+
+    const events = await get().getSessionEvents(sessionId);
+
+    // Build printable HTML and open print dialog
+    const printContent = `
+      <html><head><title>Session: ${session.name}</title>
+      <style>
+        body { font-family: system-ui, sans-serif; padding: 40px; color: #333; }
+        h1 { border-bottom: 2px solid #6366f1; padding-bottom: 8px; }
+        h2 { color: #6366f1; margin-top: 24px; }
+        table { width: 100%; border-collapse: collapse; margin: 12px 0; }
+        th, td { border: 1px solid #e5e7eb; padding: 8px 12px; text-align: left; }
+        th { background: #f9fafb; font-weight: 600; }
+        .meta { background: #f9fafb; padding: 16px; border-radius: 8px; margin: 16px 0; }
+        .meta p { margin: 4px 0; }
+        @media print { body { padding: 20px; } }
+      </style></head><body>
+      <h1>🤝 ${session.name}</h1>
+      <div class="meta">
+        <p><strong>Session ID:</strong> ${session.sessionId}</p>
+        <p><strong>Canvas:</strong> ${session.canvasId}</p>
+        <p><strong>Time:</strong> ${new Date(session.startTime).toLocaleString('zh-CN')} → ${session.endTime ? new Date(session.endTime).toLocaleString('zh-CN') : 'In progress'}</p>
+        <p><strong>Participants:</strong> ${session.participantNames.join(', ') || 'None'}</p>
+      </div>
+      <h2>📋 Event Log (${events.length} events)</h2>
+      <table>
+        <thead><tr><th>Time</th><th>Type</th><th>User</th><th>Node</th><th>Position</th></tr></thead>
+        <tbody>
+          ${events.map(e => `<tr>
+            <td>${new Date(e.timestamp).toLocaleString('zh-CN')}</td>
+            <td>${SESSION_EVENT_LABELS[e.type] ?? e.type}</td>
+            <td>${e.userName}</td>
+            <td>${e.nodeId ?? '-'}</td>
+            <td>${e.x !== undefined && e.y !== undefined ? `(${e.x}, ${e.y})` : '-'}</td>
+          </tr>`).join('\n')}
+        </tbody>
+      </table>
+      </body></html>`;
+
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      printWindow.document.write(printContent);
+      printWindow.document.close();
+      printWindow.focus();
+      printWindow.print();
+      printWindow.close();
+    }
   },
 }));
 

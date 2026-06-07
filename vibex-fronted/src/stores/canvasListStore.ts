@@ -7,9 +7,15 @@
  * S68-E4 扩展：
  * - copyNodesBetweenCanvases: 将选中的画布元数据条目复制到目标画布（ID 重映射）
  * - batchTemplateExport: 将选中的画布元数据导出为 .vbtmpl 下载文件
+ *
+ * S76-E3 扩展：
+ * - canvasIndex[]: Fuse.js 搜索索引（name:2, description:1, tags:1）
+ * - rebuildIndex(): 从当前 canvases 重建索引
+ * - indexedSearch(query): 加权多字段搜索
  */
 
 import { create } from 'zustand';
+import Fuse from 'fuse.js';
 import { generateId, generatePrefixedId } from '@/lib/canvas/id';
 import type { DDSCard, DDSEdge, ChapterType } from '@/types/dds';
 import type { RequirementTemplate } from '@/data/templates';
@@ -29,6 +35,28 @@ export interface CanvasMeta {
   updatedAt: string; // ISO 8601
   /** Archive timestamp — set when canvas is archived (S64-E4) */
   archivedAt?: string;
+  /** Canvas description for search indexing (S76-E3) */
+  description?: string;
+  /** Canvas tags for search indexing (S76-E3) */
+  tags?: string[];
+}
+
+// S76-E3: Indexed search entry (mirrors canvasSearchStore.CanvasIndexEntry for canvas-level search)
+export interface CanvasIndexEntry {
+  canvasId: string;
+  name: string;
+  description: string;
+  tags: string[];
+  updatedAt: string;
+}
+
+// S76-E3: Indexed search result
+export interface IndexedSearchResult {
+  canvasId: string;
+  name: string;
+  updatedAt: string;
+  score: number;
+  matchedField: 'name' | 'description' | 'tags' | 'multiple';
 }
 
 
@@ -47,6 +75,10 @@ export interface CanvasListState {
   selectedCanvasIds: Set<string>;
   /** Archive filter mode (S64-E4) */
   archiveFilterMode: 'all' | 'active' | 'archived';
+  /** S76-E3: Fuse.js search index for canvasIndex[] + indexedSearch() */
+  canvasIndex: CanvasIndexEntry[];
+  /** S76-E3: Fuse.js instance for canvas index */
+  canvasFuseIndex: Fuse<CanvasIndexEntry> | null;
 
 
   // Actions
@@ -109,6 +141,18 @@ export interface CanvasListState {
     backgroundColor?: string;
     onProgress?: (current: number, total: number, name: string) => void;
   }) => Promise<void>;
+  /**
+   * S76-E3: 从当前 canvases 重建 Fuse.js 搜索索引。
+   * 索引字段权重: name:2, description:1, tags:1 (归一化为 0.5/0.25/0.25)
+   * 在 loadCanvases() 完成后自动调用。
+   */
+  rebuildIndex: () => void;
+  /**
+   * S76-E3: 使用 Fuse.js 加权搜索 canvases。
+   * @param query 搜索词
+   * @returns 按相关度排序的 IndexedSearchResult[]
+   */
+  indexedSearch: (query: string) => IndexedSearchResult[];
 
 }
 
@@ -118,6 +162,19 @@ export interface CanvasListState {
 
 const IDB_CANVAS_LIST_KEY = 'vibex-canvas-list';
 const LOCALSTORAGE_INDEX_KEY = 'vibex-canvas-index';
+
+// S76-E3: Fuse.js weighted search options (name:2, description:1, tags:1)
+const CANVAS_SEARCH_FUSE_OPTIONS: Fuse.IFuseOptions<CanvasIndexEntry> = {
+  keys: [
+    { name: 'name', weight: 2 },
+    { name: 'description', weight: 1 },
+    { name: 'tags', weight: 1 },
+  ],
+  threshold: 0.4,
+  includeMatches: true,
+  minMatchCharLength: 1,
+  ignoreLocation: true,
+};
 
 // ============================================
 // Persistence helpers (re-use ddsPersistence patterns)
@@ -197,6 +254,8 @@ export const useCanvasListStore = create<CanvasListState>((set, get) => ({
   thumbnailCache: {},
   selectedCanvasIds: new Set(),
   archiveFilterMode: 'active', // S64-E4: default to active (non-archived) canvases
+  canvasIndex: [], // S76-E3: Fuse.js canvas search index
+  canvasFuseIndex: null, // S76-E3: Fuse instance
 
   loadCanvases: async () => {
     if (!isIndexedDBAvailable()) {
@@ -208,6 +267,8 @@ export const useCanvasListStore = create<CanvasListState>((set, get) => ({
       // Sort by updatedAt desc
       canvases.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
       set({ canvases, isLoaded: true });
+      // S76-E3: Rebuild search index after canvases are loaded
+      get().rebuildIndex();
     } catch (err) {
       console.error('[canvasListStore] loadCanvases failed:', err);
       set({ isLoaded: true });
@@ -243,6 +304,8 @@ export const useCanvasListStore = create<CanvasListState>((set, get) => ({
     set((state) => ({
       canvases: [meta, ...state.canvases],
     }));
+    // S76-E3: Rebuild search index after canvas creation
+    get().rebuildIndex();
 
     return meta;
   },
@@ -265,6 +328,8 @@ export const useCanvasListStore = create<CanvasListState>((set, get) => ({
       canvases: state.canvases.filter((c) => c.id !== id),
       activeCanvasId: state.activeCanvasId === id ? null : state.activeCanvasId,
     }));
+    // S76-E3: Rebuild search index after canvas deletion
+    get().rebuildIndex();
   },
 
   renameCanvas: async (id: string, name: string) => {
@@ -283,6 +348,8 @@ export const useCanvasListStore = create<CanvasListState>((set, get) => ({
     set((state) => ({
       canvases: state.canvases.map((c) => (c.id === id ? updated : c)),
     }));
+    // S76-E3: Rebuild search index after canvas rename (name changed)
+    get().rebuildIndex();
   },
 
   setActiveCanvas: (id: string) => {
@@ -573,6 +640,8 @@ export const useCanvasListStore = create<CanvasListState>((set, get) => ({
     for (const copy of copies) {
       await idbPut('canvases', copy);
     }
+    // S76-E3: Rebuild search index after canvas copies created
+    get().rebuildIndex();
   },
 
   /**
@@ -645,5 +714,47 @@ export const useCanvasListStore = create<CanvasListState>((set, get) => ({
   },
 
   // ============================================================
-  $reset: () => set({ selectedCanvasIds: new Set() }),
+  // S76-E3: Canvas indexed search (Fuse.js weighted: name:2, description:1, tags:1)
+  // ============================================================
+
+  rebuildIndex: () => {
+    const { canvases } = get();
+    const entries: CanvasIndexEntry[] = canvases
+      .filter((c) => !c.archivedAt) // only index active canvases
+      .map((c) => ({
+        canvasId: c.id,
+        name: c.name,
+        description: c.description ?? '',
+        tags: c.tags ?? [],
+        updatedAt: c.updatedAt,
+      }));
+
+    const fuse = new Fuse(entries, CANVAS_SEARCH_FUSE_OPTIONS);
+    set({ canvasIndex: entries, canvasFuseIndex: fuse });
+  },
+
+  indexedSearch: (query: string): IndexedSearchResult[] => {
+    const { canvasFuseIndex } = get();
+    if (!canvasFuseIndex || !query.trim()) return [];
+
+    const fuseResults = canvasFuseIndex.search(query);
+    return fuseResults.map((r) => {
+      const matchedKeys = r.matches?.map((m) => m.key) ?? [];
+      const matchedField: IndexedSearchResult['matchedField'] =
+        matchedKeys.length === 1
+          ? (matchedKeys[0] as 'name' | 'description' | 'tags')
+          : 'multiple';
+
+      return {
+        canvasId: r.item.canvasId,
+        name: r.item.name,
+        updatedAt: r.item.updatedAt,
+        score: r.score ?? 0,
+        matchedField,
+      };
+    });
+  },
+
+  // ============================================================
+  $reset: () => set({ selectedCanvasIds: new Set(), canvasIndex: [], canvasFuseIndex: null }),
 }));

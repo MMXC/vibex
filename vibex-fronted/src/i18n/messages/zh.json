@@ -427,6 +427,9 @@
     "selectedForCopy": "已选择",
     "confirmBatchDelete": "确认批量删除",
     "batchDeleteWarning": "即将删除 {count} 个画布，此操作不可撤销。",
-    "confirmBatchDeleteBtn": "确认删除"
+    "confirmBatchDeleteBtn": "确认删除",
+    "batchExport": "批量导出 PNG",
+    "exportWarning": "即将导出 {count} 个画布为 PNG 文件并打包为 ZIP 下载。",
+    "exportConfirm": "开始导出"
   }
 }

@@ -425,6 +425,9 @@
     "selectedForCopy": "Selected for Copy",
     "confirmBatchDelete": "Confirm Batch Delete",
     "batchDeleteWarning": "You are about to delete {count} canvases. This action cannot be undone.",
-    "confirmBatchDeleteBtn": "Confirm Delete"
+    "confirmBatchDeleteBtn": "Confirm Delete",
+    "batchExport": "Batch Export PNG",
+    "exportWarning": "You are about to export {count} canvases as PNG files and download them as a ZIP.",
+    "exportConfirm": "Export"
   }
 }

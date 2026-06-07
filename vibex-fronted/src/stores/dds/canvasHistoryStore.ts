@@ -245,6 +245,8 @@ interface CanvasHistoryState {
   listSnapshots: (canvasId: string, filters?: SnapshotListFilters) => Promise<Snapshot[]>;
   /** Delete a snapshot by ID */
   deleteSnapshot: (canvasId: string, snapshotId: string) => Promise<void>;
+  /** E5 (Sprint75): Batch delete multiple snapshots */
+  deleteSnapshots: (canvasId: string, snapshotIds: string[]) => Promise<void>;
   /** Set the current restoring snapshot ID (for UI loading state) */
   setRestoringSnapshotId: (id: string | null) => void;
   // E1 (Sprint60): Snapshot UI enhancement
@@ -536,11 +538,19 @@ export const useCanvasHistoryStore = create<CanvasHistoryState>((set, get) => ({
   },
 
   deleteSnapshot: async (canvasId: string, snapshotId: string) => {
-    if (typeof window === 'undefined' || !window.indexedDB) return;
     const { deleteSnapshotFromDB } = await import('@/lib/canvas/historyDB');
     await deleteSnapshotFromDB(canvasId, snapshotId);
     set((state) => ({
       snapshots: state.snapshots.filter((s) => s.id !== snapshotId),
+    }));
+  },
+  // E5 (Sprint75): Batch delete multiple snapshots
+  deleteSnapshots: async (canvasId: string, snapshotIds: string[]) => {
+    if (snapshotIds.length === 0) return;
+    const { deleteSnapshotsFromDB } = await import('@/lib/canvas/historyDB');
+    await deleteSnapshotsFromDB(canvasId, snapshotIds);
+    set((state) => ({
+      snapshots: state.snapshots.filter((s) => !snapshotIds.includes(s.id)),
     }));
   },
 

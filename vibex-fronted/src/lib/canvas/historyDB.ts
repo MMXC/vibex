@@ -684,6 +684,31 @@ export async function deleteSnapshotFromDB(canvasId: string, snapshotId: string)
 }
 
 /**
+ * E5 (Sprint75): Batch delete multiple snapshots from IndexedDB.
+ */
+export async function deleteSnapshotsFromDB(canvasId: string, snapshotIds: string[]): Promise<void> {
+  if (!isIndexedDBAvailable() || snapshotIds.length === 0) return;
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(DB_NAME, DB_VERSION);
+    request.onerror = () => reject(new Error(`deleteSnapshotsFromDB: open failed`));
+    request.onsuccess = () => {
+      const db = request.result;
+      const tx = db.transaction(SNAPSHOTS_STORE_NAME, 'readwrite');
+      const store = tx.objectStore(SNAPSHOTS_STORE_NAME);
+      let errors = 0;
+      for (const snapshotId of snapshotIds) {
+        store.delete([canvasId, snapshotId]);
+      }
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => {
+        errors++;
+        if (errors === snapshotIds.length) reject(new Error(`deleteSnapshotsFromDB: ${errors} errors`));
+      };
+    };
+  });
+}
+
+/**
  * E1 (Sprint60): Update snapshot metadata (name, branchName, isStarred) in IndexedDB.
  * @param snapshotId - ID of the snapshot to update
  * @param meta - Metadata fields to update

@@ -1423,3 +1423,13 @@
 - **E5.3**: historyDB deleteSnapshotsFromDB() — 批量删除 IndexedDB 快照记录
 - **E5.4**: canvasHistoryStore deleteSnapshots() — 批量删除 store action
 - **Tests**: 27/27 passing（SnapshotManagerPanel 12 tests + CanvasSettingsDrawer 15 tests）
+
+
+---
+
+## [Unreleased] S76-E1: 画布背景设置集成 — 2026-06-07
+- **S76-E1.1**: 新增`canvasBackground`统一状态对象(`variant`/`gap`/`size`/`color`)于`settingsStore.ts`，含`setCanvasBackground()`action
+- **S76-E1.2**: `setGridVariant`/`setGridSize`同步更新`canvasBackground.variant`/`gap`
+- **S76-E1.3**: `BackgroundSettings`新增Style切换器(dots/lines/cross/none)+Gap选择器+GridColor选择
+- **S76-E1.4**: `DDSFlow`移除硬编码`color="#e5e7eb"`，改为`canvasBackground.color`统一读取
+- **S76-E1.5**: `settingsStore.test.ts`新增7个S76-E1测试用例，vitest 41/41通过

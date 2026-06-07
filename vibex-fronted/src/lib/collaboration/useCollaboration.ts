@@ -13,6 +13,7 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
 import { CollabWebSocket } from './websocket';
 import { registerActivityWSHandler } from './wsActivityHandler';
+import { usePresenceStore } from './presenceStore';
 import type {
   CollabMessage,
   CollabActionPayload,
@@ -83,10 +84,22 @@ export function useCollaboration(options: UseCollaborationOptions = {}) {
     wsRef.current = new CollabWebSocket({
       url,
       maxRetries,
-      onOpen: () => setIsConnected(true),
+      onOpen: () => {
+        setIsConnected(true);
+        usePresenceStore.getState().setConnectionStatus('connected');
+      },
       onClose: () => {
         setIsConnected(false);
         setOnlineUsers([]);
+        usePresenceStore.getState().setConnectionStatus('disconnected');
+      },
+      // S77-E2: Wire connection status for reconnecting
+      onReconnecting: (attempt) => {
+        usePresenceStore.getState().setConnectionStatus('reconnecting');
+      },
+      onReconnected: () => {
+        usePresenceStore.getState().setConnectionStatus('connected');
+        usePresenceStore.getState().reSync();
       },
       onMessage: handleMessage,
     });

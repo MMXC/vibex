@@ -227,6 +227,11 @@ export const DDSToolbar = memo(function DDSToolbar({
   const chapters = useDDSCanvasStore((s) => s.chapters);
   const chatHistory = useDDSCanvasStore((s) => s.chatHistory);
 
+  // S77-E2: Connection status from presenceStore
+  const connectionStatus = usePresenceStore((s) => s.connectionStatus);
+  const connectionStatusLabel =
+    connectionStatus === 'connected' ? '已连接' : connectionStatus === 'reconnecting' ? '重连中' : '已断开';
+
   // P001-E1 i18n: use translations for chapter label
   const tToolbar = useTranslations('toolbar')();
   const tCommon = useTranslations('common')();
@@ -520,6 +525,33 @@ export const DDSToolbar = memo(function DDSToolbar({
             disabled={!rbac.canShare && !rbac.loading}
             className={styles.exportMenuWrapper}
           />
+
+          {/* S77-E2: Connection status indicator */}
+          <button
+            type="button"
+            className={styles.exportBtn}
+            aria-label={`连接状态: ${connectionStatusLabel}`}
+            title={`连接状态: ${connectionStatusLabel}`}
+            style={{ cursor: 'default', opacity: 1 }}
+          >
+            <span
+              style={{
+                display: 'inline-block',
+                width: 8,
+                height: 8,
+                borderRadius: '50%',
+                backgroundColor:
+                  connectionStatus === 'connected'
+                    ? '#22c55e'
+                    : connectionStatus === 'reconnecting'
+                    ? '#f59e0b'
+                    : '#ef4444',
+                marginRight: 4,
+                verticalAlign: 'middle',
+              }}
+              aria-hidden="true"
+            />
+          </button>
 
           {/* S75-E1: RecentSearchesDropdown */}
           <div style={{ position: 'relative' }}>

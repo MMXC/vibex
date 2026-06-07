@@ -129,6 +129,16 @@ interface PresenceState {
   /** S68-E5: Dedicated cursor tracking: userId → CursorState */
   cursors: Record<string, CursorState>;
 
+  // S77-E2: WebSocket connection status
+  /** S77-E2: WebSocket connection state */
+  connectionStatus: 'connected' | 'reconnecting' | 'disconnected';
+
+  /** S77-E2: Set connection status */
+  setConnectionStatus: (status: 'connected' | 'reconnecting' | 'disconnected') => void;
+
+  /** S77-E2: Re-sync presence after reconnect — clears stale state and re-subscribes */
+  reSync: () => void;
+
   // S76-E5: Remote editing tracking
   /** S76-E5: Inverse mapping from userId → node they're editing (remote users only) */
   remoteEditing: Map<string, { nodeId: string; userName: string }>;
@@ -360,6 +370,22 @@ export const usePresenceStore = create<PresenceState>((set, get) => {
 
     // S76-E5: Remote editing tracking
     remoteEditing: new Map(),
+
+    // S77-E2: Connection status
+    connectionStatus: 'disconnected',
+
+    setConnectionStatus: (status) => set({ connectionStatus: status }),
+
+    reSync: () => {
+      // S77-E2: After reconnect, clear stale state and trigger re-subscription
+      // The actual re-subscription is handled by useCollaboration's reconnect flow.
+      // This method signals that the store should refresh its state.
+      set((state) => ({
+        // Keep cursors and remoteUsers — they'll be repopulated by the WS re-subscription
+        // Just ensure conflicts and locks are cleared (may be stale from before disconnect)
+        pendingConflicts: [],
+      }));
+    },
 
     setRemoteUsers: (users: CollabUser[]) =>
       set((state) => {

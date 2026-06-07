@@ -1,0 +1,241 @@
+/* SnapshotManagerPanel.module.css — E5 (Sprint75) */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.headerInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.snapshotCount {
+  font-size: 13px;
+  color: #64748b;
+}
+
+.selectionCount {
+  font-size: 12px;
+  color: #6366f1;
+  font-weight: 500;
+  background: #eef2ff;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.refreshButton {
+  padding: 4px 12px;
+  font-size: 12px;
+  color: #64748b;
+  background: transparent;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.refreshButton:hover {
+  background: #f8fafc;
+  color: #334155;
+}
+
+.deleteButton {
+  padding: 4px 12px;
+  font-size: 12px;
+  color: #fff;
+  background: #ef4444;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.deleteButton:hover:not(:disabled) {
+  background: #dc2626;
+}
+
+.deleteButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.empty {
+  padding: 32px 16px;
+  text-align: center;
+  color: #94a3b8;
+}
+
+.emptyHint {
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.error {
+  padding: 12px 16px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  color: #dc2626;
+  font-size: 13px;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.selectAllRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+  font-size: 12px;
+  color: #64748b;
+}
+
+.selectAllRow input[type="checkbox"] {
+  cursor: pointer;
+}
+
+.snapshotItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 8px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  transition: all 0.15s;
+}
+
+.snapshotItem:hover {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+}
+
+.snapshotLeft {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+}
+
+.snapshotLeft input[type="checkbox"] {
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.snapshotInfo {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.snapshotName {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.snapshotNameText {
+  font-size: 13px;
+  font-weight: 500;
+  color: #1e293b;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 200px;
+}
+
+.star {
+  color: #f59e0b;
+  font-size: 12px;
+}
+
+.branchBadge {
+  font-size: 11px;
+  color: #6366f1;
+  background: #eef2ff;
+  padding: 1px 6px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.snapshotMeta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: #94a3b8;
+}
+
+.snapshotActions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  margin-left: 8px;
+}
+
+.restoreButton {
+  padding: 3px 10px;
+  font-size: 12px;
+  color: #6366f1;
+  background: transparent;
+  border: 1px solid #c7d2fe;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.restoreButton:hover:not(:disabled) {
+  background: #eef2ff;
+}
+
+.restoreButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.deleteSingleButton {
+  padding: 3px 10px;
+  font-size: 12px;
+  color: #dc2626;
+  background: transparent;
+  border: 1px solid #fecaca;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.deleteSingleButton:hover:not(:disabled) {
+  background: #fef2f2;
+}
+
+.deleteSingleButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

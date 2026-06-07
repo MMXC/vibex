@@ -1,8 +1,9 @@
 /**
  * CanvasSettingsDrawer.tsx — Canvas Settings Drawer
  * S70-E5: 画布设置面板完善
+ * S75-E5: 新增「快照管理」Tab
  *
- * 侧边抽屉，4 tabs: 预设 / 画布 / 节点 / 协作
+ * 侧边抽屉，5 tabs: 预设 / 画布 / 节点 / 快照管理 / 协作
  */
 'use client';
 
@@ -11,14 +12,16 @@ import { ViewPresetsTab } from './ViewPresetsTab';
 import { BackgroundSettings } from './BackgroundSettings';
 import { GridSettings } from './GridSettings';
 import { ZoomSettings } from './ZoomSettings';
+import { SnapshotManagerPanel } from '@/components/dds/history/SnapshotManagerPanel';
 import styles from './CanvasSettingsDrawer.module.css';
 
-type TabId = 'presets' | 'canvas' | 'nodes' | 'collaboration';
+type TabId = 'presets' | 'canvas' | 'nodes' | 'snapshots' | 'collaboration';
 
 const TABS: { id: TabId; label: string }[] = [
   { id: 'presets', label: '预设' },
   { id: 'canvas', label: '画布' },
   { id: 'nodes', label: '节点' },
+  { id: 'snapshots', label: '快照管理' },
   { id: 'collaboration', label: '协作' },
 ];
 
@@ -125,6 +128,7 @@ export function CanvasSettingsDrawer({ isOpen, onClose }: CanvasSettingsDrawerPr
             </>
           )}
           {activeTab === 'nodes' && <NodeSettingsPlaceholder />}
+          {activeTab === 'snapshots' && <SnapshotManagerPanel />}
           {activeTab === 'collaboration' && (
             <div style={{ padding: 16 }}>
               <p style={{ color: '#64748b', fontSize: 13 }}>协作设置待实现</p>

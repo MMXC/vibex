@@ -263,4 +263,116 @@ describe('useNotificationStore — S68-E2', () => {
     });
   });
 
+  // =========================================================
+  // S74-E4: @mention 通知闭环测试
+  // =========================================================
+  describe('E4.1: mention notification fields', () => {
+    it('stores mention notification with correct fields', () => {
+      const result = useNotificationStore.getState().addNotification({
+        type: 'mention',
+        title: '@alice mentioned you',
+        message: 'Hey @alice check this out',
+        senderId: 'u1',
+        senderName: 'Bob',
+        targetUserId: 'alice',
+        canvasId: 'canvas-1',
+        timestamp: Date.now(),
+      });
+      expect(result.type).toBe('mention');
+      expect(result.isRead).toBe(false);
+      expect(result.targetUserId).toBe('alice');
+      expect(result.senderName).toBe('Bob');
+      expect(result.canvasId).toBe('canvas-1');
+    });
+
+    it('getByType returns only mention notifications', () => {
+      useNotificationStore.getState().addNotification({
+        type: 'mention',
+        title: 'Mention 1',
+        message: '@you',
+        senderId: 'u1',
+        senderName: 'Alice',
+        targetUserId: 'me',
+        timestamp: Date.now(),
+      });
+      useNotificationStore.getState().addNotification({
+        type: 'system',
+        title: 'System',
+        message: 'System msg',
+        senderId: 'system',
+        senderName: 'System',
+        targetUserId: 'me',
+        timestamp: Date.now(),
+      });
+      const mentions = useNotificationStore.getState().getByType('mention');
+      expect(mentions).toHaveLength(1);
+      expect(mentions[0]!.type).toBe('mention');
+    });
+
+    it('getByType returns empty array when no mentions exist', () => {
+      const mentions = useNotificationStore.getState().getByType('mention');
+      expect(mentions).toHaveLength(0);
+    });
+  });
+
+  describe('E4.2: mention type toggle (preference)', () => {
+    it('disables mention type and skips notification', () => {
+      useNotificationStore.getState().setTypeEnabled('mention', false);
+      const result = useNotificationStore.getState().addNotification({
+        type: 'mention',
+        title: 'Should Not Store',
+        message: '@you',
+        senderId: 'u1',
+        senderName: 'Alice',
+        targetUserId: 'me',
+        timestamp: Date.now(),
+      });
+      expect(result.isRead).toBe(true);
+      const mentions = useNotificationStore.getState().getByType('mention');
+      expect(mentions).toHaveLength(0);
+      useNotificationStore.getState().setTypeEnabled('mention', true);
+    });
+
+    it('re-enables mention type and stores notifications', () => {
+      useNotificationStore.getState().setTypeEnabled('mention', true);
+      const result = useNotificationStore.getState().addNotification({
+        type: 'mention',
+        title: 'Should Store',
+        message: '@you again',
+        senderId: 'u1',
+        senderName: 'Alice',
+        targetUserId: 'me',
+        timestamp: Date.now(),
+      });
+      expect(result.isRead).toBe(false);
+      const mentions = useNotificationStore.getState().getByType('mention');
+      expect(mentions).toHaveLength(1);
+    });
+  });
+
+  describe('E4.3: multiple mentions stored as separate notifications', () => {
+    it('multiple identical mentions stored separately (dedup handled in activityStore)', () => {
+      const n1 = useNotificationStore.getState().addNotification({
+        type: 'mention',
+        title: 'First',
+        message: '@you',
+        senderId: 'u1',
+        senderName: 'Alice',
+        targetUserId: 'me',
+        timestamp: Date.now(),
+      });
+      const n2 = useNotificationStore.getState().addNotification({
+        type: 'mention',
+        title: 'Second',
+        message: '@you again',
+        senderId: 'u1',
+        senderName: 'Alice',
+        targetUserId: 'me',
+        timestamp: Date.now(),
+      });
+      expect(n1.id).not.toBe(n2.id);
+      const mentions = useNotificationStore.getState().getByType('mention');
+      expect(mentions).toHaveLength(2);
+    });
+  });
 });

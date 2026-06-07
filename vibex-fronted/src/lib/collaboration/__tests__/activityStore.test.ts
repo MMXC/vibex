@@ -1,15 +1,48 @@
 /**
  * activityStore vitest — S60-E3
  * Tests: activityStore actions, ring buffer, user status derivation
+ * S74-E4: @mention notification closure tests
  */
 
-import { describe, it, expect, beforeEach } from 'vitest';
-import { useActivityStore } from '../activityStore';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { useActivityStore, extractMentions } from '../activityStore';
+
+// S74-E4: Mock notificationStore so both activityStore and test share the same instance
+const mockNotifications: any[] = [];
+const mockAddNotification = vi.fn((data: any) => {
+  const notif = { ...data, id: `mock-${Date.now()}`, isRead: false };
+  mockNotifications.push(notif);
+  return notif;
+});
+const mockClearAll = vi.fn(() => { mockNotifications.length = 0; });
+
+vi.mock('@/stores/notificationStore', () => ({
+  notificationStore: {
+    getState: () => ({
+      notifications: mockNotifications,
+      addNotification: mockAddNotification,
+      clearAll: mockClearAll,
+    }),
+  },
+  useNotificationStore: {
+    getState: () => ({
+      notifications: mockNotifications,
+      addNotification: mockAddNotification,
+      clearAll: mockClearAll,
+    }),
+  },
+}));
 
 describe('activityStore', () => {
   beforeEach(() => {
     // Reset store between tests
     useActivityStore.setState({ entries: [], recentActivity: [], userStatuses: {} });
+    // S74-E4: clear module-level dedup cache
+    useActivityStore.getState().__clearSeenMentions?.();
+    // S74-E4: reset notificationStore mocks
+    mockNotifications.length = 0;
+    mockAddNotification.mockClear();
+    mockClearAll.mockClear();
   });
 
   describe('addEntries', () => {
@@ -149,6 +182,102 @@ describe('activityStore', () => {
       ]);
       useActivityStore.getState().clearEntries();
       expect(useActivityStore.getState().entries).toHaveLength(0);
+    });
+  });
+
+  // =========================================================
+  // S74-E4: @mention 通知闭环测试
+  // =========================================================
+  describe('extractMentions (E4)', () => {
+    it('extracts a single @mention from message', () => {
+      const result = extractMentions('Hello @alice how are you?');
+      expect(result).toEqual(['alice']);
+    });
+
+    it('extracts multiple @mentions from message', () => {
+      const result = extractMentions('Hey @alice and @bob check this out');
+      expect(result).toEqual(['alice', 'bob']);
+    });
+
+    it('returns empty array when no @mentions present', () => {
+      const result = extractMentions('Just a regular message');
+      expect(result).toEqual([]);
+    });
+
+    it('deduplicates repeated @mentions in same message', () => {
+      const result = extractMentions('Hi @alice and @alice again');
+      expect(result).toEqual(['alice']);
+    });
+
+    it('skips self-mention (sender === target)', () => {
+      mockAddNotification.mockClear();
+      useActivityStore.getState().addEntry({
+        userId: 'u1',
+        userName: 'alice', // same as mention target
+        type: 'edit',
+        timestamp: Date.now(),
+        message: 'Talking to myself @alice',
+        canvasId: 'canvas-1',
+      });
+      // Should NOT have called addNotification
+      expect(mockAddNotification).not.toHaveBeenCalled();
+    });
+
+    it('addEntry with message calls notificationStore', () => {
+      mockAddNotification.mockClear();
+      useActivityStore.getState().addEntry({
+        userId: 'u1',
+        userName: 'Bob',
+        type: 'edit',
+        timestamp: Date.now(),
+        message: 'Hey @alice look at this',
+        canvasId: 'canvas-1',
+      });
+      expect(mockAddNotification).toHaveBeenCalledTimes(1);
+      expect(mockAddNotification).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: 'mention',
+          targetUserId: 'alice',
+          senderName: 'Bob',
+          canvasId: 'canvas-1',
+        }),
+      );
+    });
+
+    it('addEntry without message does NOT call notificationStore', () => {
+      mockAddNotification.mockClear();
+      useActivityStore.getState().addEntry({
+        userId: 'u1',
+        userName: 'Alice',
+        type: 'join',
+        timestamp: Date.now(),
+        // No message field
+      });
+      expect(mockAddNotification).not.toHaveBeenCalled();
+    });
+
+    it('duplicate @mention same sender+target+canvas only notifies once', () => {
+      mockAddNotification.mockClear();
+      // First mention
+      useActivityStore.getState().addEntry({
+        userId: 'u1',
+        userName: 'Bob',
+        type: 'edit',
+        timestamp: Date.now(),
+        message: 'Hey @alice first mention',
+        canvasId: 'canvas-1',
+      });
+      // Duplicate mention (same sender+target+canvas)
+      useActivityStore.getState().addEntry({
+        userId: 'u1',
+        userName: 'Bob',
+        type: 'edit',
+        timestamp: Date.now(),
+        message: 'Hey @alice duplicate mention',
+        canvasId: 'canvas-1',
+      });
+      // Should only have called addNotification once
+      expect(mockAddNotification).toHaveBeenCalledTimes(1);
     });
   });
 });

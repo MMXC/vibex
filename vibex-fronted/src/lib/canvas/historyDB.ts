@@ -27,6 +27,11 @@
  * - DB_VERSION=5：新增 branchMeta objectStore (canvasId + branchName compound key)
  * - setBranchMeta/getBranchMeta/listBranchMetas/deleteBranchMeta
  * - BranchMeta: canvasId / branchName / name / isProtected / createdAt
+ *
+ * E3 (Sprint75): 分支对比历史记录
+ * - DB_VERSION=6：新增 branchDiffHistory objectStore (canvasId + id compound key)
+ * - saveBranchDiffHistoryToDB/listBranchDiffHistoryFromDB/clearBranchDiffHistoryFromDB
+ * - BranchDiffHistoryEntry: canvasId / id / branchA / branchB / summary / timestamp
  */
 
 import type { Command } from '@/stores/dds/canvasHistoryStore';
@@ -38,10 +43,11 @@ import type { Snapshot } from '@/stores/dds/canvasHistoryStore';
 // ============================================
 
 const DB_NAME = 'vibex-canvas-history';
-const DB_VERSION = 5; // E4 (Sprint73): branchMeta objectStore
+const DB_VERSION = 6; // E3 (Sprint75): branchDiffHistory objectStore
 const STORE_NAME = 'history';
 const SNAPSHOTS_STORE_NAME = 'snapshots';
 const BRANCH_META_STORE_NAME = 'branchMeta';
+const BRANCH_DIFF_HISTORY_STORE_NAME = 'branchDiffHistory';
 
 /** Maximum storage per canvas in bytes (5MB) */
 export const MAX_BYTES_PER_CANVAS = 5 * 1024 * 1024;
@@ -91,6 +97,37 @@ export interface BranchMeta {
   isProtected: boolean;
   /** When this branch was first created */
   createdAt: number;
+}
+
+// ============================================
+// E3 (Sprint75): Branch Diff History Types
+// ============================================
+
+/** E3 (Sprint75): Summary snapshot of a branch diff result */
+export interface BranchDiffHistorySummary {
+  totalChanges: number;
+  contextsAdded: number;
+  contextsRemoved: number;
+  contextsModified: number;
+  edgesAdded: number;
+  edgesRemoved: number;
+  edgesModified: number;
+}
+
+/** E3 (Sprint75): Branch diff history entry — stored in the branchDiffHistory objectStore */
+export interface BranchDiffHistoryEntry {
+  /** Canvas identifier */
+  canvasId: string;
+  /** Unique ID for this entry (timestamp-based) */
+  id: string;
+  /** First branch name */
+  branchA: string;
+  /** Second branch name */
+  branchB: string;
+  /** Timestamp when comparison was made */
+  timestamp: number;
+  /** Summary of changes (for list display without loading full diff) */
+  summary: BranchDiffHistorySummary;
 }
 
 // ============================================
@@ -148,6 +185,12 @@ function openDB(): Promise<IDBDatabase> {
         metaStore.createIndex('canvasId', 'canvasId', { unique: false });
         metaStore.createIndex('branchName', 'branchName', { unique: false });
         metaStore.createIndex('createdAt', 'createdAt', { unique: false });
+      }
+      // E3 (Sprint75): branchDiffHistory objectStore
+      if (!db.objectStoreNames.contains(BRANCH_DIFF_HISTORY_STORE_NAME)) {
+        const histStore = db.createObjectStore(BRANCH_DIFF_HISTORY_STORE_NAME, { keyPath: ['canvasId', 'id'] });
+        histStore.createIndex('canvasId', 'canvasId', { unique: false });
+        histStore.createIndex('timestamp', 'timestamp', { unique: false });
       }
     };
   });
@@ -962,6 +1005,114 @@ export async function deleteBranchMeta(
         const request = store.delete([canvasId, branchName]);
         request.onsuccess = () => resolve(true);
         request.onerror = () => reject(new Error(`deleteBranchMeta failed: ${request.error}`));
+      })
+      .catch(reject);
+  });
+}
+
+// ============================================
+// E3 (Sprint75): Branch Diff History DB Functions
+// ============================================
+
+/** Maximum number of branch diff history entries per canvas */
+const MAX_BRANCH_DIFF_HISTORY = 20;
+
+/**
+ * Save a branch diff history entry to IndexedDB.
+ * If adding would exceed MAX_BRANCH_DIFF_HISTORY, removes oldest entries first.
+ */
+export async function saveBranchDiffHistoryToDB(
+  entry: BranchDiffHistoryEntry
+): Promise<void> {
+  if (!isIndexedDBAvailable()) return;
+
+  return new Promise((resolve, reject) => {
+    openDB()
+      .then((db) => {
+        const tx = db.transaction(BRANCH_DIFF_HISTORY_STORE_NAME, 'readwrite');
+        const store = tx.objectStore(BRANCH_DIFF_HISTORY_STORE_NAME);
+
+        // First, count existing entries for this canvas
+        const countReq = store.index('canvasId').count(entry.canvasId);
+        countReq.onsuccess = () => {
+          const count = countReq.result as number;
+          if (count >= MAX_BRANCH_DIFF_HISTORY) {
+            // Fetch and delete oldest entries
+            const fetchReq = store.index('canvasId').getAll(entry.canvasId);
+            fetchReq.onsuccess = () => {
+              const entries = fetchReq.result as BranchDiffHistoryEntry[];
+              // Sort by timestamp ascending (oldest first)
+              entries.sort((a, b) => a.timestamp - b.timestamp);
+              const toDelete = entries.slice(0, count - MAX_BRANCH_DIFF_HISTORY + 1);
+              for (const old of toDelete) {
+                store.delete([old.canvasId, old.id]);
+              }
+              // Now add the new entry
+              const addReq = store.put(entry);
+              addReq.onsuccess = () => resolve();
+              addReq.onerror = () => reject(new Error(`saveBranchDiffHistoryToDB put failed: ${addReq.error}`));
+            };
+            fetchReq.onerror = () => reject(new Error(`saveBranchDiffHistoryToDB count/fetch failed: ${fetchReq.error}`));
+          } else {
+            const addReq = store.put(entry);
+            addReq.onsuccess = () => resolve();
+            addReq.onerror = () => reject(new Error(`saveBranchDiffHistoryToDB put failed: ${addReq.error}`));
+          }
+        };
+        countReq.onerror = () => reject(new Error(`saveBranchDiffHistoryToDB count failed: ${countReq.error}`));
+      })
+      .catch(reject);
+  });
+}
+
+/**
+ * List all branch diff history entries for a canvas, sorted by timestamp descending (newest first).
+ */
+export async function listBranchDiffHistoryFromDB(
+  canvasId: string
+): Promise<BranchDiffHistoryEntry[]> {
+  if (!isIndexedDBAvailable()) return [];
+
+  return new Promise((resolve, reject) => {
+    openDB()
+      .then((db) => {
+        const tx = db.transaction(BRANCH_DIFF_HISTORY_STORE_NAME, 'readonly');
+        const store = tx.objectStore(BRANCH_DIFF_HISTORY_STORE_NAME);
+        const index = store.index('canvasId');
+        const request = index.getAll(canvasId);
+        request.onsuccess = () => {
+          const entries = (request.result ?? []) as BranchDiffHistoryEntry[];
+          // Sort by timestamp descending (newest first)
+          entries.sort((a, b) => b.timestamp - a.timestamp);
+          resolve(entries.slice(0, MAX_BRANCH_DIFF_HISTORY));
+        };
+        request.onerror = () => reject(new Error(`listBranchDiffHistoryFromDB failed: ${request.error}`));
+      })
+      .catch(reject);
+  });
+}
+
+/**
+ * Clear all branch diff history entries for a canvas.
+ */
+export async function clearBranchDiffHistoryFromDB(canvasId: string): Promise<void> {
+  if (!isIndexedDBAvailable()) return;
+
+  return new Promise((resolve, reject) => {
+    openDB()
+      .then((db) => {
+        const tx = db.transaction(BRANCH_DIFF_HISTORY_STORE_NAME, 'readwrite');
+        const store = tx.objectStore(BRANCH_DIFF_HISTORY_STORE_NAME);
+        const index = store.index('canvasId');
+        const request = index.getAllKeys(canvasId);
+        request.onsuccess = () => {
+          const keys = request.result as Array<[string, string]>;
+          for (const key of keys) {
+            store.delete(key);
+          }
+          resolve();
+        };
+        request.onerror = () => reject(new Error(`clearBranchDiffHistoryFromDB failed: ${request.error}`));
       })
       .catch(reject);
   });

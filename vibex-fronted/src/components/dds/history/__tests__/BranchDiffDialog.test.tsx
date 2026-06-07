@@ -2,6 +2,7 @@
  * BranchDiffDialog — Component Tests
  * S74-E3: 画布分支对比视图
  * S74-E5: Keyboard navigation — Esc to close, focus trap, focus restoration
+ * S75-E3: 分支对比历史记录 — 「历史」Tab
  *
  * Uses a shared mutable mockRef so beforeEach can update the mock
  * without relying on module re-import or dynamic import isolation.
@@ -10,21 +11,41 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render } from '@testing-library/react';
+import { render, act } from '@testing-library/react';
 
 // Shared mutable ref — same object across all beforeEach calls
 const mockRef = {
   compareBranches: vi.fn(),
+  getBranchDiffHistory: vi.fn(),
+  clearBranchDiffHistory: vi.fn(),
+  branchDiffHistory: [] as Array<{
+    id: string;
+    branchA: string;
+    branchB: string;
+    timestamp: number;
+    summary: { totalChanges: number; contextsAdded: number; contextsRemoved: number; contextsModified: number; edgesAdded: number; edgesRemoved: number; edgesModified: number };
+  }>,
 };
 
 vi.mock('@/stores/dds/canvasHistoryStore', () => ({
   useCanvasHistoryStore: Object.assign(
     (selector?: (s: any) => unknown) => {
-      if (selector) return selector({ compareBranches: mockRef.compareBranches });
-      return { compareBranches: mockRef.compareBranches };
+      const state = {
+        compareBranches: mockRef.compareBranches,
+        branchDiffHistory: mockRef.branchDiffHistory,
+        getBranchDiffHistory: mockRef.getBranchDiffHistory,
+        clearBranchDiffHistory: mockRef.clearBranchDiffHistory,
+      };
+      if (selector) return selector(state);
+      return state;
     },
     {
-      getState: () => ({ compareBranches: mockRef.compareBranches }),
+      getState: () => ({
+        compareBranches: mockRef.compareBranches,
+        branchDiffHistory: mockRef.branchDiffHistory,
+        getBranchDiffHistory: mockRef.getBranchDiffHistory,
+        clearBranchDiffHistory: mockRef.clearBranchDiffHistory,
+      }),
       setState: vi.fn(),
     }
   ),
@@ -47,11 +68,16 @@ import BranchDiffDialog from '../BranchDiffDialog';
 describe('BranchDiffDialog', () => {
   beforeEach(() => {
     mockRef.compareBranches.mockReset();
+    mockRef.getBranchDiffHistory.mockReset();
+    mockRef.clearBranchDiffHistory.mockReset();
+    mockRef.branchDiffHistory = [];
     mockRef.compareBranches.mockResolvedValue({
       error: null,
       diffs: { added: [], removed: [], modified: [] },
       summary: { totalChanges: 0, contextsAdded: 0, contextsRemoved: 0, contextsModified: 0, edgesAdded: 0, edgesRemoved: 0, edgesModified: 0 },
     });
+    mockRef.getBranchDiffHistory.mockResolvedValue(undefined);
+    mockRef.clearBranchDiffHistory.mockResolvedValue(undefined);
   });
 
   it('renders null when open is false', () => {
@@ -224,5 +250,224 @@ describe('BranchDiffDialog', () => {
     document.dispatchEvent(event);
 
     expect(onClose).not.toHaveBeenCalled();
+  });
+
+  // ============================================
+  // E3 (Sprint75): Branch diff history tab tests
+  // ============================================
+
+  it('renders tab bar with 对比 and 历史 tabs', () => {
+    const { getByRole } = render(
+      <BranchDiffDialog
+        open={true}
+        branchA="main"
+        branchB="feature"
+        canvasId="canvas-1"
+        onClose={vi.fn()}
+        onRestore={vi.fn()}
+      />
+    );
+
+    // Tab bar exists with role="tablist"
+    expect(getByRole('tablist')).toBeTruthy();
+    // Both tabs present
+    expect(getByRole('tab', { name: '对比' })).toBeTruthy();
+    expect(getByRole('tab', { name: '历史' })).toBeTruthy();
+  });
+
+  it('defaults to diff tab', () => {
+    const { getByRole } = render(
+      <BranchDiffDialog
+        open={true}
+        branchA="main"
+        branchB="feature"
+        canvasId="canvas-1"
+        onClose={vi.fn()}
+        onRestore={vi.fn()}
+      />
+    );
+
+    const diffTab = getByRole('tab', { name: '对比' });
+    expect(diffTab.getAttribute('aria-selected')).toBe('true');
+  });
+
+  it('switches to history tab when 历史 tab is clicked', async () => {
+    const { getByRole, getByText } = render(
+      <BranchDiffDialog
+        open={true}
+        branchA="main"
+        branchB="feature"
+        canvasId="canvas-1"
+        onClose={vi.fn()}
+        onRestore={vi.fn()}
+      />
+    );
+
+    // Click history tab
+    const historyTab = getByRole('tab', { name: '历史' });
+    await act(async () => {
+      historyTab.click();
+    });
+
+    // History tab is now selected
+    expect(historyTab.getAttribute('aria-selected')).toBe('true');
+    // Empty state shown
+    expect(getByText('暂无对比历史记录')).toBeTruthy();
+    // getBranchDiffHistory called
+    expect(mockRef.getBranchDiffHistory).toHaveBeenCalledWith('canvas-1');
+  });
+
+  it('shows empty state in history tab when branchDiffHistory is empty', async () => {
+    const { getByRole, getByText } = render(
+      <BranchDiffDialog
+        open={true}
+        branchA="main"
+        branchB="feature"
+        canvasId="canvas-1"
+        onClose={vi.fn()}
+        onRestore={vi.fn()}
+      />
+    );
+
+    // Switch to history tab
+    const historyTab = getByRole('tab', { name: '历史' });
+    await act(async () => {
+      historyTab.click();
+    });
+
+    expect(getByText('暂无对比历史记录')).toBeTruthy();
+  });
+
+  it('shows history list when branchDiffHistory has entries', async () => {
+    // Set up mock with history entries
+    mockRef.branchDiffHistory = [
+      {
+        id: 'diff-1',
+        branchA: 'main',
+        branchB: 'feature-a',
+        timestamp: Date.now() - 1000 * 60 * 5, // 5 minutes ago
+        summary: { totalChanges: 3, contextsAdded: 1, contextsRemoved: 1, contextsModified: 1, edgesAdded: 0, edgesRemoved: 0, edgesModified: 0 },
+      },
+      {
+        id: 'diff-2',
+        branchA: 'feature-a',
+        branchB: 'feature-b',
+        timestamp: Date.now() - 1000 * 60 * 60, // 1 hour ago
+        summary: { totalChanges: 0, contextsAdded: 0, contextsRemoved: 0, contextsModified: 0, edgesAdded: 0, edgesRemoved: 0, edgesModified: 0 },
+      },
+    ];
+
+    const { getByRole, getByText } = render(
+      <BranchDiffDialog
+        open={true}
+        branchA="main"
+        branchB="feature"
+        canvasId="canvas-1"
+        onClose={vi.fn()}
+        onRestore={vi.fn()}
+      />
+    );
+
+    // Switch to history tab
+    const historyTab = getByRole('tab', { name: '历史' });
+    await act(async () => {
+      historyTab.click();
+    });
+
+    // Branch names visible
+    expect(getByText('main')).toBeTruthy();
+    expect(getByText('feature-a')).toBeTruthy();
+    // Change count visible
+    expect(getByText('3 项变更')).toBeTruthy();
+    // 无变更 for the second entry
+    expect(getByText('无变更')).toBeTruthy();
+    // Record count
+    expect(getByText('共 2 条记录')).toBeTruthy();
+    // Clear history button visible
+    expect(getByRole('button', { name: '清空历史' })).toBeTruthy();
+  });
+
+  it('emits branch-diff-history-click event when history item is clicked', async () => {
+    mockRef.branchDiffHistory = [
+      {
+        id: 'diff-1',
+        branchA: 'main',
+        branchB: 'feature-a',
+        timestamp: Date.now(),
+        summary: { totalChanges: 3, contextsAdded: 1, contextsRemoved: 1, contextsModified: 1, edgesAdded: 0, edgesRemoved: 0, edgesModified: 0 },
+      },
+    ];
+
+    const { getByRole, getByText } = render(
+      <BranchDiffDialog
+        open={true}
+        branchA="main"
+        branchB="feature"
+        canvasId="canvas-1"
+        onClose={vi.fn()}
+        onRestore={vi.fn()}
+      />
+    );
+
+    // Switch to history tab
+    const historyTab = getByRole('tab', { name: '历史' });
+    await act(async () => {
+      historyTab.click();
+    });
+
+    // Click the history item (branch names)
+    await act(async () => {
+      getByText('main').click();
+    });
+
+    // Custom event should have been dispatched
+    const dispatchedEvents = (window as unknown as { _dispatchedEvents?: CustomEvent[] })._dispatchedEvents ?? [];
+    // Check that an event was dispatched
+    expect(window.dispatchEvent).toHaveBeenCalled();
+  });
+
+  it('calls clearBranchDiffHistory when 清空历史 is clicked and confirmed', async () => {
+    mockRef.branchDiffHistory = [
+      {
+        id: 'diff-1',
+        branchA: 'main',
+        branchB: 'feature-a',
+        timestamp: Date.now(),
+        summary: { totalChanges: 1, contextsAdded: 1, contextsRemoved: 0, contextsModified: 0, edgesAdded: 0, edgesRemoved: 0, edgesModified: 0 },
+      },
+    ];
+
+    // Mock window.confirm to return true
+    const originalConfirm = window.confirm;
+    vi.stubGlobal('confirm', vi.fn().mockReturnValue(true));
+
+    try {
+      const { getByRole } = render(
+        <BranchDiffDialog
+          open={true}
+          branchA="main"
+          branchB="feature"
+          canvasId="canvas-1"
+          onClose={vi.fn()}
+          onRestore={vi.fn()}
+        />
+      );
+
+      // Switch to history tab
+      const historyTab = getByRole('tab', { name: '历史' });
+      await act(async () => {
+        historyTab.click();
+      });
+
+      // Click clear history button
+      const clearBtn = getByRole('button', { name: '清空历史' });
+      await act(async () => {
+        clearBtn.click();
+      });
+
+      expect(mockRef.clearBranchDiffHistory).toHaveBeenCalledWith('canvas-1');
+    } finally {
+      vi.stubGlobal('confirm', originalConfirm);
+    }
   });
 });

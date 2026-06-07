@@ -190,6 +190,15 @@ interface CanvasHistoryState {
   pendingConflicts: BranchConflict[];
   /** Current active branch name */
   currentBranch: string;
+  // E3 (Sprint75): Branch diff history
+  /** Branch diff history entries for the current canvas (sorted by timestamp desc, max 20) */
+  branchDiffHistory: Array<{
+    id: string;
+    branchA: string;
+    branchB: string;
+    timestamp: number;
+    summary: { totalChanges: number; contextsAdded: number; contextsRemoved: number; contextsModified: number; edgesAdded: number; edgesRemoved: number; edgesModified: number };
+  }>;
 
   /** Push a new command, execute it, and push to history */
   execute: (cmd: Command) => void;
@@ -291,6 +300,13 @@ interface CanvasHistoryState {
   ) => Promise<void>;
   /** Clear all pending conflicts (on cancel or full resolution) */
   clearPendingConflicts: () => void;
+  // E3 (Sprint75): Branch diff history actions
+  /** Load branch diff history from IndexedDB for a canvas */
+  getBranchDiffHistory: (canvasId: string) => Promise<void>;
+  /** Save a branch diff result to history after compareBranches completes */
+  addBranchDiffHistory: (canvasId: string, branchA: string, branchB: string, summary: { totalChanges: number; contextsAdded: number; contextsRemoved: number; contextsModified: number; edgesAdded: number; edgesRemoved: number; edgesModified: number }) => Promise<void>;
+  /** Clear all branch diff history for a canvas */
+  clearBranchDiffHistory: (canvasId: string) => Promise<void>;
 }
 
 // ==================== Helper ====================
@@ -318,6 +334,8 @@ export const useCanvasHistoryStore = create<CanvasHistoryState>((set, get) => ({
   // E1 (Sprint70): Branch merge conflicts
   pendingConflicts: [],
   currentBranch: 'main',
+  // E3 (Sprint75): Branch diff history
+  branchDiffHistory: [],
 
   execute: (cmd: Command) => {
     if (get().isPerforming) return;
@@ -813,6 +831,43 @@ export const useCanvasHistoryStore = create<CanvasHistoryState>((set, get) => ({
     set({ pendingConflicts: [] });
   },
 
+  // E3 (Sprint75): Branch diff history actions
+  getBranchDiffHistory: async (canvasId: string) => {
+    if (typeof window === 'undefined' || !window.indexedDB) return;
+    const { listBranchDiffHistoryFromDB } = await import('@/lib/canvas/historyDB');
+    const entries = await listBranchDiffHistoryFromDB(canvasId);
+    set({ branchDiffHistory: entries });
+  },
+
+  addBranchDiffHistory: async (
+    canvasId: string,
+    branchA: string,
+    branchB: string,
+    summary: { totalChanges: number; contextsAdded: number; contextsRemoved: number; contextsModified: number; edgesAdded: number; edgesRemoved: number; edgesModified: number }
+  ) => {
+    if (typeof window === 'undefined' || !window.indexedDB) return;
+    const { saveBranchDiffHistoryToDB, listBranchDiffHistoryFromDB } = await import('@/lib/canvas/historyDB');
+    const id = `diff-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+    const entry = {
+      canvasId,
+      id,
+      branchA,
+      branchB,
+      timestamp: Date.now(),
+      summary,
+    };
+    await saveBranchDiffHistoryToDB(entry);
+    const entries = await listBranchDiffHistoryFromDB(canvasId);
+    set({ branchDiffHistory: entries });
+  },
+
+  clearBranchDiffHistory: async (canvasId: string) => {
+    if (typeof window === 'undefined' || !window.indexedDB) return;
+    const { clearBranchDiffHistoryFromDB } = await import('@/lib/canvas/historyDB');
+    await clearBranchDiffHistoryFromDB(canvasId);
+    set({ branchDiffHistory: [] });
+  },
+
   // E1 (Sprint67): Branch comparison — compare the latest snapshots of two branches
   compareBranches: async (canvasId: string, branchA: string, branchB: string): Promise<BranchDiffResult> => {
     const emptyResult = (error: string): BranchDiffResult => ({
@@ -840,6 +895,9 @@ export const useCanvasHistoryStore = create<CanvasHistoryState>((set, get) => ({
       contextsModified: diffs.modified.length,
       edgesAdded: 0, edgesRemoved: 0, edgesModified: 0,
     };
+
+    // E3 (Sprint75): Save this comparison to branch diff history
+    await get().addBranchDiffHistory(canvasId, branchA, branchB, summary);
 
     return { branchA, branchB, snapA, snapB, diffs, summary };
   },

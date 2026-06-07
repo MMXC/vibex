@@ -25,8 +25,10 @@ interface BranchDiffDialogProps {
  * BranchDiffDialog — modal dialog for comparing two branches.
  * Opened from HistoryPanel after Ctrl+Click multi-select.
  * Shows diff between the latest snapshots of branchA and branchB.
+ *
  * S74-E3: 画布分支对比视图
  * S74-E5: Keyboard navigation — Esc to close, focus trap, focus restoration
+ * S75-E3: 分支对比历史记录 — 新增「历史」Tab
  */
 const BranchDiffDialog = memo(function BranchDiffDialog({
   open,
@@ -39,6 +41,7 @@ const BranchDiffDialog = memo(function BranchDiffDialog({
   const [diff, setDiff] = useState<BranchDiffResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<'diff' | 'history'>('diff');
 
   // Refs for focus management
   const dialogRef = useRef<HTMLDivElement>(null);
@@ -46,6 +49,9 @@ const BranchDiffDialog = memo(function BranchDiffDialog({
   const previousFocusRef = useRef<HTMLElement | null>(null);
 
   const compareBranches = useCanvasHistoryStore((s) => s.compareBranches);
+  const branchDiffHistory = useCanvasHistoryStore((s) => s.branchDiffHistory);
+  const getBranchDiffHistory = useCanvasHistoryStore((s) => s.getBranchDiffHistory);
+  const clearBranchDiffHistory = useCanvasHistoryStore((s) => s.clearBranchDiffHistory);
 
   // S74-E5: Focus restoration — save focus before opening, restore on close
   useEffect(() => {
@@ -133,6 +139,13 @@ const BranchDiffDialog = memo(function BranchDiffDialog({
     };
   }, [open]);
 
+  // E3 (Sprint75): Load branch diff history when history tab is activated
+  useEffect(() => {
+    if (activeTab === 'history' && open && canvasId) {
+      getBranchDiffHistory(canvasId);
+    }
+  }, [activeTab, open, canvasId, getBranchDiffHistory]);
+
   // Load diff when dialog opens with valid branches
   useEffect(() => {
     if (!open || !branchA || !branchB || branchA === branchB) {
@@ -173,6 +186,7 @@ const BranchDiffDialog = memo(function BranchDiffDialog({
     if (!open) {
       setDiff(null);
       setError(null);
+      setActiveTab('diff');
     }
   }, [open]);
 
@@ -182,13 +196,40 @@ const BranchDiffDialog = memo(function BranchDiffDialog({
 
   const handleCompareToMain = useCallback(() => {
     if (branchA === 'main') {
-      // If A is main, compare B to main (already comparing)
       return;
     }
-    // This would need to be wired to parent — emit a custom event
     const event = new CustomEvent('compare-to-main', { detail: { branch: branchA } });
     window.dispatchEvent(event);
   }, [branchA]);
+
+  // E3 (Sprint75): Handle clicking a history entry — emit event to switch branches
+  const handleHistoryItemClick = useCallback((entry: typeof branchDiffHistory[number]) => {
+    const event = new CustomEvent('branch-diff-history-click', {
+      detail: { branchA: entry.branchA, branchB: entry.branchB },
+    });
+    window.dispatchEvent(event);
+    setActiveTab('diff');
+  }, []);
+
+  // E3 (Sprint75): Format timestamp for display
+  const formatTimestamp = (ts: number) => {
+    const d = new Date(ts);
+    const now = new Date();
+    const isToday = d.toDateString() === now.toDateString();
+    const time = d.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+    if (isToday) return `今天 ${time}`;
+    const yesterday = new Date(now);
+    yesterday.setDate(yesterday.getDate() - 1);
+    if (d.toDateString() === yesterday.toDateString()) return `昨天 ${time}`;
+    return d.toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' }) + ` ${time}`;
+  };
+
+  // E3 (Sprint75): Clear history
+  const handleClearHistory = useCallback(() => {
+    if (canvasId && window.confirm('确定要清空所有对比历史记录吗？')) {
+      clearBranchDiffHistory(canvasId);
+    }
+  }, [canvasId, clearBranchDiffHistory]);
 
   if (!open) return null;
 
@@ -221,89 +262,172 @@ const BranchDiffDialog = memo(function BranchDiffDialog({
           </button>
         </div>
 
-        {/* Toolbar */}
-        <div className={styles.toolbar}>
-          {/* Compare to main quick action */}
-          {branchA !== 'main' && (
-            <button
-              className={styles.mainActionBtn}
-              onClick={handleCompareToMain}
-              title={`将 ${branchA} 对比到主分支`}
-            >
-              对比到主分支
-            </button>
-          )}
-          {branchB !== 'main' && (
-            <button
-              className={styles.mainActionBtn}
-              onClick={() => {
-                const event = new CustomEvent('compare-to-main', { detail: { branch: branchB } });
-                window.dispatchEvent(event);
-              }}
-              title={`将 ${branchB} 对比到主分支`}
-            >
-              对比 {branchB} → main
-            </button>
-          )}
-        </div>
-
-        {/* Summary stats */}
-        {diff && diff.summary && (
-          <div className={styles.statsBar}>
-            <span className={styles.statItem} style={{ color: '#16a34a' }}>
-              <strong>{diff.summary.contextsAdded}</strong> 新增
-            </span>
-            <span className={styles.statItem} style={{ color: '#dc2626' }}>
-              <strong>{diff.summary.contextsRemoved}</strong> 删除
-            </span>
-            <span className={styles.statItem} style={{ color: '#d97706' }}>
-              <strong>{diff.summary.contextsModified}</strong> 修改
-            </span>
-            <span className={styles.statItem} style={{ color: '#6b7280' }}>
-              共 <strong>{diff.summary.totalChanges}</strong> 项变更
-            </span>
-          </div>
-        )}
-
-        {/* Loading */}
-        {loading && (
-          <div className={styles.loadingState} role="status">
-            正在对比 <strong>{branchA}</strong> 和 <strong>{branchB}</strong>…
-          </div>
-        )}
-
-        {/* Error */}
-        {error && (
-          <div className={styles.errorState} role="alert">
-            {error}
-          </div>
-        )}
-
-        {/* Diff content */}
-        {diff && !loading && !error && (
-          <div className={styles.content}>
-            <SnapshotDiffRenderer diff={diff.diffs} onItemClick={handleItemClick} />
-          </div>
-        )}
-
-        {/* Empty — same branch or no diff yet */}
-        {!diff && !loading && !error && branchA === branchB && (
-          <div className={styles.emptyState}>
-            请选择两个不同的分支进行对比
-          </div>
-        )}
-        {!diff && !loading && !error && branchA !== branchB && (
-          <div className={styles.emptyState}>
-            正在加载对比结果…
-          </div>
-        )}
-
-        {/* Footer */}
-        <div className={styles.footer}>
-          <button className={styles.cancelBtn} onClick={onClose}>
-            关闭
+        {/* E3 (Sprint75): Tab navigation */}
+        <div className={styles.tabBar} role="tablist" aria-label="分支对比视图">
+          <button
+            role="tab"
+            aria-selected={activeTab === 'diff'}
+            className={activeTab === 'diff' ? styles.tabActive : styles.tabInactive}
+            onClick={() => setActiveTab('diff')}
+          >
+            对比
+          </button>
+          <button
+            role="tab"
+            aria-selected={activeTab === 'history'}
+            className={activeTab === 'history' ? styles.tabActive : styles.tabInactive}
+            onClick={() => {
+              setActiveTab('history');
+              if (canvasId) getBranchDiffHistory(canvasId);
+            }}
+          >
+            历史
           </button>
         </div>
+
+        {/* Tab content: 对比 */}
+        {activeTab === 'diff' && (
+          <>
+            {/* Toolbar */}
+            <div className={styles.toolbar}>
+              {branchA !== 'main' && (
+                <button
+                  className={styles.mainActionBtn}
+                  onClick={handleCompareToMain}
+                  title={`将 ${branchA} 对比到主分支`}
+                >
+                  对比到主分支
+                </button>
+              )}
+              {branchB !== 'main' && (
+                <button
+                  className={styles.mainActionBtn}
+                  onClick={() => {
+                    const event = new CustomEvent('compare-to-main', { detail: { branch: branchB } });
+                    window.dispatchEvent(event);
+                  }}
+                  title={`将 ${branchB} 对比到主分支`}
+                >
+                  对比 {branchB} → main
+                </button>
+              )}
+            </div>
+
+            {/* Summary stats */}
+            {diff && diff.summary && (
+              <div className={styles.statsBar}>
+                <span className={styles.statItem} style={{ color: '#16a34a' }}>
+                  <strong>{diff.summary.contextsAdded}</strong> 新增
+                </span>
+                <span className={styles.statItem} style={{ color: '#dc2626' }}>
+                  <strong>{diff.summary.contextsRemoved}</strong> 删除
+                </span>
+                <span className={styles.statItem} style={{ color: '#d97706' }}>
+                  <strong>{diff.summary.contextsModified}</strong> 修改
+                </span>
+                <span className={styles.statItem} style={{ color: '#6b7280' }}>
+                  共 <strong>{diff.summary.totalChanges}</strong> 项变更
+                </span>
+              </div>
+            )}
+
+            {/* Loading */}
+            {loading && (
+              <div className={styles.loadingState} role="status">
+                正在对比 <strong>{branchA}</strong> 和 <strong>{branchB}</strong>…
+              </div>
+            )}
+
+            {/* Error */}
+            {error && (
+              <div className={styles.errorState} role="alert">
+                {error}
+              </div>
+            )}
+
+            {/* Diff content */}
+            {diff && !loading && !error && (
+              <div className={styles.content}>
+                <SnapshotDiffRenderer diff={diff.diffs} onItemClick={handleItemClick} />
+              </div>
+            )}
+
+            {/* Empty — same branch or no diff yet */}
+            {!diff && !loading && !error && branchA === branchB && (
+              <div className={styles.emptyState}>
+                请选择两个不同的分支进行对比
+              </div>
+            )}
+            {!diff && !loading && !error && branchA !== branchB && (
+              <div className={styles.emptyState}>
+                正在加载对比结果…
+              </div>
+            )}
+          </>
+        )}
+
+        {/* Tab content: 历史 */}
+        {activeTab === 'history' && (
+          <>
+            {/* History toolbar */}
+            <div className={styles.historyToolbar}>
+              <span className={styles.historyCount}>
+                共 {branchDiffHistory.length} 条记录
+              </span>
+              {branchDiffHistory.length > 0 && (
+                <button
+                  className={styles.clearHistoryBtn}
+                  onClick={handleClearHistory}
+                  title="清空所有历史记录"
+                >
+                  清空历史
+                </button>
+              )}
+            </div>
+
+            {/* History list */}
+            {branchDiffHistory.length === 0 ? (
+              <div className={styles.emptyState}>
+                暂无对比历史记录
+              </div>
+            ) : (
+              <div className={styles.historyList} role="list">
+                {branchDiffHistory.map((entry) => (
+                  <button
+                    key={entry.id}
+                    className={styles.historyItem}
+                    onClick={() => handleHistoryItemClick(entry)}
+                    role="listitem"
+                    title={`点击查看 ${entry.branchA} ↔ ${entry.branchB} 的对比`}
+                  >
+                    <div className={styles.historyBranches}>
+                      <span className={styles.historyBranchName}>{entry.branchA}</span>
+                      <span className={styles.historyArrow}>↔</span>
+                      <span className={styles.historyBranchName}>{entry.branchB}</span>
+                    </div>
+                    <div className={styles.historyMeta}>
+                      <span className={styles.historyTime}>{formatTimestamp(entry.timestamp)}</span>
+                      <span className={styles.historyChangeCount}>
+                        {entry.summary.totalChanges > 0
+                          ? `${entry.summary.totalChanges} 项变更`
+                          : '无变更'}
+                      </span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+          </>
+        )}
+
+        {/* Footer — only shown in diff tab */}
+        {activeTab === 'diff' && (
+          <div className={styles.footer}>
+            <button className={styles.cancelBtn} onClick={onClose}>
+              关闭
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

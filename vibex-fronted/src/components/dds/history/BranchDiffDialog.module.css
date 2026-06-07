@@ -165,3 +165,146 @@
   background: var(--color-surface-hover, #2a2a3e);
   color: var(--color-text-primary, #e0e0e0);
 }
+
+/* ============================================
+   E3 (Sprint75): Tab Navigation
+   ============================================ */
+
+.tabBar {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid var(--color-border-subtle, #3a3a5c);
+  padding-bottom: 0;
+}
+
+.tabActive {
+  padding: 6px 14px;
+  background: transparent;
+  border: 1px solid var(--color-border-subtle, #3a3a5c);
+  border-bottom: none;
+  color: var(--color-accent-primary, #6366f1);
+  border-radius: 6px 6px 0 0;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  position: relative;
+  bottom: -1px;
+  background: var(--color-surface-elevated, #1e1e2e);
+}
+
+.tabInactive {
+  padding: 6px 14px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-bottom: none;
+  color: var(--color-text-secondary, #888);
+  border-radius: 6px 6px 0 0;
+  font-size: 13px;
+  cursor: pointer;
+  position: relative;
+  bottom: -1px;
+}
+
+.tabInactive:hover {
+  color: var(--color-text-primary, #e0e0e0);
+}
+
+/* ============================================
+   E3 (Sprint75): History List
+   ============================================ */
+
+.historyToolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.historyCount {
+  font-size: 12px;
+  color: var(--color-text-muted, #555);
+}
+
+.clearHistoryBtn {
+  padding: 4px 10px;
+  background: transparent;
+  border: 1px solid rgba(248, 113, 113, 0.4);
+  color: #f87171;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.clearHistoryBtn:hover {
+  background: rgba(248, 113, 113, 0.1);
+  border-color: #f87171;
+}
+
+.historyList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.historyItem {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 8px 10px;
+  background: var(--color-surface-hover, #2a2a3e);
+  border: 1px solid transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s ease;
+  width: 100%;
+}
+
+.historyItem:hover {
+  background: var(--color-surface-active, #33334d);
+  border-color: var(--color-accent-primary, #6366f1);
+}
+
+.historyItem:active {
+  background: var(--color-surface-hover, #2a2a3e);
+  border-color: var(--color-border-subtle, #3a3a5c);
+}
+
+.historyBranches {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+}
+
+.historyBranchName {
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  color: var(--color-text-primary, #e0e0e0);
+  font-weight: 500;
+}
+
+.historyArrow {
+  color: var(--color-text-muted, #555);
+  font-size: 11px;
+}
+
+.historyMeta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.historyTime {
+  font-size: 11px;
+  color: var(--color-text-muted, #555);
+}
+
+.historyChangeCount {
+  font-size: 11px;
+  color: var(--color-text-secondary, #888);
+}
+

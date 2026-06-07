@@ -97,6 +97,10 @@ const HistoryPanel = React.memo(function HistoryPanel({
   const renameBranch = useCanvasHistoryStore((s) => s.renameBranch);
   const deleteBranch = useCanvasHistoryStore((s) => s.deleteBranch);
   const mergeBranch = useCanvasHistoryStore((s) => s.mergeBranch);
+  // E4 (Sprint73): Branch naming & protection
+  const setBranchNameAction = useCanvasHistoryStore((s) => s.setBranchName);
+  const setBranchProtectedAction = useCanvasHistoryStore((s) => s.setBranchProtected);
+  const getBranchMetaAction = useCanvasHistoryStore((s) => s.getBranchMeta);
 
   // E1 (Sprint66): Branch operation menu state
   const [openMenuBranch, setOpenMenuBranch] = useState<string | null>(null);
@@ -104,6 +108,10 @@ const HistoryPanel = React.memo(function HistoryPanel({
   const [mergeDialog, setMergeDialog] = useState<{ open: boolean; source: string; target: string }>({ open: false, source: '', target: '' });
   // E1 (Sprint67): Branch comparison panel
   const [branchDiffOpen, setBranchDiffOpen] = useState(false);
+  // E4 (Sprint73): Branch naming & protection
+  const [branchMetas, setBranchMetas] = useState<Record<string, { name: string; isProtected: boolean; createdAt: number }>>({});
+  const [editingBranch, setEditingBranch] = useState<string | null>(null);
+  const [editingBranchName, setEditingBranchName] = useState('');
 
   // Reset state when panel opens
   useEffect(() => {
@@ -151,6 +159,55 @@ const HistoryPanel = React.memo(function HistoryPanel({
     setBranchFilter(branch);
   }, []);
 
+  // E4 (Sprint73): Load branch metadata when branches change
+  useEffect(() => {
+    if (!branches.length) return;
+    let cancelled = false;
+    (async () => {
+      const metas: typeof branchMetas = {};
+      for (const b of branches) {
+        const meta = await getBranchMetaAction('', b);
+        if (!cancelled && meta) {
+          metas[b] = meta;
+        }
+      }
+      if (!cancelled) setBranchMetas(metas);
+    })();
+    return () => { cancelled = true; };
+  }, [branches, getBranchMetaAction]);
+
+  // E4 (Sprint73): Start inline rename
+  const handleBranchInlineEdit = useCallback((branch: string, currentName: string) => {
+    setEditingBranch(branch);
+    setEditingBranchName(currentName);
+  }, []);
+
+  // E4 (Sprint73): Commit inline rename
+  const handleBranchInlineRename = useCallback(async () => {
+    if (!editingBranch || !editingBranchName.trim()) {
+      setEditingBranch(null);
+      setEditingBranchName('');
+      return;
+    }
+    await setBranchNameAction('', editingBranch, editingBranchName.trim());
+    setBranchMetas((prev) => ({
+      ...prev,
+      [editingBranch]: { ...prev[editingBranch], name: editingBranchName.trim() },
+    }));
+    setEditingBranch(null);
+    setEditingBranchName('');
+  }, [editingBranch, editingBranchName, setBranchNameAction]);
+
+  // E4 (Sprint73): Toggle branch protection
+  const handleToggleProtection = useCallback(async (branch: string) => {
+    const current = branchMetas[branch]?.isProtected ?? false;
+    await setBranchProtectedAction('', branch, !current);
+    setBranchMetas((prev) => ({
+      ...prev,
+      [branch]: { ...prev[branch], isProtected: !current },
+    }));
+  }, [branchMetas, setBranchProtectedAction]);
+
   // E1 (Sprint65): Tree view expand/collapse
   const handleToggleExpand = useCallback((snapId: string) => {
     setExpandedNodes((prev) => {
@@ -174,10 +231,16 @@ const HistoryPanel = React.memo(function HistoryPanel({
   }, [renameBranch]);
 
   const handleBranchDelete = useCallback(async (branch: string) => {
+    // E4 (Sprint73): Block deletion of protected branches
+    const meta = branchMetas[branch];
+    if (meta?.isProtected) {
+      setOpenMenuBranch(null);
+      return;
+    }
     if (!confirm(`确定删除分支 "${branch}" 及其所有快照吗？此操作不可恢复。`)) { setOpenMenuBranch(null); return; }
     await deleteBranch('', branch);
     setOpenMenuBranch(null);
-  }, [deleteBranch]);
+  }, [deleteBranch, branchMetas]);
 
   const handleBranchMerge = useCallback(async (source: string, target: string) => {
     if (source === target) { setMergeDialog({ open: false, source: '', target: '' }); return; }
@@ -277,7 +340,31 @@ const HistoryPanel = React.memo(function HistoryPanel({
                   onClick={() => handleBranchFilter(branch)}
                   title={`筛选到分支: ${branch}`}
                 >
-                  {branch === 'main' ? '🌿' : '📂'} {branch}
+                  {branch === 'main' ? '🌿' : '📂'}{' '}
+                  {editingBranch === branch ? (
+                    <input
+                      className="branch-inline-edit-input"
+                      value={editingBranchName}
+                      onChange={(e) => setEditingBranchName(e.target.value)}
+                      onBlur={handleBranchInlineRename}
+                      onKeyDown={(e) => { if (e.key === 'Enter') handleBranchInlineRename(); if (e.key === 'Escape') { setEditingBranch(null); setEditingBranchName(''); } }}
+                      autoFocus
+                      aria-label={`编辑分支 ${branch} 名称`}
+                      onClick={(e) => e.stopPropagation()}
+                    />
+                  ) : (
+                    <span
+                      onClick={() => {
+                        const meta = branchMetas[branch];
+                        handleBranchInlineEdit(branch, meta?.name ?? branch);
+                      }}
+                      style={{ cursor: 'pointer' }}
+                      title="点击编辑分支名称"
+                    >
+                      {branchMetas[branch]?.name ?? branch}
+                    </span>
+                  )}{' '}
+                  {branchMetas[branch]?.isProtected && <span aria-label="已保护">🔒</span>}
                 </span>
                 <div className="branch-ops-actions">
                   <button
@@ -286,6 +373,15 @@ const HistoryPanel = React.memo(function HistoryPanel({
                     title="重命名分支"
                     aria-label={`重命名分支 ${branch}`}
                   >✎</button>
+                  {/* E4 (Sprint73): Toggle protection */}
+                  <button
+                    className={`branch-ops-btn ${branchMetas[branch]?.isProtected ? 'protected' : ''}`}
+                    onClick={(e) => { e.stopPropagation(); handleToggleProtection(branch); }}
+                    title={branchMetas[branch]?.isProtected ? '取消保护' : '保护分支（防止误删）'}
+                    aria-label={branchMetas[branch]?.isProtected ? `取消保护 ${branch}` : `保护分支 ${branch}`}
+                  >
+                    {branchMetas[branch]?.isProtected ? '🔓' : '🔒'}
+                  </button>
                   {branch !== 'main' && (
                     <>
                       <button
@@ -295,10 +391,11 @@ const HistoryPanel = React.memo(function HistoryPanel({
                         aria-label={`合并分支 ${branch}`}
                       >↗</button>
                       <button
-                        className="branch-ops-btn danger"
+                        className={`branch-ops-btn danger ${branchMetas[branch]?.isProtected ? 'disabled' : ''}`}
                         onClick={(e) => { e.stopPropagation(); handleBranchDelete(branch); }}
-                        title="删除分支"
+                        title={branchMetas[branch]?.isProtected ? '已保护，无法删除' : '删除分支'}
                         aria-label={`删除分支 ${branch}`}
+                        disabled={!!branchMetas[branch]?.isProtected}
                       >🗑</button>
                     </>
                   )}

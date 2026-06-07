@@ -22,6 +22,11 @@
  * E1 (Sprint60): 画布版本历史 UI 增强
  * - DB_VERSION=3：snapshots 表新增 branchName / isStarred 字段
  * - updateSnapshotMetadataInDB()：更新快照元数据
+ *
+ * E4 (Sprint73): 画布分支命名与保护
+ * - DB_VERSION=5：新增 branchMeta objectStore (canvasId + branchName compound key)
+ * - setBranchMeta/getBranchMeta/listBranchMetas/deleteBranchMeta
+ * - BranchMeta: canvasId / branchName / name / isProtected / createdAt
  */
 
 import type { Command } from '@/stores/dds/canvasHistoryStore';
@@ -33,9 +38,10 @@ import type { Snapshot } from '@/stores/dds/canvasHistoryStore';
 // ============================================
 
 const DB_NAME = 'vibex-canvas-history';
-const DB_VERSION = 4; // E1 (Sprint66): branch ops indexes + parentSnapshotId field
+const DB_VERSION = 5; // E4 (Sprint73): branchMeta objectStore
 const STORE_NAME = 'history';
 const SNAPSHOTS_STORE_NAME = 'snapshots';
+const BRANCH_META_STORE_NAME = 'branchMeta';
 
 /** Maximum storage per canvas in bytes (5MB) */
 export const MAX_BYTES_PER_CANVAS = 5 * 1024 * 1024;
@@ -67,6 +73,24 @@ export interface HistoryEntry {
   _size?: number;
   /** E3: Revision number for optimistic locking — incremented on each collaborative change */
   revision: number;
+}
+
+// ============================================
+// E4 (Sprint73): Branch Metadata Types
+// ============================================
+
+/** Branch metadata record — stored in the branchMeta objectStore */
+export interface BranchMeta {
+  /** Canvas identifier */
+  canvasId: string;
+  /** Branch name (e.g., 'main', 'feature-xyz') */
+  branchName: string;
+  /** Human-readable display name (editable by user) */
+  name: string;
+  /** Whether this branch is protected from deletion */
+  isProtected: boolean;
+  /** When this branch was first created */
+  createdAt: number;
 }
 
 // ============================================
@@ -117,6 +141,13 @@ function openDB(): Promise<IDBDatabase> {
         if (!snapshotStore.indexNames.contains('parentSnapshotId')) {
           snapshotStore.createIndex('parentSnapshotId', 'parentSnapshotId', { unique: false });
         }
+      }
+      // E4 (Sprint73): branchMeta objectStore
+      if (!db.objectStoreNames.contains(BRANCH_META_STORE_NAME)) {
+        const metaStore = db.createObjectStore(BRANCH_META_STORE_NAME, { keyPath: ['canvasId', 'branchName'] });
+        metaStore.createIndex('canvasId', 'canvasId', { unique: false });
+        metaStore.createIndex('branchName', 'branchName', { unique: false });
+        metaStore.createIndex('createdAt', 'createdAt', { unique: false });
       }
     };
   });
@@ -842,4 +873,96 @@ export async function listBranchesFromDB(canvasId: string): Promise<string[]> {
     if (snap.branchName) branchSet.add(snap.branchName);
   }
   return Array.from(branchSet);
+}
+
+// ============================================
+// E4 (Sprint73): Branch Metadata CRUD
+// ============================================
+
+/**
+ * Save or update branch metadata.
+ */
+export async function setBranchMeta(
+  canvasId: string,
+  branchName: string,
+  meta: Omit<BranchMeta, 'canvasId' | 'branchName'>
+): Promise<boolean> {
+  if (!isIndexedDBAvailable()) return false;
+
+  return new Promise((resolve, reject) => {
+    openDB()
+      .then((db) => {
+        const tx = db.transaction(BRANCH_META_STORE_NAME, 'readwrite');
+        const store = tx.objectStore(BRANCH_META_STORE_NAME);
+        const entry: BranchMeta = { canvasId, branchName, ...meta };
+        const request = store.put(entry);
+        request.onsuccess = () => resolve(true);
+        request.onerror = () => reject(new Error(`setBranchMeta failed: ${request.error}`));
+      })
+      .catch(reject);
+  });
+}
+
+/**
+ * Load branch metadata for a specific canvas + branch.
+ */
+export async function getBranchMeta(
+  canvasId: string,
+  branchName: string
+): Promise<BranchMeta | null> {
+  if (!isIndexedDBAvailable()) return null;
+
+  return new Promise((resolve, reject) => {
+    openDB()
+      .then((db) => {
+        const tx = db.transaction(BRANCH_META_STORE_NAME, 'readonly');
+        const store = tx.objectStore(BRANCH_META_STORE_NAME);
+        const request = store.get([canvasId, branchName]);
+        request.onsuccess = () => resolve(request.result ?? null);
+        request.onerror = () => reject(new Error(`getBranchMeta failed: ${request.error}`));
+      })
+      .catch(reject);
+  });
+}
+
+/**
+ * List all branch metadata records for a canvas.
+ */
+export async function listBranchMetas(canvasId: string): Promise<BranchMeta[]> {
+  if (!isIndexedDBAvailable()) return [];
+
+  return new Promise((resolve, reject) => {
+    openDB()
+      .then((db) => {
+        const tx = db.transaction(BRANCH_META_STORE_NAME, 'readonly');
+        const store = tx.objectStore(BRANCH_META_STORE_NAME);
+        const index = store.index('canvasId');
+        const request = index.getAll(canvasId);
+        request.onsuccess = () => resolve((request.result ?? []) as BranchMeta[]);
+        request.onerror = () => reject(new Error(`listBranchMetas failed: ${request.error}`));
+      })
+      .catch(reject);
+  });
+}
+
+/**
+ * Delete branch metadata for a specific canvas + branch.
+ */
+export async function deleteBranchMeta(
+  canvasId: string,
+  branchName: string
+): Promise<boolean> {
+  if (!isIndexedDBAvailable()) return false;
+
+  return new Promise((resolve, reject) => {
+    openDB()
+      .then((db) => {
+        const tx = db.transaction(BRANCH_META_STORE_NAME, 'readwrite');
+        const store = tx.objectStore(BRANCH_META_STORE_NAME);
+        const request = store.delete([canvasId, branchName]);
+        request.onsuccess = () => resolve(true);
+        request.onerror = () => reject(new Error(`deleteBranchMeta failed: ${request.error}`));
+      })
+      .catch(reject);
+  });
 }

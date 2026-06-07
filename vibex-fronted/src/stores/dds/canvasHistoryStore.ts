@@ -276,6 +276,13 @@ interface CanvasHistoryState {
   // E1 (Sprint70): Branch merge conflict resolution
   /** Set the current active branch name */
   setCurrentBranch: (branchName: string) => void;
+  // E4 (Sprint73): Branch naming & protection
+  /** Set the display name for a branch */
+  setBranchName: (canvasId: string, branchName: string, name: string) => Promise<void>;
+  /** Set the protection flag for a branch */
+  setBranchProtected: (canvasId: string, branchName: string, isProtected: boolean) => Promise<void>;
+  /** Get branch metadata (name, isProtected, createdAt) */
+  getBranchMeta: (canvasId: string, branchName: string) => Promise<{ name: string; isProtected: boolean; createdAt: number } | null>;
   /** Resolve a single branch merge conflict — applies resolution and removes from pending */
   resolveBranchConflict: (
     canvasId: string,
@@ -747,6 +754,37 @@ export const useCanvasHistoryStore = create<CanvasHistoryState>((set, get) => ({
 
   setCurrentBranch: (branchName: string) => {
     set({ currentBranch: branchName });
+  },
+
+  // E4 (Sprint73): Branch naming & protection
+  setBranchName: async (canvasId: string, branchName: string, name: string) => {
+    if (typeof window === 'undefined' || !window.indexedDB) return;
+    const { setBranchMeta, getBranchMeta } = await import('@/lib/canvas/historyDB');
+    // Preserve existing isProtected/createdAt if record already exists
+    const existing = await getBranchMeta(canvasId, branchName);
+    await setBranchMeta(canvasId, branchName, {
+      name,
+      isProtected: existing?.isProtected ?? false,
+      createdAt: existing?.createdAt ?? Date.now(),
+    });
+  },
+
+  setBranchProtected: async (canvasId: string, branchName: string, isProtected: boolean) => {
+    if (typeof window === 'undefined' || !window.indexedDB) return;
+    const { setBranchMeta, getBranchMeta } = await import('@/lib/canvas/historyDB');
+    // Preserve existing name/createdAt if record already exists
+    const existing = await getBranchMeta(canvasId, branchName);
+    await setBranchMeta(canvasId, branchName, {
+      name: existing?.name ?? branchName,
+      isProtected,
+      createdAt: existing?.createdAt ?? Date.now(),
+    });
+  },
+
+  getBranchMeta: async (canvasId: string, branchName: string) => {
+    if (typeof window === 'undefined' || !window.indexedDB) return null;
+    const { getBranchMeta } = await import('@/lib/canvas/historyDB');
+    return getBranchMeta(canvasId, branchName);
   },
 
   resolveBranchConflict: async (

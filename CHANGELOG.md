@@ -6668,3 +6668,15 @@ See git history for complete changelog.
 - **CanvasImportPanel**: Drag-drop .vibex/.json/.yaml files with validation, progress bar, and canvasListStore write
 - **Batch Export Menu**: "导出选中画布" and "导出全部画布" in DDSToolbar ExportMenu using ZipExporter.exportCanvases
 - **Tests**: ZipExporter.multi-format.test.ts 16/16 (exportCanvases interface, options, skip behavior)
+
+---
+
+## [Unreleased] S77-E1: 通知持久化与跨设备同步 — 2026-06-08
+- **E1.1**: IndexedDB `notifications` objectStore + `saveNotificationToDB`/`getNotificationsFromDB`/`markAsReadInDB`/`getUnreadCountFromDB`/`saveNotificationsFromServer`/`clearNotificationsFromDB`
+- **E1.2**: `markAsRead` writes to IndexedDB + calls PATCH `/api/notifications/:id` (fire-and-forget); optimistic local update preserved on failure
+- **E1.3**: `fetchUnreadFromServer` calls GET `/api/notifications?unread=true&userId=...` + merges server notifications into local list + saves to IndexedDB
+- **E1.4**: `loadFromIndexedDB` rehydrates notifications from IndexedDB on store init
+- **E1.5**: `getUnreadCountWithServer` aggregates `getUnreadCount()` (local) + `_serverUnreadCount` (from last server sync)
+- **E1.6**: `clearAll` calls `clearNotificationsFromDB`
+- **E1.7**: DoD field coverage — `id`, `isRead`, `timestamp`, `type`, `title`, `message`
+- **E1.8**: `markAllAsRead` marks all as read + resets `_serverUnreadCount`

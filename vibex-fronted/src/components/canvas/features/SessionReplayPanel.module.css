@@ -319,3 +319,57 @@
   color: var(--color-text-secondary, #cbd5e1);
   flex: 1;
 }
+
+/* S73-E5: Export Dropdown */
+.exportWrapper {
+  position: relative;
+}
+
+.btnExport {
+  padding: 4px 10px;
+  font-size: 12px;
+  background: var(--color-surface-elevated, #1e1e35);
+  color: var(--color-text-primary, #e2e8f0);
+  border: 1px solid var(--color-border, #2d2d44);
+  border-radius: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+  font-family: inherit;
+}
+
+.btnExport:hover {
+  background: var(--color-accent, #6366f1);
+  border-color: var(--color-accent, #6366f1);
+  color: #fff;
+}
+
+.exportMenu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 4px);
+  background: var(--color-surface-elevated, #1e1e35);
+  border: 1px solid var(--color-border, #2d2d44);
+  border-radius: 8px;
+  overflow: hidden;
+  z-index: 100;
+  min-width: 160px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+.exportMenuItem {
+  display: block;
+  width: 100%;
+  padding: 8px 14px;
+  font-size: 13px;
+  text-align: left;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-primary, #e2e8f0);
+  font-family: inherit;
+}
+
+.exportMenuItem:hover {
+  background: var(--color-accent, #6366f1);
+  color: #fff;
+}

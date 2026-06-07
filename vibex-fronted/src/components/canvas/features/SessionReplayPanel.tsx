@@ -40,12 +40,29 @@ export function SessionReplayPanel({ canvasId, className }: SessionReplayPanelPr
     resumeReplay,
     setReplaySpeed,
     stopReplay,
+    exportSessionMarkdown,
+    exportSessionPDF,
   } = useCollabSessionStore();
 
   const [selectedSession, setSelectedSession] = useState<SessionRecording | null>(null);
   const [selectedEvents, setSelectedEvents] = useState<SessionEvent[]>([]);
   const [sessionName, setSessionName] = useState('');
+  const [exportMenuOpen, setExportMenuOpen] = useState(false);
+  const [copySuccess, setCopySuccess] = useState(false);
   const replayTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const exportMenuRef = useRef<HTMLDivElement | null>(null);
+
+  // Close export menu on outside click
+  useEffect(() => {
+    if (!exportMenuOpen) return;
+    const handleClick = (e: MouseEvent) => {
+      if (exportMenuRef.current && !exportMenuRef.current.contains(e.target as Node)) {
+        setExportMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [exportMenuOpen]);
 
   // Load sessions on mount
   useEffect(() => {
@@ -123,6 +140,38 @@ export function SessionReplayPanel({ canvasId, className }: SessionReplayPanelPr
     await deleteSession(sessionId);
   };
 
+  // S73-E5: Export handlers
+  const handleExportMarkdown = async () => {
+    if (!selectedSession) return;
+    setExportMenuOpen(false);
+    const md = await exportSessionMarkdown(selectedSession.sessionId);
+    // Trigger file download
+    const blob = new Blob([md], { type: 'text/markdown' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `session-${selectedSession.sessionId}.md`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleExportPDF = async () => {
+    if (!selectedSession) return;
+    setExportMenuOpen(false);
+    await exportSessionPDF(selectedSession.sessionId);
+  };
+
+  const handleCopyToClipboard = async () => {
+    if (!selectedSession) return;
+    setExportMenuOpen(false);
+    const md = await exportSessionMarkdown(selectedSession.sessionId);
+    await navigator.clipboard.writeText(md);
+    setCopySuccess(true);
+    setTimeout(() => setCopySuccess(false), 2000);
+  };
+
   const handleStartReplay = async () => {
     if (!selectedSession) return;
     await startReplay(selectedSession.sessionId);
@@ -135,6 +184,32 @@ export function SessionReplayPanel({ canvasId, className }: SessionReplayPanelPr
       {/* Header */}
       <div className={styles.header}>
         <h3 className={styles.title}>协作会话历史</h3>
+        {/* S73-E5: Export dropdown — visible when a session is selected */}
+        {selectedSession && (
+          <div className={styles.exportWrapper} ref={exportMenuRef}>
+            <button
+              className={styles.btnExport}
+              onClick={() => setExportMenuOpen((v) => !v)}
+              aria-label="导出会话"
+              aria-expanded={exportMenuOpen}
+            >
+              导出 {exportMenuOpen ? '▲' : '▼'}
+            </button>
+            {exportMenuOpen && (
+              <div className={styles.exportMenu} role="menu">
+                <button className={styles.exportMenuItem} role="menuitem" onClick={handleExportMarkdown}>
+                  📄 导出 Markdown
+                </button>
+                <button className={styles.exportMenuItem} role="menuitem" onClick={handleExportPDF}>
+                  🖨️ 导出 PDF
+                </button>
+                <button className={styles.exportMenuItem} role="menuitem" onClick={handleCopyToClipboard}>
+                  {copySuccess ? '✅ 已复制' : '📋 复制到剪贴板'}
+                </button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Recording Controls */}

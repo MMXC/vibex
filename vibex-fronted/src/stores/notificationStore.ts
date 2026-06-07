@@ -1,19 +1,35 @@
 /**
  * notificationStore — S68-E2: @提及通知系统
  * 扩展 S73-E3: 通知偏好设置
+ * 扩展 S77-E1: IndexedDB 持久化 + 后端 REST API 同步
  *
  * 职责：
  * - 管理通用通知列表（mention / reply / system / info 类型）
  * - 持久化到 localStorage（notifications + preferences）
+ * - E1 (Sprint77): IndexedDB 持久化（跨设备）+ REST API 同步
  * - 未读计数 + 广播事件
  * - 通知偏好设置（推送渠道开关 + 类型开关）
  *
  * 设计决策（来自 PRD E2 架构决策 1）：
  * - 与 mentionsStore.ts 分离：mentionsStore 仅负责 @输入时用户列表 UI 状态
  * - notificationStore 负责后端数据持久化
+ *
+ * E1 (Sprint77) 架构决策：
+ * - IndexedDB 作为 primary persistence layer（localStorage 降级）
+ * - 后端 REST API 用于跨设备同步（fetch on login）
+ * - markAsRead 同时写 IndexedDB + PATCH API
+ * - getUnreadCount 聚合本地 + 后端未读数
  */
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import {
+  saveNotificationToDB,
+  getNotificationsFromDB,
+  markAsReadInDB,
+  getUnreadCountFromDB,
+  saveNotificationsFromServer,
+  clearNotificationsFromDB,
+} from '@/lib/canvas/historyDB';
 
 export type NotificationType = 'mention' | 'reply' | 'system' | 'info';
 
@@ -84,13 +100,23 @@ export interface NotificationStoreState {
   notifications: Notification[];
   /** S73-E3: 通知偏好设置 */
   preferences: NotificationPreferences;
+  /** E1 (Sprint77): server-side unread count (merged with local count) */
+  _serverUnreadCount: number;
 
   // Actions
   addNotification: (data: Omit<Notification, 'id' | 'isRead'>) => Notification;
-  markAsRead: (id: string) => void;
+  markAsRead: (id: string) => Promise<void>;
   markAllAsRead: () => void;
   clearNotification: (id: string) => void;
   clearAll: () => void;
+
+  // E1 (Sprint77): IndexedDB persistence
+  /** E1: Load notifications from IndexedDB on app init */
+  loadFromIndexedDB: (userId?: string) => Promise<void>;
+  /** E1: Fetch unread notifications from backend REST API */
+  fetchUnreadFromServer: (userId: string) => Promise<Notification[]>;
+  /** E1: Aggregate local + server unread count */
+  getUnreadCountWithServer: () => number;
 
   // Queries
   getUnreadCount: () => number;
@@ -108,6 +134,7 @@ export const useNotificationStore = create<NotificationStoreState>()(
     (set, get) => ({
       notifications: [],
       preferences: DEFAULT_PREFERENCES,
+      _serverUnreadCount: 0,
 
       addNotification: (data) => {
         // S73-E3: respect type toggle — skip if type is disabled
@@ -130,21 +157,39 @@ export const useNotificationStore = create<NotificationStoreState>()(
         }));
         emitNotificationEvent({ type: 'notification:new', notification });
         emitNotificationEvent({ type: 'notification:new', count: get().getUnreadCount() });
+        // E1 (Sprint77): Persist to IndexedDB
+        saveNotificationToDB(notification).catch(err => {
+          console.error('[notificationStore] saveNotificationToDB failed:', err);
+        });
         return notification;
       },
 
-      markAsRead: (id) => {
+      markAsRead: async (id) => {
+        // E1 (Sprint77): Update local state first (optimistic)
         set(state => ({
           notifications: state.notifications.map(n =>
             n.id === id ? { ...n, isRead: true } : n
           ),
         }));
         emitNotificationEvent({ type: 'notification:read' });
+        // E1 (Sprint77): Update IndexedDB + call backend PATCH API
+        markAsReadInDB(id).catch(err => {
+          console.error('[notificationStore] markAsReadInDB failed:', err);
+        });
+        // Call backend API — fire and forget; UI already updated
+        fetch(`/api/notifications/${id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ isRead: true }),
+        }).catch(err => {
+          console.error('[notificationStore] PATCH /api/notifications failed:', err);
+        });
       },
 
       markAllAsRead: () => {
         set(state => ({
           notifications: state.notifications.map(n => ({ ...n, isRead: true })),
+          _serverUnreadCount: 0,
         }));
         emitNotificationEvent({ type: 'notification:cleared', count: 0 });
       },
@@ -156,8 +201,61 @@ export const useNotificationStore = create<NotificationStoreState>()(
       },
 
       clearAll: () => {
-        set({ notifications: [] });
+        set({ notifications: [], _serverUnreadCount: 0 });
         emitNotificationEvent({ type: 'notification:cleared', count: 0 });
+        clearNotificationsFromDB().catch(err => {
+          console.error('[notificationStore] clearNotificationsFromDB failed:', err);
+        });
+      },
+
+      // E1 (Sprint77): IndexedDB — load on app init
+      loadFromIndexedDB: async (userId?: string) => {
+        try {
+          const idbNotifications = await getNotificationsFromDB(userId);
+          // Merge: server-side notifications take precedence on id collision
+          const existingIds = new Set(get().notifications.map(n => n.id));
+          const newFromIDB = idbNotifications.filter(n => !existingIds.has(n.id));
+          if (newFromIDB.length > 0) {
+            set(state => ({
+              notifications: [...newFromIDB, ...state.notifications].sort(
+                (a, b) => b.timestamp - a.timestamp
+              ),
+            }));
+          }
+        } catch (err) {
+          console.error('[notificationStore] loadFromIndexedDB failed:', err);
+        }
+      },
+
+      // E1 (Sprint77): Fetch unread notifications from backend REST API
+      fetchUnreadFromServer: async (userId: string): Promise<Notification[]> => {
+        try {
+          const res = await fetch(`/api/notifications?unread=true&userId=${encodeURIComponent(userId)}`);
+          if (!res.ok) throw new Error(`fetchUnreadFromServer: ${res.status}`);
+          const serverNotifications: Notification[] = await res.json();
+          // Merge server notifications into local IndexedDB
+          await saveNotificationsFromServer(serverNotifications);
+          // Update local state
+          set(state => {
+            const existingIds = new Set(state.notifications.map(n => n.id));
+            const newNotifs = serverNotifications.filter(n => !existingIds.has(n.id));
+            return {
+              notifications: [...newNotifs, ...state.notifications].sort(
+                (a, b) => b.timestamp - a.timestamp
+              ),
+              _serverUnreadCount: serverNotifications.filter(n => !n.isRead).length,
+            };
+          });
+          return serverNotifications;
+        } catch (err) {
+          console.error('[notificationStore] fetchUnreadFromServer failed:', err);
+          return [];
+        }
+      },
+
+      // E1 (Sprint77): Aggregate local + server unread count
+      getUnreadCountWithServer: () => {
+        return get().getUnreadCount() + get()._serverUnreadCount;
       },
 
       getUnreadCount: () => {

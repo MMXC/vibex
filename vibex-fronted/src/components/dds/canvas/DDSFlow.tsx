@@ -4,12 +4,14 @@
  * S58-E2: 桌面文件拖拽导入
  * S58-E3: 协作者 Cursor 同步完善
  * S65-E3: 画布视图个性化设置 — Background 读取 settingsStore
+ * S76-E1: 画布背景设置集成 — Background 读取 canvasBackground unified object
  *
  * Renders cards as ReactFlow nodes with animated edges.
  * Uses useDDSCanvasFlow hook for store ↔ view sync.
  * E2: Integrates useFileDrop for drag-drop file import.
  * E3: Integrates useCollaboration.broadcastCursor for cursor sync.
  * S65-E3: Integrates settingsStore for dynamic background/grid/zoom.
+ * S76-E1: Uses canvasBackground from settingsStore for Background props.
  *
  * @module components/dds/canvas/DDSFlow
  */
@@ -45,9 +47,8 @@ import { FileImportDialog } from './FileImportDialog';
 import { useCollaboration } from '@/hooks/useCollaboration';
 import { broadcastActivity } from '@/lib/collaboration/wsActivityHandler';
 import { screenToFlowPosition } from '@xyflow/react';
-// S65-E3: Canvas view settings
+// S65-E3/S76-E1: Canvas view settings
 import { useSettingsStore } from '@/stores/dds/settingsStore';
-import type { GridVariant } from '@/stores/dds/settingsStore';
 
 // ==================== Node Component ====================
 
@@ -154,19 +155,24 @@ function DDSFlowInner({
     [onNodesChange]
   );
 
-  // S65-E3: Canvas view settings
+  // S65-E3/S76-E1: Canvas view settings — use canvasBackground unified object
   const backgroundColor = useSettingsStore((s) => s.backgroundColor);
-  const gridSize = useSettingsStore((s) => s.gridSize);
-  const gridVariant = useSettingsStore((s) => s.gridVariant);
+  const canvasBackground = useSettingsStore((s) => s.canvasBackground);
   const snapToGrid = useSettingsStore((s) => s.snapToGrid);
   const defaultZoom = useSettingsStore((s) => s.defaultZoom);
 
-  // Map store variant string to @xyflow/react BackgroundVariant
-  const bgVariant = (() => {
-    if (gridVariant === 'lines') return BackgroundVariant.Lines;
-    if (gridVariant === 'cross') return BackgroundVariant.Cross;
-    return BackgroundVariant.Dots;
-  })();
+  // S76-E1: Map GridVariant to BackgroundVariant (gap=0 means "none" → no grid)
+  const bgVariant =
+    canvasBackground.gap === 0
+      ? BackgroundVariant.Dots // hidden when gap=0
+      : canvasBackground.variant === 'lines'
+        ? BackgroundVariant.Lines
+        : canvasBackground.variant === 'cross'
+          ? BackgroundVariant.Cross
+          : BackgroundVariant.Dots;
+
+  // S76-E1: Background is hidden when gap=0 (no grid mode)
+  const showBackground = canvasBackground.gap > 0;
 
   // Node click → onSelectCard
   const handleNodeClick = useCallback(
@@ -258,18 +264,21 @@ function DDSFlowInner({
           fitViewOptions={{ padding: 0.2 }}
           deleteKeyCode={readOnly ? null : 'Delete'}
           snapToGrid={snapToGrid}
-          snapGrid={[gridSize, gridSize]}
+          snapGrid={[canvasBackground.gap || 16, canvasBackground.gap || 16]}
           proOptions={{ hideAttribution: true }}
           // S71-E3: Limit node positions to canvas bounds for large canvas performance
           nodeExtent={[[-10000, -10000], [10000, 10000]]}
         >
-          <Background
-            variant={bgVariant}
-            gap={gridSize}
-            size={1}
-            color="#e5e7eb"
-            style={{ backgroundColor }}
-          />
+          {/* S76-E1: Background reads from canvasBackground — no hardcoded values */}
+          {showBackground && (
+            <Background
+              variant={bgVariant}
+              gap={canvasBackground.gap}
+              size={canvasBackground.size}
+              color={canvasBackground.color}
+              style={{ backgroundColor }}
+            />
+          )}
           <Controls />
           <MiniMap
             nodeColor={() => '#6366f1'}

@@ -2,6 +2,7 @@
  * settingsStore.ts — Canvas View Settings Store
  * S65-E3: Canvas View Personalization Settings Panel
  * S69-E5: Canvas View Presets (canvasPresets, saveAsPreset, applyPreset, deletePreset)
+ * S76-E1: 画布背景设置集成 — canvasBackground unified background settings
  *
  * Manages canvas appearance settings: background color, grid size/spacing,
  * default zoom level, snap-to-grid toggle, and named view presets.
@@ -13,6 +14,18 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 
 export type GridVariant = 'dots' | 'lines' | 'cross';
+
+/** S76-E1: Unified background settings — variant + gap + size + grid color */
+export interface CanvasBackground {
+  /** Grid visual variant */
+  variant: GridVariant;
+  /** Grid gap in pixels */
+  gap: number;
+  /** Grid dot/line size */
+  size: number;
+  /** Grid line color (hex) */
+  color: string;
+}
 
 export interface CanvasSettings {
   /** Background color hex string, e.g. '#ffffff' */
@@ -38,6 +51,8 @@ export interface CanvasPreset {
 interface SettingsState {
   canvasPresets: CanvasPreset[];
   activePresetId: string | null;
+  /** S76-E1: Unified canvas background settings (variant + gap + size + color) */
+  canvasBackground: CanvasBackground;
 }
 
 interface SettingsActions {
@@ -46,6 +61,8 @@ interface SettingsActions {
   setGridVariant: (variant: GridVariant) => void;
   setDefaultZoom: (zoom: number) => void;
   setSnapToGrid: (snap: boolean) => void;
+  /** S76-E1: Set all canvas background settings at once */
+  setCanvasBackground: (bg: Partial<CanvasBackground>) => void;
   reset: () => void;
   saveAsPreset: (name: string, settings: CanvasSettings) => string;
   applyPreset: (presetId: string) => void;
@@ -64,6 +81,14 @@ const DEFAULT_SETTINGS: CanvasSettings = {
   snapToGrid: false,
 };
 
+/** S76-E1: Default canvas background */
+const DEFAULT_CANVAS_BACKGROUND: CanvasBackground = {
+  variant: 'dots',
+  gap: 16,
+  size: 1,
+  color: '#e5e7eb',
+};
+
 const DEFAULT_PRESETS_STATE: Pick<SettingsState, 'canvasPresets' | 'activePresetId'> = {
   canvasPresets: [],
   activePresetId: null,
@@ -75,13 +100,14 @@ const VALID_ZOOM_VALUES = [0.5, 0.75, 1.0, 1.25, 1.5, 2.0] as const;
 const generatePresetId = () =>
   `preset-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
-type SettingsStore = CanvasSettings & SettingsState & SettingsActions;
+type SettingsStore = Omit<CanvasSettings, 'gridSize' | 'gridVariant'> & SettingsState & SettingsActions;
 
 export const useSettingsStore = create<SettingsStore>()(
   persist(
     (set, get) => ({
       ...DEFAULT_SETTINGS,
       ...DEFAULT_PRESETS_STATE,
+      canvasBackground: DEFAULT_CANVAS_BACKGROUND,
 
       setBackgroundColor: (color: string) => {
         if (!color.startsWith('#') || (color.length !== 4 && color.length !== 7)) return;
@@ -90,12 +116,22 @@ export const useSettingsStore = create<SettingsStore>()(
 
       setGridSize: (size: number) => {
         if (!VALID_GRID_SIZES.includes(size as (typeof VALID_GRID_SIZES)[number])) return;
-        set({ gridSize: size, activePresetId: null });
+        set((state) => ({
+          gridSize: size,
+          // Sync canvasBackground.gap when gridSize changes
+          canvasBackground: { ...state.canvasBackground, gap: size },
+          activePresetId: null,
+        }));
       },
 
       setGridVariant: (variant: GridVariant) => {
         if (!['dots', 'lines', 'cross'].includes(variant)) return;
-        set({ gridVariant: variant, activePresetId: null });
+        set((state) => ({
+          gridVariant: variant,
+          // Sync canvasBackground.variant when gridVariant changes
+          canvasBackground: { ...state.canvasBackground, variant },
+          activePresetId: null,
+        }));
       },
 
       setDefaultZoom: (zoom: number) => {
@@ -105,8 +141,22 @@ export const useSettingsStore = create<SettingsStore>()(
 
       setSnapToGrid: (snap: boolean) => set({ snapToGrid: snap, activePresetId: null }),
 
+      /** S76-E1: Set canvas background settings — updates variant, gap, size, color */
+      setCanvasBackground: (bg: Partial<CanvasBackground>) => {
+        set((state) => {
+          // Validate variant if provided
+          if (bg.variant !== undefined && !['dots', 'lines', 'cross'].includes(bg.variant)) return state;
+          // Validate gap if provided (any positive integer)
+          if (bg.gap !== undefined && (bg.gap < 1 || bg.gap > 100)) return state;
+          return {
+            canvasBackground: { ...state.canvasBackground, ...bg },
+            activePresetId: null,
+          };
+        });
+      },
+
       reset: () =>
-        set({ ...DEFAULT_SETTINGS, canvasPresets: [], activePresetId: null }),
+        set({ ...DEFAULT_SETTINGS, canvasPresets: [], activePresetId: null, canvasBackground: DEFAULT_CANVAS_BACKGROUND }),
 
       saveAsPreset: (name: string, settings: CanvasSettings): string => {
         const now = Date.now();
@@ -128,6 +178,13 @@ export const useSettingsStore = create<SettingsStore>()(
         set({
           ...preset.settings,
           activePresetId: presetId,
+          // Sync canvasBackground from preset's gridVariant + gridSize
+          canvasBackground: {
+            variant: preset.settings.gridVariant,
+            gap: preset.settings.gridSize,
+            size: 1,
+            color: '#e5e7eb',
+          },
         });
       },
 

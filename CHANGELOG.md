@@ -6577,3 +6577,12 @@ See git history for complete changelog.
 - **E5.3**: `SessionReplayPanel.tsx` — header 新增导出下拉菜单（Markdown下载/PDF打印/剪贴板复制）
 - **E5.4**: `SessionReplayPanel.module.css` — 导出下拉菜单样式 + hover 反馈
 - **E5.5**: `collabSessionStore.test.ts` — 扩展覆盖 `exportSessionMarkdown`/`exportSessionPDF`（vitest 11/11）
+
+---
+
+## [Unreleased] S74-E2: 模板标签与分类筛选 — 2026-06-07
+- **E2.1**: `templateStore.ts` — `TemplateSnapshot` 新增 `tags?: string[]` 字段、`filterByTag(tags: string[])` getter、`setSelectedTags(tags: string[])` action、`selectedTags: string[]` 状态
+- **E2.2**: `templateStore.test.ts` — 扩展 E2 filter 测试（50 insertions）：filterByTag 基础、重复标签去重、空标签返回全部
+- **E2.3**: `TemplateGallery.tsx` — 顶部标签筛选栏（All + 预设标签 chips）、多标签 AND 筛选、URL params 同步
+- **E2.4**: `TemplateGallery.test.tsx` — 新建标签筛选测试（108 行，6 测试用例）：渲染 chips、aria-pressed、清除按钮、多选逻辑
+- **E2.5**: `templateStore.test.ts` — 修复 beforeEach 隔离（E3 beforeEach 清理 + window.location.search 重置）

@@ -37,17 +37,19 @@
 import type { Command } from '@/stores/dds/canvasHistoryStore';
 import { RevisionMismatchError } from '@/stores/dds/canvasHistoryStore';
 import type { Snapshot } from '@/stores/dds/canvasHistoryStore';
+import type { Notification } from '@/stores/notificationStore';
 
 // ============================================
 // Constants
 // ============================================
 
 const DB_NAME = 'vibex-canvas-history';
-const DB_VERSION = 6; // E3 (Sprint75): branchDiffHistory objectStore
+const DB_VERSION = 7; // E1 (Sprint77): notifications objectStore
 const STORE_NAME = 'history';
 const SNAPSHOTS_STORE_NAME = 'snapshots';
 const BRANCH_META_STORE_NAME = 'branchMeta';
 const BRANCH_DIFF_HISTORY_STORE_NAME = 'branchDiffHistory';
+const NOTIFICATIONS_STORE_NAME = 'notifications';
 
 /** Maximum storage per canvas in bytes (5MB) */
 export const MAX_BYTES_PER_CANVAS = 5 * 1024 * 1024;
@@ -191,6 +193,14 @@ function openDB(): Promise<IDBDatabase> {
         const histStore = db.createObjectStore(BRANCH_DIFF_HISTORY_STORE_NAME, { keyPath: ['canvasId', 'id'] });
         histStore.createIndex('canvasId', 'canvasId', { unique: false });
         histStore.createIndex('timestamp', 'timestamp', { unique: false });
+      }
+      // E1 (Sprint77): notifications objectStore
+      if (!db.objectStoreNames.contains(NOTIFICATIONS_STORE_NAME)) {
+        const notifStore = db.createObjectStore(NOTIFICATIONS_STORE_NAME, { keyPath: 'id' });
+        notifStore.createIndex('userId', 'userId', { unique: false });
+        notifStore.createIndex('canvasId', 'canvasId', { unique: false });
+        notifStore.createIndex('isRead', 'isRead', { unique: false });
+        notifStore.createIndex('timestamp', 'timestamp', { unique: false });
       }
     };
   });
@@ -1142,3 +1152,160 @@ export async function clearBranchDiffHistoryFromDB(canvasId: string): Promise<vo
       .catch(reject);
   });
 }
+
+// ============================================
+// E1 (Sprint77): Notification Persistence
+// ============================================
+
+/**
+ * E1 (Sprint77): Save a notification to IndexedDB notifications store.
+ * Called whenever a new notification arrives (from WS or addNotification).
+ */
+export async function saveNotificationToDB(notification: Notification): Promise<void> {
+  if (!isIndexedDBAvailable()) return;
+  await idbPut(notification, NOTIFICATIONS_STORE_NAME);
+}
+
+/**
+ * E1 (Sprint77): Load all notifications from IndexedDB for a given user.
+ * Returns notifications sorted by timestamp descending (newest first).
+ */
+export async function getNotificationsFromDB(userId?: string): Promise<Notification[]> {
+  if (!isIndexedDBAvailable()) return [];
+
+  return new Promise((resolve, reject) => {
+    openDB()
+      .then((db) => {
+        const tx = db.transaction(NOTIFICATIONS_STORE_NAME, 'readonly');
+        const store = tx.objectStore(NOTIFICATIONS_STORE_NAME);
+        const request = store.getAll();
+
+        request.onsuccess = () => {
+          let results = (request.result as Notification[]).map((entry) => entry as Notification);
+          // Filter by userId if provided
+          if (userId) {
+            results = results.filter((n) => n.targetUserId === userId);
+          }
+          // Sort by timestamp descending (newest first)
+          results.sort((a, b) => b.timestamp - a.timestamp);
+          resolve(results);
+        };
+        request.onerror = () => reject(new Error(`getNotificationsFromDB failed: ${request.error}`));
+      })
+      .catch(reject);
+  });
+}
+
+/**
+ * E1 (Sprint77): Mark a notification as read in IndexedDB.
+ * Returns the updated notification or null if not found.
+ */
+export async function markAsReadInDB(id: string): Promise<Notification | null> {
+  if (!isIndexedDBAvailable()) return null;
+
+  return new Promise((resolve, reject) => {
+    openDB()
+      .then((db) => {
+        const tx = db.transaction(NOTIFICATIONS_STORE_NAME, 'readwrite');
+        const store = tx.objectStore(NOTIFICATIONS_STORE_NAME);
+        const getReq = store.get(id);
+
+        getReq.onsuccess = () => {
+          const entry = getReq.result as Notification | undefined;
+          if (!entry) {
+            resolve(null);
+            return;
+          }
+          const updated: Notification = { ...entry, isRead: true };
+          const putReq = store.put(updated);
+          putReq.onsuccess = () => resolve(updated);
+          putReq.onerror = () => reject(new Error(`markAsReadInDB put failed: ${putReq.error}`));
+        };
+        getReq.onerror = () => reject(new Error(`markAsReadInDB get failed: ${getReq.error}`));
+      })
+      .catch(reject);
+  });
+}
+
+/**
+ * E1 (Sprint77): Get unread notification count from IndexedDB.
+ * Optionally scoped to a userId.
+ */
+export async function getUnreadCountFromDB(userId?: string): Promise<number> {
+  if (!isIndexedDBAvailable()) return 0;
+
+  return new Promise((resolve, reject) => {
+    openDB()
+      .then((db) => {
+        const tx = db.transaction(NOTIFICATIONS_STORE_NAME, 'readonly');
+        const store = tx.objectStore(NOTIFICATIONS_STORE_NAME);
+        const index = store.index('isRead');
+        const request = index.getAll(IDBKeyRange.only(false));
+
+        request.onsuccess = () => {
+          let results = request.result as Notification[];
+          if (userId) {
+            results = results.filter((n) => n.targetUserId === userId);
+          }
+          resolve(results.length);
+        };
+        request.onerror = () => reject(new Error(`getUnreadCountFromDB failed: ${request.error}`));
+      })
+      .catch(reject);
+  });
+}
+
+/**
+ * E1 (Sprint77): Bulk save notifications from server response.
+ * Merges server notifications with local IndexedDB — server wins on id collision.
+ */
+export async function saveNotificationsFromServer(notifications: Notification[]): Promise<void> {
+  if (!isIndexedDBAvailable() || notifications.length === 0) return;
+
+  return new Promise((resolve, reject) => {
+    openDB()
+      .then((db) => {
+        const tx = db.transaction(NOTIFICATIONS_STORE_NAME, 'readwrite');
+        const store = tx.objectStore(NOTIFICATIONS_STORE_NAME);
+        let pending = notifications.length;
+        let errors = 0;
+
+        for (const notif of notifications) {
+          const req = store.put(notif);
+          req.onsuccess = () => {
+            pending--;
+            if (pending === 0) {
+              if (errors > 0) reject(new Error(`${errors} saveNotificationsFromServer errors`));
+              else resolve();
+            }
+          };
+          req.onerror = () => {
+            errors++;
+            pending--;
+            if (pending === 0 && errors > 0) reject(new Error(`${errors} saveNotificationsFromServer errors`));
+          };
+        }
+      })
+      .catch(reject);
+  });
+}
+
+/**
+ * E1 (Sprint77): Clear all notifications from IndexedDB.
+ */
+export async function clearNotificationsFromDB(): Promise<void> {
+  if (!isIndexedDBAvailable()) return;
+
+  return new Promise((resolve, reject) => {
+    openDB()
+      .then((db) => {
+        const tx = db.transaction(NOTIFICATIONS_STORE_NAME, 'readwrite');
+        const store = tx.objectStore(NOTIFICATIONS_STORE_NAME);
+        const request = store.clear();
+        request.onsuccess = () => resolve();
+        request.onerror = () => reject(new Error(`clearNotificationsFromDB failed: ${request.error}`));
+      })
+      .catch(reject);
+  });
+}
+

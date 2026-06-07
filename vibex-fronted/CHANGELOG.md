@@ -1339,6 +1339,23 @@
 
 ---
 
+
+---
+
+## [Unreleased] S74-E1: 搜索历史记录 — 2026-06-07
+- **E1.1**: `canvasSearchStore.ts` — `recentSearches` 替代 `searchHistory`（MAX=20）+ `addRecentSearch`/`clearRecentSearches`
+- **E1.2**: `canvasSearchStore.test.ts` — 扩展测试（+101 行）：recentSearches 增删查、dedup、去重上限
+- **E1.3**: `CanvasSearchPanel.tsx` — chips 区域展示最近搜索、点击填入查询
+- **E1.4**: `CanvasSearchPanel.test.tsx` — 扩展 chips 交互测试（+78 行）
+
+## [Unreleased] S74-E3: 画布分支对比视图 — 2026-06-07
+- **E3.1**: `canvasHistoryStore.ts` — `compareBranches` action + `BranchDiffResult` 类型（三栏：added/removed/modified）
+- **E3.2**: `canvasHistoryStore.test.ts` — 新增 branch compare 测试（+98 行，6 用例）
+- **E3.3**: `HistoryPanel.tsx` — 分支 Ctrl+Click 多选、选中 2 个后"对比"按钮激活
+- **E3.4**: `BranchDiffDialog.tsx` — 新建 diff modal（三栏统计 + 差异列表）
+- **E3.5**: `BranchDiffDialog.module.css` — modal 样式
+- **E3.6**: `BranchDiffDialog.test.tsx` — 新建（5 测试用例）
+
 ## [Unreleased] S74-E2: 模板标签与分类筛选 — 2026-06-07
 - **E2.1**: `templateStore.ts` — `TemplateSnapshot` 新增 `tags?: string[]` 字段、`filterByTag` + `setSelectedTags` + `selectedTags` 状态
 - **E2.2**: `templateStore.test.ts` — 扩展 E2 filter 测试（50 insertions）+ beforeEach 隔离修复

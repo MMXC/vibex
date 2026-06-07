@@ -390,4 +390,54 @@ describe('TemplateStore - E3 Analytics & AI Recommendation', () => {
       expect(scoreT1).toBeGreaterThan(0);
     });
   });
+
+  // ============================================
+  // S74-E2: filterByTag tests
+  // ============================================
+
+  describe('filterByTag', () => {
+    it('should return all templates when no tags provided', () => {
+      const filtered = useTemplateStore.getState().filterByTag([]);
+      expect(filtered.length).toBe(3); // t1, t2, t3
+    });
+
+    it('should return templates that have ALL specified tags (AND logic)', () => {
+      // t1 has ['shop', 'cart', 'payment'], t2 has ['course', 'student', 'teacher']
+      const filtered = useTemplateStore.getState().filterByTag(['shop']);
+      expect(filtered.length).toBe(1);
+      expect(filtered[0].id).toBe('t1');
+    });
+
+    it('should return empty array when no templates match tags', () => {
+      const filtered = useTemplateStore.getState().filterByTag(['nonexistent-tag']);
+      expect(filtered.length).toBe(0);
+    });
+
+    it('should return templates matching all tags when multiple tags provided', () => {
+      // t1 has both 'shop' and 'cart'
+      const filtered = useTemplateStore.getState().filterByTag(['shop', 'cart']);
+      expect(filtered.length).toBe(1);
+      expect(filtered[0].id).toBe('t1');
+    });
+
+    it('should return empty when multi-tag AND filter has no match', () => {
+      // t1 has 'shop' but not 'course'; t2 has 'course' but not 'shop'
+      const filtered = useTemplateStore.getState().filterByTag(['shop', 'course']);
+      expect(filtered.length).toBe(0);
+    });
+  });
+
+  describe('setSelectedTags', () => {
+    it('should update selectedTags state', () => {
+      useTemplateStore.getState().setSelectedTags(['payment', 'bank']);
+      expect(useTemplateStore.getState().selectedTags).toEqual(['payment', 'bank']);
+    });
+
+    it('should clear selectedTags when empty array provided', () => {
+      useTemplateStore.getState().setSelectedTags(['payment']);
+      useTemplateStore.getState().setSelectedTags([]);
+      expect(useTemplateStore.getState().selectedTags).toEqual([]);
+    });
+  });
+
 });

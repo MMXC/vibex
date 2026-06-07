@@ -1,3 +1,11 @@
+---
+
+## [Unreleased] S76-E5: 协作冲突检测与提示 — 2026-06-08
+- **presenceStore**: 新增 `remoteEditing` Map<userId, {nodeId, userName}> + setRemoteEditing / clearRemoteEditing / getRemoteEditors / clearAllRemoteEditing
+- **presenceStore**: `removeUser` / `clearAll` 清除 remoteEditing
+- **ConflictWarningBanner**: 新建组件，显示远程用户正在编辑当前节点
+- **DDSCanvasPage**: 渲染 ConflictWarningBanner（选中文档时显示 remoteEditors）
+- **presenceStore.test.ts**: +8 S76-E5 remoteEditing 测试（74/74）
 
 ## [Unreleased] S69-E4: 节点评论系统 — 2026-06-06
 

@@ -162,4 +162,105 @@ describe('useNotificationStore — S68-E2', () => {
       expect(byType.length).toBe(2);
     });
   });
+
+
+  // =========================================================
+  // S73-E3: 通知偏好设置测试
+  // =========================================================
+  describe('E3.1: setChannelEnabled / setTypeEnabled', () => {
+    it('should toggle channel to disabled', () => {
+      useNotificationStore.getState().setChannelEnabled('browser', false);
+      expect(useNotificationStore.getState().preferences.channels.browser).toBe(false);
+    });
+
+    it('should toggle channel back to enabled', () => {
+      useNotificationStore.getState().setChannelEnabled('browser', true);
+      expect(useNotificationStore.getState().preferences.channels.browser).toBe(true);
+    });
+
+    it('should toggle type to disabled', () => {
+      useNotificationStore.getState().setTypeEnabled('mention', false);
+      expect(useNotificationStore.getState().preferences.types.mention).toBe(false);
+    });
+
+    it('should toggle type back to enabled', () => {
+      useNotificationStore.getState().setTypeEnabled('mention', true);
+      expect(useNotificationStore.getState().preferences.types.mention).toBe(true);
+    });
+
+    it('should not store notification when its type is disabled', () => {
+      // Disable mention type
+      useNotificationStore.getState().setTypeEnabled('mention', false);
+      // Add a mention notification — should return dummy (isRead: true)
+      const result = useNotificationStore.getState().addNotification({
+        ...BASE_NOTIFICATION,
+        type: 'mention',
+        title: 'Should Not Store',
+      });
+      // Should return as already-read dummy
+      expect(result.isRead).toBe(true);
+      // And it should NOT appear in the list
+      const all = useNotificationStore.getState().notifications;
+      expect(all.find(n => n.title === 'Should Not Store')).toBeUndefined();
+      // Restore
+      useNotificationStore.getState().setTypeEnabled('mention', true);
+    });
+
+    it('should still store notification when its type is enabled', () => {
+      useNotificationStore.getState().setTypeEnabled('mention', true);
+      const result = useNotificationStore.getState().addNotification({
+        ...BASE_NOTIFICATION,
+        type: 'mention',
+        title: 'Should Store',
+      });
+      expect(result.isRead).toBe(false);
+      const all = useNotificationStore.getState().notifications;
+      expect(all.find(n => n.title === 'Should Store')).toBeDefined();
+    });
+  });
+
+  describe('E3.2: resetPreferences', () => {
+    it('should reset all preferences to defaults', () => {
+      // Change some preferences
+      useNotificationStore.getState().setChannelEnabled('browser', false);
+      useNotificationStore.getState().setTypeEnabled('mention', false);
+      useNotificationStore.getState().setTypeEnabled('system', false);
+
+      // Reset
+      useNotificationStore.getState().resetPreferences();
+
+      const prefs = useNotificationStore.getState().preferences;
+      expect(prefs.channels.inApp).toBe(true);
+      expect(prefs.channels.browser).toBe(true);
+      expect(prefs.types.mention).toBe(true);
+      expect(prefs.types.reply).toBe(true);
+      expect(prefs.types.system).toBe(true);
+      expect(prefs.types.info).toBe(true);
+    });
+  });
+
+  describe('E3.3: getUnreadCount after preference filtering', () => {
+    it('should not count disabled-type notifications as unread', () => {
+      // Start fresh
+      useNotificationStore.getState().clearAll();
+      // Disable info type
+      useNotificationStore.getState().setTypeEnabled('info', false);
+      // Add two notifications: one mention (enabled), one info (disabled)
+      useNotificationStore.getState().addNotification({
+        ...BASE_NOTIFICATION,
+        type: 'mention',
+        title: 'Real Mention',
+      });
+      useNotificationStore.getState().addNotification({
+        ...BASE_NOTIFICATION,
+        type: 'info',
+        title: 'Disabled Info',
+      });
+      // Should only count the mention as unread
+      expect(useNotificationStore.getState().getUnreadCount()).toBe(1);
+      // Restore
+      useNotificationStore.getState().setTypeEnabled('info', true);
+    });
+  });
+
 });

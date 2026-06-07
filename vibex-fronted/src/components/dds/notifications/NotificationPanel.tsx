@@ -2,20 +2,23 @@
 
 /**
  * NotificationPanel — S68-E2: @提及通知系统
+ * 扩展 S73-E3: 清空历史按钮 + 设置抽屉入口
  *
  * 通知中心抽屉面板，支持：
  * - 未读红点 + 角标数字
  * - 通知列表（mention / reply / system / info）
- * - 标记已读、全部已读
+ * - 标记已读、全部已读、清空历史
  * - 分页加载
+ * - 通知偏好设置（S73-E3）
  *
  * 设计决策（来自 PRD E2 架构决策 3）：
  * - 独立 Panel（抽屉式），与 CollabActivityPanel 并列
  * - DDSToolbar 铃铛按钮触发开关
  */
-import React, { memo, useCallback, useEffect, useRef } from 'react';
+import React, { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useNotificationStore } from '@/stores/notificationStore';
 import type { Notification } from '@/stores/notificationStore';
+import { NotificationSettingsDrawer } from './NotificationSettingsDrawer';
 import styles from './NotificationPanel.module.css';
 
 export interface NotificationPanelProps {
@@ -78,7 +81,7 @@ const NotificationItem = memo(function NotificationItem({
       </div>
 
       <div className={styles.body}>
-        <div className={styles.header}>
+        <div className={styles.itemHeader}>
           <span className={styles.typeLabel}>
             {NOTIFICATION_TYPE_LABELS[notification.type] ?? '通知'}
           </span>
@@ -113,9 +116,11 @@ const NotificationPanel = memo(function NotificationPanel({
   const notifications = useNotificationStore((s) => s.notifications);
   const markAsRead = useNotificationStore((s) => s.markAsRead);
   const markAllAsRead = useNotificationStore((s) => s.markAllAsRead);
+  const clearAll = useNotificationStore((s) => s.clearAll);
   const unreadCount = useNotificationStore((s) => s.getUnreadCount());
 
   const [page, setPage] = React.useState(1);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const listRef = useRef<HTMLUListElement>(null);
 
   const paginated = notifications.slice(0, page * PAGE_SIZE);
@@ -126,9 +131,25 @@ const NotificationPanel = memo(function NotificationPanel({
     if (open) setPage(1);
   }, [open]);
 
+  // S73-E3: ESC 关闭设置抽屉
+  useEffect(() => {
+    if (!isSettingsOpen) return;
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') setIsSettingsOpen(false);
+    }
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isSettingsOpen]);
+
   const handleMarkAllRead = useCallback(() => {
     markAllAsRead();
   }, [markAllAsRead]);
+
+  const handleClearAll = useCallback(() => {
+    if (window.confirm('确定要清空所有通知吗？此操作不可撤销。')) {
+      clearAll();
+    }
+  }, [clearAll]);
 
   const handleMarkRead = useCallback(
     (id: string) => {
@@ -140,74 +161,105 @@ const NotificationPanel = memo(function NotificationPanel({
   if (!open) return null;
 
   return (
-    <aside
-      className={styles.panel}
-      role="complementary"
-      aria-label="通知中心"
-    >
-      <header className={styles.header}>
-        <h3 className={styles.title}>
-          通知中心
-          {unreadCount > 0 && (
-            <span className={styles.badge} aria-label={`${unreadCount} 条未读`}>
-              {unreadCount > 99 ? '99+' : unreadCount}
-            </span>
-          )}
-        </h3>
-        <div className={styles.headerActions}>
-          {unreadCount > 0 && (
+    <>
+      <aside
+        className={styles.panel}
+        role="complementary"
+        aria-label="通知中心"
+      >
+        <header className={styles.header}>
+          <h3 className={styles.title}>
+            通知中心
+            {unreadCount > 0 && (
+              <span className={styles.badge} aria-label={`${unreadCount} 条未读`}>
+                {unreadCount > 99 ? '99+' : unreadCount}
+              </span>
+            )}
+          </h3>
+          <div className={styles.headerActions}>
+            {/* S73-E3: 设置按钮 */}
             <button
               type="button"
-              className={styles.markAllBtn}
-              onClick={handleMarkAllRead}
-              aria-label="全部标为已读"
+              className={styles.settingsBtn}
+              onClick={() => setIsSettingsOpen(true)}
+              aria-label="通知设置"
+              title="通知设置"
             >
-              全部已读
+              ⚙
             </button>
-          )}
-          <button
-            type="button"
-            className={styles.closeBtn}
-            onClick={onClose}
-            aria-label="关闭通知面板"
-          >
-            →
-          </button>
-        </div>
-      </header>
-
-      <div className={styles.content}>
-        {notifications.length === 0 ? (
-          <p className={styles.empty}>暂无通知</p>
-        ) : (
-          <>
-            <ul
-              ref={listRef}
-              className={styles.list}
-              role="list"
-              aria-label="通知列表"
-            >
-              {paginated.map((n) => (
-                <NotificationItem
-                  key={n.id}
-                  notification={n}
-                  onRead={handleMarkRead}
-                />
-              ))}
-            </ul>
-            {hasMore && (
+            {/* S73-E3: 全部已读按钮 */}
+            {unreadCount > 0 && (
               <button
                 type="button"
-                className={styles.loadMore}
-                onClick={() => setPage(p => p + 1)}
+                className={styles.markAllBtn}
+                onClick={handleMarkAllRead}
+                aria-label="全部标为已读"
               >
-                加载更多
+                全部已读
               </button>
             )}
-          </>
-        )}
-      </div>
-    </aside>
+            {/* S73-E3: 清空历史按钮 */}
+            {notifications.length > 0 && (
+              <button
+                type="button"
+                className={styles.clearAllBtn}
+                onClick={handleClearAll}
+                aria-label="清空历史"
+                title="清空历史"
+              >
+                清空
+              </button>
+            )}
+            <button
+              type="button"
+              className={styles.closeBtn}
+              onClick={onClose}
+              aria-label="关闭通知面板"
+            >
+              →
+            </button>
+          </div>
+        </header>
+
+        <div className={styles.content}>
+          {notifications.length === 0 ? (
+            <p className={styles.empty}>暂无通知</p>
+          ) : (
+            <>
+              <ul
+                ref={listRef}
+                className={styles.list}
+                role="list"
+                aria-label="通知列表"
+              >
+                {paginated.map((n) => (
+                  <NotificationItem
+                    key={n.id}
+                    notification={n}
+                    onRead={handleMarkRead}
+                  />
+                ))}
+              </ul>
+              {hasMore && (
+                <button
+                  type="button"
+                  className={styles.loadMore}
+                  onClick={() => setPage(p => p + 1)}
+                >
+                  加载更多
+                </button>
+              )}
+            </>
+          )}
+        </div>
+      </aside>
+
+      {/* S73-E3: 通知设置抽屉 */}
+      <NotificationSettingsDrawer
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+      />
+    </>
   );
 });
 

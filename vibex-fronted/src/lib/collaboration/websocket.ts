@@ -125,20 +125,23 @@ export class CollabWebSocket {
 
     this.ws.onopen = () => {
       console.log('[CollabWS] connected');
-      this.retryCount = 0;
+      // Only reset retryCount on the very first connection ever (not on reconnects)
+      // This preserves the exponential backoff: retryCount increments for each
+      // reconnection attempt and is NOT reset between successful reconnects.
+      if (!(this as unknown as Record<string, boolean>)._everConnected) {
+        this.retryCount = 0;
+        (this as unknown as Record<string, boolean>)._everConnected = true;
+      }
       this.lastPongReceived = Date.now();
       this.missedPongCount = 0;
       this.startHeartbeat();
       this.onOpen?.();
-      // S77-E2: onReconnected called on every successful open (first connect or reconnect)
-      if (this.retryCount > 0 || this.onReconnected) {
-        this.onReconnected?.();
-      }
+      this.onReconnected?.();
     };
 
     this.ws.onclose = () => {
       console.log('[CollabWS] disconnected');
-      this.stopHeartbeat(); // Stop BEFORE scheduleReconnect so old pending pong fires first
+      this.stopHeartbeat();
       this.onClose?.();
       this.scheduleReconnect();
     };
@@ -201,16 +204,15 @@ export class CollabWebSocket {
       console.warn('[CollabWS] max retries reached, giving up');
       return;
     }
-    const attemptNumber = this.retryCount + 1;
     // S77-E2: exponential backoff with max cap
     const delay = Math.min(
       DEFAULT_BASE_RETRY_DELAY_MS * Math.pow(2, this.retryCount),
       DEFAULT_MAX_RETRY_DELAY_MS
     );
     this.retryCount++;
-    console.log(`[CollabWS] reconnecting in ${delay}ms (attempt ${attemptNumber}/${this.maxRetries})`);
+    console.log(`[CollabWS] reconnecting in ${delay}ms (attempt ${this.retryCount}/${this.maxRetries})`);
     // S77-E2: notify about reconnecting state
-    this.onReconnecting?.(attemptNumber);
+    this.onReconnecting?.(this.retryCount);
     this.retryTimer = setTimeout(() => this.connect(), delay);
   }
 

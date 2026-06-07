@@ -392,51 +392,81 @@ describe('TemplateStore - E3 Analytics & AI Recommendation', () => {
   });
 
   // ============================================
-  // S74-E2: filterByTag tests
+  // S74-E2: Tag Filter tests (own beforeEach — needs shop/course tags)
   // ============================================
-
-  describe('filterByTag', () => {
-    it('should return all templates when no tags provided', () => {
-      const filtered = useTemplateStore.getState().filterByTag([]);
-      expect(filtered.length).toBe(3); // t1, t2, t3
+  describe('S74-E2: filterByTag & setSelectedTags', () => {
+    beforeEach(() => {
+      localStorageMock.clear();
+      useTemplateStore.setState({
+        templates: [
+          {
+            id: 't1', name: 'SaaS E-commerce Platform', description: 'A complete online shopping solution',
+            category: 'saas', tags: ['shop', 'cart', 'payment'], displayName: '电商平台',
+            content: '', scenes: [], entities: [], features: [], items: [],
+            metadata: { tags: ['shop', 'cart', 'payment'] },
+          } as any,
+          {
+            id: 't2', name: 'Online Learning Platform', description: 'Education and course management',
+            category: 'education', tags: ['course', 'student', 'teacher'], displayName: '在线教育',
+            content: '', scenes: [], entities: [], features: [], items: [],
+            metadata: { tags: ['course', 'student', 'teacher'] },
+          } as any,
+          {
+            id: 't3', name: 'Finance Tracker', description: 'Personal finance and investment tracking',
+            category: 'fintech', tags: ['bank', 'investment', 'finance'], displayName: '金融科技',
+            content: '', scenes: [], entities: [], features: [], items: [],
+            metadata: { tags: ['bank', 'investment', 'finance'] },
+          } as any,
+        ],
+        filteredTemplates: [],
+        selectedCategory: 'all',
+        searchQuery: '',
+        selectedTags: [],
+        favoriteTemplateIds: [],
+        stats: { usageCount: {}, ratings: {} },
+      });
     });
 
-    it('should return templates that have ALL specified tags (AND logic)', () => {
-      // t1 has ['shop', 'cart', 'payment'], t2 has ['course', 'student', 'teacher']
-      const filtered = useTemplateStore.getState().filterByTag(['shop']);
-      expect(filtered.length).toBe(1);
-      expect(filtered[0].id).toBe('t1');
+    describe('filterByTag', () => {
+      it('should return all templates when no tags provided', () => {
+        const filtered = useTemplateStore.getState().filterByTag([]);
+        expect(filtered.length).toBe(3); // t1, t2, t3
+      });
+
+      it('should return templates that have ALL specified tags (AND logic)', () => {
+        const filtered = useTemplateStore.getState().filterByTag(['shop']);
+        expect(filtered.length).toBe(1);
+        expect(filtered[0].id).toBe('t1');
+      });
+
+      it('should return empty array when no templates match tags', () => {
+        const filtered = useTemplateStore.getState().filterByTag(['nonexistent-tag']);
+        expect(filtered.length).toBe(0);
+      });
+
+      it('should return templates matching all tags when multiple tags provided', () => {
+        const filtered = useTemplateStore.getState().filterByTag(['shop', 'cart']);
+        expect(filtered.length).toBe(1);
+        expect(filtered[0].id).toBe('t1');
+      });
+
+      it('should return empty when multi-tag AND filter has no match', () => {
+        const filtered = useTemplateStore.getState().filterByTag(['shop', 'course']);
+        expect(filtered.length).toBe(0);
+      });
     });
 
-    it('should return empty array when no templates match tags', () => {
-      const filtered = useTemplateStore.getState().filterByTag(['nonexistent-tag']);
-      expect(filtered.length).toBe(0);
-    });
+    describe('setSelectedTags', () => {
+      it('should update selectedTags state', () => {
+        useTemplateStore.getState().setSelectedTags(['payment', 'bank']);
+        expect(useTemplateStore.getState().selectedTags).toEqual(['payment', 'bank']);
+      });
 
-    it('should return templates matching all tags when multiple tags provided', () => {
-      // t1 has both 'shop' and 'cart'
-      const filtered = useTemplateStore.getState().filterByTag(['shop', 'cart']);
-      expect(filtered.length).toBe(1);
-      expect(filtered[0].id).toBe('t1');
-    });
-
-    it('should return empty when multi-tag AND filter has no match', () => {
-      // t1 has 'shop' but not 'course'; t2 has 'course' but not 'shop'
-      const filtered = useTemplateStore.getState().filterByTag(['shop', 'course']);
-      expect(filtered.length).toBe(0);
-    });
-  });
-
-  describe('setSelectedTags', () => {
-    it('should update selectedTags state', () => {
-      useTemplateStore.getState().setSelectedTags(['payment', 'bank']);
-      expect(useTemplateStore.getState().selectedTags).toEqual(['payment', 'bank']);
-    });
-
-    it('should clear selectedTags when empty array provided', () => {
-      useTemplateStore.getState().setSelectedTags(['payment']);
-      useTemplateStore.getState().setSelectedTags([]);
-      expect(useTemplateStore.getState().selectedTags).toEqual([]);
+      it('should clear selectedTags when empty array provided', () => {
+        useTemplateStore.getState().setSelectedTags(['payment']);
+        useTemplateStore.getState().setSelectedTags([]);
+        expect(useTemplateStore.getState().selectedTags).toEqual([]);
+      });
     });
   });
 

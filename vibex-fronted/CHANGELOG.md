@@ -1389,3 +1389,10 @@
 - **E1.4**: `GlobalSearchPanel.tsx` — 打开时预填充 store 中的最近搜索词
 - **E1.5**: `canvasSearchStore.ts` — 新增 `setSearchQuery()` + `addToSearchHistory()` + `clearHistory()` 方法
 - **vitest**: `RecentSearchesDropdown.test.tsx` 7/7 测试通过
+
+---
+
+## [Unreleased] S75-E2: 通知中心分类 TabBar 过滤 — 2026-06-07
+- **E2.1**: `TabBar.tsx` — 新建 TabBar 组件，支持全部/提及/回复/系统四类筛选标签，含未读计数 badge
+- **E2.2**: `NotificationPanel.tsx` — 集成 TabBar，添加 `activeTab` state + `filterByType` 过滤逻辑，tab 切换重置分页到第1页
+- **vitest**: `NotificationPanel.test.tsx` 30/30 测试通过（含 S68-E2/S73-E3/S74-E5/S75-E2 全部用例）

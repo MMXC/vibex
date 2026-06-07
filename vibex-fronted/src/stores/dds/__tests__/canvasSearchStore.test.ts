@@ -1,9 +1,10 @@
 /**
- * canvasSearchStore.test.ts — Sprint60 E5 + Sprint65 E4 + Sprint68 E3
+ * canvasSearchStore.test.ts — Sprint60 E5 + Sprint65 E4 + Sprint68 E3 + Sprint74 E1
  *
  * Sprint60 E5: canvasSearchStore unit tests
  * Sprint65 E4: globalSearchQuery / globalSearchResults tests
  * Sprint68 E3: fulltextQuery / fulltextResults / searchNodeContent tests
+ * Sprint74 E1: recentSearches (max 20) + addRecentSearch tests
  *
  * Vitest patterns used:
  * - Zustand dual-interface mock: vi.hoisted() + Object.assign for .getState()
@@ -46,18 +47,98 @@ vi.mock('@/services/canvasFulltextIndex', () => ({
 // Import after mocks are set
 // ============================================
 
-describe('canvasSearchStore — Sprint68 E3: fulltext search', () => {
+describe('canvasSearchStore — Sprint74 E1: recentSearches', () => {
   beforeEach(() => {
-    // Reset store state
     useCanvasSearchStore.setState({
-      searchHistory: [],
+      recentSearches: [],
       globalSearchQuery: '',
       globalSearchResults: [],
       fulltextQuery: '',
       fulltextResults: [],
       fulltextLoading: false,
     });
-    store['vibex-search-history'] = JSON.stringify({ state: { searchHistory: [] }, version: 0 });
+    store['vibex-search-history'] = JSON.stringify({ state: { recentSearches: [] }, version: 0 });
+    localStorageMock.getItem.mockClear();
+    localStorageMock.setItem.mockClear();
+    mockSearchNodes.mockReset();
+    vi.clearAllMocks();
+  });
+
+  describe('S74-E1: recentSearches state + addRecentSearch', () => {
+    it('initial state has empty recentSearches', () => {
+      const state = useCanvasSearchStore.getState();
+      expect(state.recentSearches).toEqual([]);
+    });
+
+    it('addRecentSearch adds a single query', () => {
+      useCanvasSearchStore.getState().addRecentSearch('测试查询');
+      expect(useCanvasSearchStore.getState().recentSearches).toEqual(['测试查询']);
+    });
+
+    it('addRecentSearch prepends new queries (most recent first)', () => {
+      useCanvasSearchStore.getState().addRecentSearch('第一个');
+      useCanvasSearchStore.getState().addRecentSearch('第二个');
+      useCanvasSearchStore.getState().addRecentSearch('第三个');
+      expect(useCanvasSearchStore.getState().recentSearches[0]).toBe('第三个');
+      expect(useCanvasSearchStore.getState().recentSearches[2]).toBe('第一个');
+    });
+
+    it('addRecentSearch deduplicates — existing query moves to top', () => {
+      useCanvasSearchStore.getState().addRecentSearch('查询A');
+      useCanvasSearchStore.getState().addRecentSearch('查询B');
+      useCanvasSearchStore.getState().addRecentSearch('查询A'); // re-search A
+      const history = useCanvasSearchStore.getState().recentSearches;
+      expect(history[0]).toBe('查询A');
+      expect(history.filter((s) => s === '查询A')).toHaveLength(1);
+      expect(history).toHaveLength(2);
+    });
+
+    it('recentSearches max is 20 items', () => {
+      for (let i = 0; i < 25; i++) {
+        useCanvasSearchStore.getState().addRecentSearch(`查询${i}`);
+      }
+      const history = useCanvasSearchStore.getState().recentSearches;
+      expect(history.length).toBeLessThanOrEqual(20);
+      expect(history[0]).toBe('查询24'); // newest first
+    });
+
+    it('addRecentSearch trims whitespace', () => {
+      useCanvasSearchStore.getState().addRecentSearch('  带空格  ');
+      expect(useCanvasSearchStore.getState().recentSearches[0]).toBe('带空格');
+    });
+
+    it('addRecentSearch ignores empty/whitespace-only queries', () => {
+      useCanvasSearchStore.getState().addRecentSearch('  ');
+      expect(useCanvasSearchStore.getState().recentSearches).toEqual([]);
+    });
+
+    it('clearHistory clears all recentSearches', () => {
+      useCanvasSearchStore.getState().addRecentSearch('A');
+      useCanvasSearchStore.getState().addRecentSearch('B');
+      useCanvasSearchStore.getState().clearHistory();
+      expect(useCanvasSearchStore.getState().recentSearches).toEqual([]);
+    });
+  });
+
+  describe('S74-E1: addToHistory backward compat alias', () => {
+    it('addToHistory calls addRecentSearch (same behavior)', () => {
+      useCanvasSearchStore.getState().addToHistory('通过旧方法添加');
+      expect(useCanvasSearchStore.getState().recentSearches).toEqual(['通过旧方法添加']);
+    });
+  });
+});
+
+describe('canvasSearchStore — Sprint68 E3: fulltext search', () => {
+  beforeEach(() => {
+    useCanvasSearchStore.setState({
+      recentSearches: [],
+      globalSearchQuery: '',
+      globalSearchResults: [],
+      fulltextQuery: '',
+      fulltextResults: [],
+      fulltextLoading: false,
+    });
+    store['vibex-search-history'] = JSON.stringify({ state: { recentSearches: [] }, version: 0 });
     localStorageMock.getItem.mockClear();
     localStorageMock.setItem.mockClear();
     mockSearchNodes.mockReset();
@@ -121,7 +202,6 @@ describe('canvasSearchStore — Sprint68 E3: fulltext search', () => {
       mockSearchNodes.mockResolvedValue(mockResults);
 
       const promise = useCanvasSearchStore.getState().searchNodeContent('找到');
-      // Should set loading true immediately
       expect(useCanvasSearchStore.getState().fulltextLoading).toBe(true);
 
       await promise;
@@ -152,13 +232,13 @@ describe('canvasSearchStore — Sprint68 E3: fulltext search', () => {
       expect(useCanvasSearchStore.getState().fulltextLoading).toBe(false);
     });
 
-    it('stores up to MAX_HISTORY_ITEMS (10) for search history', async () => {
+    it('stores up to MAX_RECENT_SEARCHES (20) for search history', async () => {
       mockSearchNodes.mockResolvedValue([]);
-      for (let i = 0; i < 12; i++) {
+      for (let i = 0; i < 25; i++) {
         await useCanvasSearchStore.getState().searchNodeContent(`查询${i}`);
       }
-      const history = useCanvasSearchStore.getState().searchHistory;
-      expect(history.length).toBeLessThanOrEqual(10);
+      const history = useCanvasSearchStore.getState().recentSearches;
+      expect(history.length).toBeLessThanOrEqual(20);
     });
   });
 
@@ -171,7 +251,6 @@ describe('canvasSearchStore — Sprint68 E3: fulltext search', () => {
       ];
       useCanvasSearchStore.getState().setFulltextResults(mockResults);
 
-      // searchNodes returns whatever is in fulltextResults at call time
       const results = useCanvasSearchStore.getState().searchNodes('test');
       expect(results).toHaveLength(2);
       expect(results[0].nodeId).toBe('node-1');
@@ -185,7 +264,6 @@ describe('canvasSearchStore — Sprint68 E3: fulltext search', () => {
     });
 
     it('returns empty array by default (no search performed)', () => {
-      // Fresh state has empty fulltextResults
       const results = useCanvasSearchStore.getState().searchNodes('query');
       expect(results).toEqual([]);
     });
@@ -196,7 +274,6 @@ describe('canvasSearchStore — Sprint68 E3: fulltext search', () => {
       ];
       useCanvasSearchStore.getState().setFulltextResults(mockResults);
 
-      // Query parameter is ignored — always returns fulltextResults
       const r1 = useCanvasSearchStore.getState().searchNodes('ignored');
       const r2 = useCanvasSearchStore.getState().searchNodes('also-ignored');
       expect(r1).toEqual(mockResults);

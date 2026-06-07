@@ -1,9 +1,10 @@
 /**
- * canvasSearchStore.ts — Sprint60 E5 + Sprint65 E4 + Sprint68 E3: 搜索体验增强
+ * canvasSearchStore.ts — Sprint60 E5 + Sprint65 E4 + Sprint68 E3 + Sprint74 E1
  *
  * Sprint60 E5: 搜索历史管理 — localStorage 持久化，最多 10 条，最新优先
  * Sprint65 E4: 扩展搜索结果 + 全局搜索状态
  * Sprint68 E3: 全文搜索状态 + searchNodeContent() 方法
+ * Sprint74 E1: recentSearches（max 20）+ addRecentSearch
  */
 
 'use client';
@@ -13,12 +14,12 @@ import { persist } from 'zustand/middleware';
 import type { SearchResult } from '@/lib/db/canvasDb';
 import type { NodeSearchResult } from '@/services/canvasFulltextIndex';
 
-const MAX_HISTORY_ITEMS = 10; // E3 D4.5: MAX 10 items for history
+const MAX_RECENT_SEARCHES = 20; // S74-E1: 最多 20 条最近搜索
 const STORAGE_KEY = 'vibex-search-history';
 
 export interface CanvasSearchState {
-  /** 搜索历史（最新在前，最多 MAX_HISTORY_ITEMS 条） */
-  searchHistory: string[];
+  /** 最近搜索记录（最新在前，最多 MAX_RECENT_SEARCHES 条）S74-E1 */
+  recentSearches: string[];
 
   /** 全局搜索查询（E4 D4.4） */
   globalSearchQuery: string;
@@ -35,8 +36,8 @@ export interface CanvasSearchState {
   /** 全文搜索加载状态（E3） */
   fulltextLoading: boolean;
 
-  /** 添加一条搜索记录到历史 */
-  addToHistory: (query: string) => void;
+  /** S74-E1: 添加最近搜索记录 */
+  addRecentSearch: (query: string) => void;
 
   /** 清空搜索历史 */
   clearHistory: () => void;
@@ -66,6 +67,12 @@ export interface CanvasSearchState {
    * 此方法用于同步获取最近一次搜索的结果。
    */
   searchNodes: (query: string) => NodeSearchResult[];
+
+  // =============================================
+  // S74-E1: Backward compatibility alias
+  // =============================================
+  /** @deprecated S74-E1: use addRecentSearch instead */
+  addToHistory: (query: string) => void;
 }
 
 // re-export type for convenience
@@ -74,7 +81,7 @@ export type { NodeSearchResult } from '@/services/canvasFulltextIndex';
 export const useCanvasSearchStore = create<CanvasSearchState>()(
   persist(
     (set, get) => ({
-      searchHistory: [],
+      recentSearches: [],
 
       globalSearchQuery: '',
       globalSearchResults: [],
@@ -83,22 +90,22 @@ export const useCanvasSearchStore = create<CanvasSearchState>()(
       fulltextResults: [],
       fulltextLoading: false,
 
-      addToHistory: (query: string) => {
+      addRecentSearch: (query: string) => {
         const trimmed = query.trim();
         if (!trimmed) return;
 
-        const current = get().searchHistory;
+        const current = get().recentSearches;
 
-        // 去重：新查询移到最前
+        // S74-E1: 去重 + max 20
         const filtered = current.filter((item) => item !== trimmed);
 
-        const next = [trimmed, ...filtered].slice(0, MAX_HISTORY_ITEMS);
+        const next = [trimmed, ...filtered].slice(0, MAX_RECENT_SEARCHES);
 
-        set({ searchHistory: next });
+        set({ recentSearches: next });
       },
 
       clearHistory: () => {
-        set({ searchHistory: [] });
+        set({ recentSearches: [] });
       },
 
       setGlobalSearchQuery: (query: string) => {
@@ -145,11 +152,16 @@ export const useCanvasSearchStore = create<CanvasSearchState>()(
       searchNodes: (_query: string) => {
         return get().fulltextResults;
       },
+
+      // S74-E1: Backward compat — alias for addRecentSearch
+      addToHistory: (query: string) => {
+        get().addRecentSearch(query);
+      },
     }),
     {
       name: STORAGE_KEY,
-      // 只持久化 searchHistory 字段（E3/E4 state is ephemeral per-session）
-      partialize: (state) => ({ searchHistory: state.searchHistory }),
+      // S74-E1: 只持久化 recentSearches 字段
+      partialize: (state) => ({ recentSearches: state.recentSearches }),
     }
   )
 );

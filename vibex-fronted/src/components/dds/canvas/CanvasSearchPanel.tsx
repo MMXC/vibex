@@ -1,12 +1,10 @@
 'use client';
 
 /**
- * CanvasSearchPanel — Sprint73 E1: 画布内容全文搜索
+ * CanvasSearchPanel — Sprint73 E1 + Sprint74 E1: 画布内容全文搜索
  *
- * Floating search panel for full-text node content search within the current canvas.
- * - Search input + real-time results list
- * - Click result → scroll to node in canvas
- * - Uses canvasSearchStore (dds/) fulltext search state
+ * Sprint73 E1: 全文搜索 + history tab + keyboard nav
+ * Sprint74 E1: recentSearches chips above input + max 20 items
  */
 
 import React, { useEffect, useRef, useCallback, useState } from 'react';
@@ -70,8 +68,8 @@ export const CanvasSearchPanel = React.memo(function CanvasSearchPanel({
   const fulltextQuery = useCanvasSearchStore((s) => s.fulltextQuery);
   const fulltextResults = useCanvasSearchStore((s) => s.fulltextResults);
   const fulltextLoading = useCanvasSearchStore((s) => s.fulltextLoading);
-  const searchHistory = useCanvasSearchStore((s) => s.searchHistory);
-  const addToHistory = useCanvasSearchStore((s) => s.addToHistory);
+  const recentSearches = useCanvasSearchStore((s) => s.recentSearches);
+  const addRecentSearch = useCanvasSearchStore((s) => s.addRecentSearch);
   const clearHistory = useCanvasSearchStore((s) => s.clearHistory);
   const searchNodeContent = useCanvasSearchStore((s) => s.searchNodeContent);
 
@@ -104,12 +102,12 @@ export const CanvasSearchPanel = React.memo(function CanvasSearchPanel({
   const handleSelectResult = useCallback(
     (result: NodeSearchResult) => {
       if (fulltextQuery.trim()) {
-        addToHistory(fulltextQuery.trim());
+        addRecentSearch(fulltextQuery.trim());
       }
       scrollToNode(result.nodeId, result.canvasId);
       onClose();
     },
-    [fulltextQuery, addToHistory, onClose]
+    [fulltextQuery, addRecentSearch, onClose]
   );
 
   // Keyboard navigation
@@ -119,7 +117,7 @@ export const CanvasSearchPanel = React.memo(function CanvasSearchPanel({
         onClose();
         return;
       }
-      const currentItems = activeTab === 'history' ? searchHistory : fulltextResults;
+      const currentItems = activeTab === 'history' ? recentSearches : fulltextResults;
       if (e.key === 'ArrowDown') {
         e.preventDefault();
         selectedIndexRef.current = Math.min(
@@ -132,7 +130,7 @@ export const CanvasSearchPanel = React.memo(function CanvasSearchPanel({
       } else if (e.key === 'Enter') {
         e.preventDefault();
         if (activeTab === 'history') {
-          const selected = searchHistory[selectedIndexRef.current];
+          const selected = recentSearches[selectedIndexRef.current];
           if (selected) {
             handleQueryChange(selected);
             setActiveTab('results');
@@ -145,12 +143,12 @@ export const CanvasSearchPanel = React.memo(function CanvasSearchPanel({
         }
       }
     },
-    [onClose, fulltextResults, searchHistory, activeTab, handleQueryChange, handleSelectResult]
+    [onClose, fulltextResults, recentSearches, activeTab, handleQueryChange, handleSelectResult]
   );
 
   if (!open) return null;
 
-  const isHistoryEmpty = searchHistory.length === 0;
+  const isHistoryEmpty = recentSearches.length === 0;
 
   return (
     <div
@@ -265,6 +263,63 @@ export const CanvasSearchPanel = React.memo(function CanvasSearchPanel({
             </button>
           )}
         </div>
+
+        {/* S74-E1: Recent Search Chips above tab bar */}
+        {!isHistoryEmpty && !fulltextQuery && activeTab === 'results' && (
+          <div
+            style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: '6px',
+              padding: '8px 16px',
+              borderBottom: '1px solid #2a2a2a',
+            }}
+            aria-label={t('recentSearchChips') ?? 'Recent searches'}
+            data-testid="recent-search-chips"
+          >
+            {recentSearches.slice(0, 5).map((item) => (
+              <button
+                key={item}
+                type="button"
+                onClick={() => {
+                  handleQueryChange(item);
+                  setActiveTab('results');
+                }}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  padding: '3px 10px',
+                  background: '#2a2a2a',
+                  border: '1px solid #3a3a3a',
+                  borderRadius: '14px',
+                  color: '#aaa',
+                  fontSize: '0.75rem',
+                  cursor: 'pointer',
+                  transition: 'background 0.15s',
+                }}
+                data-testid="recent-search-chip"
+                aria-label={`Recent: ${item}`}
+              >
+                <svg
+                  width="10"
+                  height="10"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#666"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <polyline points="1 4 1 10 7 10" />
+                  <path d="M3.51 15a9 9 0 1 0 .49-3.5" />
+                </svg>
+                {item}
+              </button>
+            ))}
+          </div>
+        )}
 
         {/* Tab Bar */}
         <div
@@ -473,22 +528,22 @@ export const CanvasSearchPanel = React.memo(function CanvasSearchPanel({
           <div
             style={{ flex: 1, overflowY: 'auto', minHeight: '60px' }}
             role="listbox"
-            aria-label={t('searchHistory') ?? 'Search history'}
-          >
-            {isHistoryEmpty ? (
-              <div
-                style={{
-                  padding: '24px',
-                  textAlign: 'center',
-                  color: '#666',
-                  fontSize: '0.875rem',
-                }}
-              >
-                {t('noSearchHistory') ?? 'No search history'}
-              </div>
-            ) : (
-              <>
-                {searchHistory.map((item, idx) => (
+              aria-label={t('searchHistory') ?? 'Search history'}
+            >
+              {isHistoryEmpty ? (
+                <div
+                  style={{
+                    padding: '24px',
+                    textAlign: 'center',
+                    color: '#666',
+                    fontSize: '0.875rem',
+                  }}
+                >
+                  {t('noSearchHistory') ?? 'No search history'}
+                </div>
+              ) : (
+                <>
+                  {recentSearches.map((item, idx) => (
                   <button
                     key={item}
                     type="button"

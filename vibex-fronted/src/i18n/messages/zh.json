@@ -395,7 +395,8 @@
     "chapterContext": "上下文",
     "chapterFlow": "流程",
     "chapterApi": "API",
-    "chapterBusinessRules": "业务规则"
+    "chapterBusinessRules": "业务规则",
+    "recentSearchChips": "最近搜索"
   },
   "batchOps": {
     "toolbar": "批量操作",

@@ -1,5 +1,5 @@
 /**
- * CanvasSearchPanel.test.tsx — Sprint73 E1: 画布内容全文搜索
+ * CanvasSearchPanel.test.tsx — Sprint73 E1 + S74-E1: 画布内容全文搜索 + 搜索历史记录
  *
  * Vitest + React Testing Library integration tests for CanvasSearchPanel.
  *
@@ -48,6 +48,7 @@ const translationsMock: Record<string, Record<string, string>> = {
     noResults: 'No results found',
     noSearchHistory: 'No search history',
     clearSearchHistory: 'Clear history',
+    recentSearchChips: 'Recent searches',
     clearHistory: 'Clear history',
     searching: 'Searching...',
     navigate: 'Navigate',
@@ -90,9 +91,9 @@ const mockSearchState: MockSearchState = {
   fulltextQuery: '',
   fulltextResults: [],
   fulltextLoading: false,
-  searchHistory: [],
-  addToHistory: vi.fn(),
-  clearHistory: vi.fn(),
+  recentSearches: [],
+  addRecentSearch: vi.fn(),
+  clearRecentSearches: vi.fn(),
   searchNodeContent: vi.fn(),
 };
 
@@ -148,7 +149,7 @@ Object.defineProperty(Element.prototype, 'scrollIntoView', {
 // Tests
 // ============================================
 
-describe('CanvasSearchPanel — S73-E1: 画布内容全文搜索', () => {
+describe('CanvasSearchPanel — S73-E1 + S74-E1: 画布内容全文搜索 + 搜索历史记录', () => {
   const onClose = vi.fn();
   const dispatchEventSpy = vi.spyOn(window, 'dispatchEvent');
 
@@ -157,9 +158,9 @@ describe('CanvasSearchPanel — S73-E1: 画布内容全文搜索', () => {
     mockSearchState.fulltextQuery = '';
     mockSearchState.fulltextResults = [];
     mockSearchState.fulltextLoading = false;
-    mockSearchState.searchHistory = [];
-    mockSearchState.addToHistory.mockClear();
-    mockSearchState.clearHistory.mockClear();
+    mockSearchState.recentSearches = [];
+    mockSearchState.addRecentSearch.mockClear();
+    mockSearchState.clearRecentSearches.mockClear();
     mockSearchState.searchNodeContent.mockClear();
     dispatchEventSpy.mockClear();
     onClose.mockClear();
@@ -281,7 +282,7 @@ describe('CanvasSearchPanel — S73-E1: 画布内容全文搜索', () => {
         mockSearchState.fulltextQuery = 'test';
       }
     );
-    mockSearchState.addToHistory.mockClear();
+    mockSearchState.addRecentSearch.mockClear();
     render(<CanvasSearchPanel open={true} onClose={onClose} />);
 
     const input = screen.getByRole('textbox');
@@ -299,7 +300,7 @@ describe('CanvasSearchPanel — S73-E1: 画布内容全文搜索', () => {
     });
 
     // Should add to history before closing
-    expect(mockSearchState.addToHistory).toHaveBeenCalledWith('test');
+    expect(mockSearchState.addRecentSearch).toHaveBeenCalledWith('test');
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
@@ -342,7 +343,7 @@ describe('CanvasSearchPanel — S73-E1: 画布内容全文搜索', () => {
   });
 
   it('shows History tab when clicked', async () => {
-    mockSearchState.searchHistory = ['previous search'];
+    mockSearchState.recentSearches = ['previous search'];
     render(<CanvasSearchPanel open={true} onClose={onClose} />);
 
     const historyTab = screen.getByRole('tab', { name: /history/i });
@@ -355,7 +356,7 @@ describe('CanvasSearchPanel — S73-E1: 画布内容全文搜索', () => {
   });
 
   it('calls clearHistory when clear button is clicked', async () => {
-    mockSearchState.searchHistory = ['search 1', 'search 2'];
+    mockSearchState.recentSearches = ['search 1', 'search 2'];
     render(<CanvasSearchPanel open={true} onClose={onClose} />);
 
     const historyTab = screen.getByRole('tab', { name: /history/i });
@@ -368,6 +369,57 @@ describe('CanvasSearchPanel — S73-E1: 画布内容全文搜索', () => {
       fireEvent.click(clearBtn);
     });
 
-    expect(mockSearchState.clearHistory).toHaveBeenCalledTimes(1);
+    expect(mockSearchState.clearRecentSearches).toHaveBeenCalledTimes(1);
   });
+
+  // ============================================
+  // S74-E1: Recent Search Chips tests
+  // ============================================
+
+  it('shows recent search chips when recentSearches is populated and results tab active', () => {
+    mockSearchState.recentSearches = ['react hooks', 'zustand store', 'vitest'];
+    render(<CanvasSearchPanel open={true} onClose={onClose} />);
+    expect(screen.getByTestId('recent-search-chips')).toBeInTheDocument();
+  });
+
+  it('hides recent search chips when user is typing a query', () => {
+    mockSearchState.recentSearches = ['react hooks', 'zustand store'];
+    mockSearchState.fulltextQuery = 'test';
+    render(<CanvasSearchPanel open={true} onClose={onClose} />);
+    expect(screen.queryByTestId('recent-search-chips')).not.toBeInTheDocument();
+  });
+
+  it('hides recent search chips when History tab is active', () => {
+    mockSearchState.recentSearches = ['react hooks'];
+    render(<CanvasSearchPanel open={true} onClose={onClose} />);
+    // Switch to History tab
+    const historyTab = screen.getByRole('tab', { name: /history/i });
+    act(() => { fireEvent.click(historyTab); });
+    expect(screen.queryByTestId('recent-search-chips')).not.toBeInTheDocument();
+  });
+
+  it('displays at most 5 recent search chips', () => {
+    mockSearchState.recentSearches = ['a', 'b', 'c', 'd', 'e', 'f', 'g'];
+    render(<CanvasSearchPanel open={true} onClose={onClose} />);
+    const chips = screen.getAllByTestId('recent-search-chip');
+    expect(chips.length).toBeLessThanOrEqual(5);
+  });
+
+  it('clicking a recent search chip sets query and switches to results tab', async () => {
+    mockSearchState.recentSearches = ['zustand'];
+    mockSearchState.searchNodeContent.mockResolvedValue(undefined);
+    render(<CanvasSearchPanel open={true} onClose={onClose} />);
+    const chip = screen.getByTestId('recent-search-chip');
+    await act(async () => { fireEvent.click(chip); });
+    await waitFor(() => {
+      expect(mockSearchState.searchNodeContent).toHaveBeenCalledWith('zustand');
+    });
+  });
+
+  it('does not show recent search chips when recentSearches is empty', () => {
+    mockSearchState.recentSearches = [];
+    render(<CanvasSearchPanel open={true} onClose={onClose} />);
+    expect(screen.queryByTestId('recent-search-chips')).not.toBeInTheDocument();
+  });
+
 });

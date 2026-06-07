@@ -393,7 +393,8 @@
     "chapterContext": "Context",
     "chapterFlow": "Flow",
     "chapterApi": "API",
-    "chapterBusinessRules": "Business Rules"
+    "chapterBusinessRules": "Business Rules",
+    "recentSearchChips": "Recent searches"
   },
   "batchOps": {
     "toolbar": "Batch Operations",

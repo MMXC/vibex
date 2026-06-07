@@ -1396,3 +1396,12 @@
 - **E2.1**: `TabBar.tsx` — 新建 TabBar 组件，支持全部/提及/回复/系统四类筛选标签，含未读计数 badge
 - **E2.2**: `NotificationPanel.tsx` — 集成 TabBar，添加 `activeTab` state + `filterByType` 过滤逻辑，tab 切换重置分页到第1页
 - **vitest**: `NotificationPanel.test.tsx` 30/30 测试通过（含 S68-E2/S73-E3/S74-E5/S75-E2 全部用例）
+
+## [Unreleased] S75-E3: 分支对比历史记录 — 2026-06-07
+- **E3.1**: `historyDB.ts` — 新增 `branchDiffHistory` objectStore + `saveBranchDiffHistory()`/`getBranchDiffHistory()`/`clearBranchDiffHistory()` 三个 DB 函数
+- **E3.2**: `canvasHistoryStore.ts` — 新增 `addBranchDiffHistory()`/`getBranchDiffHistory()`/`clearBranchDiffHistory()` 方法，持久化分支对比结果
+- **E3.3**: `BranchDiffDialog.tsx` — 新增「历史」Tab，支持查看/清除历史记录列表，含 Tab 切换逻辑
+- **E3.4**: `BranchDiffDialog.module.css` — 历史 Tab 导航 + 历史列表样式（边框/时间戳/空状态）
+- **vitest**: `BranchDiffDialog.test.tsx` E3 扩展测试 6个新用例通过
+
+

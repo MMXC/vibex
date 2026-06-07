@@ -6583,45 +6583,13 @@ See git history for complete changelog.
 
 ---
 
-## [Unreleased] S74-E1: 搜索历史记录 — 2026-06-07
-- **E1.1**: `canvasSearchStore.ts` — `recentSearches` 字段替代 `searchHistory`（MAX=20）、`addRecentSearch`（去重+上限）、`clearRecentSearches`
-- **E1.2**: `canvasSearchStore.test.ts` — 扩展测试（+101 行）：recentSearches 增删查、dedup、去重上限
-- **E1.3**: `CanvasSearchPanel.tsx` — chips 区域展示最近搜索（最多 5 条）、点击填入查询并跳转
-- **E1.4**: `CanvasSearchPanel.test.tsx` — 扩展 chips 交互测试（+78 行）
-- **E1.5**: `en.json`/`zh.json` — 中英文 i18n 键值
-
-## [Unreleased] S74-E3: 画布分支对比视图 — 2026-06-07
-- **E3.1**: `canvasHistoryStore.ts` — `compareBranches(canvasId, branchA, branchB)` action + `BranchDiffResult` 类型（三栏：added/removed/modified）
-- **E3.2**: `canvasHistoryStore.test.ts` — 新增 branch compare 测试（+98 行，6 用例）：identical/add/remove/modify/error cases
-- **E3.3**: `HistoryPanel.tsx` — 分支列表 Ctrl+Click 多选模式、选中 2 个分支后"对比"按钮激活
-- **E3.4**: `BranchDiffDialog.tsx` — 新建 diff modal（三栏统计 + 差异列表 + 对比到主分支快捷操作）
-- **E3.5**: `BranchDiffDialog.module.css` — modal 样式（overlay/dialog/header/statsBar/footer）
-- **E3.6**: `BranchDiffDialog.test.tsx` — 新建（5 测试用例）：renders/header/stats/error/close
-
-## [Unreleased] S74-E2: 模板标签与分类筛选 — 2026-06-07
-- **E2.1**: `templateStore.ts` — `TemplateSnapshot` 新增 `tags?: string[]` 字段、`filterByTag(tags: string[])` getter、`setSelectedTags(tags: string[])` action、`selectedTags: string[]` 状态
-- **E2.2**: `templateStore.test.ts` — 扩展 E2 filter 测试（50 insertions）：filterByTag 基础、重复标签去重、空标签返回全部
-- **E2.3**: `TemplateGallery.tsx` — 顶部标签筛选栏（All + 预设标签 chips）、多标签 AND 筛选、URL params 同步
-- **E2.4**: `TemplateGallery.test.tsx` — 新建标签筛选测试（108 行，6 测试用例）：渲染 chips、aria-pressed、清除按钮、多选逻辑
-- **E2.5**: `templateStore.test.ts` — 修复 beforeEach 隔离（E3 beforeEach 清理 + window.location.search 重置）
-
-
-## [Unreleased] S74-E4: @mention 通知闭环 — 2026-06-07
-- **E4.1**: `types.ts` — `ActivityEntry` 新增 `message?: string` + `canvasId?: string` 字段
-- **E4.2**: `activityStore.ts` — `extractMentions()` 函数：解析 `@username` 正则，`processMentionNotifications()` bridge 到 `notificationStore.addNotification(type: 'mention')`
-- **E4.3**: `activityStore.addEntry` — 当 entry.message 存在时自动触发 mention 通知，跳过 self-mention（sender === target）
-- **E4.4**: 去重机制：module-level Set 追踪 `(senderId, targetUserId, canvasId)` 三元组，同一会话内不重复通知
-- **vitest**: `activityStore.test.ts` +7 E4 测试（21/21），`notificationStore.test.ts` +8 E4 测试（25/25）
-
----
-
+#
 ## [Unreleased] S74-E5: 键盘导航增强 — 2026-06-07
 - **E5.1**: `CanvasSearchPanel.tsx` — 添加 `aria-activedescendant` + 搜索结果键盘导航
 - **E5.2**: `TemplateGallery.tsx` — `role="grid"` + Tab/Enter 键盘操作
 - **E5.3**: `TemplatePreviewPanel.tsx` — Esc 关闭 + Tab 焦点管理
 - **E5.4**: `NotificationPanel.tsx` — Tab/Enter 通知项导航 + Shift+Tab 反向循环
 - **E5.5**: `BranchDiffDialog.tsx` — Esc 关闭 + focus trap 焦点陷阱
-
 
 ---
 
@@ -6639,3 +6607,13 @@ See git history for complete changelog.
 - **E2.1**: `TabBar.tsx` — 新建 TabBar 组件，支持全部/提及/回复/系统四类筛选标签，含未读计数 badge
 - **E2.2**: `NotificationPanel.tsx` — 集成 TabBar，添加 `activeTab` state + `filterByType` 过滤逻辑，tab 切换重置分页到第1页
 - **vitest**: `NotificationPanel.test.tsx` 30/30 测试通过（含 S68-E2/S73-E3/S74-E5/S75-E2 全部用例）
+
+---
+
+## [Unreleased] S75-E3: 分支对比历史记录 — 2026-06-07
+- **E3.1**: `historyDB.ts` — 新增 `branchDiffHistory` objectStore + `saveBranchDiffHistory()`/`getBranchDiffHistory()`/`clearBranchDiffHistory()` 三个 DB 函数
+- **E3.2**: `canvasHistoryStore.ts` — 新增 `addBranchDiffHistory()`/`getBranchDiffHistory()`/`clearBranchDiffHistory()` 方法，持久化分支对比结果
+- **E3.3**: `BranchDiffDialog.tsx` — 新增「历史」Tab，支持查看/清除历史记录列表，含 Tab 切换逻辑
+- **E3.4**: `BranchDiffDialog.module.css` — 历史 Tab 导航 + 历史列表样式（边框/时间戳/空状态）
+- **vitest**: `BranchDiffDialog.test.tsx` E3 扩展测试 6个新用例通过
+

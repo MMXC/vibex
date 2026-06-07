@@ -6612,3 +6612,12 @@ See git history for complete changelog.
 - **E4.3**: `activityStore.addEntry` — 当 entry.message 存在时自动触发 mention 通知，跳过 self-mention（sender === target）
 - **E4.4**: 去重机制：module-level Set 追踪 `(senderId, targetUserId, canvasId)` 三元组，同一会话内不重复通知
 - **vitest**: `activityStore.test.ts` +7 E4 测试（21/21），`notificationStore.test.ts` +8 E4 测试（25/25）
+
+---
+
+## [Unreleased] S74-E5: 键盘导航增强 — 2026-06-07
+- **E5.1**: `CanvasSearchPanel.tsx` — 添加 `aria-activedescendant` + 搜索结果键盘导航
+- **E5.2**: `TemplateGallery.tsx` — `role="grid"` + Tab/Enter 键盘操作
+- **E5.3**: `TemplatePreviewPanel.tsx` — Esc 关闭 + Tab 焦点管理
+- **E5.4**: `NotificationPanel.tsx` — Tab/Enter 通知项导航 + Shift+Tab 反向循环
+- **E5.5**: `BranchDiffDialog.tsx` — Esc 关闭 + focus trap 焦点陷阱

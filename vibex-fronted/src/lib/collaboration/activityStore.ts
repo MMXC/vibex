@@ -211,6 +211,7 @@ export function activityLabel(type: ActivityType): string {
     focus: '聚焦了节点',
     blur: '取消聚焦节点',
     cursor_move: '移动了光标',
+    comment: '发送了评论',
   };
   return labels[type] ?? type;
 }

@@ -6618,9 +6618,27 @@ See git history for complete changelog.
 - **vitest**: `BranchDiffDialog.test.tsx` E3 扩展测试 6个新用例通过
 
 
-
 ---
 
+
+## [Unreleased] S75-E4: 协作活动流消息发送 — 2026-06-07
+- **E4.1**: `types.ts` — `ActivityType` 新增 `'comment'` 类型 + `ActivityEntry` 新增 `message?: string` + `canvasId?: string` 字段
+- **E4.2**: `activityStore.ts` — `activityLabel('comment')` = `'发送了评论'`
+- **E4.3**: `CollabActivityPanel.tsx` — `handleSend` 调用 `activityStore.addEntry({type:'comment', message, canvasId})` + `canvasId` prop + MentionInput import 路径修正
+- **E4.4**: `MentionInput.tsx` — ESC 同时清空下拉框和输入框内容
+- **vitest**: `CollabActivityPanel.test.tsx` 14/14 测试通过（+4 新增测试）
+
+## [Unreleased] S75-E5: Canvas Snapshot Management — 2026-06-07
+- **E5.1**: SnapshotManagerPanel 组件 — 多选批量删除画布快照（header checkbox + 全选 + footer 批量删除按钮）
+- **E5.2**: CanvasSettingsDrawer 集成 — 添加"快照管理" Tab（第5个 Tab）
+- **E5.3**: `settingsStore.ts` — 扩展 `canvasPresets` 添加 `SnapshotManagerPanel` Tab 标签
+
+## [Unreleased] S76-E1: 画布背景设置集成 — 2026-06-07
+- **S76-E1.1**: 新增`canvasBackground`统一状态对象(`variant`/`gap`/`size`/`color`)于`settingsStore.ts`，含`setCanvasBackground()`action
+- **S76-E1.2**: `setGridVariant`/`setGridGap`/`setGridSize`/`setBackgroundColor` actions 同步更新 `canvasBackground` 对象
+- **S76-E1.3**: `DDSToolbar.tsx` — Background Settings 快捷入口按钮（点击打开 BackgroundSettingsPanel）
+- **S76-E1.4**: `BackgroundSettingsPanel.tsx` — 画布背景设置面板：variant (Dots/Lines/None) + gap (8/16/24/32) + size (0.5/1/2) + color picker
+- **vitest**: BackgroundSettingsPanel vitest 8/8 通过
 ## [Unreleased] S76-E2: 批量画布PNG导出ZIP — 2026-06-07
 - **feat(S76-E2)**: BatchOpsToolbar export button + ZipExporter + canvasListStore.batchExport
 - **test(S76-E2)**: add batch export tests (Esc/click-outside/confirm)

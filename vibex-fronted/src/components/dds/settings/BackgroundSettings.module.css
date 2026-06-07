@@ -8,6 +8,95 @@
   margin: 0 0 12px;
 }
 
+.section {
+  margin-bottom: 20px;
+}
+
+.sectionLabel {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #475569;
+  margin-bottom: 8px;
+}
+
+/* S76-E1: Style options (dots/lines/cross/none) */
+.styleOptions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.styleButton {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.15s;
+  min-width: 72px;
+}
+
+.styleButton:hover {
+  border-color: #6366f1;
+  background: #f8faff;
+}
+
+.styleButton.active {
+  border-color: #6366f1;
+  background: #eef2ff;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+}
+
+.styleIcon {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.styleLabel {
+  font-size: 11px;
+  color: #475569;
+}
+
+.styleButton.active .styleLabel {
+  color: #6366f1;
+  font-weight: 600;
+}
+
+/* S76-E1: Gap options */
+.gapOptions {
+  display: flex;
+  gap: 8px;
+}
+
+.gapButton {
+  padding: 6px 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  background: white;
+  font-size: 13px;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.gapButton:hover {
+  border-color: #6366f1;
+  color: #6366f1;
+}
+
+.gapButton.active {
+  border-color: #6366f1;
+  background: #eef2ff;
+  color: #6366f1;
+  font-weight: 600;
+}
+
+/* Preset color grid */
 .presetGrid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);

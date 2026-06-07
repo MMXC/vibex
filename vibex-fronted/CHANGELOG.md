@@ -1406,9 +1406,22 @@
 
 
 
-
 ---
 
+
+## [Unreleased] S75-E4: 协作活动流消息发送 — 2026-06-07
+- **E4.1**: `types.ts` — `ActivityType` 新增 `'comment'` 类型 + `ActivityEntry` 新增 `message?: string` + `canvasId?: string` 字段
+- **E4.2**: `activityStore.ts` — `activityLabel('comment')` = `'发送了评论'`
+- **E4.3**: `CollabActivityPanel.tsx` — `handleSend` 调用 `activityStore.addEntry({type:'comment', message, canvasId})` + `canvasId` prop + MentionInput import 路径修正
+
+## [Unreleased] S75-E5: Canvas Snapshot Management — 2026-06-07
+- **E5.1**: SnapshotManagerPanel 组件 — 多选批量删除画布快照（header checkbox + 全选 + footer 批量删除按钮）
+- **E5.2**: CanvasSettingsDrawer 集成 — 添加"快照管理" Tab（第5个 Tab）
+
+## [Unreleased] S76-E1: 画布背景设置集成 — 2026-06-07
+- **S76-E1.1**: 新增`canvasBackground`统一状态对象于`settingsStore.ts`
+- **S76-E1.4**: `BackgroundSettingsPanel.tsx` — 画布背景设置面板
+- **vitest**: BackgroundSettingsPanel vitest 8/8 通过
 ## [Unreleased] S76-E2: 批量画布PNG导出ZIP — 2026-06-07
 - **feat(S76-E2)**: BatchOpsToolbar export button + ZipExporter + canvasListStore.batchExport
 - **test(S76-E2)**: add batch export tests (Esc/click-outside/confirm)

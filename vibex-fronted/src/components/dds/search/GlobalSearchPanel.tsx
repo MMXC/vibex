@@ -178,11 +178,16 @@ export function GlobalSearchPanel({ open, onClose }: GlobalSearchPanelProps) {
   const setActiveCanvas = useCanvasListStore((s) => s.setActiveCanvas);
   const router = useRouter();
 
+  // S75-E1: If a globalSearchQuery is set (from RecentSearchesDropdown), use it as initial query
+  const storeQuery = useCanvasSearchStore((s) => s.globalSearchQuery);
+
   // Focus input when opened
   useEffect(() => {
     if (open) {
       setTimeout(() => inputRef.current?.focus(), 50);
-      setQuery('');
+      // S75-E1: Pre-fill from store if set, otherwise clear
+      const initialQuery = storeQuery || '';
+      setQuery(initialQuery);
       setCanvasResults([]);
       setNodeResults([]);
       setSelectedIdx(0);

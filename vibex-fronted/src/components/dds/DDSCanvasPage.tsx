@@ -47,6 +47,7 @@ import { GlobalSearchPanel } from '@/components/dds/search/GlobalSearchPanel';
 import { CanvasSearchPanel } from '@/components/dds/canvas/CanvasSearchPanel';
 import { useSearchIndex } from '@/hooks/useSearchIndex';
 import { useCanvasSearchStore } from '@/stores/canvasSearchStore';
+import { useCanvasSearchStore as useDdsCanvasSearchStore } from '@/stores/dds/canvasSearchStore';
 import { useAutoLayout } from '@/hooks/dds/useAutoLayout';
 import { useCanvasListStore } from '@/stores/canvasListStore';
 import { MiniMapPanel } from '@/components/dds/MiniMapPanel';
@@ -663,6 +664,27 @@ const { onCursorMove, broadcastCursor } = useWebSocketPresence({
     }
     document.addEventListener('keydown', handleGlobalSearch);
     return () => document.removeEventListener('keydown', handleGlobalSearch);
+  }, []);
+
+  // S75-E1: Listen for dds:recent-search (from RecentSearchesDropdown) and dds:open-search-panel
+  useEffect(() => {
+    function handleRecentSearch(e: Event) {
+      const { term } = (e as CustomEvent<{ term: string }>).detail;
+      if (!term) return;
+      // Set the search query in the DDS store and open GlobalSearchPanel
+      useDdsCanvasSearchStore.getState().setGlobalSearchQuery(term);
+      useDdsCanvasSearchStore.getState().setSearchQuery(term);
+      setGlobalSearchPanelOpen(true);
+    }
+    function handleOpenSearchPanel() {
+      setGlobalSearchPanelOpen(true);
+    }
+    window.addEventListener('dds:recent-search', handleRecentSearch);
+    window.addEventListener('dds:open-search-panel', handleOpenSearchPanel);
+    return () => {
+      window.removeEventListener('dds:recent-search', handleRecentSearch);
+      window.removeEventListener('dds:open-search-panel', handleOpenSearchPanel);
+    };
   }, []);
 
   // S62-E1: Escape key — deselect all cards and broadcast editing end

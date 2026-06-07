@@ -44,6 +44,7 @@ import { TemplateGallery } from '@/components/dds/templates/TemplateGallery';
 import { TemplateSaveDialog } from '@/components/dds/templates/TemplateSaveDialog';
 import { ShortcutSettingsPanel } from '@/components/dds/shortcuts/ShortcutSettingsPanel';
 import { HistoryPanel } from '@/components/dds/history/HistoryPanel';
+import { RecentSearchesDropdown } from '@/components/dds/search/RecentSearchesDropdown';
 import { BackupPanel } from '@/components/dds/settings/BackupPanel';
 import { CanvasSettingsDrawer } from '@/components/dds/settings/CanvasSettingsDrawer';
 import { ConflictDialog } from '@/components/dds/canvas-dashboard/ConflictDialog';
@@ -265,6 +266,7 @@ export const DDSToolbar = memo(function DDSToolbar({
   const [isBackupOpen, setIsBackupOpen] = useState(false);
   const [isCanvasSettingsOpen, setIsCanvasSettingsOpen] = useState(false);
   const [isViewPresetsOpen, setIsViewPresetsOpen] = useState(false);
+  const [isRecentSearchesOpen, setIsRecentSearchesOpen] = useState(false);
 
   // E3-S3: RBAC for toolbar actions
   const rbac = useCanvasRBAC(projectId);
@@ -518,6 +520,29 @@ export const DDSToolbar = memo(function DDSToolbar({
             disabled={!rbac.canShare && !rbac.loading}
             className={styles.exportMenuWrapper}
           />
+
+          {/* S75-E1: RecentSearchesDropdown */}
+          <div style={{ position: 'relative' }}>
+            <button
+              type="button"
+              className={styles.exportBtn}
+              onClick={() => setIsRecentSearchesOpen((v) => !v)}
+              aria-label="搜索历史"
+              aria-expanded={isRecentSearchesOpen}
+              aria-haspopup="menu"
+              data-testid="recent-searches-btn"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+              <span>历史</span>
+            </button>
+            <RecentSearchesDropdown
+              open={isRecentSearchesOpen}
+              onClose={() => setIsRecentSearchesOpen(false)}
+            />
+          </div>
 
           {/* S69-E5: View Presets dropdown */}
           <div style={{ position: 'relative' }}>

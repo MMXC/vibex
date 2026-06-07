@@ -374,9 +374,11 @@ describe('BranchDiffDialog', () => {
       historyTab.click();
     });
 
-    // Branch names visible
+    // Branch names visible (feature-a appears twice: as branchB in entry1 and branchA in entry2)
     expect(getByText('main')).toBeTruthy();
-    expect(getByText('feature-a')).toBeTruthy();
+    const featureAEls = document.body.querySelectorAll('span');
+    const hasFeatureA = Array.from(featureAEls).some(el => el.textContent === 'feature-a');
+    expect(hasFeatureA).toBe(true);
     // Change count visible
     expect(getByText('3 项变更')).toBeTruthy();
     // 无变更 for the second entry
@@ -397,6 +399,18 @@ describe('BranchDiffDialog', () => {
         summary: { totalChanges: 3, contextsAdded: 1, contextsRemoved: 1, contextsModified: 1, edgesAdded: 0, edgesRemoved: 0, edgesModified: 0 },
       },
     ];
+
+    // Capture CustomEvent construction to get the detail directly
+    const capturedDetails: any[] = [];
+    const OriginalCustomEvent = window.CustomEvent;
+    vi.stubGlobal('CustomEvent', class extends OriginalCustomEvent {
+      constructor(type: string, init?: any) {
+        if (init?.detail !== undefined) {
+          capturedDetails.push(init.detail);
+        }
+        super(type, init);
+      }
+    });
 
     const { getByRole, getByText } = render(
       <BranchDiffDialog
@@ -420,10 +434,10 @@ describe('BranchDiffDialog', () => {
       getByText('main').click();
     });
 
-    // Custom event should have been dispatched
-    const dispatchedEvents = (window as unknown as { _dispatchedEvents?: CustomEvent[] })._dispatchedEvents ?? [];
-    // Check that an event was dispatched
-    expect(window.dispatchEvent).toHaveBeenCalled();
+    // Verify CustomEvent was dispatched with correct branch pair
+    const branchDiffClick = capturedDetails.find(d => d && typeof d === 'object' && 'branchA' in d && 'branchB' in d);
+    expect(branchDiffClick?.branchA).toBe('main');
+    expect(branchDiffClick?.branchB).toBe('feature-a');
   });
 
   it('calls clearBranchDiffHistory when 清空历史 is clicked and confirmed', async () => {

@@ -6604,3 +6604,11 @@ See git history for complete changelog.
 - **E2.3**: `TemplateGallery.tsx` — 顶部标签筛选栏（All + 预设标签 chips）、多标签 AND 筛选、URL params 同步
 - **E2.4**: `TemplateGallery.test.tsx` — 新建标签筛选测试（108 行，6 测试用例）：渲染 chips、aria-pressed、清除按钮、多选逻辑
 - **E2.5**: `templateStore.test.ts` — 修复 beforeEach 隔离（E3 beforeEach 清理 + window.location.search 重置）
+
+
+## [Unreleased] S74-E4: @mention 通知闭环 — 2026-06-07
+- **E4.1**: `types.ts` — `ActivityEntry` 新增 `message?: string` + `canvasId?: string` 字段
+- **E4.2**: `activityStore.ts` — `extractMentions()` 函数：解析 `@username` 正则，`processMentionNotifications()` bridge 到 `notificationStore.addNotification(type: 'mention')`
+- **E4.3**: `activityStore.addEntry` — 当 entry.message 存在时自动触发 mention 通知，跳过 self-mention（sender === target）
+- **E4.4**: 去重机制：module-level Set 追踪 `(senderId, targetUserId, canvasId)` 三元组，同一会话内不重复通知
+- **vitest**: `activityStore.test.ts` +7 E4 测试（21/21），`notificationStore.test.ts` +8 E4 测试（25/25）

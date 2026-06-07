@@ -6621,3 +6621,14 @@ See git history for complete changelog.
 - **E5.3**: `TemplatePreviewPanel.tsx` — Esc 关闭 + Tab 焦点管理
 - **E5.4**: `NotificationPanel.tsx` — Tab/Enter 通知项导航 + Shift+Tab 反向循环
 - **E5.5**: `BranchDiffDialog.tsx` — Esc 关闭 + focus trap 焦点陷阱
+
+
+---
+
+## [Unreleased] S75-E1: 搜索历史工具栏快捷入口 — 2026-06-07
+- **E1.1**: `RecentSearchesDropdown.tsx` — 新建组件：最多显示5条最近搜索词，点击填充搜索框，支持清除历史
+- **E1.2**: `DDSToolbar.tsx` — 在导出按钮后插入 RecentSearchesDropdown（控制开关状态）
+- **E1.3**: `DDSCanvasPage.tsx` — 注册 `dds:recent-search`（填充搜索词）+ `dds:open-search-panel`（打开完整搜索面板）事件监听
+- **E1.4**: `GlobalSearchPanel.tsx` — 打开时预填充 store 中的最近搜索词
+- **E1.5**: `canvasSearchStore.ts` — 新增 `setSearchQuery()` + `addToSearchHistory()` + `clearHistory()` 方法
+- **vitest**: `RecentSearchesDropdown.test.tsx` 7/7 测试通过

@@ -116,6 +116,55 @@ describe('settingsStore', () => {
     });
   });
 
+  describe('canvasBackground (S76-E1)', () => {
+    it('should have default canvasBackground', () => {
+      const s = useSettingsStore.getState();
+      expect(s.canvasBackground).toEqual({
+        variant: 'dots',
+        gap: 16,
+        size: 1,
+        color: '#e5e7eb',
+      });
+    });
+
+    it('should update canvasBackground.variant via setCanvasBackground', () => {
+      useSettingsStore.getState().setCanvasBackground({ variant: 'lines' });
+      expect(useSettingsStore.getState().canvasBackground.variant).toBe('lines');
+    });
+
+    it('should update canvasBackground.gap via setCanvasBackground', () => {
+      useSettingsStore.getState().setCanvasBackground({ gap: 20 });
+      expect(useSettingsStore.getState().canvasBackground.gap).toBe(20);
+    });
+
+    it('should update all canvasBackground properties at once', () => {
+      useSettingsStore.getState().setCanvasBackground({
+        variant: 'lines',
+        gap: 20,
+        size: 1,
+        color: '#cccccc',
+      });
+      const bg = useSettingsStore.getState().canvasBackground;
+      expect(bg).toEqual({ variant: 'lines', gap: 20, size: 1, color: '#cccccc' });
+    });
+
+    it('should clear activePresetId when setCanvasBackground is called', () => {
+      const state = useSettingsStore.getState();
+      state.setCanvasBackground({ variant: 'lines' });
+      expect(useSettingsStore.getState().activePresetId).toBeNull();
+    });
+
+    it('should sync gridVariant to canvasBackground.variant', () => {
+      useSettingsStore.getState().setGridVariant('cross');
+      expect(useSettingsStore.getState().canvasBackground.variant).toBe('cross');
+    });
+
+    it('should sync gridSize to canvasBackground.gap', () => {
+      useSettingsStore.getState().setGridSize(12);
+      expect(useSettingsStore.getState().canvasBackground.gap).toBe(12);
+    });
+  });
+
   describe('reset', () => {
     it('should reset all settings to defaults', () => {
       const state = useSettingsStore.getState();
@@ -124,6 +173,7 @@ describe('settingsStore', () => {
       state.setGridVariant('lines');
       state.setDefaultZoom(1.5);
       state.setSnapToGrid(true);
+      state.setCanvasBackground({ variant: 'cross', gap: 32 });
 
       state.reset();
 
@@ -133,6 +183,8 @@ describe('settingsStore', () => {
       expect(s.gridVariant).toBe('dots');
       expect(s.defaultZoom).toBe(1.0);
       expect(s.snapToGrid).toBe(false);
+      // S76-E1: canvasBackground reset
+      expect(s.canvasBackground).toEqual({ variant: 'dots', gap: 16, size: 1, color: '#e5e7eb' });
     });
   });
 });

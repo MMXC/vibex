@@ -11,6 +11,7 @@ import React, { memo, useState, useRef, useEffect, useCallback } from 'react';
 import { exportAsPNG, exportAsSVG, downloadFigmaJSON, FigmaExportChapter } from '@/hooks/useCanvasExport';
 import { useCanvasExport } from '@/hooks/canvas/useCanvasExport';
 import { useDDSCanvasStore } from '@/stores/dds';
+import { useCanvasListStore } from '@/stores/canvasListStore';
 import { ExportDialog } from '../export/ExportDialog';
 import styles from './ExportMenu.module.css';
 
@@ -269,6 +270,43 @@ export const ExportMenu = memo(function ExportMenu({
     setIsExportDialogOpen(true);
   }, []);
 
+  // S76-E4: Export selected canvases from the canvas list
+  const selectedCanvasIds = useCanvasListStore((s) => s.selectedCanvasIds);
+  const allCanvases = useCanvasListStore((s) => s.canvases);
+
+  const handleExportSelectedCanvases = useCallback(async () => {
+    if (selectedCanvasIds.size === 0) return;
+    const ids = Array.from(selectedCanvasIds);
+    try {
+      const { zipExporter, downloadExportBlob } = await import('@/services/export/ZipExporter');
+      const blob = await zipExporter.exportCanvases(ids, {
+        format: 'png',
+        scope: 'all',
+        compression: 'medium',
+      });
+      downloadExportBlob(blob, `vibex-canvases-${ids.length}.zip`);
+    } catch (err) {
+      console.error('[ExportMenu] export selected canvases error:', err);
+    }
+  }, [selectedCanvasIds]);
+
+  // S76-E4: Export all canvases from the canvas list
+  const handleExportAllCanvases = useCallback(async () => {
+    if (allCanvases.length === 0) return;
+    const ids = allCanvases.map((c) => c.id);
+    try {
+      const { zipExporter, downloadExportBlob } = await import('@/services/export/ZipExporter');
+      const blob = await zipExporter.exportCanvases(ids, {
+        format: 'png',
+        scope: 'all',
+        compression: 'medium',
+      });
+      downloadExportBlob(blob, `vibex-all-canvases-${ids.length}.zip`);
+    } catch (err) {
+      console.error('[ExportMenu] export all canvases error:', err);
+    }
+  }, [allCanvases]);
+
   const handleExport = useCallback(
     async (format: ExportFormat) => {
       switch (format) {
@@ -386,6 +424,42 @@ export const ExportMenu = memo(function ExportMenu({
               批量导出
             </span>
             <span className={styles.menuItemDesc}>PNG/SVG/PDF 多节点打包</span>
+          </button>
+
+          {/* S76-E4: Export selected canvases from canvas list */}
+          <button
+            type="button"
+            className={styles.menuItem}
+            role="menuitem"
+            onClick={handleExportSelectedCanvases}
+            disabled={selectedCanvasIds.size === 0}
+            aria-label="导出选中画布"
+            data-testid="export-option-selected-canvases"
+          >
+            <span className={styles.menuItemLabel}>导出选中画布</span>
+            <span className={styles.menuItemDesc}>
+              {selectedCanvasIds.size > 0
+                ? `已选 ${selectedCanvasIds.size} 个画布打包`
+                : '从画布列表选择后可用'}
+            </span>
+          </button>
+
+          {/* S76-E4: Export all canvases from canvas list */}
+          <button
+            type="button"
+            className={styles.menuItem}
+            role="menuitem"
+            onClick={handleExportAllCanvases}
+            disabled={allCanvases.length === 0}
+            aria-label="导出全部画布"
+            data-testid="export-option-all-canvases"
+          >
+            <span className={styles.menuItemLabel}>导出全部画布</span>
+            <span className={styles.menuItemDesc}>
+              {allCanvases.length > 0
+                ? `全部 ${allCanvases.length} 个画布打包`
+                : '无画布可导出'}
+            </span>
           </button>
         </div>
       )}

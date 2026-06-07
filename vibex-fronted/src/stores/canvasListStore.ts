@@ -96,6 +96,19 @@ export interface CanvasListState {
    * nodeIds — 要导出的画布 ID 列表
    */
   batchTemplateExport: (canvasIds: string[]) => Promise<void>;
+  /**
+   * S76-E2: 批量导出选中的画布节点为 PNG ZIP 文件。
+   * - 从 IndexedDB 加载每个画布的完整数据
+   * - 收集所有 chapters 的卡片 (context / flow / component)
+   * - 逐个渲染到隐藏容器 → html-to-image 导出为 PNG
+   * - 所有 PNG 打包为 ZIP 并触发浏览器下载
+   */
+  batchExport: (canvasIds: string[], options?: {
+    format?: 'png';
+    scale?: number;
+    backgroundColor?: string;
+    onProgress?: (current: number, total: number, name: string) => void;
+  }) => Promise<void>;
 
 }
 
@@ -593,6 +606,42 @@ export const useCanvasListStore = create<CanvasListState>((set, get) => ({
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+  },
+
+  /**
+   * S76-E2: batchExport
+   * 批量导出选中的画布节点为 PNG ZIP 文件。
+   *
+   * 流程：
+   * 1. 保存当前活跃画布 ID（用于导出后恢复）
+   * 2. 遍历每个选中画布：从 IndexedDB 加载完整数据 → 收集所有 cards
+   * 3. 逐个激活画布（触发 DOM 渲染）→ html-to-image 捕获为 PNG
+   * 4. 所有 PNG 打包为 ZIP → 触发浏览器下载
+   * 5. 恢复原始活跃画布
+   */
+  batchExport: async (canvasIds, options = {}) => {
+    if (canvasIds.length === 0) return;
+    const {
+      scale = 2,
+      backgroundColor = '#0f0f1a',
+      onProgress,
+    } = options;
+
+    const { zipExporter, downloadExportBlob } = await import('@/services/export/ZipExporter');
+
+    const blob = await zipExporter.exportCanvases(canvasIds, {
+      format: 'png',
+      scope: 'all',
+      scale,
+      backgroundColor,
+      onProgress,
+    });
+
+    const timestamp = new Date().toISOString().slice(0, 10);
+    downloadExportBlob(blob, `vibex-batch-export-${timestamp}.zip`);
+
+    // 导出完成后清除选中状态
+    get().clearSelection();
   },
 
   // ============================================================

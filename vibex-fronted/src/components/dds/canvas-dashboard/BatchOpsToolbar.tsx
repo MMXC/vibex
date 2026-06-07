@@ -6,12 +6,13 @@
  * S63-E5: Add "移动到文件夹" button + FolderPickerDialog.
  * S64-E4: Advanced BatchRenameDialog (sequence + regex mode) + batchArchive/batchUnarchive.
  * S68-E4: Add "复制到画布" button + CrossCanvasCopyDialog, "批量模板化" button + BatchDeleteConfirmDialog.
+ * S76-E2: Add "批量导出 PNG" button + BatchExportDialog (Esc/click-outside dismiss, progress).
  *
  * Displays at the top of CanvasListPanel when multiple canvases are selected.
  * Provides batch delete, batch rename, batch archive, and batch move-to-folder entry points.
  */
 
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useCanvasListStore } from '@/stores/canvasListStore';
 import { useBatchOpsStore } from '@/stores/dds/batchOpsStore';
 import { useCanvasFolderStore } from '@/stores/dds/canvasFolderStore';
@@ -57,6 +58,40 @@ export function BatchOpsToolbar({ selectedCount }: BatchOpsToolbarProps) {
 
   // S68-E4: batch delete confirm dialog state
   const [showBatchDeleteConfirm, setShowBatchDeleteConfirm] = useState(false);
+
+  // S76-E2: batch export dialog state + progress
+  const [showExportDialog, setShowExportDialog] = useState(false);
+  const [exportProgress, setExportProgress] = useState({ current: 0, total: 0, name: '' });
+  const exportDialogRef = useRef<HTMLDivElement>(null);
+  const exportAbortRef = useRef<AbortController | null>(null);
+
+  // S76-E2: Esc key + click-outside handler for export dialog
+  useEffect(() => {
+    if (!showExportDialog) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.stopPropagation();
+        setShowExportDialog(false);
+      }
+    };
+
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        exportDialogRef.current &&
+        !exportDialogRef.current.contains(e.target as Node)
+      ) {
+        setShowExportDialog(false);
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showExportDialog]);
 
   const handleMoveToFolder = useCallback(() => {
     setShowFolderPicker(true);
@@ -179,6 +214,28 @@ export function BatchOpsToolbar({ selectedCount }: BatchOpsToolbarProps) {
     }
   }, [selectedCanvasIds, clearSelection, setIsOperating]);
 
+  // S76-E2: batch export handler
+  const handleBatchExport = useCallback(() => {
+    setShowExportDialog(true);
+  }, []);
+
+  const handleExportConfirm = useCallback(async () => {
+    setShowExportDialog(false);
+    if (selectedCanvasIds.size === 0) return;
+    setIsOperating(true);
+    setExportProgress({ current: 0, total: 0, name: '' });
+    try {
+      const { batchExport } = useCanvasListStore.getState();
+      await batchExport(Array.from(selectedCanvasIds), {
+        onProgress: (current, total, name) => {
+          setExportProgress({ current, total, name });
+        },
+      });
+    } finally {
+      setIsOperating(false);
+    }
+  }, [selectedCanvasIds, setIsOperating]);
+
   if (selectedCount === 0) return null;
 
   return (
@@ -252,6 +309,16 @@ export function BatchOpsToolbar({ selectedCount }: BatchOpsToolbarProps) {
           aria-label={t('batchTemplateExport')}
         >
           📥 {t('batchTemplateExport')}
+        </button>
+
+        {/* S76-E2: Batch PNG export */}
+        <button
+          className={styles['batch-ops-toolbar__btn']}
+          onClick={handleBatchExport}
+          disabled={isOperating}
+          aria-label={t('batchExport') ?? '批量导出 PNG'}
+        >
+          📤 {t('batchExport') ?? '批量导出 PNG'}
         </button>
 
         <button
@@ -328,6 +395,41 @@ export function BatchOpsToolbar({ selectedCount }: BatchOpsToolbarProps) {
         onConfirm={handleBatchDeleteConfirm}
         onCancel={() => setShowBatchDeleteConfirm(false)}
       />
+
+      {/* S76-E2: Batch Export PNG dialog */}
+      {showExportDialog && (
+        <div
+          className={styles['dialog-overlay']}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="batch-export-title"
+        >
+          <div className={styles['dialog']} ref={exportDialogRef}>
+            <h3 id="batch-export-title" className={styles['dialog__title']}>
+              {t('batchExport') ?? '批量导出 PNG'}
+            </h3>
+            <p className={styles['dialog__body']}>
+              {t('exportWarning', { count: selectedCount })}
+            </p>
+            <div className={styles['dialog__actions']}>
+              <button
+                className={styles['dialog__cancel']}
+                onClick={() => setShowExportDialog(false)}
+                disabled={isOperating}
+              >
+                {t('cancel')}
+              </button>
+              <button
+                className={styles['dialog__confirm']}
+                onClick={handleExportConfirm}
+                disabled={isOperating}
+              >
+                {t('exportConfirm') ?? '导出'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

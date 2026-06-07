@@ -1,6 +1,7 @@
 /**
  * NotificationPanel.module.css — S68-E2
  * 扩展 S73-E3: 清空按钮 + 设置按钮样式
+ * 扩展 S74-E5: 键盘导航焦点样式
  */
 
 .panel {
@@ -168,6 +169,13 @@
 }
 
 .item.unread:hover {
+  background: #e0eeff;
+}
+
+/* S74-E5: 键盘导航焦点样式 */
+.item:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: -2px;
   background: #e0eeff;
 }
 

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { memo, useState, useEffect, useCallback } from 'react';
+import React, { memo, useState, useEffect, useCallback, useRef } from 'react';
 import { useCanvasHistoryStore } from '@/stores/dds/canvasHistoryStore';
 import type { BranchDiffResult } from '@/stores/dds/canvasHistoryStore';
 import SnapshotDiffRenderer from '../canvas-history/SnapshotDiffRenderer';
@@ -26,6 +26,7 @@ interface BranchDiffDialogProps {
  * Opened from HistoryPanel after Ctrl+Click multi-select.
  * Shows diff between the latest snapshots of branchA and branchB.
  * S74-E3: 画布分支对比视图
+ * S74-E5: Keyboard navigation — Esc to close, focus trap, focus restoration
  */
 const BranchDiffDialog = memo(function BranchDiffDialog({
   open,
@@ -39,7 +40,98 @@ const BranchDiffDialog = memo(function BranchDiffDialog({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Refs for focus management
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const previousFocusRef = useRef<HTMLElement | null>(null);
+
   const compareBranches = useCanvasHistoryStore((s) => s.compareBranches);
+
+  // S74-E5: Focus restoration — save focus before opening, restore on close
+  useEffect(() => {
+    if (open) {
+      previousFocusRef.current = document.activeElement as HTMLElement;
+      // Focus first focusable element (close button) after mount
+      requestAnimationFrame(() => {
+        closeButtonRef.current?.focus();
+      });
+    }
+  }, [open]);
+
+  // S74-E5: Escape key to close dialog
+  useEffect(() => {
+    if (!open) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        e.stopPropagation();
+        onClose();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [open, onClose]);
+
+  // S74-E5: Focus trap — keep focus within dialog
+  useEffect(() => {
+    if (!open || !dialogRef.current) return;
+
+    const dialog = dialogRef.current;
+    const focusableSelectors = [
+      'button:not([disabled])',
+      'input:not([disabled])',
+      'select:not([disabled])',
+      'textarea:not([disabled])',
+      '[tabindex]:not([tabindex="-1"])',
+      'a[href]',
+    ].join(', ');
+
+    const getFocusableElements = () =>
+      Array.from(dialog.querySelectorAll<HTMLElement>(focusableSelectors)).filter(
+        (el) => !el.closest('[aria-hidden="true"]')
+      );
+
+    const handleTabKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Tab') return;
+
+      const focusable = getFocusableElements();
+      if (focusable.length === 0) return;
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+
+    // Ensure focus stays within dialog
+    const handleFocusIn = (e: FocusEvent) => {
+      if (!dialog.contains(e.target as Node)) {
+        e.preventDefault();
+        const focusable = getFocusableElements();
+        if (focusable.length > 0) {
+          focusable[0].focus();
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleTabKey);
+    dialog.addEventListener('focusin', handleFocusIn);
+
+    return () => {
+      document.removeEventListener('keydown', handleTabKey);
+      dialog.removeEventListener('focusin', handleFocusIn);
+      // S74-E5: Restore focus when dialog closes
+      previousFocusRef.current?.focus();
+    };
+  }, [open]);
 
   // Load diff when dialog opens with valid branches
   useEffect(() => {
@@ -102,6 +194,7 @@ const BranchDiffDialog = memo(function BranchDiffDialog({
 
   return (
     <div
+      ref={dialogRef}
       className={styles.overlay}
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
       role="dialog"
@@ -118,6 +211,7 @@ const BranchDiffDialog = memo(function BranchDiffDialog({
             </span>
           </h2>
           <button
+            ref={closeButtonRef}
             className={styles.closeBtn}
             data-testid="diff-close-btn"
             onClick={onClose}

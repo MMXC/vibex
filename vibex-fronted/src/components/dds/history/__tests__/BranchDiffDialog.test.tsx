@@ -1,6 +1,7 @@
 /**
  * BranchDiffDialog — Component Tests
  * S74-E3: 画布分支对比视图
+ * S74-E5: Keyboard navigation — Esc to close, focus trap, focus restoration
  *
  * Uses a shared mutable mockRef so beforeEach can update the mock
  * without relying on module re-import or dynamic import isolation.
@@ -143,5 +144,85 @@ describe('BranchDiffDialog', () => {
     // Click the last "关闭" button (footer cancel), not the header X
     buttons[buttons.length - 1].click();
     expect(onClose).toHaveBeenCalled();
+  });
+
+  // S74-E5: Keyboard navigation tests
+  it('closes dialog when Escape key is pressed', async () => {
+    const onClose = vi.fn();
+    render(
+      <BranchDiffDialog
+        open={true}
+        branchA="main"
+        branchB="feature"
+        canvasId="canvas-1"
+        onClose={onClose}
+        onRestore={vi.fn()}
+      />
+    );
+
+    // Simulate Escape key press
+    const event = new KeyboardEvent('keydown', { key: 'Escape', bubbles: true });
+    document.dispatchEvent(event);
+
+    expect(onClose).toHaveBeenCalled();
+  });
+
+  it('does not close dialog when other keys are pressed', async () => {
+    const onClose = vi.fn();
+    render(
+      <BranchDiffDialog
+        open={true}
+        branchA="main"
+        branchB="feature"
+        canvasId="canvas-1"
+        onClose={onClose}
+        onRestore={vi.fn()}
+      />
+    );
+
+    // Simulate Enter key press
+    const event = new KeyboardEvent('keydown', { key: 'Enter', bubbles: true });
+    document.dispatchEvent(event);
+
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
+  it('focuses close button when dialog opens', async () => {
+    render(
+      <BranchDiffDialog
+        open={true}
+        branchA="main"
+        branchB="feature"
+        canvasId="canvas-1"
+        onClose={vi.fn()}
+        onRestore={vi.fn()}
+      />
+    );
+
+    // Wait for requestAnimationFrame to complete
+    await new Promise((resolve) => requestAnimationFrame(resolve));
+
+    // Close button should be focused
+    expect(document.activeElement?.getAttribute('data-testid')).toBe('diff-close-btn');
+  });
+
+  it('does not call onClose for Escape when dialog is not open', () => {
+    const onClose = vi.fn();
+    render(
+      <BranchDiffDialog
+        open={false}
+        branchA="main"
+        branchB="feature"
+        canvasId="canvas-1"
+        onClose={onClose}
+        onRestore={vi.fn()}
+      />
+    );
+
+    // Simulate Escape key press
+    const event = new KeyboardEvent('keydown', { key: 'Escape', bubbles: true });
+    document.dispatchEvent(event);
+
+    expect(onClose).not.toHaveBeenCalled();
   });
 });

@@ -191,6 +191,12 @@
   cursor: wait;
 }
 
+.cardFocused {
+  outline: 2px solid var(--color-primary, #6366f1);
+  outline-offset: 2px;
+  border-color: var(--color-primary, #6366f1);
+}
+
 .cardIcon {
   font-size: 28px;
   line-height: 1;

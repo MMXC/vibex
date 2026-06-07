@@ -7,7 +7,7 @@
  */
 'use client';
 
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import {
   listTemplates,
   getTemplate,
@@ -74,10 +74,89 @@ export function TemplateGallery({ isOpen, onClose, onTemplateApplied }: Template
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const [shareTemplateId, setShareTemplateId] = useState<string | null>(null);
   const [importUrlDialogOpen, setImportUrlDialogOpen] = useState(false);
+  // ---- Grid keyboard navigation state ----
+  const [focusedIndex, setFocusedIndex] = useState<number>(-1);
+  const gridRef = useRef<HTMLDivElement>(null);
+  const cardRefs = useRef<Map<string, HTMLButtonElement>>(new Map());
+  const colCountRef = useRef<number>(1);
 
   const templateStore = useTemplateStore();
 
 // categories removed (now via CategoryTab)
+
+  // ---- Grid keyboard navigation: measure column count via ResizeObserver ----
+  useEffect(() => {
+    const el = gridRef.current;
+    if (!el) return;
+    const observer = new ResizeObserver(() => {
+      const width = el.clientWidth;
+      const gap = 12;
+      // minmax(180px, 1fr) → minimum card width 180px
+      const cols = Math.max(1, Math.floor((width + gap) / (180 + gap)));
+      colCountRef.current = cols;
+    });
+    observer.observe(el);
+    // Initial measurement
+    const width = el.clientWidth;
+    const gap = 12;
+    colCountRef.current = Math.max(1, Math.floor((width + gap) / (180 + gap)));
+    return () => observer.disconnect();
+  }, [filtered.length]);
+
+  // ---- Grid keyboard navigation: arrow key handler ----
+  const handleGridKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLDivElement>) => {
+      const total = filtered.length;
+      if (total === 0) return;
+      const cols = colCountRef.current;
+      let next = focusedIndex;
+      switch (e.key) {
+        case 'ArrowRight':
+          e.preventDefault();
+          next = Math.min(focusedIndex + 1, total - 1);
+          break;
+        case 'ArrowLeft':
+          e.preventDefault();
+          next = Math.max(focusedIndex - 1, 0);
+          break;
+        case 'ArrowDown':
+          e.preventDefault();
+          next = Math.min(focusedIndex + cols, total - 1);
+          break;
+        case 'ArrowUp':
+          e.preventDefault();
+          next = Math.max(focusedIndex - cols, 0);
+          break;
+        case 'Home':
+          e.preventDefault();
+          next = 0;
+          break;
+        case 'End':
+          e.preventDefault();
+          next = total - 1;
+          break;
+        case 'Enter':
+        case ' ':
+          if (focusedIndex >= 0) {
+            e.preventDefault();
+            const t = filtered[focusedIndex];
+            if (t) applyTemplate(t.id);
+          }
+          return;
+        default:
+          return;
+      }
+      if (next !== focusedIndex) {
+        setFocusedIndex(next);
+        const t = filtered[next];
+        if (t) {
+          const btn = cardRefs.current.get(t.id);
+          btn?.focus();
+        }
+      }
+    },
+    [focusedIndex, filtered, applyTemplate]
+  );
 
   const loadTemplates = useCallback(async () => {
     setLoading(true);
@@ -123,6 +202,23 @@ export function TemplateGallery({ isOpen, onClose, onTemplateApplied }: Template
     window.history.replaceState(null, '', newUrl);
   }, [isOpen, selectedTags, dateRange, searchQuery, selectedCategory]);
 
+  const applyTemplate = useCallback(async (templateId: string) => {
+    setApplying(templateId);
+    try {
+      const template = await getTemplate(templateId);
+      if (!template) return;
+      const snapshot = JSON.parse(template.snapshot);
+      const result = deserializeThreeTrees(JSON.stringify(snapshot));
+      restoreStore(result);
+      onTemplateApplied?.(templateId);
+      onClose();
+    } catch (err) {
+      console.error('[TemplateGallery] Failed to apply template:', err);
+    } finally {
+      setApplying(null);
+    }
+  }, [onTemplateApplied, onClose]);
+
   useEffect(() => {
     if (isOpen) {
       loadTemplates();
@@ -158,22 +254,77 @@ export function TemplateGallery({ isOpen, onClose, onTemplateApplied }: Template
     return true;
   });
 
-  const applyTemplate = async (templateId: string) => {
-    setApplying(templateId);
-    try {
-      const template = await getTemplate(templateId);
-      if (!template) return;
-      const snapshot = JSON.parse(template.snapshot);
-      const result = deserializeThreeTrees(JSON.stringify(snapshot));
-      restoreStore(result);
-      onTemplateApplied?.(templateId);
-      onClose();
-    } catch (err) {
-      console.error('[TemplateGallery] Failed to apply template:', err);
-    } finally {
-      setApplying(null);
-    }
-  };
+  // ---- Grid keyboard navigation: measure column count via ResizeObserver ----
+  useEffect(() => {
+    const el = gridRef.current;
+    if (!el) return;
+    const observer = new ResizeObserver(() => {
+      const width = el.clientWidth;
+      const gap = 12;
+      const cols = Math.max(1, Math.floor((width + gap) / (180 + gap)));
+      colCountRef.current = cols;
+    });
+    observer.observe(el);
+    const width = el.clientWidth;
+    const gap = 12;
+    colCountRef.current = Math.max(1, Math.floor((width + gap) / (180 + gap)));
+    return () => observer.disconnect();
+  }, [filtered.length]);
+
+  // ---- Grid keyboard navigation: arrow key handler ----
+  const handleGridKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLDivElement>) => {
+      const total = filtered.length;
+      if (total === 0) return;
+      const cols = colCountRef.current;
+      let next = focusedIndex;
+      switch (e.key) {
+        case 'ArrowRight':
+          e.preventDefault();
+          next = Math.min(focusedIndex + 1, total - 1);
+          break;
+        case 'ArrowLeft':
+          e.preventDefault();
+          next = Math.max(focusedIndex - 1, 0);
+          break;
+        case 'ArrowDown':
+          e.preventDefault();
+          next = Math.min(focusedIndex + cols, total - 1);
+          break;
+        case 'ArrowUp':
+          e.preventDefault();
+          next = Math.max(focusedIndex - cols, 0);
+          break;
+        case 'Home':
+          e.preventDefault();
+          next = 0;
+          break;
+        case 'End':
+          e.preventDefault();
+          next = total - 1;
+          break;
+        case 'Enter':
+        case ' ':
+          if (focusedIndex >= 0) {
+            e.preventDefault();
+            const t = filtered[focusedIndex];
+            if (t) applyTemplate(t.id);
+          }
+          return;
+        default:
+          return;
+      }
+      if (next !== focusedIndex) {
+        setFocusedIndex(next);
+        const t = filtered[next];
+        if (t) {
+          const btn = cardRefs.current.get(t.id);
+          btn?.focus();
+        }
+      }
+    },
+    [focusedIndex, filtered, applyTemplate]
+  );
 
   const handleExportAll = () => {
     const data = templateStore.exportTemplates();
@@ -333,20 +484,35 @@ export function TemplateGallery({ isOpen, onClose, onTemplateApplied }: Template
         )}
 
         {/* Template grid */}
-        <div className={styles.grid}>
+        <div
+          className={styles.grid}
+          role="grid"
+          aria-label="模板卡片网格"
+          aria-rowcount={filtered.length}
+          aria-colcount={colCountRef.current}
+          onKeyDown={handleGridKeyDown}
+          ref={gridRef}
+        >
           {loading && <p className={styles.loading}>加载中...</p>}
           {!loading && filtered.length === 0 && (
             <p className={styles.empty}>没有找到匹配的模板</p>
           )}
           {!loading &&
-            filtered.map((t) => (
+            filtered.map((t, idx) => (
               <button
                 key={t.id}
                 type="button"
-                className={`${styles.card} ${applying === t.id ? styles.cardApplying : ''}`}
+                className={`${styles.card} ${applying === t.id ? styles.cardApplying : ''} ${focusedIndex === idx ? styles.cardFocused : ''}`}
                 onClick={() => applyTemplate(t.id)}
+                onFocus={() => setFocusedIndex(idx)}
                 disabled={applying !== null}
                 aria-label={`应用模板: ${t.name}`}
+                role="gridcell"
+                tabIndex={focusedIndex === idx ? 0 : -1}
+                ref={(el) => {
+                  if (el) cardRefs.current.set(t.id, el);
+                  else cardRefs.current.delete(t.id);
+                }}
               >
                 <span className={styles.cardIcon}>{t.icon}</span>
                 <span className={styles.cardName}>{t.name}</span>

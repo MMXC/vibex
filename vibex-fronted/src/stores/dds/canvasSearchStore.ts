@@ -1,5 +1,5 @@
 /**
- * canvasSearchStore.ts — Sprint60 E5 + Sprint65 E4 + Sprint68 E3 + Sprint74 E1
+ * canvasSearchStore.ts — Sprint60 E5 + Sprint65 E4 + Sprint68 E3 + Sprint74 E1 + Sprint75 E1
  *
  * Sprint60 E5: 搜索历史管理 — localStorage 持久化，最多 10 条，最新优先
  * Sprint65 E4: 扩展搜索结果 + 全局搜索状态
@@ -21,6 +21,9 @@ export interface CanvasSearchState {
   /** 最近搜索记录（最新在前，最多 MAX_RECENT_SEARCHES 条）S74-E1 */
   recentSearches: string[];
 
+  /** S75-E1: 当前搜索词（RecentSearchesDropdown 点击后设置，搜索面板读取） */
+  searchQuery: string;
+
   /** 全局搜索查询（E4 D4.4） */
   globalSearchQuery: string;
 
@@ -38,6 +41,12 @@ export interface CanvasSearchState {
 
   /** S74-E1: 添加最近搜索记录 */
   addRecentSearch: (query: string) => void;
+
+  /** S75-E1: 设置当前搜索词 */
+  setSearchQuery: (query: string) => void;
+
+  /** S75-E1: 添加搜索历史（被 GlobalSearchPanel 调用） */
+  addToSearchHistory: (query: string) => void;
 
   /** 清空搜索历史 */
   clearHistory: () => void;
@@ -83,6 +92,8 @@ export const useCanvasSearchStore = create<CanvasSearchState>()(
     (set, get) => ({
       recentSearches: [],
 
+      searchQuery: '', // S75-E1
+
       globalSearchQuery: '',
       globalSearchResults: [],
 
@@ -102,6 +113,14 @@ export const useCanvasSearchStore = create<CanvasSearchState>()(
         const next = [trimmed, ...filtered].slice(0, MAX_RECENT_SEARCHES);
 
         set({ recentSearches: next });
+      },
+
+      setSearchQuery: (query: string) => {
+        set({ searchQuery: query });
+      },
+
+      addToSearchHistory: (query: string) => {
+        get().addRecentSearch(query);
       },
 
       clearHistory: () => {

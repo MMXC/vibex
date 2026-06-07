@@ -1,0 +1,73 @@
+/* ConflictWarningBanner.module.css — S76-E5 */
+
+.banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 16px;
+  background: rgba(239, 68, 68, 0.12);
+  border-bottom: 1px solid rgba(239, 68, 68, 0.3);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.icon {
+  font-size: 14px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.message {
+  font-size: 13px;
+  color: #fca5a5;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.message strong {
+  color: #fecaca;
+}
+
+.dismissBtn {
+  background: transparent;
+  border: none;
+  color: rgba(252, 165, 165, 0.6);
+  font-size: 12px;
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 4px;
+  flex-shrink: 0;
+  transition: color 0.15s, background 0.15s;
+}
+
+.dismissBtn:hover {
+  color: #fecaca;
+  background: rgba(239, 68, 68, 0.15);
+}
+
+.dismissBtn:focus-visible {
+  outline: 2px solid #fca5a5;
+  outline-offset: 1px;
+}

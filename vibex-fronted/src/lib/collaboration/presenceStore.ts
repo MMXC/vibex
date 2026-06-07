@@ -129,6 +129,22 @@ interface PresenceState {
   /** S68-E5: Dedicated cursor tracking: userId → CursorState */
   cursors: Record<string, CursorState>;
 
+  // S76-E5: Remote editing tracking
+  /** S76-E5: Inverse mapping from userId → node they're editing (remote users only) */
+  remoteEditing: Map<string, { nodeId: string; userName: string }>;
+
+  /** S76-E5: Set which node a remote user is editing */
+  setRemoteEditing: (userId: string, nodeId: string, userName: string) => void;
+
+  /** S76-E5: Clear a user's remote editing state */
+  clearRemoteEditing: (userId: string) => void;
+
+  /** S76-E5: Get all remote users editing a specific node */
+  getRemoteEditors: (nodeId: string) => { userId: string; userName: string }[];
+
+  /** S76-E5: Clear all remote editing state */
+  clearAllRemoteEditing: () => void;
+
   /** S70-E4: Pending collaboration conflicts requiring resolution */
   pendingConflicts: ConflictRecord[];
 
@@ -342,6 +358,9 @@ export const usePresenceStore = create<PresenceState>((set, get) => {
     // S68-E5: Dedicated cursors field
     cursors: {},
 
+    // S76-E5: Remote editing tracking
+    remoteEditing: new Map(),
+
     setRemoteUsers: (users: CollabUser[]) =>
       set((state) => {
         const next = new Map<string, RemoteUser>();
@@ -373,7 +392,9 @@ export const usePresenceStore = create<PresenceState>((set, get) => {
         const updated = new Map(state.remoteUsers);
         updated.delete(userId);
         const { [userId]: _c, ...restCursors } = state.cursors;
-        return { remoteUsers: updated, cursors: restCursors };
+        const remoteEditingUpdated = new Map(state.remoteEditing);
+        remoteEditingUpdated.delete(userId);
+        return { remoteUsers: updated, cursors: restCursors, remoteEditing: remoteEditingUpdated };
       }),
 
     removeCursor: (userId: string) =>
@@ -394,6 +415,7 @@ export const usePresenceStore = create<PresenceState>((set, get) => {
         focusedNodes: {},
         focusedNodeInfos: new Map(),
         cursors: {},
+        remoteEditing: new Map(),
       }),
 
     lockNode: (nodeId: string, userId: string) =>
@@ -644,6 +666,34 @@ export const usePresenceStore = create<PresenceState>((set, get) => {
       }),
 
     clearAllCursors: () => set({ cursors: {} }),
+
+    // S76-E5: Remote editing tracking
+    setRemoteEditing: (userId, nodeId, userName) =>
+      set((state) => {
+        const updated = new Map(state.remoteEditing);
+        updated.set(userId, { nodeId, userName });
+        return { remoteEditing: updated };
+      }),
+
+    clearRemoteEditing: (userId) =>
+      set((state) => {
+        const updated = new Map(state.remoteEditing);
+        updated.delete(userId);
+        return { remoteEditing: updated };
+      }),
+
+    getRemoteEditors: (nodeId) => {
+      const state = get();
+      const editors: { userId: string; userName: string }[] = [];
+      for (const [userId, info] of state.remoteEditing) {
+        if (info.nodeId === nodeId) {
+          editors.push({ userId, userName: info.userName });
+        }
+      }
+      return editors;
+    },
+
+    clearAllRemoteEditing: () => set({ remoteEditing: new Map() }),
 
     // S66-E2: Node Lock actions
 

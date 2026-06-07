@@ -56,6 +56,9 @@ import { HistoryPanel } from '@/components/canvas/features/HistoryPanel';
 import { useConflictStore } from '@/stores/dds/conflictStore';
 import { ConflictDialog } from '@/components/dds/canvas-dashboard/ConflictDialog';
 import { ConflictResolutionDialog } from '@/components/dds/canvas-dashboard/ConflictResolutionDialog';
+// S76-E5: Conflict detection banner
+import { ConflictWarningBanner } from '@/components/dds/canvas-dashboard/ConflictWarningBanner/ConflictWarningBanner';
+import { usePresenceStore } from '@/lib/collaboration/presenceStore';
 import { CollabConflictDialog } from '@/components/dds/collaboration/ConflictResolutionDialog';
 import { PresenceOverlay } from '@/components/dds/presence/PresenceOverlay';
 import { useWebSocketPresence } from '@/lib/collaboration/useWebSocketPresence';
@@ -883,6 +886,9 @@ const { onCursorMove, broadcastCursor } = useWebSocketPresence({
       {/* Toolbar */}
       <DDSToolbar onAIGenerate={handleAIGenerate} agentSession={agentSession} projectId={projectId ?? ''} />
 
+      {/* S76-E5: ConflictWarningBanner — shows when a remote user is editing the selected node */}
+      <ConflictWarningBannerWrapper />
+
       {/* S53-E1: Real-time presence indicator — shows online collaborators */}
       <div style={{ position: 'absolute', top: '12px', right: '16px', zIndex: 50 }}>
         <PresenceIndicator />
@@ -1168,6 +1174,42 @@ const { onCursorMove, broadcastCursor } = useWebSocketPresence({
 // ShortcutEditModal rendered outside the main div, always mounted
 // Visibility controlled by shortcutStore.editingAction
 // The ? key handler above toggles shortcutModalOpen which drives editingAction via ShortcutEditModal internals
+/**
+ * S76-E5: ConflictWarningBannerWrapper
+ * Shows ConflictWarningBanner when a remote user is editing the selected node.
+ * Reads selectedCardIds from DDSCanvasStore and remoteEditing from presenceStore.
+ */
+function ConflictWarningBannerWrapper() {
+  const selectedCardIds = useDDSCanvasStore((s) => s.selectedCardIds);
+  const currentUserId = useAuthStore((s) => s.currentUser?.id ?? 'local-user');
+  const remoteEditing = usePresenceStore((s) => s.remoteEditing);
+
+  if (selectedCardIds.length !== 1) return null;
+
+  const selectedNodeId = selectedCardIds[0];
+  const editors = [];
+  for (const [userId, info] of remoteEditing) {
+    if (info.nodeId === selectedNodeId && userId !== currentUserId) {
+      editors.push({ userId, userName: info.userName });
+    }
+  }
+
+  if (editors.length === 0) return null;
+
+  const firstEditor = editors[0];
+  const handleDismiss = () => {
+    usePresenceStore.getState().clearRemoteEditing(firstEditor.userId);
+  };
+
+  return (
+    <ConflictWarningBanner
+      nodeId={selectedNodeId}
+      userName={firstEditor.userName}
+      onDismiss={handleDismiss}
+    />
+  );
+}
+
 function ShortcutEditModalPortal() {
   // Only render when an action is being edited
   const editingAction = useShortcutStore((s) => s.editingAction);

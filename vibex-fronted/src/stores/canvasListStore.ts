@@ -85,6 +85,18 @@ export interface ScheduledExport {
   nextRunAt: string | null;
 }
 
+// S79-E4: Canvas relation types (S78-E5: canvas relations tracking)
+export type RelationType = 'derives_from' | 'copied_to' | 'archived_backup_of' | 'parent' | 'child' | 'related';
+
+export interface CanvasRelation {
+  id: string;
+  sourceCanvasId: string;
+  targetCanvasId: string;
+  type: RelationType;
+  label: string;
+  createdAt: string;
+}
+
 export interface CanvasListState {
   /** In-memory canvas list, sorted by updatedAt descending */
   canvases: CanvasMeta[];
@@ -180,7 +192,17 @@ export interface CanvasListState {
     id: string,
     updates: Partial<Pick<ScheduledExport, 'enabled' | 'lastRunAt' | 'lastError' | 'successCount' | 'nextRunAt'>>
   ) => void;
-
+  // S78-E5: Canvas Relations
+  canvasRelations: Record<string, CanvasRelation>;
+  activeCanvasRelations: CanvasRelation[];
+  addCanvasRelation: (sourceCanvasId: string, targetCanvasId: string, type: RelationType, label: string) => string;
+  removeCanvasRelation: (relationId: string) => void;
+  updateCanvasRelation: (relationId: string, updates: Partial<CanvasRelation>) => void;
+  getCanvasRelations: (canvasId: string) => CanvasRelation[];
+  /** S79-E4: BFS traversal for multi-depth relation graph (default depth=1) */
+  getCanvasRelationsDepth: (canvasId: string, maxDepth?: number) => Array<CanvasRelation & { depth: number }>;
+  getRelationStats: (canvasId: string) => { total: number; byType: Record<RelationType, number> };
+  detectCircularRelation: (fromId: string, toId: string) => boolean;
 }
 
 // ============================================
@@ -958,6 +980,42 @@ export const useCanvasListStore = create<CanvasListState>((set, get) => ({
   // ─── S78-E5: Canvas Relations ───────────────────────────────────────────────
   canvasRelations: {} as Record<string, CanvasRelation>,
   activeCanvasRelations: [] as CanvasRelation[],
+
+  // S79-E4: BFS traversal for multi-depth relation graph.
+  // Reports each relation at the depth where the *target* canvas was first discovered.
+  // Relations to already-visited canvases are skipped (each canvas appears at one depth).
+  getCanvasRelationsDepth: (canvasId, maxDepth = 1) => {
+    const { canvases, canvasRelations } = get();
+    if (!canvasId || maxDepth < 1) return [];
+
+    // BFS: queue entries are { canvasId, depth }
+    const queue: Array<{ canvasId: string; depth: number }> = [{ canvasId, depth: 0 }];
+    const visited = new Set<string>([canvasId]);
+    const result: Array<CanvasRelation & { depth: number }> = [];
+
+    while (queue.length > 0) {
+      const { canvasId: currentId, depth } = queue.shift()!;
+      if (depth >= maxDepth) continue;
+
+      const canvas = canvases.find((c) => c.id === currentId);
+      if (!canvas) continue;
+
+      const relIds = canvas.relationIds ?? [];
+      for (const relId of relIds) {
+        const rel = canvasRelations[relId];
+        if (!rel) continue;
+
+        const otherId = rel.sourceCanvasId === currentId ? rel.targetCanvasId : rel.sourceCanvasId;
+        if (visited.has(otherId)) continue;
+
+        visited.add(otherId);
+        result.push({ ...rel, depth: depth + 1 });
+        queue.push({ canvasId: otherId, depth: depth + 1 });
+      }
+    }
+
+    return result;
+  },
 
   addCanvasRelation: (sourceCanvasId, targetCanvasId, type, label) => {
     const { canvases, canvasRelations } = get();

@@ -12,10 +12,13 @@
  * - D5.5: SessionReplayPanel UI
  *
  * S78-E3: 内联评论 — extends with comments Record + CRUD actions
+ *
+ * S79-E3: 扩展 addReply → 创建 comment_reply 通知
  */
 
 import { create } from 'zustand';
 import { openDB } from 'idb';
+import { useNotificationStore } from '@/stores/notificationStore';
 
 // ==================== Types ====================
 
@@ -515,6 +518,20 @@ export const useCollabSessionStore = create<CollabSessionState>()((set, get) => 
       },
     }));
 
+    // S79-E3: Notify each @-mentioned user
+    for (const targetUserId of mentions) {
+      if (targetUserId && targetUserId !== userId) {
+        useNotificationStore.getState().addNotification({
+          type: 'mention',
+          title: `${userName} 在评论中提到了你`,
+          message: text.length > 80 ? `${text.slice(0, 80)}…` : text,
+          targetUserId,
+          nodeId,
+          commentId,
+        });
+      }
+    }
+
     return thread;
   },
 
@@ -566,6 +583,34 @@ export const useCollabSessionStore = create<CollabSessionState>()((set, get) => 
         [nodeId]: updatedThreads,
       },
     }));
+
+    // S79-E3: Notify the parent comment's author of the reply
+    const parentComment = threads[threadIndex];
+    if (parentComment && parentComment.userId && parentComment.userId !== userId) {
+      useNotificationStore.getState().addNotification({
+        type: 'comment_reply',
+        title: `${userName} 回复了你的评论`,
+        message: text.length > 80 ? `${text.slice(0, 80)}…` : text,
+        targetUserId: parentComment.userId,
+        nodeId,
+        commentId,
+        replyId: reply.replyId,
+      });
+    }
+
+    // S79-E3: Notify each @-mentioned user in the reply
+    for (const targetUserId of mentions) {
+      if (targetUserId && targetUserId !== userId) {
+        useNotificationStore.getState().addNotification({
+          type: 'mention',
+          title: `${userName} 在回复中提到了你`,
+          message: text.length > 80 ? `${text.slice(0, 80)}…` : text,
+          targetUserId,
+          nodeId,
+          commentId,
+        });
+      }
+    }
 
     return reply;
   },

@@ -5,6 +5,7 @@
  * 扩展 S73-E3: 清空历史按钮 + 设置抽屉入口
  * 扩展 S74-E5: 键盘导航（Tab + Enter）
  * 扩展 S79-E2: 模板更新通知 Tab — template_update 类型独立 Tab 显示
+ * 扩展 S79-E3: 评论回复通知 comment_reply 显示 + node jump 锚点
  *
  * 通知中心抽屉面板，支持：
  * - 未读红点 + 角标数字
@@ -36,6 +37,7 @@ const PAGE_SIZE = 20;
 const NOTIFICATION_TYPE_LABELS: Record<string, string> = {
   mention: '@提及',
   reply: '回复',
+  comment_reply: '评论回复',   // S79-E3
   system: '系统',
   info: '通知',
   template_update: '模板更新',
@@ -44,6 +46,7 @@ const NOTIFICATION_TYPE_LABELS: Record<string, string> = {
 const NOTIFICATION_TYPE_ICONS: Record<string, string> = {
   mention: '@',
   reply: '↩',
+  comment_reply: '💬',         // S79-E3
   system: '⚙',
   info: 'ℹ',
   template_update: '📋',
@@ -85,6 +88,14 @@ function handleTemplateUpdateClick(notification: Notification): void {
     );
   }
   window.dispatchEvent(new CustomEvent('panel:open', { detail: { panel: 'template-marketplace' } }));
+}
+
+/** S79-E3: Navigate to canvas + node when clicking mention or comment_reply notification */
+function handleMentionOrReplyClick(notification: Notification): void {
+  if (notification.canvasId) {
+    const hash = notification.nodeId ? `#node-${notification.nodeId}` : '';
+    window.location.href = `/canvas/${notification.canvasId}${hash}`;
+  }
 }
 
 const NotificationItem = memo(function NotificationItem({
@@ -170,12 +181,16 @@ const NotificationItem = memo(function NotificationItem({
     );
   }
 
+  const isClickable = notification.type === 'mention' || notification.type === 'comment_reply';
+
   return (
     <li
       className={`${styles.item} ${notification.isRead ? styles.read : styles.unread}`}
       role="listitem"
       tabIndex={0}
       onKeyDown={handleKeyDown}
+      onClick={isClickable ? () => handleMentionOrReplyClick(notification) : undefined}
+      style={isClickable ? { cursor: 'pointer' } : undefined}
     >
       <div className={styles.iconWrap} aria-hidden="true">
         <span className={styles.typeIcon}>

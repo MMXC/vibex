@@ -20,6 +20,8 @@
  * - 后端 REST API 用于跨设备同步（fetch on login）
  * - markAsRead 同时写 IndexedDB + PATCH API
  * - getUnreadCount 聚合本地 + 后端未读数
+ *
+ * S79-E3: 扩展 'comment_reply' 通知类型 + commentId/replyId 字段
  */
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
@@ -32,7 +34,7 @@ import {
   clearNotificationsFromDB,
 } from '@/lib/canvas/historyDB';
 
-export type NotificationType = 'mention' | 'reply' | 'system' | 'info' | 'template_update';
+export type NotificationType = 'mention' | 'reply' | 'system' | 'info' | 'template_update' | 'comment_reply';
 
 export interface Notification {
   id: string;
@@ -57,6 +59,10 @@ export interface Notification {
   authorId?: string;
   /** S78-E2: 模板订阅通知 — 模板缩略图 */
   thumbnail?: string;
+  /** S79-E3: 评论回复通知 — 关联的评论 ID */
+  commentId?: string;
+  /** S79-E3: 评论回复通知 — 关联的回复 ID */
+  replyId?: string;
 }
 
 /** S73-E3: 通知偏好设置 */
@@ -72,13 +78,14 @@ export interface NotificationPreferences {
     reply: boolean;
     system: boolean;
     info: boolean;
-    template_update: boolean;  // S78-E2: 模板订阅通知开关
+    template_update: boolean;   // S78-E2: 模板订阅通知开关
+    comment_reply: boolean;      // S79-E3: 评论回复通知开关
   };
 }
 
 const DEFAULT_PREFERENCES: NotificationPreferences = {
   channels: { inApp: true, browser: true },
-  types: { mention: true, reply: true, system: true, info: true, template_update: true },
+  types: { mention: true, reply: true, system: true, info: true, template_update: true, comment_reply: true },
 };
 
 // Module-level listeners for cross-component notification events

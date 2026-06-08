@@ -851,7 +851,7 @@ export const useCanvasHistoryStore = create<CanvasHistoryState>((set, get) => ({
       return { ok: false, error: 'Cannot delete the main branch' };
     }
     // E3 (Sprint77): Permission check — only owner or admin can delete
-    const perm = await getBranchPermission(canvasId, branchName, userId);
+    const perm = await get().getBranchPermission(canvasId, branchName, userId);
     if (perm !== 'owner' && perm !== 'admin') {
       return { ok: false, error: 'Permission denied: only the branch owner or admin can delete this branch' };
     }
@@ -871,7 +871,7 @@ export const useCanvasHistoryStore = create<CanvasHistoryState>((set, get) => ({
       return { ok: false, error: 'Source and target branches cannot be the same' };
     }
     // E3 (Sprint77): Permission check — source branch owner or admin can merge
-    const perm = await getBranchPermission(canvasId, sourceBranch, userId);
+    const perm = await get().getBranchPermission(canvasId, sourceBranch, userId);
     if (perm !== 'owner' && perm !== 'admin') {
       return { ok: false, error: 'Permission denied: only the source branch owner or admin can merge this branch' };
     }

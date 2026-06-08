@@ -1530,3 +1530,15 @@
 - **NodeCommentPanel.tsx**: 侧边评论面板 — 线程列表 + 回复输入 + 新评论提交
 - **DDSCanvasPage.tsx**: 集成 `NodeCommentPanel` 侧边面板 + `NodeCommentBadge` 节点徽章 + `Cmd+Shift+M` 快捷键
 - **collabSessionStore.comments.test.ts**: 12 个测试用例覆盖全部CRUD操作
+
+---
+
+## [Unreleased] S78-E4: 定时导出 & Webhook — 2026-06-08
+
+- **canvasListStore**: `ScheduledExport` 接口 + `scheduledExports` 状态 + CRUD actions
+  (`addScheduledExport`, `removeScheduledExport`, `getScheduledExport`, `updateScheduledExportStatus`)
+- **Cron 解析**: `parseCronNextRun` — 支持 `*`, `*/n`, `n,m`, `n-m`, ranges；分钟级迭代
+- **ZipExporter.exportWithWebhook(canvasId, options, webhookUrl)**: 导出画布为 ZIP 后 POST 到 webhook
+- **ScheduledExportPanel**: 定时导出管理面板 — 列表/添加/开关/删除，支持 cron 表达式输入
+- **DDSToolbar**: 工具栏新增定时导出按钮
+- **canvasListStore.e4-scheduled-export.test.ts**: 20+ 测试用例覆盖 cron 解析 + store actions

@@ -1593,3 +1593,12 @@
 - **E5.3**: Add merge-history tab + `handleMergeComplete` callback to `BranchManager`; `MergeBranchButton` calls `onMergeComplete` after successful merge
 - **E5.4**: Create `MergeHistoryPanel` component — timeline view with branch info and formatted timestamps, loaded from IndexedDB on panel open
 - **E5.5**: Add `canvasHistoryStore.e5-merge-history.test.ts` — 8 unit tests for all three store actions (all passing)
+
+---
+
+## [Unreleased] S80-E1: 通知偏好设置管理面板 — 2026-06-09
+- **S80-E1.1**: IndexedDB `notification_prefs` objectStore (DB v11)，`savePreferencesToDB`/`getPreferencesFromDB`
+- **S80-E1.2**: `notificationStore` 统一 `setPreference(key, enabled)` / `getPreference(key)` 接口，`loadPreferencesFromIndexedDB` 初始化
+- **S80-E1.3**: `NotificationPreferencesPanel` 组件：频道开关 + 类型开关 + 重置按钮，绝对定位抽屉样式
+- **S80-E1.4**: `NotificationPanel` 集成新面板，移除 `NotificationSettingsDrawer`
+- **S80-E1.5**: `notificationStore.preferences.test.ts` 12 测试用例

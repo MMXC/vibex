@@ -6720,3 +6720,12 @@ See git history for complete changelog.
 - **CanvasSettingsDrawer**: 新增「性能」Tab（PerformanceSettings）
 - **PerformanceSettings**: DPR 模式选择器（自动/1x/2x）+ `calculateEffectiveDPR` 函数
 - **DDSCanvasPage.e5.test.tsx**: vitest DPR 限制逻辑 10/10
+
+---
+
+## [Unreleased] S78-E1: Canvas 分支自动合并与智能冲突解决 — 2026-06-08
+- **canvasHistoryStore.autoMergeBranch**: 新增方法 — 检测两分支间的节点冲突，通过 `pendingConflicts` 状态传递给 UI
+- **BranchAutoMergeDialog**: 新增组件 — 颜色标记冲突预览（🟢自动合并/🟡需手动/🔴冲突），支持逐节点选择保留哪边
+- **BranchManager**: 集成 `autoMergeBranch` — 无冲突时自动合并到 main，有冲突时弹出 `BranchAutoMergeDialog` 供用户逐节点选择
+- **BranchManagerProps**: 新增 `currentUserId` prop — 传递给合并操作进行权限校验
+- **canvasHistoryStore.auto-merge.test.ts**: 9 个测试用例覆盖自动合并、冲突检测、边界条件

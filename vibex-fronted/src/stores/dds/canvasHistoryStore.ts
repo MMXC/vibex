@@ -165,6 +165,24 @@ export interface SnapshotMeta {
   _size?: number;
 }
 
+// ==================== E5 (Sprint79): Merge History Types ====================
+
+/** A record of a branch merge operation — stored in IndexedDB and shown in MergeHistoryPanel */
+export interface MergeHistoryEntry {
+  /** Unique ID for this merge record */
+  id: string;
+  /** Canvas this merge belongs to */
+  canvasId: string;
+  /** Source branch name (merged from) */
+  sourceBranch: string;
+  /** Target branch name (merged into) */
+  targetBranch: string;
+  /** Timestamp of the merge */
+  timestamp: number;
+  /** User who performed the merge */
+  mergedBy?: string;
+}
+
 // ==================== Constants ====================
 
 export const MAX_HISTORY = 50;
@@ -205,6 +223,9 @@ interface CanvasHistoryState {
     timestamp: number;
     summary: { totalChanges: number; contextsAdded: number; contextsRemoved: number; contextsModified: number; edgesAdded: number; edgesRemoved: number; edgesModified: number };
   }>;
+  // E5 (Sprint79): Merge history
+  /** Merge history entries for the current canvas (sorted by timestamp desc, max 20) */
+  mergeHistory: MergeHistoryEntry[];
 
   /** Push a new command, execute it, and push to history */
   execute: (cmd: Command) => void;
@@ -334,6 +355,13 @@ interface CanvasHistoryState {
   addBranchDiffHistory: (canvasId: string, branchA: string, branchB: string, summary: { totalChanges: number; contextsAdded: number; contextsRemoved: number; contextsModified: number; edgesAdded: number; edgesRemoved: number; edgesModified: number }) => Promise<void>;
   /** Clear all branch diff history for a canvas */
   clearBranchDiffHistory: (canvasId: string) => Promise<void>;
+  // E5 (Sprint79): Merge history
+  /** Record a merge operation to IndexedDB and update mergeHistory state */
+  recordMerge: (entry: Omit<MergeHistoryEntry, 'id'>) => Promise<void>;
+  /** Load merge history from IndexedDB for a canvas (sorted by timestamp desc) */
+  getMergeHistory: (canvasId: string) => Promise<void>;
+  /** Clear all merge history for a canvas */
+  clearMergeHistory: (canvasId: string) => Promise<void>;
 }
 
 // ==================== Helper ====================
@@ -363,6 +391,8 @@ export const useCanvasHistoryStore = create<CanvasHistoryState>((set, get) => ({
   currentBranch: 'main',
   // E3 (Sprint75): Branch diff history
   branchDiffHistory: [],
+  // E5 (Sprint79): Merge history
+  mergeHistory: [],
 
   execute: (cmd: Command) => {
     if (get().isPerforming) return;
@@ -1080,6 +1110,31 @@ export const useCanvasHistoryStore = create<CanvasHistoryState>((set, get) => ({
     const { clearBranchDiffHistoryFromDB } = await import('@/lib/canvas/historyDB');
     await clearBranchDiffHistoryFromDB(canvasId);
     set({ branchDiffHistory: [] });
+  },
+
+  // E5 (Sprint79): Merge history
+  recordMerge: async (entry: Omit<MergeHistoryEntry, 'id'>) => {
+    if (typeof window === 'undefined' || !window.indexedDB) return;
+    const { saveMergeHistoryToDB, listMergeHistoryFromDB } = await import('@/lib/canvas/historyDB');
+    const id = `merge-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+    const fullEntry: MergeHistoryEntry = { ...entry, id, timestamp: Date.now() };
+    await saveMergeHistoryToDB(fullEntry);
+    const entries = await listMergeHistoryFromDB(entry.canvasId);
+    set({ mergeHistory: entries });
+  },
+
+  getMergeHistory: async (canvasId: string) => {
+    if (typeof window === 'undefined' || !window.indexedDB) return;
+    const { listMergeHistoryFromDB } = await import('@/lib/canvas/historyDB');
+    const entries = await listMergeHistoryFromDB(canvasId);
+    set({ mergeHistory: entries });
+  },
+
+  clearMergeHistory: async (canvasId: string) => {
+    if (typeof window === 'undefined' || !window.indexedDB) return;
+    const { clearMergeHistoryFromDB } = await import('@/lib/canvas/historyDB');
+    await clearMergeHistoryFromDB(canvasId);
+    set({ mergeHistory: [] });
   },
 
   // E1 (Sprint67): Branch comparison — compare the latest snapshots of two branches

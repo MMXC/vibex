@@ -44,14 +44,14 @@ import type { Notification } from '@/stores/notificationStore';
 // ============================================
 
 const DB_NAME = 'vibex-canvas-history';
-const DB_VERSION = 9; // E4 (Sprint77): CanvasChangeLog objectStore
+const DB_VERSION = 10; // E5 (Sprint79): mergeHistory objectStore
 const STORE_NAME = 'history';
 const SNAPSHOTS_STORE_NAME = 'snapshots';
 const BRANCH_META_STORE_NAME = 'branchMeta';
 const BRANCH_DIFF_HISTORY_STORE_NAME = 'branchDiffHistory';
-const BRANCH_DIFF_HISTORY_STORE_NAME = 'branchDiffHistory';
 const NOTIFICATIONS_STORE_NAME = 'notifications';
 const CANVAS_CHANGE_LOG_STORE_NAME = 'canvasChangeLog';
+const MERGE_HISTORY_STORE_NAME = 'mergeHistory';
 
 /** Maximum storage per canvas in bytes (5MB) */
 export const MAX_BYTES_PER_CANVAS = 5 * 1024 * 1024;
@@ -213,6 +213,12 @@ function openDB(): Promise<IDBDatabase> {
         const changeLogStore = db.createObjectStore(CANVAS_CHANGE_LOG_STORE_NAME, { keyPath: 'id' });
         changeLogStore.createIndex('canvasId', 'canvasId', { unique: false });
         changeLogStore.createIndex('timestamp', 'timestamp', { unique: false });
+      }
+      // E5 (Sprint79): mergeHistory objectStore
+      if (!db.objectStoreNames.contains(MERGE_HISTORY_STORE_NAME)) {
+        const mergeStore = db.createObjectStore(MERGE_HISTORY_STORE_NAME, { keyPath: ['canvasId', 'id'] });
+        mergeStore.createIndex('canvasId', 'canvasId', { unique: false });
+        mergeStore.createIndex('timestamp', 'timestamp', { unique: false });
       }
     };
   });
@@ -1399,6 +1405,104 @@ export async function clearNotificationsFromDB(): Promise<void> {
         const request = store.clear();
         request.onsuccess = () => resolve();
         request.onerror = () => reject(new Error(`clearNotificationsFromDB failed: ${request.error}`));
+      })
+      .catch(reject);
+  });
+}
+
+// ============================================
+// E5 (Sprint79): Merge History
+// ============================================
+
+import type { MergeHistoryEntry } from '@/stores/dds/canvasHistoryStore';
+
+/**
+ * E5 (Sprint79): Save a merge history entry to IndexedDB.
+ * Keeps only the 20 most recent entries per canvas.
+ */
+export async function saveMergeHistoryToDB(entry: MergeHistoryEntry): Promise<void> {
+  if (!isIndexedDBAvailable()) return;
+
+  return new Promise((resolve, reject) => {
+    openDB()
+      .then((db) => {
+        const tx = db.transaction(MERGE_HISTORY_STORE_NAME, 'readwrite');
+        const store = tx.objectStore(MERGE_HISTORY_STORE_NAME);
+        // First put the new entry
+        const putReq = store.put(entry);
+        putReq.onerror = () => reject(new Error(`saveMergeHistoryToDB put failed: ${putReq.error}`));
+
+        // Then trim to keep only 20 most recent per canvas
+        tx.oncomplete = async () => {
+          try {
+            const entries = await listMergeHistoryFromDB(entry.canvasId);
+            if (entries.length > 20) {
+              const toDelete = entries.slice(20);
+              const deleteTx = db.transaction(MERGE_HISTORY_STORE_NAME, 'readwrite');
+              const deleteStore = deleteTx.objectStore(MERGE_HISTORY_STORE_NAME);
+              for (const oldEntry of toDelete) {
+                deleteStore.delete([oldEntry.canvasId, oldEntry.id]);
+              }
+            }
+          } catch {
+            // Non-fatal: trimming is best-effort
+          }
+          resolve();
+        };
+        tx.onerror = () => reject(new Error(`saveMergeHistoryToDB transaction failed: ${tx.error}`));
+      })
+      .catch(reject);
+  });
+}
+
+/**
+ * E5 (Sprint79): List all merge history entries for a canvas, sorted by timestamp desc.
+ */
+export async function listMergeHistoryFromDB(canvasId: string): Promise<MergeHistoryEntry[]> {
+  if (!isIndexedDBAvailable()) return [];
+
+  return new Promise((resolve, reject) => {
+    openDB()
+      .then((db) => {
+        const tx = db.transaction(MERGE_HISTORY_STORE_NAME, 'readonly');
+        const store = tx.objectStore(MERGE_HISTORY_STORE_NAME);
+        const index = store.index('canvasId');
+        const request = index.getAll(canvasId);
+        request.onsuccess = () => {
+          const entries: MergeHistoryEntry[] = request.result ?? [];
+          // Sort by timestamp desc
+          entries.sort((a, b) => b.timestamp - a.timestamp);
+          resolve(entries);
+        };
+        request.onerror = () => reject(new Error(`listMergeHistoryFromDB failed: ${request.error}`));
+      })
+      .catch(reject);
+  });
+}
+
+/**
+ * E5 (Sprint79): Clear all merge history entries for a canvas.
+ */
+export async function clearMergeHistoryFromDB(canvasId: string): Promise<void> {
+  if (!isIndexedDBAvailable()) return;
+
+  return new Promise((resolve, reject) => {
+    openDB()
+      .then((db) => {
+        const tx = db.transaction(MERGE_HISTORY_STORE_NAME, 'readwrite');
+        const store = tx.objectStore(MERGE_HISTORY_STORE_NAME);
+        const index = store.index('canvasId');
+        const request = index.openCursor(IDBKeyRange.only(canvasId));
+        request.onsuccess = () => {
+          const cursor = request.result;
+          if (cursor) {
+            cursor.delete();
+            cursor.continue();
+          } else {
+            resolve();
+          }
+        };
+        request.onerror = () => reject(new Error(`clearMergeHistoryFromDB failed: ${request.error}`));
       })
       .catch(reject);
   });

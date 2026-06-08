@@ -22,7 +22,9 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { useCanvasFolderStore } from '@/stores/dds/canvasFolderStore';
+import { useCanvasListStore } from '@/stores/canvasListStore';
 import { CreateFolderDialog } from './CreateFolderDialog';
+import CanvasRelationBadge from './CanvasRelationBadge';
 import type { Folder } from '@/stores/dds/canvasFolderStore';
 import styles from './FolderTree.module.css';
 
@@ -118,6 +120,7 @@ function SortableFolderItem({
           <span className={styles['folder-item__count']}>
             {canvasesInFolder.length > 0 ? `(${canvasesInFolder.length})` : ''}
           </span>
+          <CanvasRelationBadge canvasId={folder.id} />
         </button>
       </div>
 

@@ -899,6 +899,19 @@ export const useCanvasListStore = create<CanvasListState>((set, get) => ({
     });
   },
 
+  // S79-E1: Mark a scheduled export as run (updates lastRunAt, advances nextRunAt by 1h)
+  markExportRun: (id: string) => {
+    const existing = get().scheduledExports[id];
+    if (!existing) return;
+    const next = new Date();
+    next.setHours(next.getHours() + 1);
+    get().updateScheduledExportStatus(id, {
+      lastRunAt: new Date().toISOString(),
+      successCount: (existing.successCount ?? 0) + 1,
+      nextRunAt: next.toISOString(),
+    });
+  },
+
   // ============================================================
   // S76-E3: Canvas indexed search (Fuse.js weighted: name:2, description:1, tags:1)
   // ============================================================

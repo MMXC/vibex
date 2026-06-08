@@ -1552,3 +1552,12 @@
 - **CanvasRelationBadge.tsx**: 关联计数图标徽章（带 tooltip）
 - **FolderTree.tsx**: SortableFolderItem 集成 `CanvasRelationBadge` 显示文件夹关联数
 - **canvasListStore.relations.test.ts**: 14 个测试用例（循环检测/增删/统计/$reset）
+
+
+---
+
+## [Unreleased] S79-E1: 定时导出执行引擎 — 2026-06-08
+- **S79-E1.1**: `ScheduledExportRunner` 单例 — `startScheduler()`/`stopScheduler()`，`isDue()`/`computeNextHour()` 工具函数
+- **S79-E1.2**: `canvasListStore.markExportRun(id)` — 更新 `lastRunAt`、推进 `nextRunAt` +1h、递增 `successCount`
+- **S79-E1.3**: `DDSCanvasPage.tsx` — `useEffect` mount 时启动、unmount 时停止 runner
+- **S79-E1.4**: vitest: `ScheduledExportRunner.test.ts` 12/12 pass

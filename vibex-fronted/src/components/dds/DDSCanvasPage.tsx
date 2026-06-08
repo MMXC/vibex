@@ -86,6 +86,8 @@ import { useResponsiveMode } from '@/hooks/useResponsiveMode';
 import { TouchModeIndicator } from '@/components/shared/TouchModeIndicator';
 import { SelectionToolbar } from '@/components/dds/SelectionToolbar';
 import { useSelectionBox } from '@/hooks/dds/useSelectionBox';
+// S79-E1: Start/stop the scheduled export runner on mount/unmount
+import { ScheduledExportRunner } from '@/services/export/ScheduledExportRunner';
 
 // E1 (Sprint70): reloadFromSnapshot — reads a snapshot from IndexedDB and replaces canvas nodes
 async function reloadFromSnapshot(canvasId: string, snapshotId: string): Promise<void> {
@@ -533,6 +535,15 @@ const { onCursorMove, broadcastCursor } = useWebSocketPresence({
       console.warn('[persistence] Failed to load canvas from IndexedDB:', err);
     });
   }, [projectId]);
+
+  // ---- S79-E1: Start/stop scheduled export runner on mount/unmount ----
+  useEffect(() => {
+    const runner = ScheduledExportRunner.getInstance();
+    runner.startScheduler();
+    return () => {
+      runner.stopScheduler();
+    };
+  }, []);
 
   // ---- S41-E4: Debounced canvas persistence on data changes ----
   const persistTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);

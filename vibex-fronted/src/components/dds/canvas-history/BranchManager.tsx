@@ -4,6 +4,7 @@ import React, { memo, useState, useCallback, useEffect } from 'react';
 import { useCanvasHistoryStore } from '@/stores/dds/canvasHistoryStore';
 import type { Snapshot, BranchConflict } from '@/stores/dds/canvasHistoryStore';
 import { BranchAutoMergeDialog } from './BranchAutoMergeDialog';
+import { MergeHistoryPanel } from './MergeHistoryPanel';
 
 interface BranchManagerProps {
   /** Whether the panel is open */
@@ -18,7 +19,7 @@ interface BranchManagerProps {
   onClose: () => void;
 }
 
-type Tab = 'list' | 'create' | 'delete';
+type Tab = 'list' | 'create' | 'delete' | 'merge';
 
 // E1 (Sprint70): MergeBranchButton — visible only on non-main branches
 // E1 (Sprint78): Updated to call autoMergeBranch and show conflicts in BranchAutoMergeDialog
@@ -35,9 +36,11 @@ interface MergeBranchButtonProps {
   onConflictsFound?: (conflicts: BranchConflict[]) => void;
   /** Called to close the panel */
   onClose: () => void;
+  /** E5 (Sprint79): Called after successful merge to record history */
+  onMergeComplete?: (sourceBranch: string, targetBranch: string) => void;
 }
 
-function MergeBranchButton({ branch, canvasId, currentUserId, onMergeSuccess, onConflictsFound, onClose }: MergeBranchButtonProps) {
+function MergeBranchButton({ branch, canvasId, currentUserId, onMergeSuccess, onConflictsFound, onClose, onMergeComplete }: MergeBranchButtonProps) {
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const autoMergeBranch = useCanvasHistoryStore((s) => s.autoMergeBranch);
@@ -63,6 +66,8 @@ function MergeBranchButton({ branch, canvasId, currentUserId, onMergeSuccess, on
         setCurrentBranch('main');
         await listSnapshots(canvasId ?? '');
         onMergeSuccess?.();
+        // E5 (Sprint79): Record merge in history after successful merge
+        onMergeComplete?.(branch, 'main');
         onClose();
       }
     } catch (e) {
@@ -70,7 +75,7 @@ function MergeBranchButton({ branch, canvasId, currentUserId, onMergeSuccess, on
     } finally {
       setLoading(false);
     }
-  }, [branch, canvasId, currentUserId, autoMergeBranch, setCurrentBranch, listSnapshots, onMergeSuccess, onConflictsFound, onClose]);
+  }, [branch, canvasId, currentUserId, autoMergeBranch, setCurrentBranch, listSnapshots, onMergeSuccess, onConflictsFound, onClose, onMergeComplete]);
 
   if (branch === 'main') return null;
 
@@ -111,6 +116,7 @@ const BranchManager = memo(function BranchManager({
   const listSnapshots = useCanvasHistoryStore((s) => s.listSnapshots);
   const createBranch = useCanvasHistoryStore((s) => s.createBranch);
   const deleteBranch = useCanvasHistoryStore((s) => s.deleteBranch);
+  const recordMerge = useCanvasHistoryStore((s) => s.recordMerge);
 
   const [activeTab, setActiveTab] = useState<Tab>('list');
   const [activeBranch, setActiveBranch] = useState<string>('main');
@@ -141,6 +147,21 @@ const BranchManager = memo(function BranchManager({
     setAutoMergeTarget('main');
     setAutoMergeOpen(true);
   }, [activeBranch]);
+
+  // E5 (Sprint79): Handle successful merge — record in merge history
+  const handleMergeComplete = useCallback(
+    async (sourceBranch: string, targetBranch: string) => {
+      if (!canvasId) return;
+      await recordMerge({
+        canvasId,
+        sourceBranch,
+        targetBranch,
+        timestamp: Date.now(),
+        mergedBy: currentUserId,
+      });
+    },
+    [canvasId, recordMerge, currentUserId]
+  );
 
   // S78-E1: Resolve auto-merge conflicts — called after user resolves in dialog
   const autoResolveConflicts = useCallback(async () => {
@@ -316,6 +337,7 @@ const BranchManager = memo(function BranchManager({
         canvasId={canvasId}
         currentUserId={currentUserId}
         onConflictsFound={handleConflictsFound}
+        onMergeComplete={handleMergeComplete}
         onClose={onClose}
       />
 
@@ -360,6 +382,14 @@ const BranchManager = memo(function BranchManager({
           onClick={() => setActiveTab('delete')}
         >
           删除分支
+        </button>
+        <button
+          role="tab"
+          aria-selected={activeTab === 'merge'}
+          className={`branch-tab ${activeTab === 'merge' ? 'active' : ''}`}
+          onClick={() => setActiveTab('merge')}
+        >
+          合并历史
         </button>
       </div>
 
@@ -536,6 +566,14 @@ const BranchManager = memo(function BranchManager({
             </div>
           )}
         </div>
+      )}
+
+      {/* Tab: Merge History */}
+      {activeTab === 'merge' && (
+        <MergeHistoryPanel
+          currentBranch={currentBranch ?? 'main'}
+          canvasId={canvasId}
+        />
       )}
     </div>
   );

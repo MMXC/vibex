@@ -92,6 +92,16 @@ export function TemplateMarketplacePanel({ onTemplateSelect, onClose, userId = '
     templateStore.toggleFavorite(templateId);
   }, [templateStore]);
 
+  // S78-E2: Toggle template subscription
+  const handleToggleSubscribe = useCallback((templateId: string) => {
+    const { subscribedTemplates } = templateStore;
+    if (subscribedTemplates[templateId]) {
+      templateStore.unsubscribeTemplate(templateId);
+    } else {
+      templateStore.subscribeTemplate(templateId);
+    }
+  }, [templateStore]);
+
   const usageCount = templateStore.stats.usageCount;
 
   return (
@@ -149,6 +159,7 @@ export function TemplateMarketplacePanel({ onTemplateSelect, onClose, userId = '
               <TemplateMarketplaceCard key={t.id} template={t} usageCount={usageCount[t.id]}
                 isApplying={applying === t.id} onApply={handleTemplateApply} userId={userId}
                 onRate={handleRate} onToggleFavorite={handleToggleFavorite}
+                onToggleSubscribe={handleToggleSubscribe}
                 hoveredStar={hoveredStar} onHoverStar={setHoveredStar} />
             ))}
           </div>
@@ -167,6 +178,7 @@ export function TemplateMarketplacePanel({ onTemplateSelect, onClose, userId = '
               <TemplateMarketplaceCard key={t.id} template={t} usageCount={usageCount[t.id]}
                 isApplying={applying === t.id} onApply={handleTemplateApply} userId={userId}
                 onRate={handleRate} onToggleFavorite={handleToggleFavorite}
+                onToggleSubscribe={handleToggleSubscribe}
                 hoveredStar={hoveredStar} onHoverStar={setHoveredStar} />
             ))}
           </div>
@@ -190,11 +202,13 @@ interface MarketplaceCardProps {
   onToggleFavorite?: (id: string) => void;
   hoveredStar?: number | null;
   onHoverStar?: (n: number | null) => void;
+  onToggleSubscribe?: (id: string) => void;
 }
 
 function TemplateMarketplaceCard({
   template, usageCount, isApplying, onApply,
   userId = 'user-1', onRate, onToggleFavorite, hoveredStar, onHoverStar,
+  onToggleSubscribe,
 }: MarketplaceCardProps) {
   const templateTags: string[] = template.metadata?.tags ?? template.tags ?? [];
   const displayName = template.displayName ?? template.name;
@@ -204,6 +218,7 @@ function TemplateMarketplaceCard({
   const avgRating = stats.avgRating;
   const ratingCount = stats.ratingCount;
   const isFavorite = templateStore.isFavorite(template.id);
+  const isSubscribed = !!templateStore.subscribedTemplates[template.id];
   const displayRating = hoveredStar !== null ? hoveredStar : Math.round(avgRating);
 
   return (
@@ -247,6 +262,16 @@ function TemplateMarketplaceCard({
             aria-label={isFavorite ? '取消收藏' : '添加收藏'} aria-pressed={isFavorite}
             data-testid="favorite-btn">
             {isFavorite ? '★' : '☆'}
+          </button>
+        )}
+        {/* S78-E2: Subscribe button */}
+        {onToggleSubscribe && (
+          <button type="button"
+            className={`${styles.favoriteBtn} ${isSubscribed ? styles.favoriteActive : ''}`}
+            onClick={(e) => { e.stopPropagation(); onToggleSubscribe(template.id); }}
+            aria-label={isSubscribed ? '取消订阅更新通知' : '订阅更新通知'} aria-pressed={isSubscribed}
+            data-testid="subscribe-btn">
+            {isSubscribed ? '🔔' : '🔕'}
           </button>
         )}
       </div>

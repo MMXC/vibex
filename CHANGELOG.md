@@ -6828,3 +6828,14 @@ See git history for complete changelog.
 - **S80-E2.4**: searchTemplates 与分类/标签双维度过滤集成测试
 - **S80-E2.5**: 空状态、全部标签取消选中、全部分类取消选中等边界场景
 
+
+---
+
+## [Unreleased] S80-E3: Merge History Enrichment — 2026-06-09
+- **E3.1**: `MergeHistoryEntry` 新增 `mergedNodeIds`/`conflictCount`/`authorIds` 字段
+- **E3.2**: `recordMerge` 接收并存储 enriched fields
+- **E3.3**: `MergeHistoryPanel` Timeline Item 点击展开详情
+- **E3.4**: 展开显示节点统计 + 贡献者头像列表
+- **E3.5**: 冲突数徽章 (conflictCount > 0 显示 ⚠️)
+- **E3.6**: `MergeHistoryPanel` 导出 Markdown 合并报告
+- **E3.7**: vitest: `canvasHistoryStore.e3-merge-history.test.ts` 4/4

@@ -48,6 +48,8 @@ import { HistoryPanel } from '@/components/dds/history/HistoryPanel';
 import { RecentSearchesDropdown } from '@/components/dds/search/RecentSearchesDropdown';
 import { BackupPanel } from '@/components/dds/settings/BackupPanel';
 import { CanvasSettingsDrawer } from '@/components/dds/settings/CanvasSettingsDrawer';
+import { NotificationPanel } from '@/components/dds/notifications/NotificationPanel';
+import { useNotificationStore } from '@/stores/notificationStore';
 import { ConflictDialog } from '@/components/dds/canvas-dashboard/ConflictDialog';
 import styles from './DDSToolbar.module.css';
 
@@ -274,6 +276,9 @@ export const DDSToolbar = memo(function DDSToolbar({
   const [isViewPresetsOpen, setIsViewPresetsOpen] = useState(false);
   const [isRecentSearchesOpen, setIsRecentSearchesOpen] = useState(false);
   const [isScheduledExportOpen, setIsScheduledExportOpen] = useState(false);
+  // S79-E2: Notification panel state
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+  const unreadCount = useNotificationStore((s) => s.getUnreadCount());
 
   // E3-S3: RBAC for toolbar actions
   const rbac = useCanvasRBAC(projectId);
@@ -921,6 +926,40 @@ export const DDSToolbar = memo(function DDSToolbar({
             <SettingsIcon />
           </button>
 
+          {/* S79-E2: Notification bell button */}
+          <button
+            type="button"
+            className={styles.iconButton}
+            onClick={() => setIsNotificationOpen(true)}
+            aria-label="通知中心"
+            title="通知中心"
+            data-testid="notification-bell-btn"
+          >
+            🔔
+            {unreadCount > 0 && (
+              <span
+                style={{
+                  position: 'absolute',
+                  top: '-2px',
+                  right: '-2px',
+                  width: '16px',
+                  height: '16px',
+                  borderRadius: '50%',
+                  background: '#ef4444',
+                  color: '#fff',
+                  fontSize: '10px',
+                  fontWeight: '700',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+                aria-label={`${unreadCount} 条未读通知`}
+              >
+                {unreadCount > 9 ? '9+' : unreadCount}
+              </span>
+            )}
+          </button>
+
           {/* S61-E3: Language switcher */}
           <LanguageSwitcher />
 
@@ -1112,6 +1151,12 @@ export const DDSToolbar = memo(function DDSToolbar({
           onCancel={() => useUndoRedoStore.getState().resolveConflict('cancel')}
         />
       )}
+
+      {/* S79-E2: Notification panel */}
+      <NotificationPanel
+        open={isNotificationOpen}
+        onClose={() => setIsNotificationOpen(false)}
+      />
     </>
   );
 });

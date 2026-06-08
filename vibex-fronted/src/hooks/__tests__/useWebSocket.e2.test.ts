@@ -84,12 +84,15 @@ const timerSystem = createTimerSystem();
 // ─────────────────────────────────────────────────────────────────────────────
 // Shared mock WebSocket state
 // ─────────────────────────────────────────────────────────────────────────────
+// Module-level refs to original mocks — _origSend/_origClose are vi.fn() tracked in beforeEach
+const _origClose = vi.fn();
+const _origSend = vi.fn();
 const mockWS = {
   _readyState: 0,
   get readyState() { return this._readyState; },
   set readyState(v) { this._readyState = v; },
-  close: vi.fn(),
-  send: vi.fn(),
+  close: _origClose,
+  send: _origSend,
   onopen: null as (() => void) | null,
   onclose: null as ((...args: unknown[]) => void) | null,
   onerror: null as ((...args: unknown[]) => void) | null,
@@ -126,21 +129,21 @@ const OriginalClearInterval = globalThis.clearInterval;
 beforeEach(() => {
   timerSystem.reset();
   mockWS._readyState = 0;
-  mockWS.close.mockClear();
-  mockWS.send.mockClear();
+  _origClose.mockClear();
+  _origSend.mockClear();
   mockWS.onopen = null;
   mockWS.onclose = null;
   mockWS.onerror = null;
   mockWS.onmessage = null;
 
-  // CRITICAL: Make mockWS.close() trigger onclose() — real WebSocket fires onclose when closed.
+  // CRITICAL: Make _origClose() trigger onclose() — real WebSocket fires onclose when closed.
   // Without this, scheduleReconnect() is never called because ws.onclose never fires.
-  const origClose = mockWS.close;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (mockWS as any).close = function(this: typeof mockWS) {
-    origClose.call(this);
+    _origClose();
     this.onclose?.({ code: 1006, reason: 'test close', wasClean: false } as CloseEvent);
   };
+  // Spy on wrapper so toHaveBeenCalled() works (wraps and delegates to _origClose)
 
   // Replace global timer functions with ControlledTimer equivalents
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -205,14 +208,14 @@ describe('S77-E2: WebSocket connection stability', () => {
 
     // Advance 30s — ping fires (pending timeout also fires but nothing to clear)
     timerSystem.advance(30_000);
-    expect(mockWS.send).toHaveBeenCalledWith(
+    expect(_origSend).toHaveBeenCalledWith(
       expect.stringContaining('"type":"ping"')
     );
 
     // Next ping at 30s
-    mockWS.send.mockClear();
+    _origSend.mockClear();
     timerSystem.advance(30_000);
-    expect(mockWS.send).toHaveBeenCalledWith(
+    expect(_origSend).toHaveBeenCalledWith(
       expect.stringContaining('"type":"ping"')
     );
   });
@@ -232,15 +235,15 @@ describe('S77-E2: WebSocket connection stability', () => {
 
     // Advance 1s — ping fires (pending timeout fires too but no pong yet)
     timerSystem.advance(1_000);
-    expect(mockWS.send).toHaveBeenCalled();
+    expect(_origSend).toHaveBeenCalled();
 
     // Simulate pong — CollabWebSocket calls JSON.parse(event.data)
     onMessage({ data: JSON.stringify({ type: 'pong', timestamp: Date.now() }) } as MessageEvent);
 
     // Next ping still fires (count was reset)
-    mockWS.send.mockClear();
+    _origSend.mockClear();
     timerSystem.advance(1_000);
-    expect(mockWS.send).toHaveBeenCalled();
+    expect(_origSend).toHaveBeenCalled();
   });
 
   // ── Test 3: N missed pongs triggers reconnect (timing model explained) ─────
@@ -267,7 +270,7 @@ describe('S77-E2: WebSocket connection stability', () => {
     // advance 3: pending fires → missedCount=3 ≥ maxMissedPongs=2 → close + reconnect
     timerSystem.advance(30_000);
 
-    expect(mockWS.close).toHaveBeenCalled();
+    expect(_origClose).toHaveBeenCalled();
     expect(onReconnecting).toHaveBeenCalledWith(1);  // retryCount=1 after close
   });
 
@@ -341,16 +344,16 @@ describe('S77-E2: WebSocket connection stability', () => {
 
     // First ping fires
     timerSystem.advance(30_000);
-    expect(mockWS.send).toHaveBeenCalledTimes(1);
+    expect(_origSend).toHaveBeenCalledTimes(1);
 
     // Disconnect — should stop heartbeat
     mockWS.readyState = 3;
     mockWS.onclose?.();
 
-    mockWS.send.mockClear();
+    _origSend.mockClear();
     // Advancing 60s should NOT fire any send (heartbeat stopped)
     timerSystem.advance(60_000);
-    expect(mockWS.send).not.toHaveBeenCalled();
+    expect(_origSend).not.toHaveBeenCalled();
   });
 
   // ── Test 7: multiple pong messages within interval only count once ──────────
@@ -369,18 +372,18 @@ describe('S77-E2: WebSocket connection stability', () => {
 
     // First ping fires (advance 1: ping + pending)
     timerSystem.advance(30_000);
-    expect(mockWS.send).toHaveBeenCalledTimes(1);
+    expect(_origSend).toHaveBeenCalledTimes(1);
 
     // Multiple pongs in same interval — only clears pending ping
     onMessage({ data: JSON.stringify({ type: 'pong' }) } as MessageEvent);
     onMessage({ data: JSON.stringify({ type: 'pong' }) } as MessageEvent);
 
-    mockWS.send.mockClear();
+    _origSend.mockClear();
     // Advance 2x30s: advance 1 (pending fires mc=1 + ping + new pending), advance 2 (pending fires mc=2 → close)
     timerSystem.advance(30_000);
     timerSystem.advance(30_000);
     // Only 1 ping sent (the one from advance 1); advance 2 triggers close before ping
-    expect(mockWS.send).toHaveBeenCalledTimes(1);
+    expect(_origSend).toHaveBeenCalledTimes(1);
   });
 
   // ── Test 8: successful reconnect calls onReconnected ──────────────────────
@@ -405,7 +408,7 @@ describe('S77-E2: WebSocket connection stability', () => {
 
     // advance 2: pending fires → mc=2 ≥ maxMissedPongs=1 → close + reconnect
     timerSystem.advance(30_000);
-    expect(mockWS.close).toHaveBeenCalled();
+    expect(_origClose).toHaveBeenCalled();
     expect(onReconnecting).toHaveBeenCalledWith(1);
 
     // reconnect fires after 1s backoff

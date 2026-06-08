@@ -58,10 +58,10 @@ export class CollabWebSocket {
   // S77-E2: Heartbeat state
   private heartbeatIntervalMs: number;
   private maxMissedPongs: number;
-  private heartbeatTimer: ReturnType<typeof setInterval> | null = null;
+  private pingTimer: ReturnType<typeof setTimeout> | null = null;
   private lastPongReceived: number = Date.now();
   private missedPongCount: number = 0;
-  private pendingPing: ReturnType<typeof setTimeout> | null = null;
+  private pendingPingTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor(options: CollabWSOptions) {
     this.url = options.url;
@@ -78,20 +78,29 @@ export class CollabWebSocket {
     }
   }
 
-  private startHeartbeat(): void {
-    this.stopHeartbeat();
-    this.lastPongReceived = Date.now();
-    this.missedPongCount = 0;
+  private scheduleNextPing(): void {
+    // Cancel any pending timers
+    if (this.pingTimer) {
+      clearTimeout(this.pingTimer);
+      this.pingTimer = null;
+    }
+    if (this.pendingPingTimer) {
+      clearTimeout(this.pendingPingTimer);
+      this.pendingPingTimer = null;
+    }
 
-    this.heartbeatTimer = setInterval(() => {
+    // Schedule the next ping
+    this.pingTimer = setTimeout(() => {
+      console.log('[DEBUG] ping timer cb fired: ws=', !!this.ws, 'readyState=', this.ws?.readyState, 'OPEN=', WebSocket.OPEN);
       if (!this.ws || this.ws.readyState !== WebSocket.OPEN) return;
 
       // Send ping
       const timestamp = Date.now();
+      console.log('[DEBUG] calling this.send ping');
       this.send({ type: 'ping', timestamp });
 
       // Wait for pong with 1 heartbeat interval as timeout
-      this.pendingPing = setTimeout(() => {
+      this.pendingPingTimer = setTimeout(() => {
         this.missedPongCount++;
         console.warn(
           `[CollabWS] missed pong #${this.missedPongCount}/${this.maxMissedPongs} (${Date.now() - this.lastPongReceived}ms since last pong)`
@@ -101,19 +110,29 @@ export class CollabWebSocket {
           console.warn('[CollabWS] max missed pongs reached, forcing reconnect');
           this.stopHeartbeat();
           this.ws?.close();
+        } else {
+          // Schedule the next ping cycle
+          this.scheduleNextPing();
         }
       }, this.heartbeatIntervalMs);
     }, this.heartbeatIntervalMs);
   }
 
+  private startHeartbeat(): void {
+    this.stopHeartbeat();
+    this.lastPongReceived = Date.now();
+    this.missedPongCount = 0;
+    this.scheduleNextPing();
+  }
+
   private stopHeartbeat(): void {
-    if (this.heartbeatTimer) {
-      clearInterval(this.heartbeatTimer);
-      this.heartbeatTimer = null;
+    if (this.pingTimer) {
+      clearTimeout(this.pingTimer);
+      this.pingTimer = null;
     }
-    if (this.pendingPing) {
-      clearTimeout(this.pendingPing);
-      this.pendingPing = null;
+    if (this.pendingPingTimer) {
+      clearTimeout(this.pendingPingTimer);
+      this.pendingPingTimer = null;
     }
   }
 
@@ -159,10 +178,12 @@ export class CollabWebSocket {
         if (msg.type === 'pong') {
           this.lastPongReceived = Date.now();
           this.missedPongCount = 0;
-          if (this.pendingPing) {
-            clearTimeout(this.pendingPing);
-            this.pendingPing = null;
+          if (this.pendingPingTimer) {
+            clearTimeout(this.pendingPingTimer);
+            this.pendingPingTimer = null;
           }
+          // Restart the ping cycle
+          this.scheduleNextPing();
           return;
         }
 
@@ -187,7 +208,11 @@ export class CollabWebSocket {
   }
 
   send(msg: object): void {
+    console.log('[DEBUG] send called: ws=', !!this.ws, 'readyState=', this.ws?.readyState, 'OPEN=', WebSocket.OPEN, 'typeof send=', typeof this.ws?.send);
     if (this.ws?.readyState === WebSocket.OPEN) {
+      console.log('[DEBUG] calling this.ws.send');
+      console.log('[DEBUG] this.ws.send is:', typeof this.ws.send, 'calls:', (this.ws.send as any).mock?.calls?.length);
+      console.log('[DEBUG] this.ws.send is:', typeof this.ws.send, 'mock?:', !!(this.ws.send as any).mock, 'calls:', (this.ws.send as any).mock?.calls?.length);
       this.ws.send(JSON.stringify(msg));
     } else {
       console.warn('[CollabWS] send skipped — not connected');

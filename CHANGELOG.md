@@ -6690,3 +6690,12 @@ See git history for complete changelog.
 - **E1.6**: `clearAll` calls `clearNotificationsFromDB`
 - **E1.7**: DoD field coverage — `id`, `isRead`, `timestamp`, `type`, `title`, `message`
 - **E1.8**: `markAllAsRead` marks all as read + resets `_serverUnreadCount`
+
+---
+
+## [Unreleased] S77-E3: 画布版本分支权限控制 — 2026-06-08
+- **S77-E3.1**: `BranchPermissionDialog` — 权限管理弹窗，owner/admin/write/read 权限设置
+- **S77-E3.2**: `canvasHistoryStore` permission checks — `deleteBranch`/`mergeBranch` 添加 owner/admin 权限校验
+- **S77-E3.3**: `BranchMeta.branchOwner` 字段 — IndexedDB branchMeta 新增 owner 字段
+- **S77-E3.4**: `HistoryPanel` 集成 — 权限管理按钮 + 弹窗渲染
+- **S77-E3.5**: `canvasHistoryStore.e3-permission.test.ts` — 18/18 权限逻辑测试覆盖

@@ -1,3 +1,13 @@
+## [Unreleased] S77-E2: WebSocket 连接稳定性增强 — 2026-06-08
+- **CollabWebSocket**: 新增心跳 ping/pong 机制（30s interval）—— `scheduleNextPing()` 递归 ping 周期 + `maxMissedPongs` 断线检测
+- **CollabWebSocket**: 指数退避重连策略 `delay = min(1000 * 2^attempt, 30000)` —— 3次心跳超时触发 reconnect
+- **CollabWebSocket**: `onReconnecting` / `onReconnected` 回调 + `connectionStatus` 状态字段
+- **presenceStore**: 新增 `connectionStatus: 'connected' | 'reconnecting' | 'disconnected'` + `setConnectionStatus()` action
+- **DDSToolbar**: 新增连接状态图标（三色：绿/黄/灰）
+- **useCollaboration.ts**: 集成 `onReconnecting` / `onReconnected` 回调
+- **useWebSocket.e2.test.ts**: 419行 ControlledTimer 测试套件——心跳周期/pong响应/断线重连 场景覆盖
+- **vitest**: `useWebSocket.e2.test.ts` 覆盖重连场景
+
 ---
 
 ## [Unreleased] S76-E5: 协作冲突检测与提示 — 2026-06-08

@@ -44,7 +44,7 @@ import type { Notification } from '@/stores/notificationStore';
 // ============================================
 
 const DB_NAME = 'vibex-canvas-history';
-const DB_VERSION = 10; // E5 (Sprint79): mergeHistory objectStore
+const DB_VERSION = 11; // E1 (Sprint80): notification_prefs objectStore
 const STORE_NAME = 'history';
 const SNAPSHOTS_STORE_NAME = 'snapshots';
 const BRANCH_META_STORE_NAME = 'branchMeta';
@@ -52,6 +52,7 @@ const BRANCH_DIFF_HISTORY_STORE_NAME = 'branchDiffHistory';
 const NOTIFICATIONS_STORE_NAME = 'notifications';
 const CANVAS_CHANGE_LOG_STORE_NAME = 'canvasChangeLog';
 const MERGE_HISTORY_STORE_NAME = 'mergeHistory';
+const NOTIFICATION_PREFS_STORE_NAME = 'notification_prefs';
 
 /** Maximum storage per canvas in bytes (5MB) */
 export const MAX_BYTES_PER_CANVAS = 5 * 1024 * 1024;
@@ -219,6 +220,16 @@ function openDB(): Promise<IDBDatabase> {
         const mergeStore = db.createObjectStore(MERGE_HISTORY_STORE_NAME, { keyPath: ['canvasId', 'id'] });
         mergeStore.createIndex('canvasId', 'canvasId', { unique: false });
         mergeStore.createIndex('timestamp', 'timestamp', { unique: false });
+      }
+      // E1 (Sprint80): notification_prefs objectStore
+      if (!db.objectStoreNames.contains(NOTIFICATION_PREFS_STORE_NAME)) {
+        const prefsStore = db.createObjectStore(NOTIFICATION_PREFS_STORE_NAME, { keyPath: 'key' });
+        prefsStore.createIndex('key', 'key', { unique: true });
+      } else if (oldVersion < 11) {
+        // Migration: recreate with unique key index
+        db.deleteObjectStore(NOTIFICATION_PREFS_STORE_NAME);
+        const prefsStore = db.createObjectStore(NOTIFICATION_PREFS_STORE_NAME, { keyPath: 'key' });
+        prefsStore.createIndex('key', 'key', { unique: true });
       }
     };
   });
@@ -1506,4 +1517,29 @@ export async function clearMergeHistoryFromDB(canvasId: string): Promise<void> {
       })
       .catch(reject);
   });
+}
+
+// ============================================
+// E1 (Sprint80): Notification Preferences IndexedDB
+// ============================================
+
+/**
+ * E1 (Sprint80): Save notification preferences to IndexedDB.
+ * Stores the full NotificationPreferences object under key 'preferences'.
+ */
+export async function savePreferencesToDB(prefs: import('@/stores/notificationStore').NotificationPreferences): Promise<void> {
+  if (!isIndexedDBAvailable()) return;
+  await idbPut({ key: 'preferences', ...prefs }, NOTIFICATION_PREFS_STORE_NAME);
+}
+
+/**
+ * E1 (Sprint80): Load notification preferences from IndexedDB.
+ * Returns null if no preferences are stored yet.
+ */
+export async function getPreferencesFromDB(): Promise<import('@/stores/notificationStore').NotificationPreferences | null> {
+  if (!isIndexedDBAvailable()) return null;
+  const result = await idbGet<{ key: string; channels: import('@/stores/notificationStore').NotificationPreferences['channels']; types: import('@/stores/notificationStore').NotificationPreferences['types'] }>('preferences', NOTIFICATION_PREFS_STORE_NAME);
+  if (!result) return null;
+  const { key: _ignored, ...prefs } = result;
+  return prefs as import('@/stores/notificationStore').NotificationPreferences;
 }

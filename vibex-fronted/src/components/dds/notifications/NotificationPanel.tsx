@@ -23,7 +23,7 @@
 import React, { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useNotificationStore } from '@/stores/notificationStore';
 import type { Notification } from '@/stores/notificationStore';
-import { NotificationSettingsDrawer } from './NotificationSettingsDrawer';
+import { NotificationPreferencesPanel } from './NotificationPreferencesPanel';
 import styles from './NotificationPanel.module.css';
 
 export interface NotificationPanelProps {
@@ -407,8 +407,8 @@ const NotificationPanel = memo(function NotificationPanel({
         </div>
       </aside>
 
-      {/* S73-E3: 通知设置抽屉 */}
-      <NotificationSettingsDrawer
+      {/* E1 (Sprint80): 通知偏好设置面板 */}
+      <NotificationPreferencesPanel
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
       />

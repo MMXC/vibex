@@ -1583,3 +1583,13 @@
 - **S79-E2.2**: 模板更新通知：缩略图 + 作者 + 日期 + 事件派发
 - **S79-E2.3**: DDSToolbar 铃铛按钮 + NotificationPanel 集成
 - **S79-E2.4**: 测试覆盖 (6/6 passing)
+
+
+---
+
+## [Unreleased] S79-E5: Merge History Viewer — 2026-06-09
+- **E5.1**: Add `MergeHistoryEntry` type + `mergeHistory` state + `recordMerge/getMergeHistory/clearMergeHistory` actions in `canvasHistoryStore`
+- **E5.2**: Add `MERGE_HISTORY` IndexedDB object store (DB v10) + `saveMergeHistoryToDB/listMergeHistoryFromDB/clearMergeHistoryFromDB` functions
+- **E5.3**: Add merge-history tab + `handleMergeComplete` callback to `BranchManager`; `MergeBranchButton` calls `onMergeComplete` after successful merge
+- **E5.4**: Create `MergeHistoryPanel` component — timeline view with branch info and formatted timestamps, loaded from IndexedDB on panel open
+- **E5.5**: Add `canvasHistoryStore.e5-merge-history.test.ts` — 8 unit tests for all three store actions (all passing)

@@ -6801,3 +6801,13 @@ See git history for complete changelog.
 - **S79-E2.3**: Tab 角标显示未读计数（template_update 类型独立计数）
 - **S79-E2.4**: `DDSToolbar`: 铃铛按钮 + 未读角标 + `NotificationPanel` 渲染
 - **S79-E2.5**: 新增 `NotificationPanel.template-update.test.tsx` (6/6 passing)
+
+
+---
+
+## [Unreleased] S79-E5: Merge History Viewer — 2026-06-09
+- **E5.1**: Add `MergeHistoryEntry` type + `mergeHistory` state + `recordMerge/getMergeHistory/clearMergeHistory` actions in `canvasHistoryStore`
+- **E5.2**: Add `MERGE_HISTORY` IndexedDB object store (DB v10) + `saveMergeHistoryToDB/listMergeHistoryFromDB/clearMergeHistoryFromDB` functions
+- **E5.3**: Add merge-history tab + `handleMergeComplete` callback to `BranchManager`; `MergeBranchButton` calls `onMergeComplete` after successful merge
+- **E5.4**: Create `MergeHistoryPanel` component — timeline view with branch info and formatted timestamps, loaded from IndexedDB on panel open
+- **E5.5**: Add `canvasHistoryStore.e5-merge-history.test.ts` — 8 unit tests for all three store actions (all passing)

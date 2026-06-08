@@ -6820,3 +6820,11 @@ See git history for complete changelog.
 - **S80-E1.3**: `NotificationPreferencesPanel` 组件：频道开关 + 类型开关 + 重置按钮，绝对定位抽屉样式
 - **S80-E1.4**: `NotificationPanel` 集成新面板，移除 `NotificationSettingsDrawer`
 - **S80-E1.5**: `notificationStore.preferences.test.ts` 12 测试用例
+
+## [Unreleased] S80-E2: 模板分类/标签过滤测试 — 2026-06-09
+- **S80-E2.1**: `templateStore.category.test.ts` 19 测试用例 —— filterByCategory / filterByTag / searchTemplates / filterTemplates / CategoryFilter 覆盖率
+- **S80-E2.2**: 标签 AND 交集过滤逻辑验证 (`metadata.tags` 字段)，多标签组合场景测试
+- **S80-E2.3**: CategoryFilter 多选状态测试 (AND/OR 模式)，category/tag 组合过滤场景
+- **S80-E2.4**: searchTemplates 与分类/标签双维度过滤集成测试
+- **S80-E2.5**: 空状态、全部标签取消选中、全部分类取消选中等边界场景
+

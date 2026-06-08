@@ -1561,3 +1561,11 @@
 - **S79-E1.2**: `canvasListStore.markExportRun(id)` — 更新 `lastRunAt`、推进 `nextRunAt` +1h、递增 `successCount`
 - **S79-E1.3**: `DDSCanvasPage.tsx` — `useEffect` mount 时启动、unmount 时停止 runner
 - **S79-E1.4**: vitest: `ScheduledExportRunner.test.ts` 12/12 pass
+
+---
+
+## [Unreleased] S79-E2: 模板更新通知面板 — 2026-06-08
+- **S79-E2.1**: TabBar 双 Tab：全部 / 模板更新
+- **S79-E2.2**: 模板更新通知：缩略图 + 作者 + 日期 + 事件派发
+- **S79-E2.3**: DDSToolbar 铃铛按钮 + NotificationPanel 集成
+- **S79-E2.4**: 测试覆盖 (6/6 passing)

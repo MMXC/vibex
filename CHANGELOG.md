@@ -6778,3 +6778,12 @@ See git history for complete changelog.
 - **S79-E1.2**: `canvasListStore.markExportRun(id)` — 更新 `lastRunAt`、推进 `nextRunAt` +1h、递增 `successCount`
 - **S79-E1.3**: `DDSCanvasPage.tsx` — `useEffect` mount 时启动、unmount 时停止 runner
 - **S79-E1.4**: vitest: `ScheduledExportRunner.test.ts` 12/12 pass
+
+---
+
+## [Unreleased] S79-E2: 模板更新通知面板 — 2026-06-08
+- **S79-E2.1**: `NotificationPanel`: 新增 TabBar，`全部`/`模板更新` 双 Tab 过滤
+- **S79-E2.2**: 模板更新通知项：缩略图 + 作者 + 日期 + 点击聚焦模板
+- **S79-E2.3**: Tab 角标显示未读计数（template_update 类型独立计数）
+- **S79-E2.4**: `DDSToolbar`: 铃铛按钮 + 未读角标 + `NotificationPanel` 渲染
+- **S79-E2.5**: 新增 `NotificationPanel.template-update.test.tsx` (6/6 passing)

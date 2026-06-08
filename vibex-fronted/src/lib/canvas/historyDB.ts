@@ -44,7 +44,7 @@ import type { Notification } from '@/stores/notificationStore';
 // ============================================
 
 const DB_NAME = 'vibex-canvas-history';
-const DB_VERSION = 7; // E1 (Sprint77): notifications objectStore
+const DB_VERSION = 8; // E3 (Sprint77): BranchMeta.branchOwner field
 const STORE_NAME = 'history';
 const SNAPSHOTS_STORE_NAME = 'snapshots';
 const BRANCH_META_STORE_NAME = 'branchMeta';
@@ -87,7 +87,9 @@ export interface HistoryEntry {
 // E4 (Sprint73): Branch Metadata Types
 // ============================================
 
-/** Branch metadata record — stored in the branchMeta objectStore */
+/** Branch metadata record — stored in the branchMeta objectStore
+ * E3 (Sprint77): extended with branchOwner field for permission control
+ */
 export interface BranchMeta {
   /** Canvas identifier */
   canvasId: string;
@@ -99,6 +101,8 @@ export interface BranchMeta {
   isProtected: boolean;
   /** When this branch was first created */
   createdAt: number;
+  /** Owner user ID — only owner (or admin) can delete/merge branches */
+  branchOwner: string;
 }
 
 // ============================================

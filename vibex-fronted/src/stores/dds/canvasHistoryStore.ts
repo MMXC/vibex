@@ -99,6 +99,9 @@ export interface Snapshot {
   parentSnapshotId?: string | null;
 }
 
+/** E3 (Sprint77): Branch permission levels */
+export type BranchPermission = 'owner' | 'admin' | 'write' | 'read';
+
 /** Diff result between two snapshots */
 interface SnapshotDiff {
   added: Array<{ id: string; label?: string }>;
@@ -190,6 +193,9 @@ interface CanvasHistoryState {
   pendingConflicts: BranchConflict[];
   /** Current active branch name */
   currentBranch: string;
+  // E3 (Sprint77): Branch permission control
+  /** Current user ID — used for branch permission checks (owner/admin/write/read) */
+  currentUserId: string | null;
   // E3 (Sprint75): Branch diff history
   /** Branch diff history entries for the current canvas (sorted by timestamp desc, max 20) */
   branchDiffHistory: Array<{
@@ -273,15 +279,15 @@ interface CanvasHistoryState {
   // E1 (Sprint65): Named snapshot with auto-name generation
   /** Save a named snapshot; if name is omitted, auto-generates "Snapshot-{ISO timestamp}" */
   saveNamedSnapshot: (canvasId: string, name?: string, data?: { nodes: unknown[]; edges: unknown[] }) => Promise<string>;
-  /** Create a branch snapshot based on a source snapshot; sets parentSnapshotId */
-  createBranch: (canvasId: string, sourceSnapshotId: string, branchName: string, currentData?: { nodes: unknown[]; edges: unknown[] }) => Promise<string>;
+  /** Create a branch snapshot based on a source snapshot; sets parentSnapshotId. E3: sets initial branchOwner. */
+  createBranch: (canvasId: string, sourceSnapshotId: string, branchName: string, currentData?: { nodes: unknown[]; edges: unknown[] }, owner?: string) => Promise<string>;
   // E1 (Sprint66): Branch operations
   /** Rename all snapshots in a branch */
   renameBranch: (canvasId: string, oldName: string, newName: string) => Promise<void>;
-  /** Delete all snapshots in a branch (recursive) */
-  deleteBranch: (canvasId: string, branchName: string) => Promise<void>;
-  /** Merge source branch into target branch; reparent snapshots to target's latest snapshot tip */
-  mergeBranch: (canvasId: string, sourceBranch: string, targetBranch: string) => Promise<void>;
+  /** Delete all snapshots in a branch (recursive) — requires userId for permission check */
+  deleteBranch: (canvasId: string, branchName: string, userId: string) => Promise<{ ok: boolean; error?: string }>;
+  /** Merge source branch into target branch — requires userId for permission check */
+  mergeBranch: (canvasId: string, sourceBranch: string, targetBranch: string, userId: string) => Promise<{ ok: boolean; error?: string }>;
   /** List all unique branch names for a canvas */
   listBranches: (canvasId: string) => Promise<string[]>;
   // E1 (Sprint70): Branch merge conflict resolution
@@ -292,8 +298,15 @@ interface CanvasHistoryState {
   setBranchName: (canvasId: string, branchName: string, name: string) => Promise<void>;
   /** Set the protection flag for a branch */
   setBranchProtected: (canvasId: string, branchName: string, isProtected: boolean) => Promise<void>;
-  /** Get branch metadata (name, isProtected, createdAt) */
-  getBranchMeta: (canvasId: string, branchName: string) => Promise<{ name: string; isProtected: boolean; createdAt: number } | null>;
+  /** Get branch metadata (name, isProtected, createdAt, branchOwner) */
+  getBranchMeta: (canvasId: string, branchName: string) => Promise<{ name: string; isProtected: boolean; createdAt: number; branchOwner: string } | null>;
+  // E3 (Sprint77): Branch permission control
+  /** Set the current user ID for permission checks */
+  setCurrentUserId: (userId: string | null) => void;
+  /** Set the owner of a branch — owner can delete/merge; only owner or admin can transfer ownership */
+  setBranchOwner: (canvasId: string, branchName: string, owner: string, currentUserId: string) => Promise<{ ok: boolean; error?: string }>;
+  /** Get the permission level a user has on a branch — returns 'owner' | 'admin' | 'write' | 'read' */
+  getBranchPermission: (canvasId: string, branchName: string, userId: string) => Promise<BranchPermission>;
   /** Resolve a single branch merge conflict — applies resolution and removes from pending */
   resolveBranchConflict: (
     canvasId: string,
@@ -711,10 +724,24 @@ export const useCanvasHistoryStore = create<CanvasHistoryState>((set, get) => ({
     return id;
   },
 
-  /** Create a branch snapshot with parentSnapshotId linking back to source */
-  createBranch: async (canvasId: string, sourceSnapshotId: string, branchName: string, currentData?: { nodes: unknown[]; edges: unknown[] }) => {
+  /** Create a branch snapshot with parentSnapshotId linking back to source
+   * E3 (Sprint77): Sets initial branchOwner to the creator (currentUserId)
+   */
+  createBranch: async (
+    canvasId: string,
+    sourceSnapshotId: string,
+    branchName: string,
+    currentData?: { nodes: unknown[]; edges: unknown[] },
+    owner?: string
+  ) => {
     if (typeof window === 'undefined' || !window.indexedDB) return '';
-    const { saveSnapshotToDB, loadSnapshotFromDB, listSnapshotsFromDB, deleteSnapshotFromDB } = await import('@/lib/canvas/historyDB');
+    const {
+      saveSnapshotToDB,
+      loadSnapshotFromDB,
+      listSnapshotsFromDB,
+      deleteSnapshotFromDB,
+      setBranchMeta,
+    } = await import('@/lib/canvas/historyDB');
     const sourceSnap = await loadSnapshotFromDB(canvasId, sourceSnapshotId);
     const id = `snapshot-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
     const newSnap = {
@@ -728,12 +755,80 @@ export const useCanvasHistoryStore = create<CanvasHistoryState>((set, get) => ({
     await saveSnapshotToDB(canvasId, newSnap);
     // Branch-aware LRU for the new branch
     const allSnaps = await listSnapshotsFromDB(canvasId);
-    const branchSnaps = allSnaps.filter((s) => (s.branchName ?? 'main') === branchName).sort((a, b) => b.timestamp - a.timestamp);
+    const branchSnaps = allSnaps
+      .filter((s) => (s.branchName ?? 'main') === branchName)
+      .sort((a, b) => b.timestamp - a.timestamp);
     if (branchSnaps.length > MAX_SNAPSHOTS) {
       const toDelete = branchSnaps.slice(MAX_SNAPSHOTS);
       await Promise.all(toDelete.map((s) => deleteSnapshotFromDB(canvasId, s.id)));
     }
+    // E3 (Sprint77): Set initial branch owner
+    if (owner) {
+      await setBranchMeta(canvasId, branchName, {
+        name: branchName,
+        isProtected: false,
+        createdAt: Date.now(),
+        branchOwner: owner,
+      });
+    }
     return id;
+  },
+
+  // E3 (Sprint77): Branch permission control
+  setCurrentUserId: (userId: string | null) => {
+    set({ currentUserId: userId });
+  },
+
+  setBranchOwner: async (
+    canvasId: string,
+    branchName: string,
+    owner: string,
+    currentUserId: string
+  ): Promise<{ ok: boolean; error?: string }> => {
+    if (typeof window === 'undefined' || !window.indexedDB) {
+      return { ok: false, error: 'IndexedDB unavailable' };
+    }
+    try {
+      const { getBranchMeta, setBranchMeta } = await import('@/lib/canvas/historyDB');
+      const existing = await getBranchMeta(canvasId, branchName);
+      // Use get() to call store actions from within other actions (Zustand v5 pattern)
+      const { getBranchPermission: storeGetPerm } = get();
+      const perm = existing
+        ? await storeGetPerm(canvasId, branchName, currentUserId)
+        : 'owner';
+      if (perm !== 'owner' && perm !== 'admin') {
+        return { ok: false, error: 'Permission denied: only owner or admin can transfer branch ownership' };
+      }
+      await setBranchMeta(canvasId, branchName, {
+        name: existing?.name ?? branchName,
+        isProtected: existing?.isProtected ?? false,
+        createdAt: existing?.createdAt ?? Date.now(),
+        branchOwner: owner,
+      });
+      return { ok: true };
+    } catch (e) {
+      return { ok: false, error: String(e) };
+    }
+  },
+
+  getBranchPermission: async (
+    canvasId: string,
+    branchName: string,
+    userId: string
+  ): Promise<BranchPermission> => {
+    if (!userId) return 'read';
+    if (typeof window === 'undefined' || !window.indexedDB) return 'read';
+    const { getBranchMeta } = await import('@/lib/canvas/historyDB');
+    const meta = await getBranchMeta(canvasId, branchName);
+    if (!meta) return 'read';
+    // Owner has full permissions
+    if (meta.branchOwner === userId) return 'owner';
+    // Admin check: in a real app, this would check a roles/permissions store.
+    // For MVP, we treat 'admin' as a special userId suffix or future capability.
+    // Admin bypass: any user with 'admin' in their ID (for demo purposes).
+    if (userId.startsWith('admin-')) return 'admin';
+    // Default: write permission for logged-in users (can edit but not delete/merge)
+    return 'write';
   },
 
   // ==================== E1 (Sprint66): Branch Operations ====================
@@ -748,22 +843,38 @@ export const useCanvasHistoryStore = create<CanvasHistoryState>((set, get) => ({
     set({ snapshots: list.sort((a, b) => b.timestamp - a.timestamp) });
   },
 
-  deleteBranch: async (canvasId: string, branchName: string) => {
-    if (typeof window === 'undefined' || !window.indexedDB) return;
+  deleteBranch: async (canvasId: string, branchName: string, userId: string): Promise<{ ok: boolean; error?: string }> => {
+    if (typeof window === 'undefined' || !window.indexedDB) {
+      return { ok: false, error: 'IndexedDB not available' };
+    }
     if (branchName === 'main') {
-      console.warn('[canvasHistoryStore] deleteBranch: cannot delete main branch');
-      return;
+      return { ok: false, error: 'Cannot delete the main branch' };
+    }
+    // E3 (Sprint77): Permission check — only owner or admin can delete
+    const perm = await getBranchPermission(canvasId, branchName, userId);
+    if (perm !== 'owner' && perm !== 'admin') {
+      return { ok: false, error: 'Permission denied: only the branch owner or admin can delete this branch' };
     }
     const { deleteBranchFromDB, listSnapshotsFromDB } = await import('@/lib/canvas/historyDB');
     await deleteBranchFromDB(canvasId, branchName);
     // Refresh local snapshots list
     const list = await listSnapshotsFromDB(canvasId);
     set({ snapshots: list.sort((a, b) => b.timestamp - a.timestamp) });
+    return { ok: true };
   },
 
-  mergeBranch: async (canvasId: string, sourceBranch: string, targetBranch: string) => {
-    if (typeof window === 'undefined' || !window.indexedDB) return;
-    if (sourceBranch === targetBranch) return;
+  mergeBranch: async (canvasId: string, sourceBranch: string, targetBranch: string, userId: string): Promise<{ ok: boolean; error?: string }> => {
+    if (typeof window === 'undefined' || !window.indexedDB) {
+      return { ok: false, error: 'IndexedDB not available' };
+    }
+    if (sourceBranch === targetBranch) {
+      return { ok: false, error: 'Source and target branches cannot be the same' };
+    }
+    // E3 (Sprint77): Permission check — source branch owner or admin can merge
+    const perm = await getBranchPermission(canvasId, sourceBranch, userId);
+    if (perm !== 'owner' && perm !== 'admin') {
+      return { ok: false, error: 'Permission denied: only the source branch owner or admin can merge this branch' };
+    }
     const { mergeBranchInDB, listSnapshotsFromDB } = await import('@/lib/canvas/historyDB');
     // Find the latest snapshot in target branch as merge tip
     const allSnaps = await listSnapshotsFromDB(canvasId, { branch: targetBranch });
@@ -772,6 +883,7 @@ export const useCanvasHistoryStore = create<CanvasHistoryState>((set, get) => ({
     // Refresh local snapshots list
     const list = await listSnapshotsFromDB(canvasId);
     set({ snapshots: list.sort((a, b) => b.timestamp - a.timestamp) });
+    return { ok: true };
   },
 
   listBranches: async (canvasId: string) => {
@@ -788,31 +900,38 @@ export const useCanvasHistoryStore = create<CanvasHistoryState>((set, get) => ({
   setBranchName: async (canvasId: string, branchName: string, name: string) => {
     if (typeof window === 'undefined' || !window.indexedDB) return;
     const { setBranchMeta, getBranchMeta } = await import('@/lib/canvas/historyDB');
-    // Preserve existing isProtected/createdAt if record already exists
+    // Preserve existing isProtected/createdAt/branchOwner if record already exists
     const existing = await getBranchMeta(canvasId, branchName);
     await setBranchMeta(canvasId, branchName, {
       name,
       isProtected: existing?.isProtected ?? false,
       createdAt: existing?.createdAt ?? Date.now(),
+      branchOwner: existing?.branchOwner ?? '',
     });
   },
 
   setBranchProtected: async (canvasId: string, branchName: string, isProtected: boolean) => {
     if (typeof window === 'undefined' || !window.indexedDB) return;
     const { setBranchMeta, getBranchMeta } = await import('@/lib/canvas/historyDB');
-    // Preserve existing name/createdAt if record already exists
+    // Preserve existing name/createdAt/branchOwner if record already exists
     const existing = await getBranchMeta(canvasId, branchName);
     await setBranchMeta(canvasId, branchName, {
       name: existing?.name ?? branchName,
       isProtected,
       createdAt: existing?.createdAt ?? Date.now(),
+      branchOwner: existing?.branchOwner ?? '',
     });
   },
 
   getBranchMeta: async (canvasId: string, branchName: string) => {
     if (typeof window === 'undefined' || !window.indexedDB) return null;
     const { getBranchMeta } = await import('@/lib/canvas/historyDB');
-    return getBranchMeta(canvasId, branchName);
+    const result = await getBranchMeta(canvasId, branchName);
+    // Backward compatibility: existing branches without branchOwner default to ''
+    if (result) {
+      return { ...result, branchOwner: result.branchOwner ?? '' };
+    }
+    return null;
   },
 
   resolveBranchConflict: async (

@@ -8,6 +8,7 @@ import SnapshotDiffDialog from './SnapshotDiffDialog';
 import SnapshotPreview from './SnapshotPreview';
 import BranchDiffPanel from '../canvas-history/BranchDiffPanel';
 import BranchDiffDialog from './BranchDiffDialog';
+import { BranchPermissionDialog } from './BranchPermissionDialog';
 
 /** E1 (Sprint66): Branch merge dialog props */
 export interface BranchMergeDialogProps {
@@ -110,14 +111,19 @@ const HistoryPanel = React.memo(function HistoryPanel({
   // E1 (Sprint67): Branch comparison panel
   const [branchDiffOpen, setBranchDiffOpen] = useState(false);
   // E4 (Sprint73): Branch naming & protection
-  const [branchMetas, setBranchMetas] = useState<Record<string, { name: string; isProtected: boolean; createdAt: number }>>({});
+  const [branchMetas, setBranchMetas] = useState<Record<string, { name: string; isProtected: boolean; createdAt: number; branchOwner: string }>>({});
   const [editingBranch, setEditingBranch] = useState<string | null>(null);
   const [editingBranchName, setEditingBranchName] = useState('');
+  // E3 (Sprint77): Branch permission control — current user ID
+  const currentUserId = 'user-1'; // TODO: wire to auth store (useCollabStore or similar)
 
   // S74-E3: Branch multi-select state for Ctrl+Click comparison
   const [selectedBranches, setSelectedBranches] = useState<Set<string>>(new Set());
   const [branchDiffDialogOpen, setBranchDiffDialogOpen] = useState(false);
   const [branchDiffDialogBranches, setBranchDiffDialogBranches] = useState<{ branchA: string; branchB: string } | null>(null);
+  // E3 (Sprint77): Branch permission dialog state
+  const [permDialogOpen, setPermDialogOpen] = useState(false);
+  const [permDialogBranch, setPermDialogBranch] = useState('');
 
   // S74-E3: Ctrl+Click branch selection for comparison
   const handleBranchSelect = useCallback((branch: string, ctrlKey: boolean) => {
@@ -281,16 +287,24 @@ const HistoryPanel = React.memo(function HistoryPanel({
       return;
     }
     if (!confirm(`确定删除分支 "${branch}" 及其所有快照吗？此操作不可恢复。`)) { setOpenMenuBranch(null); return; }
-    await deleteBranch('', branch);
+    // E3 (Sprint77): Permission check — deleteBranch validates owner/admin
+    const result = await deleteBranch('', branch, currentUserId);
+    if (!result.ok) {
+      alert(result.error ?? '删除失败');
+    }
     setOpenMenuBranch(null);
-  }, [deleteBranch, branchMetas]);
+  }, [deleteBranch, branchMetas, currentUserId]);
 
   const handleBranchMerge = useCallback(async (source: string, target: string) => {
     if (source === target) { setMergeDialog({ open: false, source: '', target: '' }); return; }
-    await mergeBranch('', source, target);
+    // E3 (Sprint77): Permission check — mergeBranch validates source branch owner/admin
+    const result = await mergeBranch('', source, target, currentUserId);
+    if (!result.ok) {
+      alert(result.error ?? '合并失败');
+    }
     setMergeDialog({ open: false, source: '', target: '' });
     setOpenMenuBranch(null);
-  }, [mergeBranch]);
+  }, [mergeBranch, currentUserId]);
 
   // Close menus on outside click
   useEffect(() => {
@@ -443,6 +457,13 @@ const HistoryPanel = React.memo(function HistoryPanel({
                     title="重命名分支"
                     aria-label={`重命名分支 ${branch}`}
                   >✎</button>
+                  {/* E3 (Sprint77): Branch permission management */}
+                  <button
+                    className="branch-ops-btn"
+                    onClick={(e) => { e.stopPropagation(); setPermDialogBranch(branch); setPermDialogOpen(true); setOpenMenuBranch(null); }}
+                    title="权限管理"
+                    aria-label={`权限管理 ${branch}`}
+                  >👤</button>
                   {/* E4 (Sprint73): Toggle protection */}
                   <button
                     className={`branch-ops-btn ${branchMetas[branch]?.isProtected ? 'protected' : ''}`}
@@ -721,6 +742,15 @@ const HistoryPanel = React.memo(function HistoryPanel({
         open={branchDiffOpen}
         onClose={() => setBranchDiffOpen(false)}
       />
+
+      {/* E3 (Sprint77): Branch permission management dialog */}
+      {permDialogOpen && (
+        <BranchPermissionDialog
+          canvasId=""
+          branchName={permDialogBranch}
+          onClose={() => setPermDialogOpen(false)}
+        />
+      )}
     </div>
   );
 });

@@ -150,3 +150,82 @@
 .merge-history-user {
   color: #6b7280;
 }
+
+/* E3 (Sprint80): New styles */
+
+.merge-history-export {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: #6b7280;
+  padding: 4px;
+  border-radius: 4px;
+  line-height: 1;
+}
+
+.merge-history-export:hover {
+  background: #f3f4f6;
+  color: #10b981;
+}
+
+.merge-history-main-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.merge-history-conflict {
+  font-size: 11px;
+  color: #f59e0b;
+  font-weight: 500;
+}
+
+.merge-history-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 0 4px 20px;
+  border-top: 1px dashed #e5e7eb;
+  margin-top: 4px;
+}
+
+.merge-history-stat {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #374151;
+}
+
+.merge-history-stat-label {
+  color: #9ca3af;
+  font-size: 11px;
+  min-width: 48px;
+}
+
+.merge-history-authors {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+
+.merge-history-avatar-list {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.merge-history-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #dbeafe;
+  color: #1d4ed8;
+  font-size: 10px;
+  font-weight: 600;
+}

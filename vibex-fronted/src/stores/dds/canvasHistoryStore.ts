@@ -181,6 +181,13 @@ export interface MergeHistoryEntry {
   timestamp: number;
   /** User who performed the merge */
   mergedBy?: string;
+  // E3 (Sprint80): Enriched merge metadata
+  /** Node IDs that were merged in this operation */
+  mergedNodeIds?: string[];
+  /** Number of conflicts resolved during merge */
+  conflictCount?: number;
+  /** User IDs who contributed to the merged nodes */
+  authorIds?: string[];
 }
 
 // ==================== Constants ====================

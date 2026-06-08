@@ -1521,3 +1521,12 @@
 - **templateStore**: 新增 `subscribeTemplate`/`unsubscribeTemplate`/`subscribeAuthor`/`unsubscribeAuthor`/`getTemplateUpdates` actions + `subscribedTemplates`/`subscribedAuthors` 持久化状态
 - **TemplateMarketplacePanel**: 卡片新增 🔔/🔕 订阅按钮，点击切换订阅状态 + 触发通知偏好
 - **templateStore.subscription.test.ts**: 订阅/退订/更新检测 9 个测试用例全部通过
+
+---
+
+## [Unreleased] S78-E3: 画布节点内联评论 — 2026-06-08
+- **collabSessionStore**: 新增 `comments` Record + `addComment()`/`getComments()`/`getCommentCount()`/`addReply()`/`deleteComment()` actions
+- **NodeCommentBadge.tsx**: 节点评论计数Badge（count>0时显示emoji+数字）
+- **NodeCommentPanel.tsx**: 侧边评论面板 — 线程列表 + 回复输入 + 新评论提交
+- **DDSCanvasPage.tsx**: 集成 `NodeCommentPanel` 侧边面板 + `NodeCommentBadge` 节点徽章 + `Cmd+Shift+M` 快捷键
+- **collabSessionStore.comments.test.ts**: 12 个测试用例覆盖全部CRUD操作

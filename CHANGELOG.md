@@ -6729,3 +6729,12 @@ See git history for complete changelog.
 - **BranchManager**: 集成 `autoMergeBranch` — 无冲突时自动合并到 main，有冲突时弹出 `BranchAutoMergeDialog` 供用户逐节点选择
 - **BranchManagerProps**: 新增 `currentUserId` prop — 传递给合并操作进行权限校验
 - **canvasHistoryStore.auto-merge.test.ts**: 9 个测试用例覆盖自动合并、冲突检测、边界条件
+
+
+---
+
+## [Unreleased] S78-E2: 模板订阅与更新通知 — 2026-06-08
+- **notificationStore**: 新增 `template_update` NotificationType + `templateId`/`authorId`/`thumbnail` 字段
+- **templateStore**: 新增 `subscribeTemplate`/`unsubscribeTemplate`/`subscribeAuthor`/`unsubscribeAuthor`/`getTemplateUpdates` actions + `subscribedTemplates`/`subscribedAuthors` 持久化状态
+- **TemplateMarketplacePanel**: 卡片新增 🔔/🔕 订阅按钮，点击切换订阅状态 + 触发通知偏好
+- **templateStore.subscription.test.ts**: 订阅/退订/更新检测 9 个测试用例全部通过

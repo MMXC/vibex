@@ -1542,3 +1542,13 @@
 - **ScheduledExportPanel**: 定时导出管理面板 — 列表/添加/开关/删除，支持 cron 表达式输入
 - **DDSToolbar**: 工具栏新增定时导出按钮
 - **canvasListStore.e4-scheduled-export.test.ts**: 20+ 测试用例覆盖 cron 解析 + store actions
+
+---
+
+## [Unreleased] S78-E5: 画布关联追踪 — 2026-06-08
+- **canvasListStore**: `CanvasRelation` interface + `RelationType` union + `canvasRelations` state + actions
+  (`addCanvasRelation`, `removeCanvasRelation`, `updateCanvasRelation`, `getCanvasRelations`, `getRelationStats`, `detectCircularRelation`)
+- **CanvasRelationsPanel.tsx**: 关联追踪面板 — 关系列表 + 类型筛选 + 添加/删除关系
+- **CanvasRelationBadge.tsx**: 关联计数图标徽章（带 tooltip）
+- **FolderTree.tsx**: SortableFolderItem 集成 `CanvasRelationBadge` 显示文件夹关联数
+- **canvasListStore.relations.test.ts**: 14 个测试用例（循环检测/增删/统计/$reset）

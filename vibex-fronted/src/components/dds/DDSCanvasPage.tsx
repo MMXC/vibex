@@ -38,6 +38,8 @@ import { KeyboardHelpOverlay } from '@/components/shared/KeyboardHelpOverlay';
 import { OperationOverlay } from '@/components/shared/OperationOverlay';
 import { ShortcutEditModal } from '@/components/shortcuts/ShortcutEditModal';
 import { useShortcutStore } from '@/stores/shortcutStore';
+import { useSettingsStore } from '@/stores/dds/settingsStore';
+import { calculateEffectiveDPR } from '@/components/dds/settings/PerformanceSettings';
 import { NewUserGuide } from '@/components/guide/NewUserGuide';
 import { createDDSAPI } from '@/hooks/dds/useDDSAPI';
 import { useDDSCanvasSearch } from '@/hooks/dds/useDDSCanvasSearch';
@@ -306,6 +308,12 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
   // E5-U1 AC1: Touch mode detection
   const { isMobile, isTablet } = useResponsiveMode();
   const [touchMode, setTouchMode] = useState(false);
+
+  // E5 (Sprint77): DPR performance mode — calculated once on mount
+  const dprMode = useSettingsStore((s) => s.dprMode);
+  const [effectiveDPR] = useState(() =>
+    typeof window !== 'undefined' ? calculateEffectiveDPR(window.devicePixelRatio, dprMode) : 1
+  );
 
   // E5-U1: Detect first touch interaction — switch canvas to touch mode
   useEffect(() => {
@@ -947,6 +955,8 @@ const { onCursorMove, broadcastCursor } = useWebSocketPresence({
                 selectedCardIds={selectedCardIds}
                 /* E5-U1: Touch mode — disable drag, enable pinch-zoom */
                 touchMode={touchMode}
+                /* E5 (Sprint77): DPR performance mode */
+                effectiveDPR={effectiveDPR}
                 /* S63-E1: wire pane mouse move → cursor broadcast */
                 onCursorMove={onCursorMove}
               />

@@ -156,6 +156,8 @@ export interface DDSFlowProps {
   selectedCardIds?: string[];
   /** E5: when true, canvas switches to touch-optimized mode */
   touchMode?: boolean;
+  /** E5 (Sprint77): effective DPR from DDSCanvasPage DPR capping */
+  effectiveDPR?: number;
   /** S63-E1: called on pane mouse move with flow-space coordinates */
   onCursorMove?: (x: number, y: number) => void;
 }
@@ -169,6 +171,7 @@ function DDSFlowInner({
   onSelectCard,
   selectedCardIds = [],
   touchMode = false,
+  effectiveDPR = 1,
   onCursorMove,
 }: DDSFlowProps) {
   const reactFlow = useReactFlow();
@@ -357,6 +360,18 @@ function DDSFlowInner({
     [onSelectCard, nodeLocks, currentUserId, showNodeLockedToast]
   );
 
+  // E5 (Sprint77): Debounce onNodesChange to reduce excessive DPR re-renders
+  const handleNodesChangeDebounced = useMemo(() => {
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    return (changes: Parameters<typeof onNodesChange>[0]) => {
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(() => {
+        onNodesChange(changes);
+        timer = null;
+      }, 100);
+    };
+  }, [onNodesChange]);
+
   // S66-E2: Block drag on locked nodes — intercept position change events
   const handleNodesChange = useCallback(
     (changes: Parameters<typeof onNodesChange>[0]) => {
@@ -372,9 +387,10 @@ function DDSFlowInner({
           }
         }
       }
-      onNodesChange(changes);
+      // E5 (Sprint77): Debounce 100ms — use debounced handler for all changes
+      handleNodesChangeDebounced(changes);
     },
-    [onNodesChange, nodeLocks, currentUserId, showNodeLockedToast]
+    [handleNodesChangeDebounced, nodeLocks, currentUserId, showNodeLockedToast]
   );
 
   const handleToggle = useCallback(
@@ -445,6 +461,27 @@ function DDSFlowInner({
         */}
         {/* P005-E3: MiniMap — E5: default hidden on touch/mobile */}
         {!touchMode && <MiniMapPanel />}
+
+        {/* E5 (Sprint77): DPR indicator — only shown when DPR is capped */}
+        {effectiveDPR < (typeof window !== 'undefined' ? Math.min(window.devicePixelRatio, 2) : 1) && (
+          <div
+            style={{
+              position: 'absolute',
+              bottom: 8,
+              right: 8,
+              background: 'rgba(59,130,246,0.9)',
+              color: '#fff',
+              fontSize: 11,
+              padding: '2px 6px',
+              borderRadius: 4,
+              zIndex: 10,
+              pointerEvents: 'none',
+            }}
+            aria-hidden="true"
+          >
+            DPR {effectiveDPR.toFixed(1)}
+          </div>
+        )}
 
         {/* E1-U2/U3: Group collapse overlay */}
         <GroupCollapseOverlay

@@ -48,11 +48,16 @@ export interface CanvasPreset {
   updatedAt: number;
 }
 
+/** E5 (Sprint77): DPR performance mode */
+export type DprMode = 'auto' | '1x' | '2x';
+
 interface SettingsState {
   canvasPresets: CanvasPreset[];
   activePresetId: string | null;
   /** S76-E1: Unified canvas background settings (variant + gap + size + color) */
   canvasBackground: CanvasBackground;
+  /** E5 (Sprint77): DPR performance mode */
+  dprMode: DprMode;
 }
 
 interface SettingsActions {
@@ -63,6 +68,8 @@ interface SettingsActions {
   setSnapToGrid: (snap: boolean) => void;
   /** S76-E1: Set all canvas background settings at once */
   setCanvasBackground: (bg: Partial<CanvasBackground>) => void;
+  /** E5 (Sprint77): Set DPR performance mode */
+  setDprMode: (mode: DprMode) => void;
   reset: () => void;
   saveAsPreset: (name: string, settings: CanvasSettings) => string;
   applyPreset: (presetId: string) => void;
@@ -89,9 +96,10 @@ const DEFAULT_CANVAS_BACKGROUND: CanvasBackground = {
   color: '#e5e7eb',
 };
 
-const DEFAULT_PRESETS_STATE: Pick<SettingsState, 'canvasPresets' | 'activePresetId'> = {
+const DEFAULT_PRESETS_STATE: Pick<SettingsState, 'canvasPresets' | 'activePresetId' | 'dprMode'> = {
   canvasPresets: [],
   activePresetId: null,
+  dprMode: 'auto',
 };
 
 const VALID_GRID_SIZES = [12, 16, 24, 32] as const;
@@ -153,6 +161,11 @@ export const useSettingsStore = create<SettingsStore>()(
             activePresetId: null,
           };
         });
+      },
+
+      /** E5 (Sprint77): Set DPR performance mode */
+      setDprMode: (mode: DprMode) => {
+        set({ dprMode: mode });
       },
 
       reset: () =>

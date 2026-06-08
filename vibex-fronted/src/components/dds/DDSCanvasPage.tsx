@@ -55,6 +55,8 @@ import { useCanvasListStore } from '@/stores/canvasListStore';
 import { MiniMapPanel } from '@/components/dds/MiniMapPanel';
 import { ReviewReportPanel } from '@/components/design-review';
 import { HistoryPanel } from '@/components/canvas/features/HistoryPanel';
+import { NodeCommentPanel } from '@/components/dds/canvas/NodeCommentPanel';
+import { useCollabSessionStore } from '@/lib/collaboration/collabSessionStore';
 import { useConflictStore } from '@/stores/dds/conflictStore';
 import { ConflictDialog } from '@/components/dds/canvas-dashboard/ConflictDialog';
 import { ConflictResolutionDialog } from '@/components/dds/canvas-dashboard/ConflictResolutionDialog';
@@ -606,6 +608,7 @@ const { onCursorMove, broadcastCursor } = useWebSocketPresence({
   const [fulltextSearchOpen, setFulltextSearchOpen] = useState(false); // S73-E1: Cmd/Ctrl+F
   const [globalSearchPanelOpen, setGlobalSearchPanelOpen] = useState(false);
   const [historyPanelOpen, setHistoryPanelOpen] = useState(false);
+  const [commentPanelOpen, setCommentPanelOpen] = useState(false);
   const { query: searchQuery, setQuery: setSearchQuery, results: searchResults, clearResults } =
     useDDSCanvasSearch();
 
@@ -675,6 +678,21 @@ const { onCursorMove, broadcastCursor } = useWebSocketPresence({
     }
     document.addEventListener('keydown', handleGlobalSearch);
     return () => document.removeEventListener('keydown', handleGlobalSearch);
+  }, []);
+
+  // S78-E3: Cmd+Shift+M / Ctrl+Shift+M: toggle Node Comment Panel
+  useEffect(() => {
+    function handleToggleComment(e: KeyboardEvent) {
+      if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key.toLowerCase() === 'm') {
+        e.preventDefault();
+        const selectedCardIds = useDDSCanvasStore.getState().selectedCardIds;
+        if (selectedCardIds.length === 1) {
+          setCommentPanelOpen((v) => !v);
+        }
+      }
+    }
+    document.addEventListener('keydown', handleToggleComment);
+    return () => document.removeEventListener('keydown', handleToggleComment);
   }, []);
 
   // S75-E1: Listen for dds:recent-search (from RecentSearchesDropdown) and dds:open-search-panel
@@ -896,6 +914,34 @@ const { onCursorMove, broadcastCursor } = useWebSocketPresence({
 
       {/* S76-E5: ConflictWarningBanner — shows when a remote user is editing the selected node */}
       <ConflictWarningBannerWrapper />
+
+      {/* S78-E3: NodeCommentBadge — shows on selected node card */}
+      {(() => {
+        const selectedCardIds = useDDSCanvasStore.getState().selectedCardIds;
+        if (selectedCardIds.length !== 1) return null;
+        const nodeId = selectedCardIds[0];
+        const count = useCollabSessionStore.getState().getCommentCount(nodeId);
+        if (count <= 0) return null;
+        return (
+          <div style={{ position: 'absolute', top: '64px', right: '16px', zIndex: 100 }}>
+            <button
+              style={{
+                display: 'flex', alignItems: 'center', gap: '4px',
+                padding: '4px 10px', borderRadius: '16px',
+                background: 'var(--color-primary, #6366f1)', color: '#fff',
+                border: 'none', cursor: 'pointer', fontSize: '12px', fontWeight: 600,
+                boxShadow: '0 2px 8px rgba(99,102,241,0.4)',
+              }}
+              onClick={() => setCommentPanelOpen(true)}
+              aria-label={`查看 ${count} 条评论`}
+              title={`${count} 条评论 — 按 Cmd+Shift+M 打开`}
+              type="button"
+            >
+              💬 {count >= 100 ? '99+' : count}
+            </button>
+          </div>
+        );
+      })()}
 
       {/* S53-E1: Real-time presence indicator — shows online collaborators */}
       <div style={{ position: 'absolute', top: '12px', right: '16px', zIndex: 50 }}>
@@ -1150,6 +1196,33 @@ const { onCursorMove, broadcastCursor } = useWebSocketPresence({
       open={historyPanelOpen}
       onClose={() => setHistoryPanelOpen(false)}
     />
+
+    {/* S78-E3: Node Comment Panel — opens from badge or toolbar */}
+    {(() => {
+      const selectedCardIds = useDDSCanvasStore.getState().selectedCardIds;
+      const nodeId = selectedCardIds.length === 1 ? selectedCardIds[0] : null;
+      const threads = nodeId ? useCollabSessionStore.getState().getComments(nodeId) : [];
+      const currentUser = useAuthStore.getState().currentUser;
+      return (
+        <NodeCommentPanel
+          nodeId={nodeId ?? ''}
+          threads={threads}
+          currentUserId={currentUser?.id}
+          currentUserName={currentUser?.name}
+          open={commentPanelOpen && nodeId !== null}
+          onClose={() => setCommentPanelOpen(false)}
+          onAddComment={(nid, text, uid, uname, mentions) => {
+            useCollabSessionStore.getState().addComment(nid, text, uid, uname, mentions);
+          }}
+          onAddReply={(nid, cid, text, uid, uname, mentions) => {
+            useCollabSessionStore.getState().addReply(nid, cid, text, uid, uname, mentions);
+          }}
+          onDeleteComment={(nid, cid) => {
+            useCollabSessionStore.getState().deleteComment(nid, cid);
+          }}
+        />
+      );
+    })()}
 
     {/* P003-T3.7: New user guide overlay on DDS canvas */}
     <NewUserGuide />

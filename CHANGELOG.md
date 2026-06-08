@@ -6699,3 +6699,14 @@ See git history for complete changelog.
 - **S77-E3.3**: `BranchMeta.branchOwner` 字段 — IndexedDB branchMeta 新增 owner 字段
 - **S77-E3.4**: `HistoryPanel` 集成 — 权限管理按钮 + 弹窗渲染
 - **S77-E3.5**: `canvasHistoryStore.e3-permission.test.ts` — 18/18 权限逻辑测试覆盖
+
+
+---
+
+## [Unreleased] S77-E4: 画布离线缓存与冲突解决 — 2026-06-08
+
+- **canvasOfflineStore.ts** (NEW): Zustand store with `isOffline`/`pendingQueue`/`syncStatus`/`lastSyncedAt`, `queueChange()` → IndexedDB persistence, conflict detection via `remoteUpdatedAt > lastSyncedAt`
+- **historyDB.ts**: `DB_VERSION=9`, `CanvasChangeLog` objectStore (`CanvasChangeLogEntry`, `saveCanvasChangeToDB`, `loadCanvasChangesFromDB`, `clearCanvasChangesFromDB`)
+- **OfflineBanner.tsx** (NEW): 固定底部 banner，显示离线/同步中/冲突状态
+- **canvasOfflineStore.test.ts**: 23 tests covering offline state, queue, reconnect conflict detection, replay/discard/resolve flows
+

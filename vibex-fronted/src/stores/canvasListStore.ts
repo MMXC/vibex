@@ -39,6 +39,8 @@ export interface CanvasMeta {
   description?: string;
   /** Canvas tags for search indexing (S76-E3) */
   tags?: string[];
+  /** Relation IDs pointing into canvasRelations map (S78-E5) */
+  relationIds?: string[];
 }
 
 // S76-E3: Indexed search entry (mirrors canvasSearchStore.CanvasIndexEntry for canvas-level search)
@@ -940,5 +942,109 @@ export const useCanvasListStore = create<CanvasListState>((set, get) => ({
   },
 
   // ============================================================
-  $reset: () => set({ selectedCanvasIds: new Set(), canvasIndex: [], canvasFuseIndex: null, scheduledExports: {} }),
+  // ─── S78-E5: Canvas Relations ───────────────────────────────────────────────
+  canvasRelations: {} as Record<string, CanvasRelation>,
+  activeCanvasRelations: [] as CanvasRelation[],
+
+  addCanvasRelation: (sourceCanvasId, targetCanvasId, type, label) => {
+    const { canvases, canvasRelations } = get();
+    const source = canvases.find((c) => c.id === sourceCanvasId);
+    const target = canvases.find((c) => c.id === targetCanvasId);
+    if (!source) throw new Error('Source canvas not found');
+    if (!target) throw new Error('Target canvas not found');
+    if (sourceCanvasId === targetCanvasId) throw new Error('circular dependency: self-loop');
+    if (get().detectCircularRelation(sourceCanvasId, targetCanvasId)) {
+      throw new Error('circular dependency detected');
+    }
+    const id = generatePrefixedId('rel');
+    const relation: CanvasRelation = {
+      id,
+      sourceCanvasId,
+      targetCanvasId,
+      type,
+      createdAt: new Date().toISOString(),
+      label,
+    };
+    set({
+      canvasRelations: { ...canvasRelations, [id]: relation },
+      canvases: get().canvases.map((c) => {
+        if (c.id === sourceCanvasId) return { ...c, relationIds: [...(c.relationIds ?? []), id] };
+        if (c.id === targetCanvasId) return { ...c, relationIds: [...(c.relationIds ?? []), id] };
+        return c;
+      }),
+    });
+    return id;
+  },
+
+  removeCanvasRelation: (relationId) => {
+    set({
+      canvasRelations: Object.fromEntries(
+        Object.entries(get().canvasRelations).filter(([k]) => k !== relationId)
+      ),
+      canvases: get().canvases.map((c) => {
+        if (c.relationIds?.includes(relationId)) {
+          return { ...c, relationIds: c.relationIds.filter((id) => id !== relationId) };
+        }
+        return c;
+      }),
+    });
+  },
+
+  updateCanvasRelation: (relationId, updates) => {
+    const existing = get().canvasRelations[relationId];
+    if (!existing) return;
+    set({
+      canvasRelations: {
+        ...get().canvasRelations,
+        [relationId]: { ...existing, ...updates },
+      },
+    });
+  },
+
+  getCanvasRelations: (canvasId) => {
+    const { canvases, canvasRelations } = get();
+    const canvas = canvases.find((c) => c.id === canvasId);
+    if (!canvas) return [];
+    return (canvas.relationIds ?? []).map((id) => canvasRelations[id]).filter(Boolean);
+  },
+
+  getRelationStats: (canvasId) => {
+    const relations = get().getCanvasRelations(canvasId);
+    const byType: Record<RelationType, number> = {
+      derives_from: 0, copied_to: 0, archived_backup_of: 0,
+      parent: 0, child: 0, related: 0,
+    };
+    for (const rel of relations) byType[rel.type]++;
+    return { total: relations.length, byType };
+  },
+
+  detectCircularRelation: (fromId, toId) => {
+    // Check if adding a relation fromId → toId would create a cycle.
+    // Returns true if there's already a path from toId → fromId
+    // (i.e., adding fromId → toId would create a cycle).
+    if (fromId === toId) return true;
+    const visited = new Set<string>();
+    const stack = [toId]; // start from target, look for source
+    while (stack.length > 0) {
+      const current = stack.pop()!;
+      if (current === fromId) return true; // found path back to source = cycle
+      if (visited.has(current)) continue;
+      visited.add(current);
+      // Follow outgoing relations from current
+      const rels = get().getCanvasRelations(current);
+      for (const rel of rels) {
+        if (!visited.has(rel.targetCanvasId)) stack.push(rel.targetCanvasId);
+      }
+    }
+    return false;
+  },
+
+  $reset: () => set({
+    selectedCanvasIds: new Set(),
+    canvasIndex: [],
+    canvasFuseIndex: null,
+    scheduledExports: {},
+    canvasRelations: {},
+    activeCanvasRelations: [],
+  }),
 }));

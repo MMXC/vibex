@@ -49,6 +49,20 @@ export interface TemplateNode {
   outboundCount: number;  // 该节点指向的其他节点数
 }
 
+/** S78-E2: 模板订阅状态 */
+export interface TemplateSubscription {
+  templateId: string;
+  subscribedAt: number;   // timestamp ms
+  /** 最后检测到更新的时间戳 */
+  lastUpdateCheck: number;
+}
+
+export interface AuthorSubscription {
+  authorId: string;
+  subscribedAt: number;
+  lastUpdateCheck: number;
+}
+
 interface TemplateState {
   // 状态
   templates: RequirementTemplate[];
@@ -59,6 +73,22 @@ interface TemplateState {
   isSelectorOpen: boolean;
   stats: TemplateStats;
   favoriteTemplateIds: string[];  // 收藏模板ID列表
+
+  // ---- S78-E2: 模板订阅 ----
+  /** 订阅的模板 ID → 订阅状态 */
+  subscribedTemplates: Record<string, TemplateSubscription>;
+  /** 订阅的作者 ID → 订阅状态 */
+  subscribedAuthors: Record<string, AuthorSubscription>;
+  /** 订阅模板 */
+  subscribeTemplate: (templateId: string) => void;
+  /** 取消订阅模板 */
+  unsubscribeTemplate: (templateId: string) => void;
+  /** 订阅作者 */
+  subscribeAuthor: (authorId: string) => void;
+  /** 取消订阅作者 */
+  unsubscribeAuthor: (authorId: string) => void;
+  /** 获取有更新的模板列表（检查时间戳 > lastUpdateCheck） */
+  getTemplateUpdates: () => RequirementTemplate[];
   
   // 操作 - 模板选择
   setCategory: (category: TemplateCategory | 'all') => void;
@@ -223,6 +253,10 @@ export const useTemplateStore = create<TemplateState>()(
       isSelectorOpen: false,
       stats: getInitialStats(),
       favoriteTemplateIds: [],
+
+      // ---- S78-E2: 模板订阅 ----
+      subscribedTemplates: {},
+      subscribedAuthors: {},
       // ---- E4: 高级搜索过滤 ----
       filterOptions: { tags: [], dateRange: { start: null as number | null, end: null as number | null }, searchQuery: '' } as FilterOptions,
       // ---- E5: 模板画廊搜索增强 ----
@@ -231,7 +265,70 @@ export const useTemplateStore = create<TemplateState>()(
       customCategories: [] as { id: string; name: string; createdAt: number }[],
       // ---- E2: 缩略图缓存 ----
       thumbnailCache: {},
-      
+
+      // ---- S78-E2: 模板订阅 actions ----
+      subscribeTemplate: (templateId) => {
+        const { subscribedTemplates } = get();
+        if (subscribedTemplates[templateId]) return; // already subscribed
+        set({
+          subscribedTemplates: {
+            ...subscribedTemplates,
+            [templateId]: { templateId, subscribedAt: Date.now(), lastUpdateCheck: Date.now() },
+          },
+        });
+      },
+
+      unsubscribeTemplate: (templateId) => {
+        const { subscribedTemplates } = get();
+        if (!subscribedTemplates[templateId]) return;
+        const next = { ...subscribedTemplates };
+        delete next[templateId];
+        set({ subscribedTemplates: next });
+      },
+
+      subscribeAuthor: (authorId) => {
+        const { subscribedAuthors } = get();
+        if (subscribedAuthors[authorId]) return;
+        set({
+          subscribedAuthors: {
+            ...subscribedAuthors,
+            [authorId]: { authorId, subscribedAt: Date.now(), lastUpdateCheck: Date.now() },
+          },
+        });
+      },
+
+      unsubscribeAuthor: (authorId) => {
+        const { subscribedAuthors } = get();
+        if (!subscribedAuthors[authorId]) return;
+        const next = { ...subscribedAuthors };
+        delete next[authorId];
+        set({ subscribedAuthors: next });
+      },
+
+      /** 返回有更新的模板（updatedAt > lastUpdateCheck 的已订阅模板） */
+      getTemplateUpdates: () => {
+        const { subscribedTemplates, templates } = get();
+        const now = Date.now();
+        const updated: RequirementTemplate[] = [];
+
+        for (const [templateId, sub] of Object.entries(subscribedTemplates)) {
+          // Simulate update detection: treat templates updated since subscription as "updated"
+          // In a real implementation this would call a backend API
+          const template = templates.find(t => t.id === templateId);
+          if (template && (template as any).updatedAt > sub.lastUpdateCheck) {
+            updated.push(template);
+            // Update lastUpdateCheck to avoid repeat notifications
+            set(state => ({
+              subscribedTemplates: {
+                ...state.subscribedTemplates,
+                [templateId]: { ...state.subscribedTemplates[templateId], lastUpdateCheck: now },
+              },
+            }));
+          }
+        }
+        return updated;
+      },
+
       // 设置分类
       setCategory: (category) => {
         const { templates, searchQuery, selectedTags, favoriteTemplateIds } = get();

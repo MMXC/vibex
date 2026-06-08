@@ -50,8 +50,8 @@ export function resetRunnerInstance(): void {
 }
 
 /** Standalone start — delegates to singleton instance */
-export function startScheduler(): void {
-  ScheduledExportRunner.getInstance().startScheduler();
+export function startScheduler(): Promise<void> {
+  return ScheduledExportRunner.getInstance().startScheduler();
 }
 
 /** Standalone stop — delegates to singleton instance */
@@ -73,12 +73,12 @@ export class ScheduledExportRunner {
   }
 
   /** Start polling every POLL_INTERVAL_MS */
-  startScheduler(): void {
-    if (this.running) return;
+  startScheduler(): Promise<void> {
+    if (this.running) return Promise.resolve();
     this.running = true;
 
     // Run immediately on start
-    this.pollAndExecute().catch((err) => {
+    const immediate = this.pollAndExecute().catch((err) => {
       console.error('[ScheduledExportRunner] poll error:', err);
     });
 
@@ -87,6 +87,8 @@ export class ScheduledExportRunner {
         console.error('[ScheduledExportRunner] poll error:', err);
       });
     }, POLL_INTERVAL_MS);
+
+    return immediate;
   }
 
   /** Stop polling and clear the interval */
@@ -105,17 +107,13 @@ export class ScheduledExportRunner {
     if (!this.running) return;
 
     const store = useCanvasListStore.getState();
-    console.log('[runner] pollAndExecute: store.scheduledExports keys:', Object.keys(store.scheduledExports));
     const allExports = Object.values(store.scheduledExports);
-    console.log('[runner] allExports count:', allExports.length, 'IDs:', allExports.map(e => e.id));
 
     for (let _i = 0; _i < allExports.length; _i++) {
       const export_ = allExports[_i];
-      console.log('[runner] loop: export_.id:', export_.id);
       if (!isDue(export_)) continue;
 
       const { id, canvasId, webhookUrl } = export_;
-      console.log('[runner] after destructure: id:', id);
 
       try {
         const zipExporter = new ZipExporter();
@@ -133,7 +131,6 @@ export class ScheduledExportRunner {
           successCount: (export_.successCount ?? 0) + 1,
           nextRunAt,
         });
-        console.log('[runner] after success update, scheduledExports:', JSON.stringify(Object.keys(store.scheduledExports)));
       } catch (err) {
         const message = err instanceof Error ? err.message : String(err);
         console.error(`[ScheduledExportRunner] Export failed for ${id}:`, message);
@@ -143,7 +140,6 @@ export class ScheduledExportRunner {
           lastError: message,
           nextRunAt: computeNextHour(),
         });
-        console.log('[runner] after error update, scheduledExports:', JSON.stringify(Object.keys(store.scheduledExports)));
       }
     }
   }

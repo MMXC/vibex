@@ -3,25 +3,20 @@
  * 扩展 S73-E3: 通知偏好设置
  * 扩展 S77-E1: IndexedDB 持久化 + 后端 REST API 同步
  * 扩展 S78-E2: 模板订阅通知 — 'template_update' 通知类型
+ * 扩展 S79-E3: 评论回复通知 comment_reply 显示
+ * 扩展 E1 (Sprint80): 统一 setPreference/getPreference + IndexedDB notification_prefs 表
  *
  * 职责：
  * - 管理通用通知列表（mention / reply / system / info 类型）
- * - 持久化到 localStorage（notifications + preferences）
- * - E1 (Sprint77): IndexedDB 持久化（跨设备）+ REST API 同步
+ * - 持久化到 IndexedDB（notifications + preferences）
  * - 未读计数 + 广播事件
  * - 通知偏好设置（推送渠道开关 + 类型开关）
  *
- * 设计决策（来自 PRD E2 架构决策 1）：
- * - 与 mentionsStore.ts 分离：mentionsStore 仅负责 @输入时用户列表 UI 状态
- * - notificationStore 负责后端数据持久化
- *
- * E1 (Sprint77) 架构决策：
- * - IndexedDB 作为 primary persistence layer（localStorage 降级）
- * - 后端 REST API 用于跨设备同步（fetch on login）
- * - markAsRead 同时写 IndexedDB + PATCH API
- * - getUnreadCount 聚合本地 + 后端未读数
- *
- * S79-E3: 扩展 'comment_reply' 通知类型 + commentId/replyId 字段
+ * E1 (Sprint80) 架构决策：
+ * - 统一 setPreference(key, enabled) / getPreference(key) 接口
+ * - IndexedDB notification_prefs 表持久化偏好设置
+ * - setPreference 保存时同步写 IndexedDB
+ * - loadPreferencesFromIndexedDB 在 app init 时调用
  */
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
@@ -32,6 +27,8 @@ import {
   getUnreadCountFromDB,
   saveNotificationsFromServer,
   clearNotificationsFromDB,
+  savePreferencesToDB,
+  getPreferencesFromDB,
 } from '@/lib/canvas/historyDB';
 
 export type NotificationType = 'mention' | 'reply' | 'system' | 'info' | 'template_update' | 'comment_reply';
@@ -142,6 +139,14 @@ export interface NotificationStoreState {
   setChannelEnabled: (channel: keyof NotificationPreferences['channels'], enabled: boolean) => void;
   setTypeEnabled: (type: keyof NotificationPreferences['types'], enabled: boolean) => void;
   resetPreferences: () => void;
+
+  // E1 (Sprint80): Unified preference interface
+  /** E1 (Sprint80): Set preference for a channel or type. Persists to IndexedDB. */
+  setPreference: (key: string, enabled: boolean) => void;
+  /** E1 (Sprint80): Get preference enabled status for a channel or type. */
+  getPreference: (key: string) => { enabled: boolean } | undefined;
+  /** E1 (Sprint80): Load preferences from IndexedDB on app init. */
+  loadPreferencesFromIndexedDB: () => Promise<void>;
 }
 
 export const useNotificationStore = create<NotificationStoreState>()(
@@ -152,10 +157,10 @@ export const useNotificationStore = create<NotificationStoreState>()(
       _serverUnreadCount: 0,
 
       addNotification: (data) => {
-        // S73-E3: respect type toggle — skip if type is disabled
-        const typeEnabled = get().preferences.types[data.type] ?? true;
-        if (!typeEnabled) {
-          // Return a dummy notification for compatibility but don't store
+        // E1 (Sprint80): respect type toggle via unified getPreference
+        const pref = get().getPreference(data.type);
+        if (pref !== undefined && !pref.enabled) {
+          // Type is disabled — return dummy for compatibility but don't store
           return {
             ...data,
             id: generateId(),
@@ -306,6 +311,68 @@ export const useNotificationStore = create<NotificationStoreState>()(
 
       resetPreferences: () => {
         set({ preferences: DEFAULT_PREFERENCES });
+        // E1 (Sprint80): Persist to IndexedDB
+        savePreferencesToDB(DEFAULT_PREFERENCES).catch(err => {
+          console.error('[notificationStore] savePreferencesToDB (reset) failed:', err);
+        });
+      },
+
+      // E1 (Sprint80): Unified preference interface
+      setPreference: (key, enabled) => {
+        const { preferences } = get();
+        // Check if key is a channel
+        if (key in preferences.channels) {
+          const channel = key as keyof NotificationPreferences['channels'];
+          const updated: NotificationPreferences = {
+            ...preferences,
+            channels: { ...preferences.channels, [channel]: enabled },
+          };
+          set({ preferences: updated });
+          savePreferencesToDB(updated).catch(err => {
+            console.error('[notificationStore] savePreferencesToDB (channel) failed:', err);
+          });
+          return;
+        }
+        // Check if key is a type
+        if (key in preferences.types) {
+          const type = key as keyof NotificationPreferences['types'];
+          const updated: NotificationPreferences = {
+            ...preferences,
+            types: { ...preferences.types, [type]: enabled },
+          };
+          set({ preferences: updated });
+          savePreferencesToDB(updated).catch(err => {
+            console.error('[notificationStore] savePreferencesToDB (type) failed:', err);
+          });
+          return;
+        }
+        // Unknown key — no-op
+        console.warn(`[notificationStore] setPreference: unknown key "${key}"`);
+      },
+
+      getPreference: (key) => {
+        const { preferences } = get();
+        // Check channels
+        if (key in preferences.channels) {
+          return { enabled: preferences.channels[key as keyof NotificationPreferences['channels']] };
+        }
+        // Check types
+        if (key in preferences.types) {
+          return { enabled: preferences.types[key as keyof NotificationPreferences['types']] };
+        }
+        return undefined;
+      },
+
+      // E1 (Sprint80): Load preferences from IndexedDB on app init
+      loadPreferencesFromIndexedDB: async () => {
+        try {
+          const prefs = await getPreferencesFromDB();
+          if (prefs) {
+            set({ preferences: prefs });
+          }
+        } catch (err) {
+          console.error('[notificationStore] loadPreferencesFromIndexedDB failed:', err);
+        }
       },
     }),
     {

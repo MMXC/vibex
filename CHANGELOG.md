@@ -6790,6 +6790,12 @@ See git history for complete changelog.
 - **S79-E3.5**: `NotificationPanel` — `comment_reply` 类型图标/标签 + 点击跳转画布节点
 - **S79-E3.6**: vitest: `collabSessionStore.comments-notification.test.ts` 8/8 + `mentionStore.mention-notification.test.ts` 4/4
 
+- **S79-E4.1**: `canvasListStore.getCanvasRelationsDepth()` — BFS 多层遍历，返回 reachables 列表（含深度标记）
+- **S79-E4.2**: `RelationType` + `CanvasRelation` 类型导出（从 canvasListStore）
+- **S79-E4.3**: vitest: `canvasListStore.relations.test.ts` 25/25 (含 E4 BFS 10 项 + E5 基础 15 项)
+
+
+
 - **S79-E2.1**: `NotificationPanel`: 新增 TabBar，`全部`/`模板更新` 双 Tab 过滤
 - **S79-E2.2**: 模板更新通知项：缩略图 + 作者 + 日期 + 点击聚焦模板
 - **S79-E2.3**: Tab 角标显示未读计数（template_update 类型独立计数）

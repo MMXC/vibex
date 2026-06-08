@@ -231,17 +231,53 @@ export function parseCronNextRun(cronExpression: string, from: Date = new Date()
   const checkDate = new Date(from.getTime());
   checkDate.setSeconds(0, 0);
 
+  // Parse the target minute(s) from minuteField to support "skip current hour" logic.
+  // Returns null for wildcard (*), or:
+  //   - 'single': single number like '30'
+  //   - 'multi': */N (step) or list like '0,30' — multiple occurrences per hour
+  function parseMinuteTarget(minuteF: string): { target: number | null; multi: boolean } {
+    if (minuteF === '*') return { target: null, multi: true };
+    if (minuteF.startsWith('*/')) return { target: parseInt(minuteF.slice(2), 10), multi: true };
+    if (minuteF.includes(',')) return { target: 0, multi: true };
+    if (minuteF.includes('-')) return { target: parseInt(minuteF.split('-')[0]!, 10), multi: false };
+    return { target: parseInt(minuteF, 10), multi: false };
+  }
+  const { target: minuteTarget, multi: minuteMulti } = parseMinuteTarget(minuteField);
+
   for (let i = 0; i < 366 * 24 * 60; i++) {
     checkDate.setTime(from.getTime() + i * 60 * 1000);
     checkDate.setSeconds(0, 0);
 
-    if (
-      matchCronField(minuteField, checkDate.getMinutes(), 59) &&
-      matchCronField(hourField, checkDate.getHours(), 23) &&
-      matchCronField(dayField, checkDate.getDate(), 31) &&
-      matchCronField(monthField, checkDate.getMonth() + 1, 12) &&
-      matchCronField(weekdayField, checkDate.getDay(), 6)
-    ) {
+    // Check if ALL fields match
+    const minuteMatch = matchCronField(minuteField, checkDate.getUTCMinutes(), 59);
+    const hourMatch = matchCronField(hourField, checkDate.getUTCHours(), 23);
+    const dayMatch = matchCronField(dayField, checkDate.getUTCDate(), 31);
+    const monthMatch = matchCronField(monthField, checkDate.getUTCMonth() + 1, 12);
+    const weekdayMatch = matchCronField(weekdayField, checkDate.getUTCDay(), 6);
+
+    if (minuteMatch && hourMatch && dayMatch && monthMatch && weekdayMatch) {
+      // Option B: only skip for single-occurrence minute patterns (e.g., '30').
+      // Multi-occurrence patterns (*/N, lists) can have multiple matches per hour → return first.
+      if (minuteTarget !== null && !minuteMulti && i < 60) {
+        if (i < minuteTarget) {
+          // Target is ahead in current hour → return it (unless we're at second 0)
+          if (i === 0) {
+            const nowSeconds = from.getSeconds();
+            if (nowSeconds > 0) return checkDate.toISOString();
+            continue; // at second 0 of current minute → skip to next minute
+          }
+          return checkDate.toISOString();
+        } else {
+          // Target already passed in this hour → skip to next hour
+          continue;
+        }
+      }
+      // Wildcard minute or past the first hour window
+      if (i === 0) {
+        const nowSeconds = from.getSeconds();
+        if (nowSeconds > 0) return checkDate.toISOString();
+        continue; // at second 0 → skip to next minute
+      }
       return checkDate.toISOString();
     }
   }
@@ -797,7 +833,7 @@ export const useCanvasListStore = create<CanvasListState>((set, get) => ({
 
   /**
    * Parse a cron field value and check if a given value matches.
-   * Supports: *, specific number, */n (every n), n,m (list), n-m (range)
+   * Supports: *, specific number, *\/n (every n), n,m (list), n-m (range)
    */
   // (helpers defined above store creation)
 

@@ -44,12 +44,14 @@ import type { Notification } from '@/stores/notificationStore';
 // ============================================
 
 const DB_NAME = 'vibex-canvas-history';
-const DB_VERSION = 8; // E3 (Sprint77): BranchMeta.branchOwner field
+const DB_VERSION = 9; // E4 (Sprint77): CanvasChangeLog objectStore
 const STORE_NAME = 'history';
 const SNAPSHOTS_STORE_NAME = 'snapshots';
 const BRANCH_META_STORE_NAME = 'branchMeta';
 const BRANCH_DIFF_HISTORY_STORE_NAME = 'branchDiffHistory';
+const BRANCH_DIFF_HISTORY_STORE_NAME = 'branchDiffHistory';
 const NOTIFICATIONS_STORE_NAME = 'notifications';
+const CANVAS_CHANGE_LOG_STORE_NAME = 'canvasChangeLog';
 
 /** Maximum storage per canvas in bytes (5MB) */
 export const MAX_BYTES_PER_CANVAS = 5 * 1024 * 1024;
@@ -205,6 +207,12 @@ function openDB(): Promise<IDBDatabase> {
         notifStore.createIndex('canvasId', 'canvasId', { unique: false });
         notifStore.createIndex('isRead', 'isRead', { unique: false });
         notifStore.createIndex('timestamp', 'timestamp', { unique: false });
+      }
+      // E4 (Sprint77): CanvasChangeLog objectStore
+      if (!db.objectStoreNames.contains(CANVAS_CHANGE_LOG_STORE_NAME)) {
+        const changeLogStore = db.createObjectStore(CANVAS_CHANGE_LOG_STORE_NAME, { keyPath: 'id' });
+        changeLogStore.createIndex('canvasId', 'canvasId', { unique: false });
+        changeLogStore.createIndex('timestamp', 'timestamp', { unique: false });
       }
     };
   });
@@ -1294,6 +1302,89 @@ export async function saveNotificationsFromServer(notifications: Notification[])
   });
 }
 
+// ============================================
+// E4 (Sprint77): Canvas Change Log CRUD
+// ============================================
+
+/**
+ * E4 (Sprint77): Save a canvas change to the offline change log.
+ */
+export async function saveCanvasChangeToDB(change: CanvasChangeLogEntry): Promise<void> {
+  if (!isIndexedDBAvailable()) return;
+
+  return new Promise((resolve, reject) => {
+    openDB()
+      .then((db) => {
+        const tx = db.transaction(CANVAS_CHANGE_LOG_STORE_NAME, 'readwrite');
+        const store = tx.objectStore(CANVAS_CHANGE_LOG_STORE_NAME);
+        const request = store.put(change);
+        request.onsuccess = () => resolve();
+        request.onerror = () => reject(new Error(`saveCanvasChangeToDB failed: ${request.error}`));
+      })
+      .catch(reject);
+  });
+}
+
+/**
+ * E4 (Sprint77): Load all pending canvas changes for a canvas (oldest first).
+ */
+export async function loadCanvasChangesFromDB(canvasId: string): Promise<CanvasChangeLogEntry[]> {
+  if (!isIndexedDBAvailable()) return [];
+
+  return new Promise((resolve, reject) => {
+    openDB()
+      .then((db) => {
+        const tx = db.transaction(CANVAS_CHANGE_LOG_STORE_NAME, 'readonly');
+        const store = tx.objectStore(CANVAS_CHANGE_LOG_STORE_NAME);
+        const index = store.index('canvasId');
+        const request = index.getAll(IDBKeyRange.only(canvasId));
+        request.onsuccess = () => {
+          const results = request.result as CanvasChangeLogEntry[];
+          // Sort by timestamp ascending (oldest first)
+          results.sort((a, b) => a.timestamp - b.timestamp);
+          resolve(results);
+        };
+        request.onerror = () => reject(new Error(`loadCanvasChangesFromDB failed: ${request.error}`));
+      })
+      .catch(reject);
+  });
+}
+
+/**
+ * E4 (Sprint77): Clear all canvas changes for a canvas (after replay).
+ */
+export async function clearCanvasChangesFromDB(canvasId: string): Promise<void> {
+  if (!isIndexedDBAvailable()) return;
+
+  return new Promise((resolve, reject) => {
+    openDB()
+      .then((db) => {
+        const tx = db.transaction(CANVAS_CHANGE_LOG_STORE_NAME, 'readwrite');
+        const store = tx.objectStore(CANVAS_CHANGE_LOG_STORE_NAME);
+        const index = store.index('canvasId');
+        const request = index.getAllKeys(IDBKeyRange.only(canvasId));
+        request.onsuccess = () => {
+          let pending = request.result.length;
+          if (pending === 0) { resolve(); return; }
+          for (const key of request.result) {
+            const delReq = store.delete(key);
+            delReq.onsuccess = () => {
+              pending--;
+              if (pending === 0) resolve();
+            };
+            delReq.onerror = () => {
+              pending--;
+              if (pending === 0) resolve(); // Best effort
+            };
+          }
+        };
+        request.onerror = () => reject(new Error(`clearCanvasChangesFromDB failed: ${request.error}`));
+      })
+      .catch(reject);
+  });
+}
+
+
 /**
  * E1 (Sprint77): Clear all notifications from IndexedDB.
  */
@@ -1312,4 +1403,3 @@ export async function clearNotificationsFromDB(): Promise<void> {
       .catch(reject);
   });
 }
-

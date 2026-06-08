@@ -10,6 +10,8 @@
  * - D5.3: Replay engine — speed control (0.5x/1x/2x/4x), pause/resume
  * - D5.4: WebSocket event capture handler
  * - D5.5: SessionReplayPanel UI
+ *
+ * S78-E3: 内联评论 — extends with comments Record + CRUD actions
  */
 
 import { create } from 'zustand';
@@ -69,6 +71,32 @@ export interface ReplayState {
   startedAt: number | null;  // Date.now() when playback started
 }
 
+// ==================== S78-E3: Comment Types ====================
+
+/** A single reply in a comment thread */
+export interface CommentReply {
+  replyId: string;
+  userId: string;
+  userName: string;
+  avatar?: string;
+  text: string;
+  timestamp: number;
+  mentions: string[];  // user IDs mentioned via @
+}
+
+/** A comment thread on a node */
+export interface CommentThread {
+  commentId: string;
+  nodeId: string;
+  userId: string;
+  userName: string;
+  avatar?: string;
+  text: string;
+  timestamp: number;
+  mentions: string[];   // user IDs mentioned via @
+  replies: CommentReply[];
+}
+
 // ==================== IndexedDB ====================
 
 const DB_NAME = 'vibex-collab-sessions';
@@ -98,6 +126,8 @@ async function initDB() {
 
 let _sessionIdCounter = 0;
 let _eventIdCounter = 0;
+let _commentIdCounter = 0;
+let _replyIdCounter = 0;
 
 function newSessionId(): string {
   return `session-${Date.now()}-${++_sessionIdCounter}`;
@@ -105,6 +135,14 @@ function newSessionId(): string {
 
 function newEventId(): string {
   return `event-${Date.now()}-${++_eventIdCounter}`;
+}
+
+function newCommentId(): string {
+  return `comment-${Date.now()}-${++_commentIdCounter}`;
+}
+
+function newReplyId(): string {
+  return `reply-${Date.now()}-${++_replyIdCounter}`;
 }
 
 // ==================== Store Interface ====================
@@ -144,6 +182,39 @@ export interface CollabSessionState {
   // Export actions (S73-E5)
   exportSessionMarkdown: (sessionId: string) => Promise<string>;
   exportSessionPDF: (sessionId: string) => Promise<void>;
+
+  // S78-E3: Comments
+  comments: Record<string, CommentThread>;  // keyed by nodeId
+
+  /** Add a new comment to a node */
+  addComment: (
+    nodeId: string,
+    text: string,
+    userId: string,
+    userName: string,
+    mentions?: string[],
+    avatar?: string,
+  ) => CommentThread;
+
+  /** Get all comment threads for a node */
+  getComments: (nodeId: string) => CommentThread[];
+
+  /** Get total comment count for a node (all threads + replies) */
+  getCommentCount: (nodeId: string) => number;
+
+  /** Delete a comment thread (and all its replies) */
+  deleteComment: (nodeId: string, commentId: string) => void;
+
+  /** Add a reply to an existing comment thread */
+  addReply: (
+    nodeId: string,
+    commentId: string,
+    text: string,
+    userId: string,
+    userName: string,
+    mentions?: string[],
+    avatar?: string,
+  ) => CommentReply | null;
 }
 
 // ==================== Store Implementation ====================
@@ -162,6 +233,9 @@ export const useCollabSessionStore = create<CollabSessionState>()((set, get) => 
     startedAt: null,
   },
   replayEvents: [],
+
+  // S78-E3: Comments state
+  comments: {},
 
   // ==================== Recording ====================
 
@@ -368,13 +442,11 @@ export const useCollabSessionStore = create<CollabSessionState>()((set, get) => 
   },
 
   async exportSessionPDF(sessionId: string): Promise<void> {
-    // Load session metadata into a temporary element for print styling
     const session = await get().getSession(sessionId);
     if (!session) return;
 
     const events = await get().getSessionEvents(sessionId);
 
-    // Build printable HTML and open print dialog
     const printContent = `
       <html><head><title>Session: ${session.name}</title>
       <style>
@@ -418,6 +490,84 @@ export const useCollabSessionStore = create<CollabSessionState>()((set, get) => 
       printWindow.print();
       printWindow.close();
     }
+  },
+
+  // ==================== S78-E3: Comments ====================
+
+  addComment(nodeId, text, userId, userName, mentions = [], avatar) {
+    const commentId = newCommentId();
+    const thread: CommentThread = {
+      commentId,
+      nodeId,
+      userId,
+      userName,
+      avatar,
+      text,
+      timestamp: Date.now(),
+      mentions,
+      replies: [],
+    };
+
+    set((state) => ({
+      comments: {
+        ...state.comments,
+        [nodeId]: [...(state.comments[nodeId] ?? []), thread],
+      },
+    }));
+
+    return thread;
+  },
+
+  getComments(nodeId) {
+    return get().comments[nodeId] ?? [];
+  },
+
+  getCommentCount(nodeId) {
+    const threads = get().comments[nodeId] ?? [];
+    return threads.reduce((acc, t) => acc + 1 + t.replies.length, 0);
+  },
+
+  deleteComment(nodeId, commentId) {
+    set((state) => {
+      const threads = state.comments[nodeId] ?? [];
+      return {
+        comments: {
+          ...state.comments,
+          [nodeId]: threads.filter((t) => t.commentId !== commentId),
+        },
+      };
+    });
+  },
+
+  addReply(nodeId, commentId, text, userId, userName, mentions = [], avatar) {
+    const threads = get().comments[nodeId];
+    if (!threads) return null;
+
+    const threadIndex = threads.findIndex((t) => t.commentId === commentId);
+    if (threadIndex < 0) return null;
+
+    const reply: CommentReply = {
+      replyId: newReplyId(),
+      userId,
+      userName,
+      avatar,
+      text,
+      timestamp: Date.now(),
+      mentions,
+    };
+
+    const updatedThreads = threads.map((t) =>
+      t.commentId === commentId ? { ...t, replies: [...t.replies, reply] } : t,
+    );
+
+    set((state) => ({
+      comments: {
+        ...state.comments,
+        [nodeId]: updatedThreads,
+      },
+    }));
+
+    return reply;
   },
 }));
 

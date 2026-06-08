@@ -10,8 +10,11 @@
  * - 模块级 listeners，与 commentStore 事件订阅模式一致
  * - 未读计数：mentions.filter(m => !m.read).length
  * - WebSocket comment:mention 消息触发 addMention
+ *
+ * S79-E3: addMention 现在也会触发 notificationStore 的 mention 通知
  */
 import { create } from 'zustand';
+import { useNotificationStore } from '@/stores/notificationStore';
 
 export interface Mention {
   mentionId: string;
@@ -81,6 +84,21 @@ export const useMentionsStore = create<MentionsStoreState>((set, get) => ({
       unreadCount: state.unreadCount + 1,
     }));
     emitMentionEvent({ type: 'mention:received', mention });
+
+    // S79-E3: Trigger notificationStore mention notification
+    // Only notify if the mentioned user is not the sender
+    if (mention.toUser && mention.toUser !== mention.fromUser) {
+      useNotificationStore.getState().addNotification({
+        type: 'mention',
+        title: `${mention.fromUser} 在评论中提到了你`,
+        message: mention.commentText.length > 80
+          ? `${mention.commentText.slice(0, 80)}…`
+          : mention.commentText,
+        targetUserId: mention.toUser,
+        nodeId: mention.nodeId,
+        commentId: mention.commentId,
+      });
+    }
   },
 
   markAsRead: (mentionId) => {

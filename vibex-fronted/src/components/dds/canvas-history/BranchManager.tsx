@@ -2,13 +2,16 @@
 
 import React, { memo, useState, useCallback, useEffect } from 'react';
 import { useCanvasHistoryStore } from '@/stores/dds/canvasHistoryStore';
-import type { Snapshot } from '@/stores/dds/canvasHistoryStore';
+import type { Snapshot, BranchConflict } from '@/stores/dds/canvasHistoryStore';
+import { BranchAutoMergeDialog } from './BranchAutoMergeDialog';
 
 interface BranchManagerProps {
   /** Whether the panel is open */
   open: boolean;
   /** Current canvas ID for branch operations */
   canvasId?: string;
+  /** Current user ID — passed to merge operations for permission checks */
+  currentUserId?: string;
   /** Called when user switches to a different branch */
   onBranchSwitch?: (branchName: string) => void;
   /** Called to close the panel */
@@ -18,21 +21,26 @@ interface BranchManagerProps {
 type Tab = 'list' | 'create' | 'delete';
 
 // E1 (Sprint70): MergeBranchButton — visible only on non-main branches
+// E1 (Sprint78): Updated to call autoMergeBranch and show conflicts in BranchAutoMergeDialog
 interface MergeBranchButtonProps {
   /** Current branch name */
   branch: string;
   /** Current canvas ID */
   canvasId?: string;
+  /** Current user ID for permission checks */
+  currentUserId?: string;
   /** Called when merge completes successfully */
   onMergeSuccess?: () => void;
+  /** Called when conflicts are detected — passes the conflict list */
+  onConflictsFound?: (conflicts: BranchConflict[]) => void;
   /** Called to close the panel */
   onClose: () => void;
 }
 
-function MergeBranchButton({ branch, canvasId, onMergeSuccess, onClose }: MergeBranchButtonProps) {
+function MergeBranchButton({ branch, canvasId, currentUserId, onMergeSuccess, onConflictsFound, onClose }: MergeBranchButtonProps) {
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
-  const mergeBranch = useCanvasHistoryStore((s) => s.mergeBranch);
+  const autoMergeBranch = useCanvasHistoryStore((s) => s.autoMergeBranch);
   const setCurrentBranch = useCanvasHistoryStore((s) => s.setCurrentBranch);
   const listSnapshots = useCanvasHistoryStore((s) => s.listSnapshots);
 
@@ -41,18 +49,28 @@ function MergeBranchButton({ branch, canvasId, onMergeSuccess, onClose }: MergeB
     setLoading(true);
     setError(null);
     try {
-      await mergeBranch(canvasId ?? '', branch, 'main');
-      setCurrentBranch('main');
-      // Reload snapshots
-      await listSnapshots(canvasId ?? '');
-      onMergeSuccess?.();
-      onClose();
+      const result = await autoMergeBranch(
+        canvasId ?? '',
+        branch,
+        'main',
+        currentUserId ?? null
+      );
+      if (result.pendingConflicts && result.pendingConflicts.length > 0) {
+        // Conflicts detected — delegate to BranchAutoMergeDialog via callback
+        onConflictsFound?.(result.pendingConflicts);
+      } else {
+        // Clean merge succeeded
+        setCurrentBranch('main');
+        await listSnapshots(canvasId ?? '');
+        onMergeSuccess?.();
+        onClose();
+      }
     } catch (e) {
       setError(e instanceof Error ? e.message : '合并失败');
     } finally {
       setLoading(false);
     }
-  }, [branch, canvasId, mergeBranch, setCurrentBranch, listSnapshots, onMergeSuccess, onClose]);
+  }, [branch, canvasId, currentUserId, autoMergeBranch, setCurrentBranch, listSnapshots, onMergeSuccess, onConflictsFound, onClose]);
 
   if (branch === 'main') return null;
 
@@ -81,9 +99,11 @@ function MergeBranchButton({ branch, canvasId, onMergeSuccess, onClose }: MergeB
 }
 
 // E1 (Sprint69): BranchManager
+// S78-E1: Added currentUserId prop for merge permission checks
 const BranchManager = memo(function BranchManager({
   open,
   canvasId,
+  currentUserId,
   onBranchSwitch,
   onClose,
 }: BranchManagerProps) {
@@ -107,6 +127,35 @@ const BranchManager = memo(function BranchManager({
   const [branchToDelete, setBranchToDelete] = useState<string | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
+
+  // S78-E1: Auto-merge dialog state
+  const [autoMergeOpen, setAutoMergeOpen] = useState(false);
+  const [autoMergeConflicts, setAutoMergeConflicts] = useState<BranchConflict[]>([]);
+  const [autoMergeSource, setAutoMergeSource] = useState<string>('');
+  const [autoMergeTarget, setAutoMergeTarget] = useState<string>('main');
+
+  // S78-E1: Handle conflicts found by MergeBranchButton
+  const handleConflictsFound = useCallback((conflicts: BranchConflict[]) => {
+    setAutoMergeConflicts(conflicts);
+    setAutoMergeSource(activeBranch);
+    setAutoMergeTarget('main');
+    setAutoMergeOpen(true);
+  }, [activeBranch]);
+
+  // S78-E1: Resolve auto-merge conflicts — called after user resolves in dialog
+  const autoResolveConflicts = useCallback(async () => {
+    // Re-fetch the latest conflicts from store (store updates pendingConflicts on autoMergeBranch)
+    const storeConflicts = useCanvasHistoryStore.getState().pendingConflicts;
+    if (storeConflicts && storeConflicts.length > 0) {
+      setAutoMergeConflicts(storeConflicts);
+      // Keep dialog open so user can pick resolution per conflict
+    } else {
+      // Conflicts were cleared (user resolved or no conflicts) — close dialog and reload
+      setAutoMergeOpen(false);
+      setAutoMergeConflicts([]);
+      await listSnapshots(canvasId ?? '');
+    }
+  }, [canvasId, listSnapshots]);
 
   // S71-E3: Lazy loading — show only 50 snapshots initially
   const [visibleSnapshotCount, setVisibleSnapshotCount] = useState(50);
@@ -261,11 +310,30 @@ const BranchManager = memo(function BranchManager({
       </div>
 
       {/* E1 (Sprint70): Merge to Main — visible only when on non-main branch */}
+      {/* E1 (Sprint78): Now uses autoMergeBranch — conflicts trigger BranchAutoMergeDialog */}
       <MergeBranchButton
         branch={activeBranch}
         canvasId={canvasId}
+        currentUserId={currentUserId}
+        onConflictsFound={handleConflictsFound}
         onClose={onClose}
       />
+
+      {/* S78-E1: Auto-merge conflict resolution dialog */}
+      {autoMergeOpen && (
+        <BranchAutoMergeDialog
+          canvasId={canvasId ?? ''}
+          sourceBranch={autoMergeSource}
+          targetBranch={autoMergeTarget}
+          conflicts={autoMergeConflicts}
+          currentUserId={currentUserId}
+          onClose={() => {
+            setAutoMergeOpen(false);
+            setAutoMergeConflicts([]);
+          }}
+          onResolved={autoResolveConflicts}
+        />
+      )}
 
       {/* Tab navigation */}
       <div className="branch-manager-tabs" role="tablist">

@@ -288,6 +288,18 @@ interface CanvasHistoryState {
   deleteBranch: (canvasId: string, branchName: string, userId: string) => Promise<{ ok: boolean; error?: string }>;
   /** Merge source branch into target branch — requires userId for permission check */
   mergeBranch: (canvasId: string, sourceBranch: string, targetBranch: string, userId: string) => Promise<{ ok: boolean; error?: string }>;
+  // E1 (Sprint78): Canvas 分支自动合并 — auto-merge with conflict detection
+  /**
+   * Attempt auto-merge of source branch into target branch.
+   * - No conflicts: performs merge via mergeBranchInDB and returns { ok: true, conflicts: [] }
+   * - Has conflicts: populates pendingConflicts and returns { ok: true, conflicts: [...] }
+   *   for resolution via BranchAutoMergeDialog before the merge completes.
+   */
+  autoMergeBranch: (
+    canvasId: string,
+    sourceBranch: string,
+    targetBranch: string
+  ) => Promise<{ ok: boolean; error?: string; conflicts: BranchConflict[] }>;
   /** List all unique branch names for a canvas */
   listBranches: (canvasId: string) => Promise<string[]>;
   // E1 (Sprint70): Branch merge conflict resolution
@@ -884,6 +896,79 @@ export const useCanvasHistoryStore = create<CanvasHistoryState>((set, get) => ({
     const list = await listSnapshotsFromDB(canvasId);
     set({ snapshots: list.sort((a, b) => b.timestamp - a.timestamp) });
     return { ok: true };
+  },
+
+  // E1 (Sprint78): Canvas 分支自动合并 — auto-merge with conflict detection
+  autoMergeBranch: async (
+    canvasId: string,
+    sourceBranch: string,
+    targetBranch: string,
+  ): Promise<{ ok: boolean; error?: string; conflicts: BranchConflict[] }> => {
+    if (typeof window === 'undefined' || !window.indexedDB) {
+      return { ok: false, error: 'IndexedDB not available', conflicts: [] };
+    }
+    if (sourceBranch === targetBranch) {
+      return { ok: false, error: 'Source and target branches cannot be the same', conflicts: [] };
+    }
+
+    const { listSnapshotsFromDB, mergeBranchInDB } = await import('@/lib/canvas/historyDB');
+    const { currentUserId } = get();
+
+    // Get latest snapshot from each branch
+    const [targetSnaps, sourceSnaps] = await Promise.all([
+      listSnapshotsFromDB(canvasId, { branch: targetBranch }),
+      listSnapshotsFromDB(canvasId, { branch: sourceBranch }),
+    ]);
+
+    if (sourceSnaps.length === 0) {
+      return { ok: false, error: `Source branch "${sourceBranch}" does not exist`, conflicts: [] };
+    }
+
+    const targetTip = targetSnaps.sort((a, b) => b.timestamp - a.timestamp)[0] ?? null;
+    const sourceTip = sourceSnaps.sort((a, b) => b.timestamp - a.timestamp)[0] ?? null;
+
+    // Build node-id map for each branch
+    const targetNodes = new Map(
+      (targetTip?.data?.nodes ?? []).map((n: { id: string }) => [n.id, n])
+    );
+    const sourceNodes = new Map(
+      (sourceTip?.data?.nodes ?? []).map((n: { id: string }) => [n.id, n])
+    );
+
+    // Detect conflicts: nodes that exist in both branches with different content
+    const conflicts: BranchConflict[] = [];
+    for (const [nodeId, sourceNode] of sourceNodes) {
+      const targetNode = targetNodes.get(nodeId);
+      if (targetNode !== undefined) {
+        // Same node ID exists in both — check if content differs
+        const sourceJson = JSON.stringify(sourceNode);
+        const targetJson = JSON.stringify(targetNode);
+        if (sourceJson !== targetJson) {
+          conflicts.push({
+            id: `conflict-${Date.now()}-${nodeId}`,
+            nodeId,
+            nodeLabel: typeof sourceNode === 'object' && sourceNode !== null ? (sourceNode as Record<string, unknown>).label as string ?? nodeId : nodeId,
+            localBranch: sourceBranch,
+            remoteBranch: targetBranch,
+            localData: sourceNode as Record<string, unknown>,
+            remoteData: targetNode as Record<string, unknown>,
+            timestamp: Date.now(),
+          });
+        }
+      }
+    }
+
+    if (conflicts.length === 0) {
+      // No conflicts — auto-merge
+      await mergeBranchInDB(canvasId, sourceBranch, targetBranch, targetTip?.id ?? null);
+      const list = await listSnapshotsFromDB(canvasId);
+      set({ snapshots: list.sort((a, b) => b.timestamp - a.timestamp), pendingConflicts: [] });
+      return { ok: true, conflicts: [] };
+    } else {
+      // Has conflicts — populate pendingConflicts for BranchAutoMergeDialog
+      set({ pendingConflicts: conflicts });
+      return { ok: true, conflicts };
+    }
   },
 
   listBranches: async (canvasId: string) => {

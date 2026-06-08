@@ -20,6 +20,7 @@ import { useFlowStore } from '@/lib/canvas/stores/flowStore';
 import { useComponentStore } from '@/lib/canvas/stores/componentStore';
 import { exportDDSCanvasData, exportToStateMachine } from '@/services/dds/exporter';
 import { useDDSCanvasStore, ddsChapterActions } from '@/stores/dds';
+import { ScheduledExportPanel } from './ScheduledExportPanel';
 import { useAutoLayout } from '@/hooks/dds/useAutoLayout';
 import { useClipboardStore } from '@/stores/clipboardStore';
 import { useCanvasHistoryStore } from '@/stores/dds/canvasHistoryStore';
@@ -272,6 +273,7 @@ export const DDSToolbar = memo(function DDSToolbar({
   const [isCanvasSettingsOpen, setIsCanvasSettingsOpen] = useState(false);
   const [isViewPresetsOpen, setIsViewPresetsOpen] = useState(false);
   const [isRecentSearchesOpen, setIsRecentSearchesOpen] = useState(false);
+  const [isScheduledExportOpen, setIsScheduledExportOpen] = useState(false);
 
   // E3-S3: RBAC for toolbar actions
   const rbac = useCanvasRBAC(projectId);
@@ -525,6 +527,17 @@ export const DDSToolbar = memo(function DDSToolbar({
             disabled={!rbac.canShare && !rbac.loading}
             className={styles.exportMenuWrapper}
           />
+
+          {/* S78-E4: Scheduled export & webhook */}
+          <button
+            type="button"
+            className={styles.exportBtn}
+            onClick={() => setIsScheduledExportOpen(true)}
+            aria-label="定时导出 Webhook"
+            title="定时导出 Webhook"
+          >
+            🔔
+          </button>
 
           {/* S77-E2: Connection status indicator */}
           <button
@@ -1076,6 +1089,12 @@ export const DDSToolbar = memo(function DDSToolbar({
         isOpen={isBackupOpen}
         onClose={() => setIsBackupOpen(false)}
         canvasId={canvasId ?? ''}
+      />
+
+      {/* S78-E4: Scheduled Export & Webhook panel */}
+      <ScheduledExportPanel
+        open={isScheduledExportOpen}
+        onClose={() => setIsScheduledExportOpen(false)}
       />
 
       {/* S70-E5: Canvas Settings Drawer */}

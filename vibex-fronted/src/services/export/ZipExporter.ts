@@ -513,6 +513,150 @@ export class ZipExporter {
 
     return zipBlob;
   }
+
+  /**
+   * S78-E4: Export a single canvas as a ZIP archive and POST it to a webhook URL.
+   *
+   * Flow:
+   * 1. Load canvas data from IndexedDB
+   * 2. Create ZIP blob with canvas cards as PNG files + manifest
+   * 3. POST the ZIP blob to the provided webhookUrl as multipart/form-data
+   *
+   * @param canvasId - Canvas project ID to export
+   * @param options - Export options (format, scale, backgroundColor, onProgress)
+   * @param webhookUrl - Full URL to POST the ZIP to after creation
+   * @throws Error if canvas not found in IndexedDB, ZIP creation fails, or POST fails
+   *
+   * @example
+   * const zipExporter = new ZipExporter();
+   * await zipExporter.exportWithWebhook('my-canvas-id', {
+   *   format: 'png',
+   *   scope: 'all',
+   * }, 'https://api.example.com/webhook');
+   */
+  async exportWithWebhook(
+    canvasId: string,
+    options: BatchExportOptions,
+    webhookUrl: string
+  ): Promise<{ zipBlob: Blob; postStatus: number }> {
+    if (!webhookUrl.startsWith('http://') && !webhookUrl.startsWith('https://')) {
+      throw new Error('Webhook URL must start with http:// or https://');
+    }
+
+    // Load canvas from IndexedDB
+    const { loadLatestSnapshot } = await import('@/services/dds/ddsPersistence');
+    const project = await loadLatestSnapshot(canvasId);
+    if (!project) {
+      throw new Error(`Canvas not found: ${canvasId}`);
+    }
+
+    const { format, scale = 2, backgroundColor = DEFAULT_BG_COLOR, onProgress } = options;
+
+    // Collect all cards
+    const allCards: Array<{ nodeId: string; name: string; selector: string }> = [];
+    for (const chapterData of Object.values(project.chapters)) {
+      for (const card of chapterData.cards) {
+        allCards.push({
+          nodeId: card.id,
+          name: card.title ?? card.id,
+          selector: `[data-id="${card.id}"]`,
+        });
+      }
+    }
+
+    if (allCards.length === 0) {
+      throw new Error('Canvas has no exportable cards');
+    }
+
+    const zip = new JSZip();
+    const timestamp = new Date().toISOString().slice(0, 10);
+    const folder = zip.folder(sanitizeFilename(project.projectName || canvasId));
+    if (!folder) throw new Error('Failed to create ZIP folder');
+
+    let processedNodes = 0;
+    const captureFn = async (card: typeof allCards[number]) => {
+      const el = document.querySelector<HTMLElement>(card.selector);
+      if (!el) return new Blob([], { type: 'image/png' });
+
+      if (format === 'png' || format === 'pdf') {
+        const dataUrl = await toPng(el, {
+          backgroundColor,
+          pixelRatio: scale,
+          width: el.scrollWidth,
+          height: el.scrollHeight,
+          style: { transform: 'none' },
+        });
+        const response = await fetch(dataUrl);
+        return response.blob();
+      } else {
+        const dataUrl = await toSvg(el, {
+          backgroundColor,
+          width: el.scrollWidth,
+          height: el.scrollHeight,
+          style: { transform: 'none' },
+        });
+        const response = await fetch(dataUrl);
+        return response.blob();
+      }
+    };
+
+    for (let i = 0; i < allCards.length; i += MAX_CONCURRENT) {
+      const batch = allCards.slice(i, i + MAX_CONCURRENT);
+      const blobs = await Promise.all(batch.map((card) => captureFn(card)));
+      batch.forEach((card, idx) => {
+        const filename = `${sanitizeFilename(card.name)}.${format}`;
+        folder.file(filename, blobs[idx]!);
+        processedNodes++;
+        onProgress?.(processedNodes, allCards.length, `${project.projectName}/${card.name}`);
+      });
+    }
+
+    // Add manifest
+    const manifest = JSON.stringify(
+      {
+        projectId: canvasId,
+        projectName: project.projectName,
+        exportedAt: new Date().toISOString(),
+        version: '1.0.0',
+        format,
+        cardCount: allCards.length,
+        cards: allCards.map((c) => ({
+          nodeId: c.nodeId,
+          name: c.name,
+          filename: `${sanitizeFilename(c.name)}.${format}`,
+        })),
+      },
+      null,
+      2
+    );
+    folder.file('manifest.json', manifest);
+
+    // Generate ZIP blob
+    const zipBlob = await zip.generateAsync({
+      type: 'blob',
+      compression: 'DEFLATE',
+      compressionOptions: { level: 6 },
+    });
+
+    // POST to webhook as multipart/form-data
+    const formData = new FormData();
+    formData.append('file', zipBlob, `${sanitizeFilename(project.projectName || canvasId)}-${timestamp}.zip`);
+    formData.append('canvasId', canvasId);
+    formData.append('exportedAt', new Date().toISOString());
+    formData.append('format', format);
+
+    const response = await fetch(webhookUrl, {
+      method: 'POST',
+      body: formData,
+      // Note: not setting Content-Type header — browser sets it automatically with boundary
+    });
+
+    if (!response.ok) {
+      throw new Error(`Webhook POST failed: ${response.status} ${response.statusText}`);
+    }
+
+    return { zipBlob, postStatus: response.status };
+  }
 }
 
 /** Singleton instance */

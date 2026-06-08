@@ -59,6 +59,29 @@ export interface IndexedSearchResult {
   matchedField: 'name' | 'description' | 'tags' | 'multiple';
 }
 
+// S78-E4: Scheduled export entry
+export interface ScheduledExport {
+  id: string;
+  /** Target canvas ID to export */
+  canvasId: string;
+  /** Human-readable canvas name at creation time */
+  canvasName: string;
+  /** Cron expression: minute hour day month weekday */
+  cronExpression: string;
+  /** Webhook URL to POST the ZIP to after export */
+  webhookUrl: string;
+  /** Whether this schedule is active */
+  enabled: boolean;
+  /** Last time this export ran successfully */
+  lastRunAt: string | null;
+  /** Last error message if last run failed */
+  lastError: string | null;
+  /** Number of successful runs */
+  successCount: number;
+  createdAt: string;
+  /** Next scheduled run time (ISO string, computed from cronExpression + now) */
+  nextRunAt: string | null;
+}
 
 export interface CanvasListState {
   /** In-memory canvas list, sorted by updatedAt descending */
@@ -79,7 +102,8 @@ export interface CanvasListState {
   canvasIndex: CanvasIndexEntry[];
   /** S76-E3: Fuse.js instance for canvas index */
   canvasFuseIndex: Fuse<CanvasIndexEntry> | null;
-
+  /** S78-E4: Scheduled export tasks keyed by id */
+  scheduledExports: Record<string, ScheduledExport>;
 
   // Actions
   loadCanvases: () => Promise<void>;
@@ -117,23 +141,14 @@ export interface CanvasListState {
   setArchiveFilterMode: (mode: 'all' | 'active' | 'archived') => void;
   /**
    * S68-E4: 复制选中的画布元数据条目到目标画布。
-   * srcId — 来源画布 ID（用于上下文，无实际用途）
-   * nodeIds — 要复制的画布 ID 列表
-   * destId — 目标画布 ID
-   * 为每个条目生成新 ID 和新创建时间，名称追加 " (副本)"。
    */
   copyNodesBetweenCanvases: (srcId: string, nodeIds: string[], destId: string) => Promise<void>;
   /**
    * S68-E4: 批量导出选中的画布元数据为 .vbtmpl JSON 文件。
-   * nodeIds — 要导出的画布 ID 列表
    */
   batchTemplateExport: (canvasIds: string[]) => Promise<void>;
   /**
    * S76-E2: 批量导出选中的画布节点为 PNG ZIP 文件。
-   * - 从 IndexedDB 加载每个画布的完整数据
-   * - 收集所有 chapters 的卡片 (context / flow / component)
-   * - 逐个渲染到隐藏容器 → html-to-image 导出为 PNG
-   * - 所有 PNG 打包为 ZIP 并触发浏览器下载
    */
   batchExport: (canvasIds: string[], options?: {
     format?: 'png';
@@ -143,16 +158,26 @@ export interface CanvasListState {
   }) => Promise<void>;
   /**
    * S76-E3: 从当前 canvases 重建 Fuse.js 搜索索引。
-   * 索引字段权重: name:2, description:1, tags:1 (归一化为 0.5/0.25/0.25)
-   * 在 loadCanvases() 完成后自动调用。
    */
   rebuildIndex: () => void;
   /**
    * S76-E3: 使用 Fuse.js 加权搜索 canvases。
-   * @param query 搜索词
-   * @returns 按相关度排序的 IndexedSearchResult[]
    */
   indexedSearch: (query: string) => IndexedSearchResult[];
+  /**
+   * S78-E4: Add a new scheduled export task.
+   * @returns the id of the newly created scheduled export
+   */
+  addScheduledExport: (canvasId: string, cronExpression: string, webhookUrl: string) => string;
+  /** S78-E4: Remove a scheduled export by id */
+  removeScheduledExport: (id: string) => void;
+  /** S78-E4: Get a scheduled export by id */
+  getScheduledExport: (id: string) => ScheduledExport | null;
+  /** S78-E4: Update enabled/disabled status and last run results of a scheduled export */
+  updateScheduledExportStatus: (
+    id: string,
+    updates: Partial<Pick<ScheduledExport, 'enabled' | 'lastRunAt' | 'lastError' | 'successCount' | 'nextRunAt'>>
+  ) => void;
 
 }
 
@@ -175,6 +200,57 @@ const CANVAS_SEARCH_FUSE_OPTIONS: Fuse.IFuseOptions<CanvasIndexEntry> = {
   minMatchCharLength: 1,
   ignoreLocation: true,
 };
+
+// ============================================
+// S78-E4: Cron expression parser + next run calculator
+// ============================================
+
+function matchCronField(field: string, value: number, max: number): boolean {
+  if (field === '*') return true;
+  if (field.startsWith('*/')) {
+    const step = parseInt(field.slice(2), 10);
+    return step > 0 && value % step === 0;
+  }
+  if (field.includes(',')) {
+    return field.split(',').some((part) => matchCronField(part.trim(), value, max));
+  }
+  if (field.includes('-')) {
+    const [startStr, endStr] = field.split('-');
+    const start = parseInt(startStr, 10);
+    const end = parseInt(endStr, 10);
+    return value >= start && value <= end;
+  }
+  return parseInt(field, 10) === value;
+}
+
+export function parseCronNextRun(cronExpression: string, from: Date = new Date()): string | null {
+  const parts = cronExpression.trim().split(/\s+/);
+  if (parts.length !== 5) return null;
+
+  const [minuteField, hourField, dayField, monthField, weekdayField] = parts;
+  const checkDate = new Date(from.getTime());
+  checkDate.setSeconds(0, 0);
+
+  for (let i = 0; i < 366 * 24 * 60; i++) {
+    checkDate.setTime(from.getTime() + i * 60 * 1000);
+    checkDate.setSeconds(0, 0);
+
+    if (
+      matchCronField(minuteField, checkDate.getMinutes(), 59) &&
+      matchCronField(hourField, checkDate.getHours(), 23) &&
+      matchCronField(dayField, checkDate.getDate(), 31) &&
+      matchCronField(monthField, checkDate.getMonth() + 1, 12) &&
+      matchCronField(weekdayField, checkDate.getDay(), 6)
+    ) {
+      return checkDate.toISOString();
+    }
+  }
+  return null;
+}
+
+export function isValidCronExpression(cron: string): boolean {
+  return parseCronNextRun(cron) !== null;
+}
 
 // ============================================
 // Persistence helpers (re-use ddsPersistence patterns)
@@ -256,6 +332,7 @@ export const useCanvasListStore = create<CanvasListState>((set, get) => ({
   archiveFilterMode: 'active', // S64-E4: default to active (non-archived) canvases
   canvasIndex: [], // S76-E3: Fuse.js canvas search index
   canvasFuseIndex: null, // S76-E3: Fuse instance
+  scheduledExports: {}, // S78-E4: scheduled export tasks
 
   loadCanvases: async () => {
     if (!isIndexedDBAvailable()) {
@@ -714,6 +791,77 @@ export const useCanvasListStore = create<CanvasListState>((set, get) => ({
   },
 
   // ============================================================
+  // S78-E4: Cron expression parser + next run calculator
+  // Supports: minute hour day month weekday
+  // ============================================================
+
+  /**
+   * Parse a cron field value and check if a given value matches.
+   * Supports: *, specific number, */n (every n), n,m (list), n-m (range)
+   */
+  // (helpers defined above store creation)
+
+  // ============================================================
+  // S78-E4: Scheduled export actions
+  // ============================================================
+
+  addScheduledExport: (canvasId: string, cronExpression: string, webhookUrl: string) => {
+    const { canvases } = get();
+    const canvas = canvases.find((c) => c.id === canvasId);
+    if (!canvas) throw new Error(`Canvas not found: ${canvasId}`);
+    if (!isValidCronExpression(cronExpression)) throw new Error(`Invalid cron expression: ${cronExpression}`);
+
+    const id = generateId();
+    const nextRunAt = parseCronNextRun(cronExpression);
+
+    set((state) => ({
+      scheduledExports: {
+        ...state.scheduledExports,
+        [id]: {
+          id,
+          canvasId,
+          canvasName: canvas.name,
+          cronExpression,
+          webhookUrl,
+          enabled: true,
+          lastRunAt: null,
+          lastError: null,
+          successCount: 0,
+          createdAt: new Date().toISOString(),
+          nextRunAt,
+        },
+      },
+    }));
+
+    return id;
+  },
+
+  removeScheduledExport: (id: string) => {
+    set((state) => {
+      const next = { ...state.scheduledExports };
+      delete next[id];
+      return { scheduledExports: next };
+    });
+  },
+
+  getScheduledExport: (id: string) => {
+    return get().scheduledExports[id] ?? null;
+  },
+
+  updateScheduledExportStatus: (id, updates) => {
+    set((state) => {
+      const existing = state.scheduledExports[id];
+      if (!existing) return state;
+      return {
+        scheduledExports: {
+          ...state.scheduledExports,
+          [id]: { ...existing, ...updates },
+        },
+      };
+    });
+  },
+
+  // ============================================================
   // S76-E3: Canvas indexed search (Fuse.js weighted: name:2, description:1, tags:1)
   // ============================================================
 
@@ -756,5 +904,5 @@ export const useCanvasListStore = create<CanvasListState>((set, get) => ({
   },
 
   // ============================================================
-  $reset: () => set({ selectedCanvasIds: new Set(), canvasIndex: [], canvasFuseIndex: null }),
+  $reset: () => set({ selectedCanvasIds: new Set(), canvasIndex: [], canvasFuseIndex: null, scheduledExports: {} }),
 }));

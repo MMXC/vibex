@@ -6710,3 +6710,13 @@ See git history for complete changelog.
 - **OfflineBanner.tsx** (NEW): 固定底部 banner，显示离线/同步中/冲突状态
 - **canvasOfflineStore.test.ts**: 23 tests covering offline state, queue, reconnect conflict detection, replay/discard/resolve flows
 
+
+---
+
+## [Unreleased] S77-E5: Canvas DPR 缩放性能优化 — 2026-06-08
+- **settingsStore**: 新增 `dprMode: 'auto'|'1x'|'2x'` + `setDprMode` action
+- **DDSCanvasPage**: mount 时根据 `devicePixelRatio` + `dprMode` 计算 `effectiveDPR`
+- **DDSFlow**: 新增 `effectiveDPR` prop，`handleNodesChange` debounce 100ms 批量更新
+- **CanvasSettingsDrawer**: 新增「性能」Tab（PerformanceSettings）
+- **PerformanceSettings**: DPR 模式选择器（自动/1x/2x）+ `calculateEffectiveDPR` 函数
+- **DDSCanvasPage.e5.test.tsx**: vitest DPR 限制逻辑 10/10

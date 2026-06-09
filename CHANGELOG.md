@@ -6846,3 +6846,19 @@ See git history for complete changelog.
 - **S80-E4.2**: `settingsStore.ts` — `lastOpenedTab` 持久化
 - **S80-E4.3**: `DDSToolbar.tsx` — ⚙️ 设置按钮集成
 - **S80-E4.4**: `SettingsModal.test.tsx` — 7/7 vitest tab 切换测试
+
+
+---
+
+## [Unreleased] S80-E5: 协作者在线状态与活动流 — 2026-06-09
+- **presenceStore**: 添加 `lastActiveAt: Record<userId, number>` — 记录每个协作者最后活动时间戳
+- **presenceStore**: 添加 `updateLastActive(userId)` — 更新协作者活动时间戳
+- **presenceStore**: 添加 `isOnline(userId)` — 5分钟内活跃 → 在线，≥5分钟 → 离线
+- **OnlinePresenceIndicator.tsx**: 绿色/灰色圆点组件，基于 lastActiveAt 显示在线状态
+- **types.ts**: 添加 `PresenceUpdateMessage` WebSocket 消息类型
+- **useCollaboration.ts**: `handleMessage` 支持 `presence_update` 消息类型
+- **DDSFlow.tsx**: `handleNodeMouseMove` + `handleNodesChange` → 调用 `updateLastActive`
+- **DDSCanvasPage.tsx**: 集成 `OnlinePresenceIndicator` (top:60px, right:16px)
+- **presenceStore.e5.test.ts**: 11/11 — lastActiveAt / isOnline / updateLastActive / clearAll / removeUser
+- **OnlinePresenceIndicator.test.tsx**: 7/7 — 组件渲染 / isOnline 逻辑
+- **测试修复**: `OnlinePresenceIndicator` 使用 `export default`，import 改为 default import；`onlineUsers` 类型修正为 `string[]`；添加 CSS module mock

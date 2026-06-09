@@ -6880,3 +6880,11 @@ See git history for complete changelog.
 - **DataSettingsPanel.tsx**: 新建组件 —— 导出按钮（下载 .json）+ 导入按钮（FileInput + 验证反馈）；位于 SettingsModal「数据管理」Tab
 - **DataSettingsPanel.module.css**: 新建样式文件
 - **settingsStore.e2-export-import.test.ts**: 32 个测试（export/import valid + invalid + edge cases + round-trip）
+
+---
+
+## [Unreleased] S81-E3: 画布性能监控面板 — 2026-06-09
+- **S81-E3.1**: `usePerformanceMonitor` hook — `getFPS()` via requestAnimationFrame loop, `getNodeCount()`/`getEdgeCount()` from `useReactFlow`
+- **S81-E3.2**: `PerformanceMonitor` component — real-time FPS + node/edge count overlay, collapsible, bottom-right corner
+- **S81-E3.3**: `DDSCanvasPage.tsx` — integrate `<PerformanceMonitor>` at `bottom: 16px; right: 16px`
+- **S81-E3.4**: `PerformanceMonitor.test.tsx` — 10 vitest tests covering collapse/expand, node/edge counts, aria-expanded

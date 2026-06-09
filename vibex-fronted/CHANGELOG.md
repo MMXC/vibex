@@ -6862,3 +6862,13 @@ See git history for complete changelog.
 - **presenceStore.e5.test.ts**: 11/11 — lastActiveAt / isOnline / updateLastActive / clearAll / removeUser
 - **OnlinePresenceIndicator.test.tsx**: 7/7 — 组件渲染 / isOnline 逻辑
 - **测试修复**: `OnlinePresenceIndicator` 使用 `export default`，import 改为 default import；`onlineUsers` 类型修正为 `string[]`；添加 CSS module mock
+
+---
+
+## [Unreleased] S81-E1: 画布导入格式支持 — 2026-06-09
+- **CanvasImporter.ts**: 新建服务类 —— `parseFlowJson()` 解析 .flow.json + `parseFlowZip()` 解析 .flow.zip + `checkConflict()` 名称冲突检测
+- **ImportMenu.tsx**: 新建下拉组件 —— 文件选择 + URL 输入 + 拖拽区（.flow.json / .flow.zip）
+- **ImportConflictDialog.tsx**: 新建对话框 —— 覆盖 / 重命名 / 取消 冲突解决方案
+- **DDSToolbar.tsx**: ImportMenu 替换旧 import 按钮，集成 canvasListStore 冲突检测
+- **CanvasImporter.test.ts**: 20 个测试用例（format routing / JSON / ZIP / conflict）
+

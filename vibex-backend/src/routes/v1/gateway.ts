@@ -81,6 +81,7 @@ import teamId from './teams/:id';
 import teamMembers from './teams/:id/members';
 import teamPermissions from './teams/:id/permissions';
 import canvasShare from './canvas-share';
+import shareImport from './canvas-share-import';
 
 // 创建 v1 路由
 const v1 = new Hono();
@@ -270,6 +271,9 @@ protected_.route('/teams/:id/permissions', teamPermissions);
 
 // Canvas Share — E5
 protected_.route('/canvas-share', canvasShare);
+
+// Canvas Share Import — S83-E2 (public endpoint — no auth required)
+v1.route('/canvas-share/import', shareImport);
 
 // 计划
 protected_.route('/plan', plan);

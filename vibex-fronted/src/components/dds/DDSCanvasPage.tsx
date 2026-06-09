@@ -57,6 +57,7 @@ import { ReviewReportPanel } from '@/components/design-review';
 import { HistoryPanel } from '@/components/canvas/features/HistoryPanel';
 import { NodeCommentPanel } from '@/components/dds/canvas/NodeCommentPanel';
 import { CanvasImportPanel } from '@/components/dds/canvas-dashboard/CanvasImportPanel';
+import { ImportShareDialog } from '@/components/dds/share/ImportShareDialog';
 import { useFileDrop } from '@/hooks/canvas/useFileDrop';
 import { useCollabSessionStore } from '@/lib/collaboration/collabSessionStore';
 import { useConflictStore } from '@/stores/dds/conflictStore';
@@ -119,6 +120,8 @@ export interface DDSCanvasPageProps {
   agentSession?: string | null;
   /** E1-S2: 来自 Onboarding 的模板 requirement 内容 */
   templateRequirement?: string;
+  /** S83-E2: Share token from URL ?import= param — triggers ImportShareDialog */
+  importShareToken?: string | null;
 }
 
 // ==================== Page State ====================
@@ -243,6 +246,7 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
   onAIGenerate,
   agentSession,
   templateRequirement: templateReqProp,
+  importShareToken,
 }: DDSCanvasPageProps) {
   /** E1-S2: 从 prop 或 localStorage 读取模板 requirement */
   const templateRequirement = (() => {
@@ -257,6 +261,28 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
     pageState: 'loading',
     errorMessage: null,
   });
+
+  // ---- S83-E2: Import Share Dialog ----
+  const [importShareOpen, setImportShareOpen] = useState(false);
+  const [importShareTokenState, setImportShareTokenState] = useState<string | null>(null);
+
+  // S83-E2: Open import dialog when ?import= param is present
+  useEffect(() => {
+    if (importShareToken) {
+      setImportShareTokenState(importShareToken);
+      setImportShareOpen(true);
+    }
+  }, [importShareToken]);
+
+  const handleImportShareClose = useCallback(() => {
+    setImportShareOpen(false);
+    // Remove ?import= from URL without full navigation
+    if (typeof window !== 'undefined') {
+      const url = new URL(window.location.href);
+      url.searchParams.delete('import');
+      window.history.replaceState({}, '', url.toString());
+    }
+  }, []);
 
   // ---- S16-P0-2: Conflict Resolution Dialog ----
   const [conflictDialogOpen, setConflictDialogOpen] = useState(false);
@@ -1303,6 +1329,13 @@ const { onCursorMove, broadcastCursor } = useWebSocketPresence({
     )}
     {/* S81-E3: Performance monitor — real-time FPS + node/edge count, bottom-right */}
     <PerformanceMonitor />
+
+    {/* S83-E2: ImportShareDialog — shown when ?import=<shareToken> is in URL */}
+    <ImportShareDialog
+      isOpen={importShareOpen}
+      shareToken={importShareTokenState ?? ''}
+      onClose={handleImportShareClose}
+    />
     </>
   );
 });

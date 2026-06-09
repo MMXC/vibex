@@ -1,3 +1,10 @@
+## [Unreleased] S83-E2: 导入链接画布 — 2026-06-10
+- **ImportShareDialog.tsx**: 新增 `ImportShareDialog` 组件 — 分享链接导入弹窗，支持 token 验证、画布预览、导入确认
+- **ImportShareDialog.module.css**: ImportShareDialog 样式（overlay、dialog、header、body、footer、preview、footer 按钮）
+- **ImportShareDialog.test.tsx**: 6 个 S83-E2 单元测试（渲染、验证状态、成功预览、错误状态、取消/导入按钮交互）
+- **canvas-share.ts**: 新增 `validateShareToken` / `registerShareToken` / `revokeShareToken` API 方法
+- **DDSCanvasPage.tsx**: 集成 ImportShareDialog，处理 `?import=<token>` URL 参数
+- **vitest**: ImportShareDialog.test.tsx 6/6 通过
 ## [Unreleased] S82-E5: 自动解决策略 + WS 冲突触发 — 2026-06-09
 - **ConflictDialog.tsx**: 新增 `showAutoResolve` / `onAutoResolve` props + `AutoResolveStrategy` 类型
 - **ConflictDialog.tsx**: 新增自动解决策略选择区域（Auto-merge / Keep Mine / Keep Theirs 三按钮）

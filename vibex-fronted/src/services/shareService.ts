@@ -1,16 +1,19 @@
 /**
  * shareService.ts — Sprint82 E3: Canvas Share Service
+ * Sprint83 E2: Added backend token sync for import-from-share support
  *
  * Service layer for canvas share link management.
  * Provides generateShareLink, revokeShareLink, listShareLinks operations.
  *
  * Architecture:
  * - Uses localStorage for share link persistence (no backend required for link-share)
+ * - Syncs tokens to backend via canvasShareApi.registerShareToken() for import-from-share support
  * - In a real backend deployment, these would be API calls
  */
 
 import { generateShareToken, buildSnapshotUrl } from '@/lib/shareUtils';
 import type { ShareRole } from '@/lib/api/canvas-share';
+import { canvasShareApi } from '@/lib/api/canvas-share';
 
 // ============================================
 // Types
@@ -77,7 +80,7 @@ function saveLinks(links: ShareLink[]): void {
 
 /**
  * Generate a new share link for a canvas.
- * Stores the link metadata in localStorage.
+ * Stores the link metadata in localStorage AND syncs to backend for import-from-share support.
  */
 export async function generateShareLink(
   options: GenerateShareLinkOptions
@@ -100,6 +103,17 @@ export async function generateShareLink(
   links.push(link);
   saveLinks(links);
 
+  // Sync token to backend for import-from-share support (S83-E2)
+  // Fire-and-forget — localStorage is the primary store
+  canvasShareApi.registerShareToken({
+    token,
+    canvasId: options.canvasId,
+    role: options.role,
+    expiresAt,
+  }).catch(() => {
+    // Backend sync failure is non-fatal — localStorage still has the token
+  });
+
   const url = buildSnapshotUrl({
     canvasId: options.canvasId,
     projectName: options.canvasName,
@@ -120,6 +134,12 @@ export async function revokeShareLink(token: string): Promise<boolean> {
     return false; // Not found
   }
   saveLinks(filtered);
+
+  // Sync revocation to backend (S83-E2) — fire-and-forget
+  canvasShareApi.revokeShareToken(token).catch(() => {
+    // Backend sync failure is non-fatal
+  });
+
   return true;
 }
 

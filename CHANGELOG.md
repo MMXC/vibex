@@ -6872,3 +6872,11 @@ See git history for complete changelog.
 - **DDSToolbar.tsx**: ImportMenu 替换旧 import 按钮，集成 canvasListStore 冲突检测
 - **CanvasImporter.test.ts**: 20 个测试用例（format routing / JSON / ZIP / conflict）
 
+---
+
+## [Unreleased] S81-E2: 设置导入导出 — 2026-06-09
+- **settingsStore.ts**: 添加 `exportSettings()` — 导出版本化 JSON（含 version/exportedAt/data）；添加 `importSettings(json)` — 导入验证 + 状态还原；添加 `SETTINGS_VERSION = '1.0.0'`
+- **historyDB.ts**: `DB_VERSION` 11→12，新增 `settings_export` objectStore（含 `id` keyPath + `timestamp` 索引）
+- **DataSettingsPanel.tsx**: 新建组件 —— 导出按钮（下载 .json）+ 导入按钮（FileInput + 验证反馈）；位于 SettingsModal「数据管理」Tab
+- **DataSettingsPanel.module.css**: 新建样式文件
+- **settingsStore.e2-export-import.test.ts**: 32 个测试（export/import valid + invalid + edge cases + round-trip）

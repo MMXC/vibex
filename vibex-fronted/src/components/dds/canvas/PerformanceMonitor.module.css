@@ -1,0 +1,90 @@
+/* PerformanceMonitor.module.css — S81-E3 */
+.container {
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+  z-index: 1000;
+  min-width: 120px;
+  background: rgba(15, 23, 42, 0.88);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  font-family: ui-monospace, 'Cascadia Code', 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: #e2e8f0;
+  overflow: hidden;
+  user-select: none;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 6px 10px;
+  background: rgba(30, 41, 59, 0.9);
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  color: #94a3b8;
+  font-size: 11px;
+  font-family: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.header:hover {
+  background: rgba(51, 65, 85, 0.9);
+  color: #e2e8f0;
+}
+
+.headerTitle {
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+.chevron {
+  font-size: 9px;
+  color: #64748b;
+}
+
+.metrics {
+  display: flex;
+  gap: 8px;
+  padding: 8px 10px;
+  align-items: center;
+}
+
+.metric {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.metricLabel {
+  font-size: 9px;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.metricValue {
+  font-size: 14px;
+  font-weight: 700;
+  color: #f8fafc;
+  line-height: 1;
+}
+
+/* FPS colour states */
+.fpsOk {
+  color: #4ade80; /* green — ≥30 fps */
+}
+
+.fpsWarning {
+  color: #fb923c; /* orange — <30 fps */
+}
+
+.fpsNeutral {
+  color: #94a3b8; /* grey — initial 0 */
+}

@@ -6839,3 +6839,10 @@ See git history for complete changelog.
 - **E3.5**: 冲突数徽章 (conflictCount > 0 显示 ⚠️)
 - **E3.6**: `MergeHistoryPanel` 导出 Markdown 合并报告
 - **E3.7**: vitest: `canvasHistoryStore.e3-merge-history.test.ts` 4/4
+
+
+## [Unreleased] S80-E4: 画布设置中心 — 2026-06-09
+- **S80-E4.1**: `SettingsModal.tsx` — 4-tab 统一设置入口（快捷键/画布/通知/性能）
+- **S80-E4.2**: `settingsStore.ts` — `lastOpenedTab` 持久化
+- **S80-E4.3**: `DDSToolbar.tsx` — ⚙️ 设置按钮集成
+- **S80-E4.4**: `SettingsModal.test.tsx` — 7/7 vitest tab 切换测试

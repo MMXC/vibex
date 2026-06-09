@@ -333,6 +333,14 @@ interface CanvasHistoryState {
   // E1 (Sprint70): Branch merge conflict resolution
   /** Set the current active branch name */
   setCurrentBranch: (branchName: string) => void;
+  // E1 (Sprint82): Canvas branch management UI
+  /** Switch to a different branch — saves current canvas state, updates currentBranch, and loads the new branch's snapshots. Fires restoringSnapshotId to signal canvas reload. */
+  switchBranch: (canvasId: string, branchId: string, getCanvasData?: () => { nodes: unknown[]; edges: unknown[] }) => Promise<void>;
+  /** Compare two branches and return diff result — wraps compareBranches with BranchDiffResult return type */
+  diffBranches: (canvasId: string, branchA: string, branchB: string) => Promise<BranchDiffResult>;
+  /** Load all snapshots for a given branch and update store state */
+  loadBranch: (canvasId: string, branchId: string) => Promise<void>;
+
   // E4 (Sprint73): Branch naming & protection
   /** Set the display name for a branch */
   setBranchName: (canvasId: string, branchName: string, name: string) => Promise<void>;
@@ -1016,6 +1024,49 @@ export const useCanvasHistoryStore = create<CanvasHistoryState>((set, get) => ({
 
   setCurrentBranch: (branchName: string) => {
     set({ currentBranch: branchName });
+  },
+
+  // E1 (Sprint82): Canvas branch management UI
+  /** Switch to a different branch — saves current canvas state, switches branch, and triggers canvas reload. */
+  switchBranch: async (
+    canvasId: string,
+    branchId: string,
+    getCanvasData?: () => { nodes: unknown[]; edges: unknown[] }
+  ) => {
+    if (typeof window === 'undefined' || !window.indexedDB) return;
+    const { currentBranch } = get();
+    // Step 1: Save current canvas state to the current branch before switching
+    if (getCanvasData) {
+      const data = getCanvasData();
+      if (data.nodes?.length || data.edges?.length) {
+        const { saveSnapshotToDB } = await import('@/lib/canvas/historyDB');
+        const id = `snapshot-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+        const snapshot = { id, name: `auto-${new Date().toISOString()}`, timestamp: Date.now(), data, branchName: currentBranch };
+        await saveSnapshotToDB(canvasId, snapshot);
+      }
+    }
+    // Step 2: Switch branch
+    set({ currentBranch: branchId, restoringSnapshotId: branchId });
+    // Step 3: Load new branch snapshots and refresh list
+    const { listSnapshotsFromDB } = await import('@/lib/canvas/historyDB');
+    const newSnapshots = await listSnapshotsFromDB(canvasId);
+    set({ snapshots: newSnapshots.sort((a, b) => b.timestamp - a.timestamp), restoringSnapshotId: null });
+  },
+
+  /** Compare two branches and return BranchDiffResult */
+  diffBranches: async (canvasId: string, branchA: string, branchB: string): Promise<BranchDiffResult> => {
+    return get().compareBranches(canvasId, branchA, branchB);
+  },
+
+  /** Load all snapshots for a given branch and update store state */
+  loadBranch: async (canvasId: string, branchId: string) => {
+    if (typeof window === 'undefined' || !window.indexedDB) return;
+    const { listSnapshotsFromDB } = await import('@/lib/canvas/historyDB');
+    const branchSnapshots = await listSnapshotsFromDB(canvasId);
+    const filtered = branchSnapshots
+      .filter((s) => (s as { branchName?: string }).branchName === branchId)
+      .sort((a, b) => b.timestamp - a.timestamp);
+    set({ snapshots: filtered, currentBranch: branchId });
   },
 
   // E4 (Sprint73): Branch naming & protection

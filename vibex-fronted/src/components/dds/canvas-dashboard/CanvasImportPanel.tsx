@@ -3,7 +3,7 @@
  * S76-E4: 画布导入导出完整流程
  *
  * Responsibilities:
- * - Drag-and-drop zone for .vibex / .json / .yaml files
+ * - Drag-and-drop zone for .vibex / .json / .yaml / .flow.json / .flow.zip files
  * - File preview with validation
  * - Write imported data to IndexedDB via canvasListStore
  * - Auto-open imported canvas after confirmation
@@ -43,7 +43,7 @@ type ImportStatus = 'idle' | 'processing' | 'success' | 'error';
 
 // ==================== Constants ====================
 
-const ACCEPTED_EXTENSIONS = ['.vibex', '.json', '.yaml', '.yml'];
+const ACCEPTED_EXTENSIONS = ['.vibex', '.json', '.yaml', '.yml', '.flow.json', '.flow.zip', '.flow.yaml', '.flow.yml'];
 const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
 
 // ==================== Helpers ====================
@@ -55,10 +55,12 @@ function formatBytes(bytes: number): string {
 }
 
 function validateFile(file: File): string | undefined {
-  const ext = file.name.toLowerCase().split('.').pop() || '';
-  const extWithDot = `.${ext}`;
-  if (!ACCEPTED_EXTENSIONS.includes(extWithDot)) {
-    return `不支持的文件格式 "${ext}"，仅支持 ${ACCEPTED_EXTENSIONS.join(', ')}`;
+  const name = file.name.toLowerCase();
+  // Support both single-part (.json) and multi-part (.flow.json) extensions
+  const extMatch = name.match(/\.(flow\.json|flow\.zip|flow\.yaml|flow\.yml|vibex|yaml|yml|json)$/);
+  const ext = extMatch ? extMatch[0] : null;
+  if (!ext || !ACCEPTED_EXTENSIONS.includes(ext)) {
+    return `不支持的文件格式 "${name.replace(/.*\./, '')}"，仅支持 ${ACCEPTED_EXTENSIONS.join(', ')}`;
   }
   if (file.size > MAX_FILE_SIZE) {
     return `文件过大 (${formatBytes(file.size)})，最大支持 ${formatBytes(MAX_FILE_SIZE)}`;
@@ -238,7 +240,7 @@ export const CanvasImportPanel = memo(function CanvasImportPanel({
         }
 
         // Create new canvas with imported data
-        const baseName = preview.file.name.replace(/\.(vibex|json|yaml|yml)$/i, '');
+        const baseName = preview.file.name.replace(/\.(flow\.yaml|flow\.yml|flow\.json|flow\.zip|vibex|yaml|yml|json)$/i, '');
         const canvas = await createCanvas(baseName);
 
         // The canvas meta is created; for full data import, the caller
@@ -342,15 +344,16 @@ export const CanvasImportPanel = memo(function CanvasImportPanel({
               fileInputRef.current?.click();
             }
           }}
-        >
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept=".vibex,.json,.yaml,.yml"
-            multiple
-            className={styles.hiddenInput}
-            onChange={handleFileSelect}
-            aria-hidden="true"
+            {/* Hidden file input */}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".vibex,.json,.yaml,.yml,.flow.json,.flow.zip,.flow.yaml,.flow.yml"
+              multiple
+              onChange={handleFileSelect}
+              className={styles.hiddenInput}
+              aria-hidden="true"
+            />
           />
           <div className={styles.dropIcon}>
             <svg
@@ -373,7 +376,7 @@ export const CanvasImportPanel = memo(function CanvasImportPanel({
             {isDragging ? '松开以添加文件' : '拖拽文件到此处，或点击选择'}
           </p>
           <p className={styles.dropHint}>
-            支持 .vibex, .json, .yaml, .yml，单文件最大 {formatBytes(MAX_FILE_SIZE)}
+            支持 .vibex, .json, .yaml, .yml, .flow.json, .flow.zip, .flow.yaml, .flow.yml，单文件最大 {formatBytes(MAX_FILE_SIZE)}
           </p>
         </div>
 

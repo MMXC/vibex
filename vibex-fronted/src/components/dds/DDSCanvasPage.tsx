@@ -56,6 +56,8 @@ import { MiniMapPanel } from '@/components/dds/MiniMapPanel';
 import { ReviewReportPanel } from '@/components/design-review';
 import { HistoryPanel } from '@/components/canvas/features/HistoryPanel';
 import { NodeCommentPanel } from '@/components/dds/canvas/NodeCommentPanel';
+import { CanvasImportPanel } from '@/components/dds/canvas-dashboard/CanvasImportPanel';
+import { useFileDrop } from '@/hooks/canvas/useFileDrop';
 import { useCollabSessionStore } from '@/lib/collaboration/collabSessionStore';
 import { useConflictStore } from '@/stores/dds/conflictStore';
 import { PerformanceMonitor } from '@/components/dds/canvas/PerformanceMonitor';
@@ -578,6 +580,22 @@ const { onCursorMove, broadcastCursor } = useWebSocketPresence({
   // S62-E1: Collaboration editing broadcast
   const { startEditing, endEditing } = useCollabEditing();
 
+  // S82-E4: File drag-drop import — open CanvasImportPanel on valid file drop
+  const {
+    isDragging: isFileDragging,
+    isImportReady: isFileDragImportReady,
+    clearImportReady: clearFileDragImportReady,
+    handleDragEnter: handleFileDragEnter,
+    handleDragLeave: handleFileDragLeave,
+    handleDragOver: handleFileDragOver,
+    handleDrop: handleFileDrop,
+  } = useFileDrop({
+    onImportReady: () => {
+      clearFileDragImportReady();
+      setImportPanelOpen(true);
+    },
+  });
+
   const handleSelectCard = useCallback(
     (cardId: string) => {
       const state = useDDSCanvasStore.getState();
@@ -619,6 +637,7 @@ const { onCursorMove, broadcastCursor } = useWebSocketPresence({
   const [searchPanelOpen, setSearchPanelOpen] = useState(false);
   const [canvasSearchPanelOpen, setCanvasSearchPanelOpen] = useState(false);
   const [fulltextSearchOpen, setFulltextSearchOpen] = useState(false); // S73-E1: Cmd/Ctrl+F
+  const [importPanelOpen, setImportPanelOpen] = useState(false); // S82-E4: File drag-drop import
   const [globalSearchPanelOpen, setGlobalSearchPanelOpen] = useState(false);
   const [historyPanelOpen, setHistoryPanelOpen] = useState(false);
   const [commentPanelOpen, setCommentPanelOpen] = useState(false);
@@ -921,6 +940,10 @@ const { onCursorMove, broadcastCursor } = useWebSocketPresence({
       data-testid="dds-canvas-page"
       style={{ minHeight: '100vh', background: 'var(--bg-primary, #0a0a0a)' }}
       onMouseMove={handleMouseMove}
+      onDragEnter={handleFileDragEnter}
+      onDragLeave={handleFileDragLeave}
+      onDragOver={handleFileDragOver}
+      onDrop={handleFileDrop}
     >
       {/* Toolbar */}
       <DDSToolbar onAIGenerate={handleAIGenerate} agentSession={agentSession} projectId={projectId ?? ''} />
@@ -1160,6 +1183,16 @@ const { onCursorMove, broadcastCursor } = useWebSocketPresence({
       `}</style>
     </div>
     </TreeErrorBoundary>
+
+    {/* S82-E4: CanvasImportPanel — file drag-drop import */}
+    <CanvasImportPanel
+      open={importPanelOpen}
+      onClose={() => setImportPanelOpen(false)}
+      onImported={(canvasId) => {
+        setImportPanelOpen(false);
+        canvasSetActive(canvasId);
+      }}
+    />
 
     {/* S16-P0-1: Design Review panel */}
     <ReviewReportPanel />

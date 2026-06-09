@@ -1,5 +1,6 @@
 
 
+## [Unreleased] S83-E5: 批量画布ZIP导出 — 2026-06-10
 ## [Unreleased] S83-E3: 协作者冲突确认反馈 — 2026-06-17
 - **Component**: 新增 `ConflictConfirmToast.tsx` — 冲突自动解决后的确认 Toast，3秒自动消失
 - **Component**: Toast 显示使用的策略（自动合并 / 保留我的版本 / 保留对方版本）

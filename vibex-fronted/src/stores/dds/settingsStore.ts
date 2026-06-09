@@ -58,6 +58,8 @@ interface SettingsState {
   canvasBackground: CanvasBackground;
   /** E5 (Sprint77): DPR performance mode */
   dprMode: DprMode;
+  /** E4 (Sprint80): last opened tab in SettingsModal */
+  lastOpenedTab: string | null;
 }
 
 interface SettingsActions {
@@ -70,6 +72,8 @@ interface SettingsActions {
   setCanvasBackground: (bg: Partial<CanvasBackground>) => void;
   /** E5 (Sprint77): Set DPR performance mode */
   setDprMode: (mode: DprMode) => void;
+  /** E4 (Sprint80): Set last opened settings tab */
+  setLastOpenedTab: (tab: string) => void;
   reset: () => void;
   saveAsPreset: (name: string, settings: CanvasSettings) => string;
   applyPreset: (presetId: string) => void;
@@ -96,10 +100,11 @@ const DEFAULT_CANVAS_BACKGROUND: CanvasBackground = {
   color: '#e5e7eb',
 };
 
-const DEFAULT_PRESETS_STATE: Pick<SettingsState, 'canvasPresets' | 'activePresetId' | 'dprMode'> = {
+const DEFAULT_PRESETS_STATE: Pick<SettingsState, 'canvasPresets' | 'activePresetId' | 'dprMode' | 'lastOpenedTab'> = {
   canvasPresets: [],
   activePresetId: null,
   dprMode: 'auto',
+  lastOpenedTab: null,
 };
 
 const VALID_GRID_SIZES = [12, 16, 24, 32] as const;
@@ -166,6 +171,11 @@ export const useSettingsStore = create<SettingsStore>()(
       /** E5 (Sprint77): Set DPR performance mode */
       setDprMode: (mode: DprMode) => {
         set({ dprMode: mode });
+      },
+
+      /** E4 (Sprint80): Persist last opened settings tab */
+      setLastOpenedTab: (tab: string) => {
+        set({ lastOpenedTab: tab });
       },
 
       reset: () =>

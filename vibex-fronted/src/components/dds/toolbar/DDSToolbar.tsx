@@ -21,6 +21,7 @@ import { useComponentStore } from '@/lib/canvas/stores/componentStore';
 import { exportDDSCanvasData, exportToStateMachine } from '@/services/dds/exporter';
 import { useDDSCanvasStore, ddsChapterActions } from '@/stores/dds';
 import { ScheduledExportPanel } from './ScheduledExportPanel';
+import { SettingsModal } from '@/components/dds/settings/SettingsModal';
 import { useAutoLayout } from '@/hooks/dds/useAutoLayout';
 import { useClipboardStore } from '@/stores/clipboardStore';
 import { useCanvasHistoryStore } from '@/stores/dds/canvasHistoryStore';
@@ -276,6 +277,8 @@ export const DDSToolbar = memo(function DDSToolbar({
   const [isViewPresetsOpen, setIsViewPresetsOpen] = useState(false);
   const [isRecentSearchesOpen, setIsRecentSearchesOpen] = useState(false);
   const [isScheduledExportOpen, setIsScheduledExportOpen] = useState(false);
+  // E4 (Sprint80): Settings modal state
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   // S79-E2: Notification panel state
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const unreadCount = useNotificationStore((s) => s.getUnreadCount());
@@ -542,6 +545,17 @@ export const DDSToolbar = memo(function DDSToolbar({
             title="定时导出 Webhook"
           >
             🔔
+          </button>
+
+          {/* S80-E4: Settings button */}
+          <button
+            type="button"
+            className={styles.exportBtn}
+            onClick={() => setIsSettingsOpen(true)}
+            aria-label="设置中心"
+            title="设置中心"
+          >
+            ⚙️
           </button>
 
           {/* S77-E2: Connection status indicator */}
@@ -1156,6 +1170,12 @@ export const DDSToolbar = memo(function DDSToolbar({
       <NotificationPanel
         open={isNotificationOpen}
         onClose={() => setIsNotificationOpen(false)}
+      />
+
+      {/* S80-E4: Settings Modal */}
+      <SettingsModal
+        open={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
       />
     </>
   );

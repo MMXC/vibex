@@ -6888,3 +6888,14 @@ See git history for complete changelog.
 - **S81-E3.2**: `PerformanceMonitor` component — real-time FPS + node/edge count overlay, collapsible, bottom-right corner
 - **S81-E3.3**: `DDSCanvasPage.tsx` — integrate `<PerformanceMonitor>` at `bottom: 16px; right: 16px`
 - **S81-E3.4**: `PerformanceMonitor.test.tsx` — 10 vitest tests covering collapse/expand, node/edge counts, aria-expanded
+
+
+---
+
+## [Unreleased] S82-E1: Canvas Branch Management UI — 2026-06-09
+
+### E1: Canvas Branch UI — `switchBranch` / `diffBranches` / `loadBranch`
+- **canvasHistoryStore.ts**: 新增 `switchBranch` (保存当前画布状态并切换分支)、`diffBranches` (对比两个分支快照差异)、`loadBranch` (加载指定分支快照列表)
+- **MergeHistoryPanel.tsx**: 合并历史面板 — 时间线展示、分支名称、贡献者头像、冲突徽章、展开/折叠、Markdown 导出
+- **MergeHistoryPanel.test.tsx**: 15/15 测试覆盖 (空状态、标题、分支名称、用户名、冲突徽章、展开折叠、键盘可访问性、关闭、导出、贡献者头像)
+

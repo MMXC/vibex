@@ -58,6 +58,7 @@ import { HistoryPanel } from '@/components/canvas/features/HistoryPanel';
 import { NodeCommentPanel } from '@/components/dds/canvas/NodeCommentPanel';
 import { useCollabSessionStore } from '@/lib/collaboration/collabSessionStore';
 import { useConflictStore } from '@/stores/dds/conflictStore';
+import { PerformanceMonitor } from '@/components/dds/canvas/PerformanceMonitor';
 import { ConflictDialog } from '@/components/dds/canvas-dashboard/ConflictDialog';
 import { ConflictResolutionDialog } from '@/components/dds/canvas-dashboard/ConflictResolutionDialog';
 // S76-E5: Conflict detection banner
@@ -1267,6 +1268,8 @@ const { onCursorMove, broadcastCursor } = useWebSocketPresence({
         onReject={handleReject}
       />
     )}
+    {/* S81-E3: Performance monitor — real-time FPS + node/edge count, bottom-right */}
+    <PerformanceMonitor />
     </>
   );
 });

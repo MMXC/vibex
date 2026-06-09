@@ -44,7 +44,7 @@ import type { Notification } from '@/stores/notificationStore';
 // ============================================
 
 const DB_NAME = 'vibex-canvas-history';
-const DB_VERSION = 11; // E1 (Sprint80): notification_prefs objectStore
+const DB_VERSION = 12; // E2 (Sprint81): settings_export objectStore
 const STORE_NAME = 'history';
 const SNAPSHOTS_STORE_NAME = 'snapshots';
 const BRANCH_META_STORE_NAME = 'branchMeta';
@@ -53,6 +53,8 @@ const NOTIFICATIONS_STORE_NAME = 'notifications';
 const CANVAS_CHANGE_LOG_STORE_NAME = 'canvasChangeLog';
 const MERGE_HISTORY_STORE_NAME = 'mergeHistory';
 const NOTIFICATION_PREFS_STORE_NAME = 'notification_prefs';
+/** E2 (Sprint81): Settings backup records */
+const SETTINGS_EXPORT_STORE_NAME = 'settings_export';
 
 /** Maximum storage per canvas in bytes (5MB) */
 export const MAX_BYTES_PER_CANVAS = 5 * 1024 * 1024;
@@ -230,6 +232,11 @@ function openDB(): Promise<IDBDatabase> {
         db.deleteObjectStore(NOTIFICATION_PREFS_STORE_NAME);
         const prefsStore = db.createObjectStore(NOTIFICATION_PREFS_STORE_NAME, { keyPath: 'key' });
         prefsStore.createIndex('key', 'key', { unique: true });
+      }
+      // E2 (Sprint81): settings_export objectStore
+      if (!db.objectStoreNames.contains(SETTINGS_EXPORT_STORE_NAME)) {
+        const exportStore = db.createObjectStore(SETTINGS_EXPORT_STORE_NAME, { keyPath: 'id' });
+        exportStore.createIndex('timestamp', 'timestamp', { unique: false });
       }
     };
   });

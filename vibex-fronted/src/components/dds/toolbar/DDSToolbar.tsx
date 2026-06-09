@@ -32,6 +32,7 @@ import { useCanvasImport } from '@/hooks/canvas/useCanvasImport';
 import { useCanvasRBAC } from '@/hooks/useCanvasRBAC';
 import { ShareToTeamModal } from '@/components/team-share/ShareToTeamModal';
 import { ExportMenu } from './ExportMenu';
+import { ImportMenu } from './ImportMenu';
 import { OnlineUsers } from './OnlineUsers';
 import { OfflineIndicator } from './OfflineIndicator';
 import { PresencePanel } from '@/components/presence/PresencePanel';
@@ -51,6 +52,7 @@ import { BackupPanel } from '@/components/dds/settings/BackupPanel';
 import { CanvasSettingsDrawer } from '@/components/dds/settings/CanvasSettingsDrawer';
 import { NotificationPanel } from '@/components/dds/notifications/NotificationPanel';
 import { useNotificationStore } from '@/stores/notificationStore';
+import { canvasListStore } from '@/stores/canvasListStore';
 import { ConflictDialog } from '@/components/dds/canvas-dashboard/ConflictDialog';
 import styles from './DDSToolbar.module.css';
 
@@ -746,26 +748,31 @@ export const DDSToolbar = memo(function DDSToolbar({
             <span>{tToolbar('analyze')}</span>
           </button>
 
-          {/* E2: Import button with hidden file input (Bug fix: wire hidden input) */}
-          <button
-            type="button"
-            className={styles.exportBtn}
-            onClick={() => importRef.current?.click()}
-            aria-label={tToolbar('importCanvas')}
-            title={rbac.canEdit ? tToolbar('importHint') : tToolbar('permissionRequired')}
-            disabled={!rbac.canEdit && !rbac.loading}
-            data-testid="canvas-import-btn"
-          >
-            {tToolbar('import')}
-          </button>
-          <input
-            ref={importRef}
-            type="file"
-            accept=".json,.vibex"
-            style={{ display: 'none' }}
-            data-testid="canvas-import-input"
-            onChange={handleImportChange}
-          />
+          {/* S81-E1: ImportMenu — .flow.json / .flow.zip with URL input + drag zone */}
+          <div style={{ position: 'relative' }}>
+            <ImportMenu
+              getExistingCanvases={() =>
+                canvasListStore.getState().canvases.map((c) => ({ id: c.id, name: c.name }))
+              }
+              onImportSuccess={(canvasId, renamedName) => {
+                // S81-E1: Import success handler — the ImportMenu handles the actual
+                // parsing; this callback receives the resolved action (cover/rename/cancel).
+                // Wire to ddsChapterActions after canvas data is merged.
+                console.info('[DDSToolbar] Import success', { canvasId, renamedName });
+              }}
+            >
+              <button
+                type="button"
+                className={styles.exportBtn}
+                aria-label={tToolbar('importCanvas')}
+                title={rbac.canEdit ? tToolbar('importHint') : tToolbar('permissionRequired')}
+                disabled={!rbac.canEdit && !rbac.loading}
+                data-testid="canvas-import-btn"
+              >
+                {tToolbar('import')}
+              </button>
+            </ImportMenu>
+          </div>
 
           {/* S42-E3: Template Gallery button */}
           <button

@@ -1,0 +1,137 @@
+.panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 320px;
+  background: var(--color-surface, #1a1a2e);
+  border: 1px solid var(--color-border, #2a2a4a);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  z-index: 1000;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.divider {
+  height: 1px;
+  background: var(--color-border, #2a2a4a);
+  margin: 4px 0;
+}
+
+.fileBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 12px;
+  background: var(--color-primary, #6366f1);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.fileBtn:hover {
+  background: var(--color-primary-hover, #4f46e5);
+}
+
+.fileBtn:focus-visible {
+  outline: 2px solid var(--color-focus, #818cf8);
+  outline-offset: 2px;
+}
+
+.formats {
+  font-size: 11px;
+  color: var(--color-text-muted, #9ca3af);
+  text-align: center;
+}
+
+.urlRow {
+  display: flex;
+  gap: 8px;
+}
+
+.urlInput {
+  flex: 1;
+  padding: 6px 10px;
+  background: var(--color-bg, #0f0f1a);
+  border: 1px solid var(--color-border, #2a2a4a);
+  border-radius: 6px;
+  color: var(--color-text, #e5e7eb);
+  font-size: 13px;
+}
+
+.urlInput::placeholder {
+  color: var(--color-text-muted, #9ca3af);
+}
+
+.urlInput:focus {
+  outline: none;
+  border-color: var(--color-focus, #6366f1);
+}
+
+.urlBtn {
+  padding: 6px 12px;
+  background: var(--color-secondary, #10b981);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.urlBtn:hover:not(:disabled) {
+  background: #059669;
+}
+
+.urlBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.dropZone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 24px 16px;
+  border: 2px dashed var(--color-border, #2a2a4a);
+  border-radius: 8px;
+  color: var(--color-text-muted, #9ca3af);
+  font-size: 13px;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+  cursor: default;
+}
+
+.dropActive {
+  border-color: var(--color-primary, #6366f1);
+  color: var(--color-primary, #6366f1);
+  background: rgba(99, 102, 241, 0.08);
+}
+
+.dropError {
+  border-color: #ef4444;
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.08);
+}
+
+.error {
+  padding: 8px 10px;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 6px;
+  color: #fca5a5;
+  font-size: 12px;
+}

@@ -41,6 +41,16 @@ export interface CanvasMeta {
   tags?: string[];
   /** Relation IDs pointing into canvasRelations map (S78-E5) */
   relationIds?: string[];
+  /** S82-E3: Share links associated with this canvas */
+  shareLinks?: CanvasShareLink[];
+}
+
+/** S82-E3: Share link metadata stored in canvas metadata */
+export interface CanvasShareLink {
+  token: string;
+  role: 'viewer' | 'editor';
+  createdAt: string;
+  expiresAt: string | null;
 }
 
 // S76-E3: Indexed search entry (mirrors canvasSearchStore.CanvasIndexEntry for canvas-level search)
@@ -203,6 +213,21 @@ export interface CanvasListState {
   getCanvasRelationsDepth: (canvasId: string, maxDepth?: number) => Array<CanvasRelation & { depth: number }>;
   getRelationStats: (canvasId: string) => { total: number; byType: Record<RelationType, number> };
   detectCircularRelation: (fromId: string, toId: string) => boolean;
+  // S82-E3: Share Link Management
+  /** Canvas ID for which share dialog is open (null = closed) */
+  shareDialogCanvasId: string | null;
+  /** Loading state for share operations */
+  isShareLoading: boolean;
+  /** Error message from last share operation */
+  shareError: string | null;
+  /** Open share dialog for a canvas */
+  openShareDialog: (canvasId: string) => void;
+  /** Close share dialog */
+  closeShareDialog: () => void;
+  /** Add a share link to a canvas metadata */
+  addShareLink: (canvasId: string, token: string, role: 'viewer' | 'editor', expiresAt: string | null) => Promise<void>;
+  /** Remove a share link from a canvas metadata */
+  removeShareLink: (canvasId: string, token: string) => Promise<void>;
 }
 
 // ============================================
@@ -393,6 +418,10 @@ export const useCanvasListStore = create<CanvasListState>((set, get) => ({
   canvasIndex: [], // S76-E3: Fuse.js canvas search index
   canvasFuseIndex: null, // S76-E3: Fuse instance
   scheduledExports: {}, // S78-E4: scheduled export tasks
+  // S82-E3: Share Link Management
+  shareDialogCanvasId: null,
+  isShareLoading: false,
+  shareError: null,
 
   loadCanvases: async () => {
     if (!isIndexedDBAvailable()) {
@@ -1110,6 +1139,60 @@ export const useCanvasListStore = create<CanvasListState>((set, get) => ({
     return false;
   },
 
+  // S82-E3: Share Link Management
+  openShareDialog: (canvasId: string) => {
+    set({ shareDialogCanvasId: canvasId, shareError: null, isShareLoading: false });
+  },
+
+  closeShareDialog: () => {
+    set({ shareDialogCanvasId: null, shareError: null, isShareLoading: false });
+  },
+
+  addShareLink: async (
+    canvasId: string,
+    token: string,
+    role: 'viewer' | 'editor',
+    expiresAt: string | null
+  ) => {
+    set({ isShareLoading: true, shareError: null });
+    try {
+      const canvas = get().canvases.find((c) => c.id === canvasId);
+      if (!canvas) throw new Error('Canvas not found');
+      const newLink: CanvasShareLink = { token, role, createdAt: new Date().toISOString(), expiresAt };
+      const existingLinks = canvas.shareLinks ?? [];
+      const updated: CanvasMeta = {
+        ...canvas,
+        shareLinks: [...existingLinks.filter((l) => l.token !== token), newLink],
+      };
+      await idbPut('canvases', updated);
+      set((state) => ({
+        canvases: state.canvases.map((c) => (c.id === canvasId ? updated : c)),
+        isShareLoading: false,
+      }));
+    } catch (err) {
+      set({ isShareLoading: false, shareError: (err as Error).message });
+    }
+  },
+
+  removeShareLink: async (canvasId: string, token: string) => {
+    set({ isShareLoading: true, shareError: null });
+    try {
+      const canvas = get().canvases.find((c) => c.id === canvasId);
+      if (!canvas) throw new Error('Canvas not found');
+      const updated: CanvasMeta = {
+        ...canvas,
+        shareLinks: (canvas.shareLinks ?? []).filter((l) => l.token !== token),
+      };
+      await idbPut('canvases', updated);
+      set((state) => ({
+        canvases: state.canvases.map((c) => (c.id === canvasId ? updated : c)),
+        isShareLoading: false,
+      }));
+    } catch (err) {
+      set({ isShareLoading: false, shareError: (err as Error).message });
+    }
+  },
+
   $reset: () => set({
     selectedCanvasIds: new Set(),
     canvasIndex: [],
@@ -1117,5 +1200,8 @@ export const useCanvasListStore = create<CanvasListState>((set, get) => ({
     scheduledExports: {},
     canvasRelations: {},
     activeCanvasRelations: [],
+    shareDialogCanvasId: null,
+    isShareLoading: false,
+    shareError: null,
   }),
 }));

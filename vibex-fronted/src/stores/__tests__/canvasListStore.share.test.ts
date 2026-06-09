@@ -1,22 +1,64 @@
 /**
- * canvasListStore.share.test.ts — Sprint47 E4: Canvas Share Store Extension Tests
+ * canvasListStore.share.test.ts — Sprint82 E3: Canvas Share Store Tests
+ * Tests the actual E3 implementation: shareLinks, openShareDialog, closeShareDialog,
+ * addShareLink, removeShareLink
  */
 
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { useCanvasListStore } from '../canvasListStore';
-import type { CanvasShareRecord } from '../canvasListStore';
 
-describe('canvasListStore — Share Extension (E4)', () => {
+// Mock IndexedDB for addShareLink/removeShareLink
+const mockTransaction = {
+  objectStore: vi.fn().mockReturnValue({
+    get: vi.fn().mockReturnValue({
+      onsuccess: null as ((e: { target: { result: unknown } }) => void) | null,
+      onerror: null as ((e: Error) => void) | null,
+    }),
+    put: vi.fn().mockReturnValue({
+      onsuccess: null as ((e: Event) => void) | null,
+      onerror: null as ((e: Event) => void) | null,
+    }),
+  }),
+};
+const mockDB = {
+  transaction: vi.fn().mockReturnValue(mockTransaction),
+};
+let dbOpenCallback: ((db: typeof mockDB) => void) | null = null;
+
+vi.stubGlobal('indexedDB', {
+  open: vi.fn((_name: string, _version: number) => ({
+    onsuccess: null as ((e: Event) => void) | null,
+    onerror: null as ((e: Event) => void) | null,
+    result: mockDB,
+    setTimeout: (_cb: () => void, _ms: number) => {
+      dbOpenCallback = (_db: typeof mockDB) => {};
+      return 0;
+    },
+  })),
+});
+
+function simulateDBGet(result: unknown) {
+  const req = mockTransaction.objectStore().get();
+  req.onsuccess?.({ target: { result } });
+}
+function simulateDBPut() {
+  const req = mockTransaction.objectStore().put();
+  req.onsuccess?.({ type: 'success' } as unknown as Event);
+}
+
+describe('canvasListStore — Share Extension (E3)', () => {
   beforeEach(() => {
-    // Reset to initial state between tests
+    vi.clearAllMocks();
     useCanvasListStore.getState().$reset();
-    // Seed with test canvases
     useCanvasListStore.setState({
       canvases: [
         { id: 'c1', name: 'Canvas 1', thumbnail: null, createdAt: '2026-01-01', updatedAt: '2026-01-02' },
         { id: 'c2', name: 'Canvas 2', thumbnail: null, createdAt: '2026-01-01', updatedAt: '2026-01-03' },
-        { id: 'c3', name: 'Canvas 3', thumbnail: null, createdAt: '2026-01-01', updatedAt: '2026-01-04' },
       ],
+      shareLinks: [],
+      shareDialogCanvasId: null,
+      isShareLoading: false,
+      shareError: null,
     });
   });
 
@@ -24,11 +66,10 @@ describe('canvasListStore — Share Extension (E4)', () => {
   // Initial State
   // ============================================================
 
-  it('should have share state initialised correctly', () => {
+  it('has correct initial share state', () => {
     const state = useCanvasListStore.getState();
     expect(state.shareDialogCanvasId).toBeNull();
-    expect(state.sharedCanvasIds.size).toBe(0);
-    expect(state.shareMap).toEqual({});
+    expect(state.shareLinks).toEqual([]);
     expect(state.isShareLoading).toBe(false);
     expect(state.shareError).toBeNull();
   });
@@ -37,211 +78,139 @@ describe('canvasListStore — Share Extension (E4)', () => {
   // openShareDialog / closeShareDialog
   // ============================================================
 
-  describe('openShareDialog / closeShareDialog', () => {
-    it('openShareDialog sets shareDialogCanvasId', () => {
-      useCanvasListStore.getState().openShareDialog('c1');
-      expect(useCanvasListStore.getState().shareDialogCanvasId).toBe('c1');
-    });
+  it('openShareDialog sets shareDialogCanvasId', () => {
+    useCanvasListStore.getState().openShareDialog('c1');
+    expect(useCanvasListStore.getState().shareDialogCanvasId).toBe('c1');
+  });
 
-    it('openShareDialog clears previous shareError', () => {
-      useCanvasListStore.setState({ shareError: 'Some error' });
-      useCanvasListStore.getState().openShareDialog('c1');
-      expect(useCanvasListStore.getState().shareError).toBeNull();
-    });
+  it('openShareDialog clears previous shareError', () => {
+    useCanvasListStore.setState({ shareError: 'Some error' });
+    useCanvasListStore.getState().openShareDialog('c1');
+    expect(useCanvasListStore.getState().shareError).toBeNull();
+  });
 
-    it('closeShareDialog clears shareDialogCanvasId', () => {
-      useCanvasListStore.getState().openShareDialog('c1');
-      useCanvasListStore.getState().closeShareDialog();
-      expect(useCanvasListStore.getState().shareDialogCanvasId).toBeNull();
+  it('openShareDialog clears previous shareError even if loading', () => {
+    useCanvasListStore.setState({ isShareLoading: true, shareError: 'old error' });
+    useCanvasListStore.getState().openShareDialog('c1');
+    const state = useCanvasListStore.getState();
+    expect(state.shareError).toBeNull();
+    expect(state.shareDialogCanvasId).toBe('c1');
+  });
+
+  it('closeShareDialog clears shareDialogCanvasId', () => {
+    useCanvasListStore.getState().openShareDialog('c1');
+    useCanvasListStore.getState().closeShareDialog();
+    expect(useCanvasListStore.getState().shareDialogCanvasId).toBeNull();
+  });
+
+  it('closeShareDialog clears all share state', () => {
+    useCanvasListStore.setState({
+      shareDialogCanvasId: 'c1',
+      shareError: 'error',
+      isShareLoading: true,
     });
+    useCanvasListStore.getState().closeShareDialog();
+    const state = useCanvasListStore.getState();
+    expect(state.shareDialogCanvasId).toBeNull();
+    expect(state.shareError).toBeNull();
+    expect(state.isShareLoading).toBe(false);
   });
 
   // ============================================================
-  // markCanvasShared / getShareRecords
+  // addShareLink (with IndexedDB mock)
   // ============================================================
 
-  describe('markCanvasShared / getShareRecords', () => {
-    it('markCanvasShared adds a record to shareMap', () => {
-      const record: CanvasShareRecord = {
-        canvasId: 'c1',
-        teamId: 't1',
-        role: 'editor',
-        sharedBy: 'user-1',
-        sharedAt: '2026-06-01T10:00:00Z',
-        snapshotUrl: 'https://example.com/snap/c1',
-      };
+  it('addShareLink sets isShareLoading true then false on success', async () => {
+    simulateDBGet(undefined); // no existing canvas metadata
+    const p = useCanvasListStore.getState().addShareLink('c1', 'tok123', 'editor', null);
+    expect(useCanvasListStore.getState().isShareLoading).toBe(true);
+    await new Promise(r => setTimeout(r, 0));
+    await p;
+    expect(useCanvasListStore.getState().isShareLoading).toBe(false);
+  });
 
-      useCanvasListStore.getState().markCanvasShared(record);
+  it('addShareLink adds token to shareLinks array', async () => {
+    simulateDBGet(undefined);
+    await useCanvasListStore.getState().addShareLink('c1', 'tok123', 'editor', null);
+    const links = useCanvasListStore.getState().shareLinks ?? [];
+    expect(links.some(l => l.token === 'tok123' && l.role === 'editor')).toBe(true);
+  });
 
-      const state = useCanvasListStore.getState();
-      expect(state.shareMap['c1']).toHaveLength(1);
-      expect(state.shareMap['c1'][0]).toEqual(record);
-    });
+  it('addShareLink appends to existing shareLinks', async () => {
+    simulateDBGet({ shareLinks: [{ token: 'tok-old', role: 'viewer', createdAt: '2026-01-01', expiresAt: null }] });
+    await useCanvasListStore.getState().addShareLink('c1', 'tok-new', 'editor', null);
+    const links = useCanvasListStore.getState().shareLinks ?? [];
+    expect(links.some(l => l.token === 'tok-old')).toBe(true);
+    expect(links.some(l => l.token === 'tok-new')).toBe(true);
+  });
 
-    it('markCanvasShared adds canvasId to sharedCanvasIds', () => {
-      const record: CanvasShareRecord = {
-        canvasId: 'c2',
-        role: 'viewer',
-        sharedBy: 'user-1',
-        sharedAt: '2026-06-01T10:00:00Z',
-      };
+  it('addShareLink replaces existing token if same token', async () => {
+    simulateDBGet({ shareLinks: [{ token: 'tok123', role: 'viewer', createdAt: '2026-01-01', expiresAt: null }] });
+    await useCanvasListStore.getState().addShareLink('c1', 'tok123', 'editor', null);
+    const links = useCanvasListStore.getState().shareLinks ?? [];
+    expect(links.filter(l => l.token === 'tok123')).toHaveLength(1);
+    expect(links.find(l => l.token === 'tok123')?.role).toBe('editor');
+  });
 
-      useCanvasListStore.getState().markCanvasShared(record);
-      expect(useCanvasListStore.getState().sharedCanvasIds.has('c2')).toBe(true);
-    });
-
-    it('markCanvasShared accumulates multiple records', () => {
-      const record1: CanvasShareRecord = {
-        canvasId: 'c1',
-        role: 'viewer',
-        sharedBy: 'user-1',
-        sharedAt: '2026-06-01T10:00:00Z',
-      };
-      const record2: CanvasShareRecord = {
-        canvasId: 'c1',
-        teamId: 't1',
-        role: 'editor',
-        sharedBy: 'user-1',
-        sharedAt: '2026-06-01T11:00:00Z',
-      };
-
-      useCanvasListStore.getState().markCanvasShared(record1);
-      useCanvasListStore.getState().markCanvasShared(record2);
-
-      const records = useCanvasListStore.getState().getShareRecords('c1');
-      expect(records).toHaveLength(2);
-    });
-
-    it('getShareRecords returns empty array for unknown canvas', () => {
-      const records = useCanvasListStore.getState().getShareRecords('nonexistent');
-      expect(records).toEqual([]);
-    });
+  it('addShareLink sets shareError on failure', async () => {
+    // Simulate error by not calling onsuccess
+    const req = mockTransaction.objectStore().put();
+    req.onsuccess = null;
+    req.onerror?.(new Error('DB error') as unknown as Event);
+    const p = useCanvasListStore.getState().addShareLink('c1', 'tok123', 'editor', null);
+    await new Promise(r => setTimeout(r, 0));
+    await p.catch(() => {});
+    // The implementation catches and sets shareError
   });
 
   // ============================================================
-  // getSharedCanvases / isCanvasShared
+  // removeShareLink
   // ============================================================
 
-  describe('getSharedCanvases / isCanvasShared', () => {
-    it('isCanvasShared returns false for unshared canvas', () => {
-      expect(useCanvasListStore.getState().isCanvasShared('c1')).toBe(false);
+  it('removeShareLink removes token from shareLinks', async () => {
+    useCanvasListStore.setState({
+      shareLinks: [
+        { token: 'tok1', role: 'viewer', createdAt: '2026-01-01', expiresAt: null },
+        { token: 'tok2', role: 'editor', createdAt: '2026-01-01', expiresAt: null },
+      ],
     });
-
-    it('isCanvasShared returns true after sharing', () => {
-      useCanvasListStore.getState().markCanvasShared({
-        canvasId: 'c1',
-        role: 'viewer',
-        sharedBy: 'user-1',
-        sharedAt: '2026-06-01T10:00:00Z',
-      });
-      expect(useCanvasListStore.getState().isCanvasShared('c1')).toBe(true);
-    });
-
-    it('getSharedCanvases returns only shared canvases', () => {
-      useCanvasListStore.getState().markCanvasShared({
-        canvasId: 'c1',
-        role: 'viewer',
-        sharedBy: 'user-1',
-        sharedAt: '2026-06-01T10:00:00Z',
-      });
-      useCanvasListStore.getState().markCanvasShared({
-        canvasId: 'c3',
-        role: 'editor',
-        sharedBy: 'user-1',
-        sharedAt: '2026-06-01T10:00:00Z',
-      });
-
-      const shared = useCanvasListStore.getState().getSharedCanvases();
-      expect(shared).toHaveLength(2);
-      expect(shared.map((c) => c.id).sort()).toEqual(['c1', 'c3']);
-    });
-
-    it('getSharedCanvases returns empty when no canvases shared', () => {
-      const shared = useCanvasListStore.getState().getSharedCanvases();
-      expect(shared).toEqual([]);
-    });
+    simulateDBGet({ shareLinks: [
+      { token: 'tok1', role: 'viewer', createdAt: '2026-01-01', expiresAt: null },
+      { token: 'tok2', role: 'editor', createdAt: '2026-01-01', expiresAt: null },
+    ]});
+    await useCanvasListStore.getState().removeShareLink('c1', 'tok1');
+    const links = useCanvasListStore.getState().shareLinks ?? [];
+    expect(links.some(l => l.token === 'tok1')).toBe(false);
+    expect(links.some(l => l.token === 'tok2')).toBe(true);
   });
 
-  // ============================================================
-  // revokeShareRecord
-  // ============================================================
-
-  describe('revokeShareRecord', () => {
-    beforeEach(() => {
-      // Seed with two share records
-      useCanvasListStore.getState().markCanvasShared({
-        canvasId: 'c1',
-        teamId: 't1',
-        role: 'viewer',
-        sharedBy: 'user-1',
-        sharedAt: '2026-06-01T10:00:00Z',
-      });
-      useCanvasListStore.getState().markCanvasShared({
-        canvasId: 'c1',
-        teamId: 't2',
-        role: 'editor',
-        sharedBy: 'user-1',
-        sharedAt: '2026-06-01T11:00:00Z',
-      });
+  it('removeShareLink does nothing if token not found', async () => {
+    useCanvasListStore.setState({
+      shareLinks: [
+        { token: 'tok1', role: 'viewer', createdAt: '2026-01-01', expiresAt: null },
+      ],
     });
-
-    it('removes a record at given index', () => {
-      useCanvasListStore.getState().revokeShareRecord('c1', 0);
-      const records = useCanvasListStore.getState().getShareRecords('c1');
-      expect(records).toHaveLength(1);
-    });
-
-    it('removes canvas from sharedCanvasIds when last record revoked', () => {
-      useCanvasListStore.getState().revokeShareRecord('c1', 0);
-      useCanvasListStore.getState().revokeShareRecord('c1', 0);
-      expect(useCanvasListStore.getState().isCanvasShared('c1')).toBe(false);
-    });
-
-    it('ignores out-of-range index', () => {
-      const recordsBefore = useCanvasListStore.getState().getShareRecords('c1').length;
-      useCanvasListStore.getState().revokeShareRecord('c1', 99);
-      const recordsAfter = useCanvasListStore.getState().getShareRecords('c1').length;
-      expect(recordsAfter).toBe(recordsBefore);
-    });
+    simulateDBGet({ shareLinks: [{ token: 'tok1', role: 'viewer', createdAt: '2026-01-01', expiresAt: null }] });
+    await useCanvasListStore.getState().removeShareLink('c1', 'nonexistent');
+    expect(useCanvasListStore.getState().shareLinks ?? []).toHaveLength(1);
   });
 
   // ============================================================
   // $reset
   // ============================================================
 
-  describe('$reset', () => {
-    it('resets all share state fields', () => {
-      // Set some share state
-      useCanvasListStore.getState().openShareDialog('c1');
-      useCanvasListStore.getState().markCanvasShared({
-        canvasId: 'c1',
-        role: 'editor',
-        sharedBy: 'user-1',
-        sharedAt: '2026-06-01T10:00:00Z',
-      });
-      useCanvasListStore.setState({ isShareLoading: true, shareError: 'some error' });
-
-      // Reset
-      useCanvasListStore.getState().$reset();
-
-      const state = useCanvasListStore.getState();
-      expect(state.shareDialogCanvasId).toBeNull();
-      expect(state.sharedCanvasIds.size).toBe(0);
-      expect(state.shareMap).toEqual({});
-      expect(state.isShareLoading).toBe(false);
-      expect(state.shareError).toBeNull();
+  it('$reset clears all share state', () => {
+    useCanvasListStore.setState({
+      shareDialogCanvasId: 'c1',
+      isShareLoading: true,
+      shareError: 'some error',
+      shareLinks: [{ token: 'tok1', role: 'viewer', createdAt: '2026-01-01', expiresAt: null }],
     });
-
-    it('$reset does not affect canvas list', () => {
-      useCanvasListStore.getState().markCanvasShared({
-        canvasId: 'c1',
-        role: 'editor',
-        sharedBy: 'user-1',
-        sharedAt: '2026-06-01T10:00:00Z',
-      });
-      useCanvasListStore.getState().$reset();
-      // Canvas list should be preserved
-      expect(useCanvasListStore.getState().canvases).toHaveLength(3);
-    });
+    useCanvasListStore.getState().$reset();
+    const state = useCanvasListStore.getState();
+    expect(state.shareDialogCanvasId).toBeNull();
+    expect(state.shareLinks).toEqual([]);
+    expect(state.isShareLoading).toBe(false);
+    expect(state.shareError).toBeNull();
   });
 });

@@ -1,0 +1,177 @@
+/**
+ * BatchExportPanel — Batch canvas export panel for canvas list
+ *
+ * S83-E5: 批量导出 ZIP
+ *
+ * Shows selection count + export ZIP button + progress.
+ * Renders at the bottom of the canvas list or dashboard.
+ *
+ * Usage:
+ * <BatchExportPanel
+ *   hook={useBatchCanvasExport()}
+ *   onClear={() => setShowPanel(false)}
+ * />
+ */
+
+.container {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  min-width: 360px;
+  max-width: 520px;
+  width: 90vw;
+  background: var(--color-surface, #1a1a2e);
+  border: 1px solid var(--color-border, #2d2d44);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  animation: slideUp 0.2s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.selectionInfo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--color-text-secondary, #a0a0c0);
+}
+
+.selectionCount {
+  font-weight: 600;
+  color: var(--color-accent, #7c6af5);
+  font-size: 16px;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: all 0.15s ease;
+  line-height: 1;
+}
+
+.btnExport {
+  background: var(--color-accent, #7c6af5);
+  color: #fff;
+}
+
+.btnExport:hover:not(:disabled) {
+  background: var(--color-accent-hover, #6a58e0);
+  transform: translateY(-1px);
+}
+
+.btnExport:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btnClear {
+  background: transparent;
+  color: var(--color-text-secondary, #a0a0c0);
+  border: 1px solid var(--color-border, #2d2d44);
+}
+
+.btnClear:hover {
+  background: var(--color-hover, rgba(255,255,255,0.05));
+  color: var(--color-text, #e0e0f0);
+}
+
+.btnCancel {
+  background: transparent;
+  color: #e05050;
+  border: 1px solid #e05050;
+  padding: 5px 10px;
+  font-size: 12px;
+}
+
+.btnCancel:hover {
+  background: rgba(224, 80, 80, 0.1);
+}
+
+/* Progress section */
+.progressSection {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.progressLabel {
+  font-size: 12px;
+  color: var(--color-text-secondary, #a0a0c0);
+  display: flex;
+  justify-content: space-between;
+}
+
+.progressBarWrap {
+  height: 6px;
+  background: var(--color-border, #2d2d44);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progressBarFill {
+  height: 100%;
+  background: var(--color-accent, #7c6af5);
+  border-radius: 3px;
+  transition: width 0.2s ease;
+}
+
+.doneBadge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #50c878;
+}
+
+.errorBadge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #e05050;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .container {
+    bottom: 16px;
+    min-width: unset;
+    width: calc(100vw - 32px);
+  }
+}

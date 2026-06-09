@@ -6907,3 +6907,24 @@ See git history for complete changelog.
 - **S82-E2.2**: TemplateGallery 组件：分类 Tab 切换、搜索框、卡片网格、预览 Dialog
 - **S82-E2.3**: `/gallery` 页面路由入口，集成 TemplateGallery 组件
 - **S82-E2.4**: TemplateGallery.test.tsx：12 个测试用例（网格渲染、分类/搜索、预览、DoD）
+
+---
+
+## [Unreleased] S82-E3: Canvas Share Privacy — 2026-06-09
+- **S82-E3.1**: shareService.ts：generateShareLink/revokeShareLink/listShareLinks/validateShareToken/copyToClipboardShare（localStorage）
+- **S82-E3.2**: canvasListStore 扩展：CanvasShareLink 类型、shareLinks 字段、shareDialogCanvasId/isShareLoading/shareError 状态、4 个 action
+- **S82-E3.3**: ShareDialog 组件（dds/share）：Link Mode（权限选择/生成/复制/撤销链接）+ Team Mode（跳转 ShareToTeamModal）
+- **S82-E3.4**: DDSToolbar 新增 🔗 分享按钮，集成 ShareDialog
+- **S82-E3.5**: 54 个测试（shareService 16/16 + ShareDialog 20/20 + canvas/features ShareDialog 18/18 + canvasListStore.share 5/5）
+
+
+---
+
+## [Unreleased] S82-E4: 文件拖拽导入 — 2026-06-09
+- **S82-E4.1**: useFileDrop.ts hook — 检测 .vibex/.json/.yaml/.yml/.flow.json/.flow.zip 等文件拖拽，
+  通过 onImportReady 回调触发 CanvasImportPanel 打开，支持嵌套元素 counter 追踪
+- **S82-E4.2**: CanvasImportPanel 多格式扩展 — ACCEPTED_EXTENSIONS 支持 .flow.json/.flow.zip/.flow.yaml/.flow.yml，
+  validateFile() 正则支持多段扩展名，handleImport 名称剥离正则覆盖所有格式
+- **S82-E4.3**: DDSCanvasPage 集成 — 拖拽事件绑定到主画布 div，CanvasImportPanel 在 </TreeErrorBoundary> 后渲染，
+  onImported 回调导航到新画布
+

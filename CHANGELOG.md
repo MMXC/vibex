@@ -1,3 +1,17 @@
+
+
+## [Unreleased] S83-E2: 导入链接画布 — 2026-06-10
+- **Backend**: `/v1/canvas-share/import` GET/POST endpoints — public share token validation + canvas import API
+- **Backend**: `/v1/canvas-share/import/register` POST — register share tokens from frontend
+- **Backend**: `/v1/canvas-share/import/revoke` DELETE — revoke share tokens
+- **Frontend**: `canvasShareApi.validateShareToken()` + `registerShareToken()` + `importCanvas()` API clients
+- **Frontend**: `shareService.ts` now syncs tokens to backend on generate/revoke
+- **Component**: `ImportShareDialog.tsx` — modal for previewing and confirming share link imports
+- **Integration**: `DDSCanvasPage.tsx` reads `?import=<token>` URL param and opens ImportShareDialog
+- **Route**: `dds-canvas/page.tsx` passes `importShareToken` prop to DDSCanvasPage
+- **Tests**: `ImportShareDialog.test.tsx` vitest suite
+
+
 ## [Unreleased] S82-E5: 自动解决策略 + WS 冲突触发 — 2026-06-09
 - **vibex-fronted/ConflictDialog.tsx**: 新增 `showAutoResolve` / `onAutoResolve` props + `AutoResolveStrategy` 类型（'auto-merge' / 'keep-mine' / 'keep-theirs'）
 - **vibex-fronted/ConflictDialog.module.css**: 新增红色冲突高亮 `.conflictHighlight`（2px #ef4444 边框 + 背景 + pulse 动画）

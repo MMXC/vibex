@@ -20,11 +20,13 @@ function DDSCanvasContent() {
   const searchParams = useSearchParams();
   const projectId = searchParams.get('projectId') ?? '';
   const agentSession = searchParams.get('agentSession') ?? null;
+  const importShareToken = searchParams.get('import') ?? null;
 
   return (
     <DDSCanvasPage
       projectId={projectId}
       agentSession={agentSession}
+      importShareToken={importShareToken}
     />
   );
 }

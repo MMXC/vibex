@@ -68,4 +68,45 @@ export const canvasShareApi = {
       method: 'DELETE',
       body: JSON.stringify({ canvasId, teamId }),
     }),
+
+  /**
+   * Register a share token with the backend.
+   * Called by shareService when generateShareLink() is invoked.
+   * Ensures the token is available for import-from-share validation.
+   */
+  registerShareToken: (data: { token: string; canvasId: string; role: ShareRole; expiresAt?: string | null }) =>
+    fetchCS<{ success: boolean; token: string }>(`${API_BASE}/v1/canvas-share/import/register`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+
+  /**
+   * Validate a share token and retrieve canvas data for import.
+   * Public endpoint — no auth required.
+   * Returns canvas metadata and data if the token is valid.
+   */
+  validateShareToken: (token: string) =>
+    fetchCS<{
+      success: boolean;
+      token: string;
+      canvasId: string;
+      canvasName: string | null;
+      canvasVersion: number | null;
+      role: ShareRole;
+      expiresAt: string | null;
+      canvasData: unknown | null;
+    }>(`${API_BASE}/v1/canvas-share/import`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token }),
+    }),
+
+  /**
+   * Revoke a share token (delete it from the backend store).
+   */
+  revokeShareToken: (token: string) =>
+    fetchCS<{ success: boolean }>(
+      `${API_BASE}/v1/canvas-share/import?token=${encodeURIComponent(token)}`,
+      { method: 'DELETE' }
+    ),
 };

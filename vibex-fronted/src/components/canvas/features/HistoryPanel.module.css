@@ -439,3 +439,11 @@
 .confirmBtn:hover {
   background: #4a58b0;
 }
+
+/* S83-E1: Timeline tab container */
+.timelineTab {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}

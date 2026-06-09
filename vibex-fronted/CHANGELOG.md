@@ -6940,3 +6940,25 @@ See git history for complete changelog.
 - **S82-E4.3**: DDSCanvasPage 集成 — 拖拽事件绑定到主画布 div，CanvasImportPanel 在 </TreeErrorBoundary> 后渲染，
   onImported 回调导航到新画布
 
+
+---
+
+## [Unreleased] S83-E1: 画布版本历史时间轴 — 2026-06-10
+- **src/stores/dds/canvasTimelineStore.ts**: 新建 timeline 状态管理（zoomLevel/activeBranch/selectedRange/previewSnapshotId）
+- **src/stores/dds/canvasTimelineStore.ts**: `filterSnapshotsByZoom()` / `getUniqueBranches()` / `getTickWidth()` 辅助函数
+- **src/components/dds/history/VersionTimeline.tsx**: 新建增强时间轴组件（带 zoom 控件 + 分支筛选）
+- **src/components/dds/history/VersionTimeline.tsx**: 4级 zoom 控制（1小时/1天/1周/1月）+ 分支下拉筛选 + 时间轴卡片操作
+- **src/components/dds/history/VersionTimeline.module.css**: 新建样式文件
+- **src/components/canvas/features/HistoryPanel.tsx**: 新增"时间轴"Tab，集成 VersionTimeline
+- **src/components/canvas/features/HistoryPanel.module.css**: 新增 `.timelineTab` 容器样式
+- **src/components/dds/history/__tests__/VersionTimeline.test.tsx**: 10+ 单元测试（zoom/branch/rendering/actions）
+- **vitest**: VersionTimeline.test.tsx 全部通过
+
+## [Unreleased] S83-E1: 画布版本历史时间轴 — 2026-06-10
+- **VersionTimeline.tsx**: 新建时间轴组件，支持缩放（hour/day/week/month）、分支筛选、时间范围选择、快照预览
+- **VersionTimeline.module.css**: 时间轴样式（.timeline / .zoomControls / .timelineBody / .card / .actions）
+- **canvasTimelineStore.ts**: 新建 Zustand store——zoomLevel / activeBranch / selectedRange / previewSnapshotId + 辅助函数
+- **HistoryPanel.tsx**: 新增 'timeline' Tab，整合 VersionTimeline 组件渲染至 HistoryPanel 侧边栏
+- **HistoryPanel.module.css**: timeline Tab 相关样式
+- **VersionTimeline.test.tsx**: 21 个单元测试全部通过 ✅
+

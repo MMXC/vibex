@@ -6939,3 +6939,29 @@ See git history for complete changelog.
 - **S82-E4.3**: DDSCanvasPage 集成 — 拖拽事件绑定到主画布 div，CanvasImportPanel 在 </TreeErrorBoundary> 后渲染，
   onImported 回调导航到新画布
 
+
+---
+
+## [Unreleased] S83-E1: 画布版本历史时间轴 — 2026-06-10
+- **vibex-fronted/src/stores/dds/canvasTimelineStore.ts**: 新建 timeline 状态管理（zoomLevel/activeBranch/selectedRange/previewSnapshotId）
+- **vibex-fronted/src/stores/dds/canvasTimelineStore.ts**: `filterSnapshotsByZoom()` — 按 zoom level 过滤快照（hour/day/week/month）
+- **vibex-fronted/src/stores/dds/canvasTimelineStore.ts**: `getUniqueBranches()` / `getTickWidth()` 辅助函数
+- **vibex-fronted/src/components/dds/history/VersionTimeline.tsx**: 新建增强时间轴组件（带 zoom 控件 + 分支筛选）
+- **vibex-fronted/src/components/dds/history/VersionTimeline.tsx**: 4级 zoom 控制（1小时/1天/1周/1月）+ 分支下拉筛选
+- **vibex-fronted/src/components/dds/history/VersionTimeline.tsx**: 时间轴节点样式（星标/当前/普通）+ 操作按钮（收藏/对比/恢复/删除）
+- **vibex-fronted/src/components/dds/history/VersionTimeline.module.css**: 新建样式文件
+- **vibex-fronted/src/components/canvas/features/HistoryPanel.tsx**: 新增"时间轴"Tab（Tab='timeline'），集成 VersionTimeline 组件
+- **vibex-fronted/src/components/canvas/features/HistoryPanel.module.css**: 新增 `.timelineTab` 容器样式
+- **vibex-fronted/src/components/dds/history/__tests__/VersionTimeline.test.tsx**: 10+ 单元测试
+- **vitest**: VersionTimeline.test.tsx 全部通过
+
+## [Unreleased] S83-E1: 画布版本历史时间轴 — 2026-06-10
+- **vibex-fronted/src/components/dds/history/VersionTimeline.tsx**: 新建时间轴组件，支持缩放（hour/day/week/month）、分支筛选、时间范围选择、快照预览
+- **vibex-fronted/src/components/dds/history/VersionTimeline.module.css**: 时间轴样式（.timeline / .zoomControls / .timelineBody / .card / .actions）
+- **vibex-fronted/src/stores/dds/canvasTimelineStore.ts**: 新建 Zustand store——zoomLevel / activeBranch / selectedRange / previewSnapshotId 状态 + setZoomLevel / zoomIn / zoomOut / setActiveBranch actions
+- **vibex-fronted/src/stores/dds/canvasTimelineStore.ts**: 导出辅助函数 filterSnapshotsByZoom / getUniqueBranches / getTickWidth
+- **vibex-fronted/src/components/canvas/features/HistoryPanel.tsx**: 新增 'timeline' Tab，整合 VersionTimeline 组件渲染至 HistoryPanel 侧边栏
+- **vibex-fronted/src/components/canvas/features/HistoryPanel.module.css**: timeline Tab 相关样式
+- **vibex-fronted/src/components/dds/history/__tests__/VersionTimeline.test.tsx**: 21 个单元测试（空状态/缩放控制/时间轴渲染/操作/键盘/分支筛选）全部通过
+- **vitest**: 21/21 通过 ✅
+

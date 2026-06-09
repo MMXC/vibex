@@ -6898,3 +6898,11 @@ See git history for complete changelog.
 - **canvasHistoryStore.ts**: 新增 `switchBranch`、`diffBranches`、`loadBranch` 方法
 - **MergeHistoryPanel.tsx**: 合并历史面板 (时间线/展开/导出)
 - **MergeHistoryPanel.test.tsx**: 15/15 测试
+
+---
+
+## [Unreleased] S82-E2: Template Gallery UI — 2026-06-09
+- **S82-E2.1**: TemplateCard 组件：缩略图/图标、标题、描述、分类标签、收藏按钮
+- **S82-E2.2**: TemplateGallery 组件：分类 Tab 切换、搜索框、卡片网格、预览 Dialog
+- **S82-E2.3**: `/gallery` 页面路由入口，集成 TemplateGallery 组件
+- **S82-E2.4**: TemplateGallery.test.tsx：12 个测试用例（网格渲染、分类/搜索、预览、DoD）

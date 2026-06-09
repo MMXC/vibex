@@ -1,0 +1,355 @@
+/**
+ * ShareDialog.module.css — Sprint82 E3
+ * Modal overlay + dialog styles following VibeX design system.
+ */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(2px);
+}
+
+.dialog {
+  background: var(--color-surface, #1e1e2e);
+  border: 1px solid var(--color-border, #3a3a5c);
+  border-radius: 12px;
+  width: min(480px, 90vw);
+  max-height: 90vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 20px 20px 12px;
+  border-bottom: 1px solid var(--color-border, #3a3a5c);
+  position: relative;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-text-primary, #e5e7eb);
+  margin: 0;
+  flex: 1;
+}
+
+.subtitle {
+  font-size: 13px;
+  color: var(--color-text-secondary, #9ca3af);
+  margin: 4px 0 0;
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  color: var(--color-text-muted, #6b7280);
+  cursor: pointer;
+  font-size: 16px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  line-height: 1;
+  flex-shrink: 0;
+  transition: color 0.15s;
+}
+
+.closeBtn:hover {
+  color: var(--color-text-primary, #e5e7eb);
+}
+
+.body {
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  flex: 1;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-secondary, #9ca3af);
+}
+
+.select {
+  background: var(--color-bg-secondary, #2a2a3e);
+  border: 1px solid var(--color-border, #3a3a5c);
+  border-radius: 8px;
+  color: var(--color-text-primary, #e5e7eb);
+  font-size: 14px;
+  padding: 8px 12px;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.select:focus {
+  border-color: var(--color-accent, #6366f1);
+}
+
+.linkArea {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.urlRow {
+  display: flex;
+  gap: 8px;
+}
+
+.urlInput {
+  flex: 1;
+  background: var(--color-bg-secondary, #2a2a3e);
+  border: 1px solid var(--color-border, #3a3a5c);
+  border-radius: 8px;
+  color: var(--color-text-primary, #e5e7eb);
+  font-size: 13px;
+  padding: 8px 12px;
+  outline: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.copyBtn {
+  background: var(--color-accent, #6366f1);
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 8px 14px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.15s, background-color 0.15s;
+  flex-shrink: 0;
+}
+
+.copyBtn:hover {
+  opacity: 0.85;
+}
+
+.copyBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.copyBtn.copied {
+  background: #16a34a;
+}
+
+.generateBtn {
+  background: var(--color-accent, #6366f1);
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 10px;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.generateBtn:hover {
+  opacity: 0.85;
+}
+
+.generateBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.hint {
+  font-size: 12px;
+  color: var(--color-text-muted, #6b7280);
+  margin: 0;
+}
+
+.noLink {
+  font-size: 14px;
+  color: var(--color-text-muted, #6b7280);
+  text-align: center;
+  margin: 0;
+}
+
+.revokeBtn {
+  background: none;
+  border: 1px solid #ef4444;
+  border-radius: 8px;
+  color: #ef4444;
+  font-size: 13px;
+  padding: 6px 12px;
+  cursor: pointer;
+  align-self: flex-start;
+  transition: background-color 0.15s;
+}
+
+.revokeBtn:hover {
+  background-color: rgba(239, 68, 68, 0.1);
+}
+
+.revokeBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.loading {
+  font-size: 14px;
+  color: var(--color-text-muted, #6b7280);
+  text-align: center;
+  margin: 0;
+}
+
+.otherLinks {
+  border-top: 1px solid var(--color-border, #3a3a5c);
+  padding-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.otherLinksTitle {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-secondary, #9ca3af);
+  margin: 0 0 4px;
+}
+
+.otherLinkItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.otherLinkRole {
+  color: var(--color-text-primary, #e5e7eb);
+  flex: 1;
+}
+
+.otherLinkDate {
+  color: var(--color-text-muted, #6b7280);
+  font-size: 12px;
+}
+
+.revokeSmallBtn {
+  background: none;
+  border: none;
+  color: #ef4444;
+  cursor: pointer;
+  font-size: 12px;
+  padding: 2px 4px;
+  border-radius: 4px;
+  transition: background-color 0.15s;
+}
+
+.revokeSmallBtn:hover {
+  background-color: rgba(239, 68, 68, 0.1);
+}
+
+.revokeSmallBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.error {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid #ef4444;
+  border-radius: 8px;
+  color: #ef4444;
+  font-size: 13px;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.dismissError {
+  background: none;
+  border: none;
+  color: #ef4444;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 0 2px;
+  flex-shrink: 0;
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 12px 20px 20px;
+  border-top: 1px solid var(--color-border, #3a3a5c);
+}
+
+.teamShareBtn {
+  background: none;
+  border: 1px solid var(--color-border, #3a3a5c);
+  border-radius: 8px;
+  color: var(--color-text-secondary, #9ca3af);
+  font-size: 13px;
+  padding: 8px 14px;
+  cursor: pointer;
+  margin-right: auto;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.teamShareBtn:hover {
+  border-color: var(--color-text-secondary, #9ca3af);
+  color: var(--color-text-primary, #e5e7eb);
+}
+
+.cancelBtn {
+  background: none;
+  border: 1px solid var(--color-border, #3a3a5c);
+  border-radius: 8px;
+  color: var(--color-text-secondary, #9ca3af);
+  font-size: 14px;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.cancelBtn:hover {
+  border-color: var(--color-text-secondary, #9ca3af);
+  color: var(--color-text-primary, #e5e7eb);
+}
+
+.saveBtn {
+  background: var(--color-accent, #6366f1);
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.saveBtn:hover {
+  opacity: 0.85;
+}
+
+.saveBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

@@ -36,6 +36,8 @@ import { ImportMenu } from './ImportMenu';
 import { OnlineUsers } from './OnlineUsers';
 import { OfflineIndicator } from './OfflineIndicator';
 import { PresencePanel } from '@/components/presence/PresencePanel';
+import { ShareDialog } from '@/components/dds/share/ShareDialog';
+import { useCanvasListStore } from '@/stores/canvasListStore';
 import { ViewPresetsPanel } from './ViewPresetsPanel';
 import { useTranslations } from '@/hooks/useTranslations';
 import { useLanguage } from '@/hooks/settings/useLanguage';
@@ -284,6 +286,12 @@ export const DDSToolbar = memo(function DDSToolbar({
   // S79-E2: Notification panel state
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const unreadCount = useNotificationStore((s) => s.getUnreadCount());
+  // S82-E3: Share dialog state
+  const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
+  const activeCanvasId = useCanvasListStore((s) => s.activeCanvasId);
+  const activeCanvas = useCanvasListStore((s) =>
+    s.canvases.find((c) => c.id === activeCanvasId)
+  );
 
   // E3-S3: RBAC for toolbar actions
   const rbac = useCanvasRBAC(projectId);
@@ -558,6 +566,17 @@ export const DDSToolbar = memo(function DDSToolbar({
             title="设置中心"
           >
             ⚙️
+          </button>
+
+          {/* S82-E3: Share link button */}
+          <button
+            type="button"
+            className={styles.exportBtn}
+            onClick={() => setIsShareDialogOpen(true)}
+            aria-label="分享画布"
+            title="分享画布"
+          >
+            🔗
           </button>
 
           {/* S77-E2: Connection status indicator */}
@@ -1183,6 +1202,28 @@ export const DDSToolbar = memo(function DDSToolbar({
       <SettingsModal
         open={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
+      />
+
+      {/* S82-E3: Share Dialog */}
+      <ShareDialog
+        isOpen={isShareDialogOpen}
+        canvasId={activeCanvasId ?? ''}
+        canvasName={activeCanvas?.name}
+        onClose={() => setIsShareDialogOpen(false)}
+        onSave={(token, role) => {
+          if (activeCanvasId && token) {
+            useCanvasListStore.getState().addShareLink(
+              activeCanvasId,
+              token,
+              role as 'viewer' | 'editor',
+              null
+            );
+          }
+        }}
+        onTeamShareRequest={() => {
+          setIsShareDialogOpen(false);
+          setShareToTeamModalOpen(true);
+        }}
       />
     </>
   );

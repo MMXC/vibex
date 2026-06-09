@@ -64,6 +64,8 @@ import { useConflictStore } from '@/stores/dds/conflictStore';
 import { PerformanceMonitor } from '@/components/dds/canvas/PerformanceMonitor';
 import { ConflictDialog } from '@/components/dds/canvas-dashboard/ConflictDialog';
 import { ConflictResolutionDialog } from '@/components/dds/canvas-dashboard/ConflictResolutionDialog';
+import { ConflictConfirmToast } from '@/components/dds/canvas-dashboard/ConflictConfirmToast';
+import type { AutoResolveStrategy } from '@/components/dds/canvas-dashboard/ConflictConfirmToast';
 // S76-E5: Conflict detection banner
 import { ConflictWarningBanner } from '@/components/dds/canvas-dashboard/ConflictWarningBanner/ConflictWarningBanner';
 import { usePresenceStore } from '@/lib/collaboration/presenceStore';
@@ -291,6 +293,23 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
   // E1 (Sprint70): Branch merge conflict dialog state
   const [mergeConflictOpen, setMergeConflictOpen] = useState(false);
   const [mergeConflictError, setMergeConflictError] = useState<string | null>(null);
+
+  // S83-E3: Conflict confirmation toast state
+  const [conflictConfirmVisible, setConflictConfirmVisible] = useState(false);
+  const [conflictConfirmStrategy, setConflictConfirmStrategy] = useState<AutoResolveStrategy | null>(null);
+
+  // S83-E3: Handle conflict resolution strategy chosen
+  const handleConflictResolved = useCallback((strategy: AutoResolveStrategy) => {
+    setConflictConfirmStrategy(strategy);
+    setConflictConfirmVisible(true);
+  }, []);
+
+  // S83-E3: Handle viewing details (placeholder — can be extended to show diff)
+  const handleConflictDetails = useCallback(() => {
+    // TODO(S83-E3): Navigate to a details panel or open a diff modal
+    // e.g., setShowDiffPanel(true);
+    setConflictConfirmVisible(false);
+  }, []);
 
   // E4 (Sprint70): Collaboration conflict dialog state
   const [collabConflictOpen, setCollabConflictOpen] = useState(false);
@@ -1257,6 +1276,7 @@ const { onCursorMove, broadcastCursor } = useWebSocketPresence({
           canvasId={projectId}
           onResolved={handleMergeResolve}
           onClose={() => setMergeConflictOpen(false)}
+          onAutoResolved={handleConflictResolved}
         />
       );
     })()}
@@ -1335,6 +1355,14 @@ const { onCursorMove, broadcastCursor } = useWebSocketPresence({
       isOpen={importShareOpen}
       shareToken={importShareTokenState ?? ''}
       onClose={handleImportShareClose}
+    />
+
+    {/* S83-E3: Conflict confirm toast — shown after auto-resolve strategy is chosen */}
+    <ConflictConfirmToast
+      visible={conflictConfirmVisible}
+      strategy={conflictConfirmStrategy}
+      onDetails={handleConflictDetails}
+      onDismiss={() => setConflictConfirmVisible(false)}
     />
     </>
   );

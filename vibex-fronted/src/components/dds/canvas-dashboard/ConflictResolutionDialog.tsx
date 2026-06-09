@@ -6,6 +6,8 @@
  * 1. Keep my version — discard the remote changes
  * 2. Keep their version — discard local changes
  * 3. Merge both — attempt a content-level merge
+ *
+ * S83-E3: Added onAutoResolved callback to notify parent of the chosen strategy.
  */
 
 'use client';
@@ -13,6 +15,7 @@
 import React, { memo, useCallback } from 'react';
 import { useCanvasHistoryStore } from '@/stores/dds/canvasHistoryStore';
 import type { BranchConflict } from '@/stores/dds/canvasHistoryStore';
+import type { AutoResolveStrategy } from './ConflictConfirmToast';
 
 export interface ConflictResolutionDialogProps {
   /** Whether the dialog is open */
@@ -23,6 +26,8 @@ export interface ConflictResolutionDialogProps {
   onResolved: () => void;
   /** Called when user cancels */
   onClose: () => void;
+  /** S83-E3: Called when a resolution strategy is chosen (before checking if more conflicts remain) */
+  onAutoResolved?: (strategy: AutoResolveStrategy) => void;
 }
 
 const ConflictResolutionDialog = memo(function ConflictResolutionDialog({
@@ -30,6 +35,7 @@ const ConflictResolutionDialog = memo(function ConflictResolutionDialog({
   canvasId,
   onResolved,
   onClose,
+  onAutoResolved,
 }: ConflictResolutionDialogProps) {
   const pendingConflicts = useCanvasHistoryStore((s) => s.pendingConflicts);
   const resolveBranchConflict = useCanvasHistoryStore((s) => s.resolveBranchConflict);
@@ -37,9 +43,22 @@ const ConflictResolutionDialog = memo(function ConflictResolutionDialog({
 
   const currentConflict = pendingConflicts[0] ?? null;
 
+  // S83-E3: Map resolution type to AutoResolveStrategy
+  const mapStrategy = (resolution: 'keep-local' | 'keep-remote' | 'merge'): AutoResolveStrategy => {
+    switch (resolution) {
+      case 'keep-local': return 'keep-mine';
+      case 'keep-remote': return 'keep-theirs';
+      case 'merge': return 'auto-merge';
+    }
+  };
+
   const handleResolve = useCallback(
     async (resolution: 'keep-local' | 'keep-remote' | 'merge') => {
       if (!currentConflict) return;
+      // S83-E3: Notify parent of the chosen strategy
+      if (onAutoResolved) {
+        onAutoResolved(mapStrategy(resolution));
+      }
       await resolveBranchConflict(
         canvasId,
         currentConflict.nodeId,
@@ -52,7 +71,7 @@ const ConflictResolutionDialog = memo(function ConflictResolutionDialog({
         onResolved();
       }
     },
-    [currentConflict, resolveBranchConflict, pendingConflicts, clearPendingConflicts, canvasId, onResolved],
+    [currentConflict, resolveBranchConflict, pendingConflicts, clearPendingConflicts, canvasId, onResolved, onAutoResolved],
   );
 
   const handleCancel = useCallback(() => {

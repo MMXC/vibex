@@ -1,5 +1,14 @@
 
 
+## [Unreleased] S83-E3: 协作者冲突确认反馈 — 2026-06-17
+- **Component**: 新增 `ConflictConfirmToast.tsx` — 冲突自动解决后的确认 Toast，3秒自动消失
+- **Component**: Toast 显示使用的策略（自动合并 / 保留我的版本 / 保留对方版本）
+- **Component**: Toast 点击触发 `onDetails` 回调（可扩展为查看详细变更 diff）
+- **ConflictResolutionDialog**: 新增 `onAutoResolved` 回调 prop，传递所选策略给父组件
+- **DDSCanvasPage**: 集成 `ConflictConfirmToast` 组件，管理 toast 可见性状态
+- **Tests**: `ConflictConfirmToast.test.tsx` — 8 个测试用例覆盖显示/策略/自动关闭/点击交互
+
+
 ## [Unreleased] S83-E2: 导入链接画布 — 2026-06-10
 - **Backend**: `/v1/canvas-share/import` GET/POST endpoints — public share token validation + canvas import API
 - **Backend**: `/v1/canvas-share/import/register` POST — register share tokens from frontend

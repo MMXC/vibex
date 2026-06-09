@@ -117,6 +117,15 @@ export interface UserActivityMessage {
   userId: string;
 }
 
+// ==================== S80-E5: Presence Update ====================
+
+/** S80-E5: Server → Client presence_update — broadcast when a user's last activity changes */
+export interface PresenceUpdateMessage {
+  type: 'presence_update';
+  userId: string;
+  lastActiveAt: number;
+}
+
 // ==================== Union ====================
 
 export type CollabMessage =
@@ -128,7 +137,8 @@ export type CollabMessage =
   | RemoteActionMessage
   | PresenceMessage
   | ConflictMessage
-  | ActivityMessage;
+  | ActivityMessage
+  | PresenceUpdateMessage;
 
 // ==================== Action Payload ====================
 

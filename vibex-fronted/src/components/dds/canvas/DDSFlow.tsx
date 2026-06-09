@@ -46,6 +46,9 @@ import { FileImportDialog } from './FileImportDialog';
 // E3: Collaboration cursor broadcast
 import { useCollaboration } from '@/hooks/useCollaboration';
 import { broadcastActivity } from '@/lib/collaboration/wsActivityHandler';
+import { usePresenceStore } from '@/lib/collaboration/presenceStore';
+// S80-E5: Presence update on activity
+import { useAuthStore } from '@/stores/authStore';
 import { screenToFlowPosition } from '@xyflow/react';
 // S65-E3/S76-E1: Canvas view settings
 import { useSettingsStore } from '@/stores/dds/settingsStore';
@@ -125,10 +128,15 @@ function DDSFlowInner({
 
   // E3: Collaboration cursor broadcast
   const { broadcastCursor } = useCollaboration();
+  // S80-E5: Current user ID for presence updates
+  const currentUserId = useAuthStore((s) => s.currentUser?.id ?? 'local-user');
 
   // E2: Wrap onNodesChange to broadcast activity events
+  // S80-E5: Also update own lastActiveAt on node edit activity
   const handleNodesChange = useCallback(
     (changes: Parameters<typeof onNodesChange>[0]) => {
+      // S80-E5: Update own presence on any canvas change
+      usePresenceStore.getState().updateLastActive(currentUserId);
       // Broadcast activity for add/remove operations
       for (const change of changes) {
         if (change.type === 'add' && change.node) {
@@ -152,7 +160,7 @@ function DDSFlowInner({
       // Call original handler
       onNodesChange(changes);
     },
-    [onNodesChange]
+    [onNodesChange, currentUserId]
   );
 
   // S65-E3/S76-E1: Canvas view settings — use canvasBackground unified object
@@ -185,13 +193,16 @@ function DDSFlowInner({
   );
 
   // E3: Cursor broadcast on node hover (throttled inside broadcastCursor, 100ms)
+  // S80-E5: Also update local user's lastActiveAt when they move mouse
   const handleNodeMouseMove = useCallback(
     (event: React.MouseEvent, node: Node) => {
       const viewport = getViewport();
       const flowPos = screenToFlowPosition({ x: event.clientX, y: event.clientY }, viewport);
       broadcastCursor(flowPos.x, flowPos.y, node.id);
+      // S80-E5: Update own presence on mouse activity
+      usePresenceStore.getState().updateLastActive(currentUserId);
     },
-    [getViewport, broadcastCursor]
+    [getViewport, broadcastCursor, currentUserId]
   );
 
   // E2: Drag event handlers

@@ -69,6 +69,7 @@ import { useWebSocketPresence } from '@/lib/collaboration/useWebSocketPresence';
 // S62-E1: Collaboration editing broadcast
 import { useCollabEditing } from '@/lib/collaboration/useCollabEditing';
 import { usePresenceStore } from '@/lib/collaboration/presenceStore';
+import { OnlinePresenceIndicator } from '@/components/dds/collab/OnlinePresenceIndicator';
 import { useUserPreferencesStore } from '@/stores/userPreferencesStore';
 import useRealtimeSync from '@/hooks/useRealtimeSync';
 import { useAuthStore } from '@/stores/authStore';
@@ -957,6 +958,11 @@ const { onCursorMove, broadcastCursor } = useWebSocketPresence({
       {/* S53-E1: Real-time presence indicator — shows online collaborators */}
       <div style={{ position: 'absolute', top: '12px', right: '16px', zIndex: 50 }}>
         <PresenceIndicator />
+      </div>
+
+      {/* S80-E5: Online presence indicator — shows green/grey dots per collaborator */}
+      <div style={{ position: 'absolute', top: '60px', right: '16px', zIndex: 50 }}>
+        <OnlinePresenceIndicator />
       </div>
 
       {/* E10-E1: CodeGenPanel — always visible */}

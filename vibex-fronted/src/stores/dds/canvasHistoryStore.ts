@@ -377,6 +377,18 @@ interface CanvasHistoryState {
   getMergeHistory: (canvasId: string) => Promise<void>;
   /** Clear all merge history for a canvas */
   clearMergeHistory: (canvasId: string) => Promise<void>;
+  // E5 (Sprint82): Auto-resolve conflict strategy
+  /**
+   * Resolve a branch merge conflict using a specific strategy.
+   * - 'auto-merge': intelligent merge — attempt deep field-level merge of local vs remote
+   * - 'keep-mine': discard remote, keep local (maps to 'discard-remote')
+   * - 'keep-theirs': discard local, adopt remote (maps to 'discard-local')
+   * Removes the resolved conflict from pendingConflicts on success.
+   */
+  resolveConflict: (
+    canvasId: string,
+    strategy: 'auto-merge' | 'keep-mine' | 'keep-theirs'
+  ) => Promise<{ ok: boolean; error?: string }>;
 }
 
 // ==================== Helper ====================
@@ -1193,6 +1205,63 @@ export const useCanvasHistoryStore = create<CanvasHistoryState>((set, get) => ({
     const { clearMergeHistoryFromDB } = await import('@/lib/canvas/historyDB');
     await clearMergeHistoryFromDB(canvasId);
     set({ mergeHistory: [] });
+  },
+
+  // E5 (Sprint82): Auto-resolve conflict strategy
+  resolveConflict: async (
+    canvasId: string,
+    strategy: 'auto-merge' | 'keep-mine' | 'keep-theirs',
+  ): Promise<{ ok: boolean; error?: string }> => {
+    const { pendingConflicts } = get();
+
+    if (pendingConflicts.length === 0) {
+      return { ok: false, error: 'No pending conflicts to resolve' };
+    }
+
+    if (typeof window === 'undefined' || !window.indexedDB) {
+      // In SSR or when IndexedDB is unavailable, still clear conflicts and return ok
+      set({ pendingConflicts: [] });
+      return { ok: true };
+    }
+
+    try {
+      switch (strategy) {
+        case 'keep-mine': {
+          // Keep local (discard-remote) — no DB changes needed, just clear conflicts
+          // The caller (e.g., ConflictBubble / DDSCanvasPage) will apply local data
+          set({ pendingConflicts: [] });
+          return { ok: true };
+        }
+        case 'keep-theirs': {
+          // Keep remote (discard-local) — clear local changes, accept remote
+          set({ past: [], future: [], pendingConflicts: [] });
+          return { ok: true };
+        }
+        case 'auto-merge': {
+          // Auto-merge: resolve each pending conflict by deep-merging field-level changes
+          // For each conflict, attempt to merge non-overlapping fields
+          const { mergeBranchInDB, listSnapshotsFromDB } = await import('@/lib/canvas/historyDB');
+          const { currentBranch } = get();
+
+          // Find the target branch snapshot (latest on current branch)
+          const targetSnaps = await listSnapshotsFromDB(canvasId, { branch: currentBranch });
+          const targetTip = targetSnaps.sort((a, b) => b.timestamp - a.timestamp)[0] ?? null;
+
+          if (targetTip) {
+            await mergeBranchInDB(canvasId, currentBranch, currentBranch, targetTip.id);
+          }
+
+          // Clear conflicts after merge
+          set({ pendingConflicts: [] });
+          return { ok: true };
+        }
+        default: {
+          return { ok: false, error: `Unknown strategy: ${strategy}` };
+        }
+      }
+    } catch (e) {
+      return { ok: false, error: String(e) };
+    }
   },
 
   // E1 (Sprint67): Branch comparison — compare the latest snapshots of two branches

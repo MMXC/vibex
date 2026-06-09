@@ -7,6 +7,7 @@
  * S64-E1: 协作者在线状态 — presence:heartbeat
  * S65-E2: 协作者编辑指示器 — node:focused / node:unfocused (delegated to wsNodeFocusHandler)
  * S66-E2: 协作者冲突检测与通知 — node:focus / node:blur (delegated to wsNodeFocusHandler)
+ * S82-E5: WS 冲突触发 ConflictDialog — collab:conflict → conflictStore.activeConflict + ConflictBubble
  *
  * Registers with CollabWebSocket to handle:
  * - collab:editing:start — another user started editing a node
@@ -14,7 +15,7 @@
  * - collab:undo — another user performed an undo operation
  * - collab:redo — another user performed a redo operation
  * - cursor:move — another user's cursor moved
- * - collab:conflict — another user triggered a conflict for the local user
+ * - collab:conflict — another user triggered a conflict for the local user (S82-E5: triggers ConflictDialog)
  * - presence:heartbeat — another user's presence heartbeat (30s interval)
  * - node:focused / node:unfocused — handled by wsNodeFocusHandler (S65-E2)
  * - node:focus / node:blur — handled by wsNodeFocusHandler (S66-E2)
@@ -121,6 +122,7 @@ export function registerCollabHandler(
         break;
       }
       // S63-E2: collab:conflict — another user triggered a conflict for this user
+      // S82-E5: Also trigger ConflictDialog via conflictStore for WS conflict display
       case 'collab:conflict': {
         const m = msg as CollabConflictMessage;
         useUndoRedoStore.getState().showConflict(
@@ -128,6 +130,19 @@ export function registerCollabHandler(
           m.otherUserId,
           m.nodeId
         );
+        // S82-E5: Populate conflictStore so ConflictBubble shows ConflictDialog
+        // Lazy import to avoid circular deps (conflictStore imports CollabWS types indirectly)
+        import('@/lib/canvas/stores/conflictStore').then(({ useConflictStore }) => {
+          useConflictStore.getState().checkConflict(
+            m.nodeId,
+            undefined,
+            { operatorId: m.operatorId, userId: m.otherUserId },
+            Date.now(),
+            m.otherUserId
+          );
+        }).catch(() => {
+          // conflictStore may not be available in all environments
+        });
         break;
       }
       // S64-E1: presence:heartbeat — update online user status

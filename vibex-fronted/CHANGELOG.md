@@ -1,3 +1,16 @@
+## [Unreleased] S82-E5: 自动解决策略 + WS 冲突触发 — 2026-06-09
+- **ConflictDialog.tsx**: 新增 `showAutoResolve` / `onAutoResolve` props + `AutoResolveStrategy` 类型
+- **ConflictDialog.tsx**: 新增自动解决策略选择区域（Auto-merge / Keep Mine / Keep Theirs 三按钮）
+- **ConflictDialog.module.css**: 新增 `.conflictHighlight` 红色冲突高亮（边框 + 背景 + pulse 动画）
+- **ConflictDialog.module.css**: 新增 `.autoResolveSection` / `.autoResolveBtn` 系列样式
+- **canvasHistoryStore.ts**: 新增 `resolveConflict(branchId, strategy)` 方法，支持 'auto-merge' / 'keep-mine' / 'keep-theirs'
+- **wsCollabHandler.ts**: `collab:conflict` 消息处理增加 `conflictStore.checkConflict()` 调用，触发 ConflictBubble 显示 ConflictDialog
+- **ConflictDialog.e5.test.tsx**: 14 个 S82-E5 单元测试（auto-resolve 按钮渲染、aria-label、callback 验证）
+- **canvasHistoryStore.e5.test.ts**: 6 个 resolveConflict 单元测试（strategy 分支、pendingConflicts 清理）
+- **vitest**: ConflictDialog.e5.test.tsx + canvasHistoryStore.e5.test.ts 均通过
+
+---
+
 ## [Unreleased] S77-E2: WebSocket 连接稳定性增强 — 2026-06-08
 - **CollabWebSocket**: 新增心跳 ping/pong 机制（30s interval）—— `scheduleNextPing()` 递归 ping 周期 + `maxMissedPongs` 断线检测
 - **CollabWebSocket**: 指数退避重连策略 `delay = min(1000 * 2^attempt, 30000)` —— 3次心跳超时触发 reconnect

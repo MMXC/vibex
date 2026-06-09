@@ -1,13 +1,15 @@
 'use client';
 
 /**
- * HistoryPanel — Undo/Redo History Sidebar + E1: Snapshots Tab
+ * HistoryPanel — Undo/Redo History Sidebar + E1: Snapshots Tab + S83-E1: Timeline Tab
  * P004-E4: History Panel for selective undo/redo
  * E1 (Sprint58): 画布版本分支管理 — Snapshots tab for named canvas versions
+ * S83-E1: 画布版本历史时间轴 — Timeline tab with zoom controls
  *
  * Displays:
  * - History tab: command snapshots from canvasHistoryStore (Undo/Redo)
  * - Snapshots tab: named canvas version snapshots (E1)
+ * - Timeline tab: zoomable timeline view of snapshots (S83-E1)
  *
  *遵守约束:
  * - 无 any 类型
@@ -16,9 +18,11 @@
 
 import React, { useState, useCallback } from 'react';
 import { useCanvasHistoryStore } from '@/stores/dds/canvasHistoryStore';
+import { VersionTimeline } from '@/components/dds/history/VersionTimeline';
+import type { Snapshot } from '@/stores/dds/canvasHistoryStore';
 import styles from './HistoryPanel.module.css';
 
-type Tab = 'history' | 'snapshots';
+type Tab = 'history' | 'snapshots' | 'timeline';
 
 interface HistoryPanelProps {
   /** Whether the panel is visible */
@@ -53,6 +57,7 @@ export function HistoryPanel({ open, onClose, canvasId = 'default-canvas', onRes
   const [saveDialogName, setSaveDialogName] = useState('');
   const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [selectedTimelineSnapId, setSelectedTimelineSnapId] = useState<string | null>(null);
 
   const past = useCanvasHistoryStore((s) => s.past);
   const future = useCanvasHistoryStore((s) => s.future);
@@ -105,7 +110,6 @@ export function HistoryPanel({ open, onClose, canvasId = 'default-canvas', onRes
   const handleSaveSnapshot = useCallback(async () => {
     const name = saveDialogName.trim() || `版本 ${snapshots.length + 1}`;
     if (!getCurrentCanvasData) {
-      // If no data getter provided, use empty snapshot (caller should override)
       await saveSnapshot(canvasId, name, { nodes: [], edges: [] });
     } else {
       const data = getCurrentCanvasData();
@@ -137,6 +141,49 @@ export function HistoryPanel({ open, onClose, canvasId = 'default-canvas', onRes
       setDeleteConfirmId(null);
     },
     [canvasId, deleteSnapshot]
+  );
+
+  // ==================== S83-E1: Timeline Actions ====================
+
+  const handleTimelineSelect = useCallback(
+    (snap: Snapshot) => {
+      setSelectedTimelineSnapId(snap.id);
+      handleRestoreSnapshot(snap.id);
+    },
+    [handleRestoreSnapshot]
+  );
+
+  const handleTimelineStar = useCallback(
+    (snap: Snapshot) => {
+      onStar(snap);
+    },
+    [onStar]
+  );
+
+  const handleTimelineCompare = useCallback(
+    (snap: Snapshot) => {
+      // Emit a custom event for branch diff
+      window.dispatchEvent(
+        new CustomEvent('dds:branch-compare', {
+          detail: { snapshotId: snap.id, branchName: snap.branchName },
+        })
+      );
+    },
+    []
+  );
+
+  const handleTimelineRestore = useCallback(
+    (snap: Snapshot) => {
+      handleRestoreSnapshot(snap.id);
+    },
+    [handleRestoreSnapshot]
+  );
+
+  const handleTimelineDelete = useCallback(
+    (snap: Snapshot) => {
+      handleDeleteSnapshot(snap.id);
+    },
+    [handleDeleteSnapshot]
   );
 
   if (!open) return null;
@@ -173,6 +220,17 @@ export function HistoryPanel({ open, onClose, canvasId = 'default-canvas', onRes
               <span className={styles.badge}>{snapshots.length}</span>
             )}
           </button>
+          <button
+            className={`${styles.tab} ${activeTab === 'timeline' ? styles.tabActive : ''}`}
+            onClick={() => setActiveTab('timeline')}
+            role="tab"
+            aria-selected={activeTab === 'timeline'}
+          >
+            时间轴
+            {snapshots.length > 0 && (
+              <span className={styles.badge}>{snapshots.length}</span>
+            )}
+          </button>
         </div>
 
         <div className={styles.body}>
@@ -182,7 +240,6 @@ export function HistoryPanel({ open, onClose, canvasId = 'default-canvas', onRes
                 <div className={styles.empty}>暂无历史记录</div>
               ) : (
                 <ol className={styles.list} aria-label="历史记录列表">
-                  {/* Past commands — undoable */}
                   {past.map((cmd, i) => (
                     <li key={cmd.id} className={styles.item}>
                       <button
@@ -198,14 +255,12 @@ export function HistoryPanel({ open, onClose, canvasId = 'default-canvas', onRes
                     </li>
                   ))}
 
-                  {/* Divider */}
                   {past.length > 0 && future.length > 0 && (
                     <li className={styles.dividerItem}>
                       <span className={styles.dividerLabel}>— 已撤销 —</span>
                     </li>
                   )}
 
-                  {/* Future (redo) commands */}
                   {future.map((cmd, i) => {
                     const targetIndex = past.length + i;
                     return (
@@ -228,7 +283,6 @@ export function HistoryPanel({ open, onClose, canvasId = 'default-canvas', onRes
 
           {activeTab === 'snapshots' && (
             <>
-              {/* Save button */}
               <div className={styles.snapshotActions}>
                 <button
                   className={styles.saveSnapshotBtn}
@@ -239,7 +293,6 @@ export function HistoryPanel({ open, onClose, canvasId = 'default-canvas', onRes
                 </button>
               </div>
 
-              {/* Save dialog */}
               {isSaveDialogOpen && (
                 <div className={styles.saveDialog}>
                   <div className={styles.saveDialogOverlay} onClick={handleCloseSaveDialog} aria-hidden="true" />
@@ -270,7 +323,6 @@ export function HistoryPanel({ open, onClose, canvasId = 'default-canvas', onRes
                 </div>
               )}
 
-              {/* Snapshot list */}
               {snapshots.length === 0 ? (
                 <div className={styles.empty}>
                   <div>暂无保存的版本</div>
@@ -330,11 +382,27 @@ export function HistoryPanel({ open, onClose, canvasId = 'default-canvas', onRes
               )}
             </>
           )}
+
+          {activeTab === 'timeline' && (
+            <div className={styles.timelineTab}>
+              <VersionTimeline
+                snapshots={snapshots}
+                selectedId={selectedTimelineSnapId}
+                onSelect={handleTimelineSelect}
+                onStar={handleTimelineStar}
+                onCompare={handleTimelineCompare}
+                onRestore={handleTimelineRestore}
+                onDelete={handleTimelineDelete}
+              />
+            </div>
+          )}
         </div>
 
         <footer className={styles.footer}>
           <div className={styles.hint}>
-            {activeTab === 'history' ? '点击记录可跳转至任意历史位置' : '点击 ↩️ 恢复版本，当前画布将被替换'}
+            {activeTab === 'history' ? '点击记录可跳转至任意历史位置' :
+             activeTab === 'snapshots' ? '点击 ↩️ 恢复版本，当前画布将被替换' :
+             '使用时间轴缩放和分支筛选来浏览历史版本'}
           </div>
         </footer>
       </aside>

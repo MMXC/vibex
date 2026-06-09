@@ -1,3 +1,14 @@
+## [Unreleased] S82-E5: 自动解决策略 + WS 冲突触发 — 2026-06-09
+- **vibex-fronted/ConflictDialog.tsx**: 新增 `showAutoResolve` / `onAutoResolve` props + `AutoResolveStrategy` 类型（'auto-merge' / 'keep-mine' / 'keep-theirs'）
+- **vibex-fronted/ConflictDialog.module.css**: 新增红色冲突高亮 `.conflictHighlight`（2px #ef4444 边框 + 背景 + pulse 动画）
+- **vibex-fronted/ConflictDialog.module.css**: 新增 `.autoResolveSection` / `.autoResolveBtn*` 样式（Auto-merge / Keep Mine / Keep Theirs 三按钮）
+- **vibex-fronted/canvasHistoryStore.ts**: 新增 `resolveConflict(branchId, strategy)` 方法，支持三种策略
+- **vibex-fronted/wsCollabHandler.ts**: `collab:conflict` 消息处理增加 `conflictStore.checkConflict()` 调用，触发 ConflictDialog
+- **vibex-fronted/ConflictDialog.e5.test.tsx**: 14 个单元测试
+- **vibex-fronted/canvasHistoryStore.e5.test.ts**: 6 个单元测试
+
+---
+
 ## [Unreleased] S77-E2: WebSocket 连接稳定性增强 — 2026-06-08
 - **CollabWebSocket**: 新增心跳 ping/pong 机制（30s interval）—— `scheduleNextPing()` 递归 ping 周期 + `maxMissedPongs` 断线检测
 - **CollabWebSocket**: 指数退避重连策略 `delay = min(1000 * 2^attempt, 30000)` —— 3次心跳超时触发 reconnect

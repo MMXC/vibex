@@ -1,11 +1,17 @@
 /**
  * ConflictDialog.tsx — Sprint53 E2 (Sprint58 E5 扩展)
+ * E5 (Sprint82): Auto-resolve strategy selection
  *
  * 三选项 + 手动合并冲突对话框（Sprint58 E5 扩展）：
  * - Discard Local: 丢弃本地修改，采用远程版本
  * - Merge: 保留两者（追加到未来栈，支持后续 redo）
  * - Discard Remote: 丢弃远程修改，保留本地版本
  * - Manual Merge (E5): 手动编辑 JSON 后合并
+ *
+ * E5 (Sprint82): Auto-resolve strategy selection:
+ * - Auto-merge: intelligent merge preferring newer changes
+ * - Keep mine: keep local version (discard-remote)
+ * - Keep theirs: use remote version (discard-local)
  *
  * 由 canvasHistoryStore.triggerConflictToast() 调用触发
  * E5: 由 wsConflictHandler 写入 conflictStore，ConflictDialog 读取 store 状态
@@ -22,6 +28,9 @@ import styles from './ConflictDialog.module.css';
 
 // E5: extended to include 'manual'
 export type ConflictResolution = 'discard-local' | 'merge' | 'discard-remote' | 'manual';
+
+/** E5: Auto-resolve strategies for WS conflict trigger */
+export type AutoResolveStrategy = 'auto-merge' | 'keep-mine' | 'keep-theirs';
 
 export interface ConflictDialogProps {
   /** 对话框打开状态 */
@@ -40,6 +49,10 @@ export interface ConflictDialogProps {
   onResolve: (resolution: ConflictResolution, manualContent?: string) => void;
   /** 关闭对话框（不解决冲突） */
   onClose: () => void;
+  /** E5: 显示自动解决策略选择区域（WS 冲突触发时为 true） */
+  showAutoResolve?: boolean;
+  /** E5: 自动解决策略回调（WS 冲突触发时优先使用） */
+  onAutoResolve?: (strategy: AutoResolveStrategy) => void;
 }
 
 // ============================================================================
@@ -79,10 +92,21 @@ export function ConflictDialog({
   remoteData,
   onResolve,
   onClose,
+  showAutoResolve = false,
+  onAutoResolve,
 }: ConflictDialogProps) {
   const [selected, setSelected] = useState<ConflictResolution | null>(null);
   const [manualContent, setManualContent] = useState('');
   const [isManualMode, setIsManualMode] = useState(false);
+
+  // E5: Handle auto-resolve strategy selection
+  const handleAutoResolve = useCallback(
+    (strategy: AutoResolveStrategy) => {
+      setSelected(strategy as ConflictResolution);
+      onAutoResolve?.(strategy);
+    },
+    [onAutoResolve]
+  );
 
   // Initialize manual editor with local data when entering manual mode
   const handleEnterManual = useCallback(() => {
@@ -130,11 +154,14 @@ export function ConflictDialog({
       aria-modal="true"
       aria-label="Undo/Redo 协作冲突"
     >
-      <div className={styles.dialog} data-testid="conflict-dialog">
+      <div
+        className={`${styles.dialog}${showAutoResolve ? ` ${styles.conflictHighlight}` : ''}`}
+        data-testid="conflict-dialog"
+      >
         {/* Header */}
         <div className={styles.header}>
           <h2 className={styles.title} data-testid="dialog-title">
-            {isManualMode ? '✏️ 手动合并冲突' : '⚠️ 协作冲突检测到'}
+            {isManualMode ? '✏️ 手动合并冲突' : showAutoResolve ? '⚡ 自动解决策略' : '⚠️ 协作冲突检测到'}
           </h2>
           <button
             type="button"
@@ -146,6 +173,55 @@ export function ConflictDialog({
             {isManualMode ? '← 返回' : '✕'}
           </button>
         </div>
+
+        {/* E5: Auto-resolve strategy selection section */}
+        {showAutoResolve && !isManualMode && (
+          <div className={styles.autoResolveSection} data-testid="auto-resolve-section">
+            <div className={styles.autoResolveSectionHeader}>
+              <span aria-hidden="true">⚡</span>
+              <span className={styles.autoResolveSectionTitle}>选择自动解决策略</span>
+            </div>
+            <p className={styles.autoResolveSectionDesc}>
+              协作冲突已触发。请选择自动解决策略：智能合并会尝试保留双方的有效修改，
+              Keep Mine 保留本地版本，Keep Theirs 采用远程版本。
+            </p>
+            <div className={styles.autoResolveActions} data-testid="auto-resolve-actions">
+              <button
+                type="button"
+                className={`${styles.autoResolveBtn} ${styles['autoResolveBtn--auto-merge']}`}
+                onClick={() => handleAutoResolve('auto-merge')}
+                data-testid="btn-auto-merge"
+                aria-label="自动合并：智能合并双方修改"
+              >
+                <span className={styles.autoResolveIcon}>🤖</span>
+                <span className={styles.autoResolveLabel}>Auto-merge</span>
+                <span className={styles.autoResolveDesc}>智能合并</span>
+              </button>
+              <button
+                type="button"
+                className={`${styles.autoResolveBtn} ${styles['autoResolveBtn--keep-mine']}`}
+                onClick={() => handleAutoResolve('keep-mine')}
+                data-testid="btn-keep-mine"
+                aria-label="保留本地版本"
+              >
+                <span className={styles.autoResolveIcon}>💾</span>
+                <span className={styles.autoResolveLabel}>Keep Mine</span>
+                <span className={styles.autoResolveDesc}>保留本地</span>
+              </button>
+              <button
+                type="button"
+                className={`${styles.autoResolveBtn} ${styles['autoResolveBtn--keep-theirs']}`}
+                onClick={() => handleAutoResolve('keep-theirs')}
+                data-testid="btn-keep-theirs"
+                aria-label="使用远程版本"
+              >
+                <span className={styles.autoResolveIcon}>☁️</span>
+                <span className={styles.autoResolveLabel}>Keep Theirs</span>
+                <span className={styles.autoResolveDesc}>使用远程</span>
+              </button>
+            </div>
+          </div>
+        )}
 
         {isManualMode ? (
           <>

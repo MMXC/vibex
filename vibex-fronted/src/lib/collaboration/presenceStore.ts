@@ -66,7 +66,7 @@ export interface NodeLockInfo {
 }
 
 
-/** S68-E5: Cursor state for the dedicated cursors field */
+/** S68-E5: Dedicated cursors field */
 export interface CursorState {
   userId: string;
   userName: string;
@@ -77,6 +77,12 @@ export interface CursorState {
   y: number;
   /** Last update timestamp */
   lastSeen: number;
+}
+
+/** S80-E5: Last activity timestamp per user — used for online/idle detection */
+export interface LastActivityInfo {
+  userId: string;
+  lastActiveAt: number;
 }
 
 /** S70-E4: Collaboration conflict record */
@@ -128,6 +134,16 @@ interface PresenceState {
   // S68-E5: Dedicated cursors field
   /** S68-E5: Dedicated cursor tracking: userId → CursorState */
   cursors: Record<string, CursorState>;
+
+  // S80-E5: Online presence & activity tracking
+  /** S80-E5: Last activity timestamps per user (userId → timestamp) */
+  lastActiveAt: Record<string, number>;
+
+  /** S80-E5: Update last activity for a user (called on mouse move / node edit) */
+  updateLastActive: (userId: string) => void;
+
+  /** S80-E5: Check if a user is online based on 5-minute activity threshold */
+  isOnline: (userId: string) => boolean;
 
   // S77-E2: WebSocket connection status
   /** S77-E2: WebSocket connection state */
@@ -368,6 +384,21 @@ export const usePresenceStore = create<PresenceState>((set, get) => {
     // S68-E5: Dedicated cursors field
     cursors: {},
 
+    // S80-E5: Online presence & activity tracking
+    lastActiveAt: {},
+
+    updateLastActive: (userId: string) =>
+      set((state) => ({
+        lastActiveAt: { ...state.lastActiveAt, [userId]: Date.now() },
+      })),
+
+    isOnline: (userId: string) => {
+      const lastActive = get().lastActiveAt[userId];
+      if (!lastActive) return false;
+      // 5-minute threshold
+      return Date.now() - lastActive < 5 * 60 * 1000;
+    },
+
     // S76-E5: Remote editing tracking
     remoteEditing: new Map(),
 
@@ -420,7 +451,8 @@ export const usePresenceStore = create<PresenceState>((set, get) => {
         const { [userId]: _c, ...restCursors } = state.cursors;
         const remoteEditingUpdated = new Map(state.remoteEditing);
         remoteEditingUpdated.delete(userId);
-        return { remoteUsers: updated, cursors: restCursors, remoteEditing: remoteEditingUpdated };
+        const { [userId]: _la, ...restLastActive } = state.lastActiveAt;
+        return { remoteUsers: updated, cursors: restCursors, remoteEditing: remoteEditingUpdated, lastActiveAt: restLastActive };
       }),
 
     removeCursor: (userId: string) =>
@@ -442,6 +474,7 @@ export const usePresenceStore = create<PresenceState>((set, get) => {
         focusedNodeInfos: new Map(),
         cursors: {},
         remoteEditing: new Map(),
+        lastActiveAt: {},
       }),
 
     lockNode: (nodeId: string, userId: string) =>

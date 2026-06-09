@@ -71,6 +71,11 @@ export function useCollaboration(options: UseCollaborationOptions = {}) {
         case 'conflict':
           onConflict?.(msg);
           break;
+        // S80-E5: Server broadcasts presence_update when a user's last activity changes
+        // → update lastActiveAt in presenceStore (drives isOnline())
+        case 'presence_update':
+          usePresenceStore.getState().lastActiveAt[msg.userId] = msg.lastActiveAt;
+          break;
       }
     },
     [onRemoteAction, onPresence, onConflict]

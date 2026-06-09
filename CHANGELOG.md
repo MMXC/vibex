@@ -6988,3 +6988,13 @@ See git history for complete changelog.
 - **vibex-fronted/src/components/dds/history/__tests__/VersionTimeline.test.tsx**: 21 个单元测试（空状态/缩放控制/时间轴渲染/操作/键盘/分支筛选）全部通过
 - **vitest**: 21/21 通过 ✅
 
+
+
+## [Unreleased] S83-E4: 模板标签系统 — 2026-06-10
+- **Component**: `TagSelector.tsx` — multi-select tag component with custom tag creation, AND-logic filtering
+- **Component**: `DateRangePicker.tsx` — date range filter for template gallery
+- **Store**: `FilterOptions` interface in `templateStore.ts` — tags/dateRange/searchQuery filter state
+- **Integration**: `TemplateGallery.tsx` — tag+category+date+search filter pipeline (AND logic for tags)
+- **URL State**: Gallery filters persisted to URL params (`?tags=&start=&end=&q=&cat=`)
+- **Data Model**: `CanvasTemplateSummary.tags: string[]` + `CanvasTemplateSummary.category` fields
+- **Tests**: `TagSelector.test.tsx` — 8 vitest cases covering render/dropdown/toggle/outside-click

@@ -13,23 +13,37 @@
  */
 import { NextRequest } from 'next/server';
 
-// Mock DB functions
-const mockQueryDB = jest.fn();
-const mockQueryOne = jest.fn();
-const mockExecuteDB = jest.fn();
-const mockGenerateId = jest.fn();
-const mockSafeError = jest.fn();
+// Mock DB functions — defined inside jest.mock factory to avoid TDZ hoisting issue
+// Tests access via global.__mocks__
+jest.mock('@/lib/db', () => {
+  const mockQueryDB = jest.fn();
+  const mockQueryOne = jest.fn();
+  const mockExecuteDB = jest.fn();
+  const mockGenerateId = jest.fn();
+  (global as Record<string, unknown>).__notifQueryDB = mockQueryDB;
+  (global as Record<string, unknown>).__notifQueryOne = mockQueryOne;
+  (global as Record<string, unknown>).__notifExecuteDB = mockExecuteDB;
+  (global as Record<string, unknown>).__notifGenerateId = mockGenerateId;
+  return {
+    queryDB: mockQueryDB,
+    queryOne: mockQueryOne,
+    executeDB: mockExecuteDB,
+    generateId: mockGenerateId,
+  };
+});
 
-jest.mock('@/lib/db', () => ({
-  queryDB: (...args: unknown[]) => mockQueryDB(...args),
-  queryOne: (...args: unknown[]) => mockQueryOne(...args),
-  executeDB: (...args: unknown[]) => mockExecuteDB(...args),
-  generateId: (...args: unknown[]) => mockGenerateId(...args),
-}));
+jest.mock('@/lib/log-sanitizer', () => {
+  const mockSafeError = jest.fn();
+  (global as Record<string, unknown>).__notifSafeError = mockSafeError;
+  return { safeError: mockSafeError };
+});
 
-jest.mock('@/lib/log-sanitizer', () => ({
-  safeError: (...args: unknown[]) => mockSafeError(...args),
-}));
+// Access mocks in tests
+const mockQueryDB = () => (global as Record<string, unknown>).__notifQueryDB as jest.Mock;
+const mockQueryOne = () => (global as Record<string, unknown>).__notifQueryOne as jest.Mock;
+const mockExecuteDB = () => (global as Record<string, unknown>).__notifExecuteDB as jest.Mock;
+const mockGenerateId = () => (global as Record<string, unknown>).__notifGenerateId as jest.Mock;
+const mockSafeError = () => (global as Record<string, unknown>).__notifSafeError as jest.Mock;
 
 import { GET as listNotifications, POST as createNotification } from './route';
 
@@ -50,7 +64,7 @@ describe('GET /api/notifications', () => {
   });
 
   it('returns paginated notification list', async () => {
-    mockQueryDB
+    mockQueryDB()
       .mockResolvedValueOnce([
         {
           id: 'notif-1', user_id: 'user-1', type: 'mention', title: '@mention test',
@@ -68,8 +82,8 @@ describe('GET /api/notifications', () => {
           comment_id: null, reply_id: null, is_read: 1,
           created_at: '2026-06-09T08:00:00.000Z',
         },
-      ])
-      .mockResolvedValueOnce([{ cnt: 2 }]);
+      ]);
+    mockQueryOne().mockResolvedValueOnce({ cnt: 2 });
 
     const request = new NextRequest(
       'http://localhost:3000/api/notifications?userId=user-1&limit=20&offset=0'
@@ -90,7 +104,7 @@ describe('GET /api/notifications', () => {
   });
 
   it('filters by unread only', async () => {
-    mockQueryDB
+    mockQueryDB()
       .mockResolvedValueOnce([
         {
           id: 'notif-1', user_id: 'user-1', type: 'mention', title: '@mention test',
@@ -100,8 +114,8 @@ describe('GET /api/notifications', () => {
           comment_id: null, reply_id: null, is_read: 0,
           created_at: '2026-06-10T12:00:00.000Z',
         },
-      ])
-      .mockResolvedValueOnce([{ cnt: 1 }]);
+      ]);
+    mockQueryOne().mockResolvedValueOnce({ cnt: 1 });
 
     const request = new NextRequest(
       'http://localhost:3000/api/notifications?userId=user-1&unread=true'
@@ -112,7 +126,7 @@ describe('GET /api/notifications', () => {
     expect(data.notifications).toHaveLength(1);
     expect(data.notifications[0].isRead).toBe(false);
     // Verify SQL had is_read = 0 filter
-    expect(mockQueryDB).toHaveBeenCalledWith(
+    expect(mockQueryDB()).toHaveBeenCalledWith(
       mockEnv,
       expect.stringContaining('is_read = 0'),
       expect.any(Array)
@@ -120,16 +134,15 @@ describe('GET /api/notifications', () => {
   });
 
   it('filters by type', async () => {
-    mockQueryDB
-      .mockResolvedValueOnce([])
-      .mockResolvedValueOnce([{ cnt: 0 }]);
+    mockQueryDB().mockResolvedValueOnce([]);
+    mockQueryOne().mockResolvedValueOnce({ cnt: 0 });
 
     const request = new NextRequest(
       'http://localhost:3000/api/notifications?userId=user-1&type=mention'
     );
     const response = await listNotifications(request, { env: mockEnv as never });
     expect(response.status).toBe(200);
-    expect(mockQueryDB).toHaveBeenCalledWith(
+    expect(mockQueryDB()).toHaveBeenCalledWith(
       mockEnv,
       expect.stringContaining('type = ?'),
       expect.arrayContaining(['user-1', 'mention'])
@@ -137,7 +150,8 @@ describe('GET /api/notifications', () => {
   });
 
   it('returns 500 on DB error', async () => {
-    mockQueryDB.mockRejectedValueOnce(new Error('DB connection failed'));
+    mockQueryDB().mockRejectedValueOnce(new Error('DB connection failed'));
+    mockSafeError().mockImplementation(() => {});
 
     const request = new NextRequest(
       'http://localhost:3000/api/notifications?userId=user-1'
@@ -146,7 +160,7 @@ describe('GET /api/notifications', () => {
     expect(response.status).toBe(500);
     const data = await response.json();
     expect(data.error).toContain('Failed to fetch');
-    expect(mockSafeError).toHaveBeenCalled();
+    expect(mockSafeError()).toHaveBeenCalled();
   });
 });
 
@@ -168,8 +182,8 @@ describe('POST /api/notifications', () => {
   });
 
   it('creates a notification successfully and returns 201', async () => {
-    mockGenerateId.mockReturnValue('notif-generated-id');
-    mockExecuteDB.mockResolvedValueOnce({ meta: { changes: 1 } });
+    mockGenerateId().mockReturnValue('notif-generated-id');
+    mockExecuteDB().mockResolvedValueOnce({ meta: { changes: 1 } });
 
     const body = {
       userId: 'user-1',
@@ -192,7 +206,7 @@ describe('POST /api/notifications', () => {
     expect(data.id).toBe('notif-generated-id');
     expect(data.created_at).toBeTruthy();
     // Verify all fields are passed to executeDB
-    expect(mockExecuteDB).toHaveBeenCalledWith(
+    expect(mockExecuteDB()).toHaveBeenCalledWith(
       mockEnv,
       expect.stringContaining('INSERT INTO notifications'),
       expect.arrayContaining(['notif-generated-id', 'user-1', 'mention'])
@@ -200,8 +214,9 @@ describe('POST /api/notifications', () => {
   });
 
   it('returns 500 on DB error during creation', async () => {
-    mockGenerateId.mockReturnValue('notif-err-id');
-    mockExecuteDB.mockRejectedValueOnce(new Error('DB write failed'));
+    mockGenerateId().mockReturnValue('notif-err-id');
+    mockExecuteDB().mockRejectedValueOnce(new Error('DB write failed'));
+    mockSafeError().mockImplementation(() => {});
 
     const body = {
       userId: 'user-1',
@@ -218,6 +233,6 @@ describe('POST /api/notifications', () => {
     });
     const response = await createNotification(request, { env: mockEnv as never });
     expect(response.status).toBe(500);
-    expect(mockSafeError).toHaveBeenCalled();
+    expect(mockSafeError()).toHaveBeenCalled();
   });
 });

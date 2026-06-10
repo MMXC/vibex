@@ -6,8 +6,10 @@
 
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import type { Template } from '@/types/template';
+import { useTemplateStore } from '@/stores/templateStore';
+import { TemplateRating } from './TemplateRating';
 import styles from './TemplateDetail.module.css';
 
 export interface TemplateDetailProps {
@@ -170,6 +172,12 @@ export function TemplateDetail({
               </div>
             </section>
 
+            {/* 评分 (E5) */}
+            <section className={styles.section}>
+              <h3 className={styles.sectionTitle}>评分</h3>
+              <TemplateRatingSection template={template} />
+            </section>
+
             {/* 技术信息 */}
             <section className={styles.section}>
               <h3 className={styles.sectionTitle}>技术信息</h3>
@@ -199,6 +207,89 @@ export function TemplateDetail({
           </button>
         </footer>
       </div>
+    </div>
+  );
+}
+
+// ---- E5: 模板评分组件 ----
+
+interface CommentInputProps {
+  templateId: string;
+  onSubmitted?: () => void;
+}
+
+function CommentInput({ templateId, onSubmitted }: CommentInputProps) {
+  const [comment, setComment] = useState('');
+  const [rating, setRating] = useState(0);
+  const [submitting, setSubmitting] = useState(false);
+  const [done, setDone] = useState(false);
+  const submitRating = useTemplateStore((s) => s.submitRating);
+
+  const handleSubmit = useCallback(async () => {
+    if (rating === 0) return;
+    setSubmitting(true);
+    await submitRating(templateId, rating, comment);
+    setSubmitting(false);
+    setDone(true);
+    onSubmitted?.();
+  }, [rating, comment, templateId, submitRating, onSubmitted]);
+
+  if (done) {
+    return (
+      <div className={styles.commentDone}>
+        感谢你的评分！
+      </div>
+    );
+  }
+
+  return (
+    <div className={styles.commentForm}>
+      <TemplateRating value={rating} onChange={setRating} size="large" />
+      <textarea
+        className={styles.commentInput}
+        value={comment}
+        onChange={(e) => setComment(e.target.value.slice(0, 200))}
+        placeholder="简短评论（可选，最多200字）"
+        rows={2}
+      />
+      <span className={styles.charCount}>{comment.length}/200</span>
+      <button
+        className={styles.submitRatingBtn}
+        onClick={handleSubmit}
+        disabled={submitting || rating === 0}
+      >
+        {submitting ? '提交中...' : '提交评分'}
+      </button>
+    </div>
+  );
+}
+
+function TemplateRatingSection({ template }: { template: Template }) {
+  const [showComment, setShowComment] = useState(false);
+  const stats = useTemplateStore((s) =>
+    template.id ? s.getTemplateStats(template.id) : null
+  );
+
+  const avgRating = stats?.avgRating ?? template.rating ?? 0;
+  const ratingCount = stats?.ratingCount ?? 0;
+
+  return (
+    <div className={styles.ratingSection}>
+      <TemplateRating
+        average={avgRating}
+        count={ratingCount}
+        readonly
+        size="medium"
+      />
+      <button
+        className={styles.rateBtn}
+        onClick={() => setShowComment((v) => !v)}
+      >
+        {showComment ? '取消' : '我要评分'}
+      </button>
+      {showComment && (
+        <CommentInput templateId={template.id} />
+      )}
     </div>
   );
 }

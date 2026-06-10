@@ -44,6 +44,7 @@ interface TemplateGalleryProps {
 export function TemplateGallery({ onInsert, open = true }: TemplateGalleryProps) {
   const [localQuery, setLocalQuery] = useState('');
   const [previewTemplate, setPreviewTemplate] = useState<RequirementTemplate | null>(null);
+  const [sortBy, setSortBy] = useState<'recent' | 'rating' | 'usage'>('recent');
 
   // Store state
   const templates = useTemplateStore((s) => s.templates);
@@ -58,16 +59,33 @@ export function TemplateGallery({ onInsert, open = true }: TemplateGalleryProps)
   // If store search is active, use filteredTemplates.
   // Otherwise, filter locally by name when user types in the search box.
   const displayedTemplates = useMemo(() => {
+    let list: RequirementTemplate[];
     if (searchQuery || localQuery) {
       const q = (searchQuery || localQuery).toLowerCase();
-      return templates.filter((t) => {
+      list = templates.filter((t) => {
         const name = (t.displayName ?? t.name).toLowerCase();
         const desc = (t.description ?? '').toLowerCase();
         return name.includes(q) || desc.includes(q);
       });
+    } else {
+      list = filteredTemplates.length > 0 ? filteredTemplates : templates;
     }
-    return filteredTemplates.length > 0 ? filteredTemplates : templates;
-  }, [templates, filteredTemplates, searchQuery, localQuery]);
+    return [...list].sort((a, b) => {
+      if (sortBy === 'recent') {
+        const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        return bTime - aTime; // newest first
+      }
+      // rating / usage: metadata.score as proxy for community stats
+      if (sortBy === 'rating') {
+        return (b.metadata?.score ?? 0) - (a.metadata?.score ?? 0);
+      }
+      if (sortBy === 'usage') {
+        return (b.metadata?.score ?? 0) - (a.metadata?.score ?? 0);
+      }
+      return 0;
+    });
+  }, [templates, filteredTemplates, searchQuery, localQuery, sortBy]);
 
   const handleCategoryChange = useCallback(
     (category: TemplateCategory | 'all') => {
@@ -150,6 +168,18 @@ export function TemplateGallery({ onInsert, open = true }: TemplateGalleryProps)
           <span className={styles.resultCount} aria-live="polite">
             {displayedTemplates.length} 个模板
           </span>
+
+          {/* Sort dropdown */}
+          <select
+            className={styles.sortSelect}
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
+            aria-label="排序方式"
+          >
+            <option value="recent">🕒 最近更新</option>
+            <option value="rating">⭐ 最高评分</option>
+            <option value="usage">📈 使用最多</option>
+          </select>
         </div>
       </div>
 

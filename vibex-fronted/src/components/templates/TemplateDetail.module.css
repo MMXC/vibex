@@ -410,6 +410,92 @@
   transform: none;
 }
 
+/* E5: Rating section */
+.ratingSection {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.rateBtn {
+  align-self: flex-start;
+  padding: 6px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  background: transparent;
+  color: #9090a0;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.rateBtn:hover {
+  border-color: rgba(0, 212, 255, 0.5);
+  color: #00d4ff;
+}
+
+.commentForm {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 8px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 8px;
+}
+
+.commentInput {
+  padding: 8px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #f0f0f5;
+  font-size: 13px;
+  font-family: inherit;
+  resize: none;
+  outline: none;
+}
+
+.commentInput:focus {
+  border-color: rgba(0, 212, 255, 0.5);
+}
+
+.charCount {
+  font-size: 12px;
+  color: #6b7280;
+  align-self: flex-end;
+}
+
+.submitRatingBtn {
+  align-self: flex-end;
+  padding: 8px 20px;
+  border: none;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #00d4ff, #0070f3);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.submitRatingBtn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 212, 255, 0.3);
+}
+
+.submitRatingBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.commentDone {
+  padding: 10px;
+  font-size: 13px;
+  color: #10b981;
+  text-align: center;
+}
+
 /* 响应式 */
 @media (max-width: 768px) {
   .content {

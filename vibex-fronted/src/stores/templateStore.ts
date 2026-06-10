@@ -105,6 +105,20 @@ interface TemplateState {
   getPopularTemplates: (limit?: number) => RequirementTemplate[];
   getTopRatedTemplates: (limit?: number) => RequirementTemplate[];
 
+  // ---- E5: 模板发布与评分系统 ----
+  /** 发布当前画布为模板 */
+  publishTemplate: (options: {
+    name: string;
+    description?: string;
+    tags?: string[];
+    thumbnail?: string;
+    canvasId?: string;
+    contentJson?: string;
+  }) => Promise<{ ok: boolean; templateId?: string; error?: string }>;
+
+  /** 提交模板评分（含评论） */
+  submitRating: (templateId: string, rating: number, comment?: string) => Promise<void>;
+
   // ---- E3: 模板使用分析与AI推荐 ----
   // 按使用量排序（前N）
   topTemplates: (limit: number) => RequirementTemplate[];
@@ -400,6 +414,47 @@ export const useTemplateStore = create<TemplateState>()(
           : 0;
         
         return { usageCount, avgRating, ratingCount };
+      },
+
+      // ---- E5: 模板发布与评分系统 ----
+      publishTemplate: async ({ name, description = '', tags = [], thumbnail, canvasId, contentJson = '{}' }) => {
+        try {
+          const res = await fetch('/api/templates', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, description, tags, thumbnail, canvasId, contentJson }),
+          });
+          const data = await res.json();
+          if (data.ok) {
+            return { ok: true, templateId: data.template?.id };
+          }
+          return { ok: false, error: data.error || 'Publish failed' };
+        } catch (err) {
+          const msg = err instanceof Error ? err.message : 'Network error';
+          return { ok: false, error: msg };
+        }
+      },
+
+      submitRating: async (templateId, rating, comment = '') => {
+        const { stats } = get();
+        const res = await fetch(`/api/templates/${templateId}/rate`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ rating, comment }),
+        });
+        const data = await res.json();
+        if (data.ok) {
+          // Update local stats
+          const newStats = {
+            ...stats,
+            ratings: {
+              ...stats.ratings,
+              [templateId]: [...(stats.ratings[templateId] || []), rating],
+            },
+          };
+          set({ stats: newStats });
+          saveStats(newStats);
+        }
       },
       
       // 获取热门模板

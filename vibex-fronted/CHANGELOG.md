@@ -1,3 +1,12 @@
+## [Unreleased] S85-E5: 模板发布与评分系统 — 2026-06-11
+- **templateStore**: 新增 `publishTemplate()` + `submitRating()` 方法（Zustand store）
+- **PublishTemplateDialog**: 新增发布模板对话框组件（表单验证 + API 调用）
+- **TemplateGallery**: 评分排序选项（recent/rating/usage 下拉选择器）
+- **TemplateDetail**: 评分展示区（星级显示 + 评分统计）
+- **TemplateStats**: 评分数据统计组件
+- **DDSToolbar**: 发布按钮集成（发布当前画布为模板）
+- **Backend**: POST /api/templates + GET /api/templates + POST /api/templates/:id/rate API 路由
+
 ## [Unreleased] S85-E3: 通知中心面板 — 2026-06-11
 - **Backend D1 notifications API**: 新增 `/api/notifications` GET/POST + `/api/notifications/[id]/read` POST + `/api/notifications/read-all` POST
 - **Backend D1 Schema**: 新增 `0015_notifications.sql` — `notifications` 表（支持 mention/reply/collaborator_join/system/info/template_update/comment_reply 类型）

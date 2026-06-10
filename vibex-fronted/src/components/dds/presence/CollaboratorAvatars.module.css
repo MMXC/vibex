@@ -1,0 +1,176 @@
+/**
+ * CollaboratorAvatars.module.css — S84-E2
+ *
+ * Design tokens (reference DESIGN.md variables when available):
+ * - Status dot colors via CSS custom properties
+ * - Avatar sizing: 32px diameter (--avatar-size: 32px)
+ * - Stack gap: -8px overlap (like Figma/Notion)
+ * - Fade-out: 300ms ease-out transition (S84-E2 DoD requirement)
+ */
+
+.container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(8px);
+  min-height: 40px;
+}
+
+.containerEmpty {
+  min-height: 40px;
+  justify-content: center;
+}
+
+/* Avatar stack — items overlap leftwards */
+.avatarStack {
+  display: flex;
+  align-items: center;
+}
+
+.avatarWrapper {
+  position: relative;
+  margin-left: -8px;
+  transition: opacity 300ms ease-out, transform 300ms ease-out;
+}
+
+.avatarWrapper:first-child {
+  margin-left: 0;
+}
+
+/* S84-E2: Collaborator disconnect fade-out — 300ms CSS transition (DoD requirement) */
+.fadingOut {
+  opacity: 0;
+  transform: scale(0.8);
+  pointer-events: none;
+}
+
+/* Avatar circle */
+.avatarCircle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--avatar-color, #6366f1);
+  border: 2px solid rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+/* Avatar image */
+.avatarImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+/* Avatar initial (fallback when no avatar URL) */
+.avatarInitial {
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1;
+  text-transform: uppercase;
+  user-select: none;
+}
+
+/* Status dot — bottom-right of avatar */
+.statusDot {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(0, 0, 0, 0.3);
+  background: var(--status-color, #22c55e);
+  transition: background 200ms ease;
+}
+
+/* Status dot color variants via data attribute */
+.statusDot[data-status='online'] {
+  --status-color: #22c55e;
+}
+
+.statusDot[data-status='idle'] {
+  --status-color: #eab308;
+}
+
+.statusDot[data-status='offline'] {
+  --status-color: #9ca3af;
+}
+
+/* Avatar item wrapper */
+.avatarItem {
+  position: relative;
+  cursor: pointer;
+}
+
+.avatarItem:hover .avatarCircle {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
+  transition: transform 150ms ease, box-shadow 150ms ease;
+}
+
+/* Overflow badge */
+.overflowBadge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  border: 2px dashed rgba(255, 255, 255, 0.2);
+  margin-left: -8px;
+  cursor: default;
+}
+
+.overflowText {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 11px;
+  font-weight: 600;
+  user-select: none;
+}
+
+/* Empty state */
+.emptyState {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: rgba(255, 255, 255, 0.4);
+  padding: 4px;
+}
+
+.emptyLabel {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.35);
+  user-select: none;
+}
+
+/* Reconnect spinner */
+.reconnectIndicator {
+  display: flex;
+  align-items: center;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.reconnectSpinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

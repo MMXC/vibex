@@ -1,0 +1,69 @@
+/**
+ * CollaboratorCursors.module.css — S84-E2
+ *
+ * Positioning: absolutely positioned relative to canvas container.
+ * Cursors are pointer-events: none so they don't interfere with interactions.
+ * Fade-out animation on cursor removal.
+ */
+
+.container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 100;
+  overflow: hidden;
+}
+
+.cursorWrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  will-change: transform;
+  /* Smooth cursor movement */
+  transition: transform 80ms linear, opacity 300ms ease-out;
+}
+
+/* Cursor icon */
+.cursorIcon {
+  display: flex;
+  align-items: flex-start;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+  transform: translate(-1px, -1px);
+}
+
+/* Nickname label */
+.cursorLabel {
+  position: absolute;
+  top: 20px;
+  left: 10px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #fff;
+  white-space: nowrap;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  user-select: none;
+  /* Fade-in on appearance */
+  animation: labelFadeIn 150ms ease-out;
+}
+
+@keyframes labelFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Cursor removal fade-out */
+.cursorWrapper[data-removing='true'] {
+  opacity: 0;
+  pointer-events: none;
+}

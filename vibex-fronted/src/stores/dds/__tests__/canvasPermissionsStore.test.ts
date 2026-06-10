@@ -42,6 +42,7 @@ describe('canvasPermissionsStore — S85-E1', () => {
 
   describe('fetchCollaborators', () => {
     it('parses collaborators and sets myRole from matching userId', async () => {
+      // Two mocks: one for initCanvas's internal fetchCollaborators, one for explicit call
       mockFetchJson({
         collaborators: [
           {
@@ -57,6 +58,21 @@ describe('canvasPermissionsStore — S85-E1', () => {
         ],
       });
       await useCanvasPermissionsStore.getState().initCanvas('canvas-1', 'user-1');
+      // After initCanvas, myRole is already set. fetchCollaborators re-fetches.
+      mockFetchJson({
+        collaborators: [
+          {
+            id: 'collab-1', permissionId: 'perm-1', userId: 'user-1',
+            email: 'alice@example.com', display_name: 'Alice',
+            role: 'owner', joined_at: '2026-01-01', last_active_at: null,
+          },
+          {
+            id: 'collab-2', permissionId: 'perm-2', userId: 'user-2',
+            email: 'bob@example.com', display_name: 'Bob',
+            role: 'editor', joined_at: '2026-01-02', last_active_at: null,
+          },
+        ],
+      });
       await useCanvasPermissionsStore.getState().fetchCollaborators();
       const s = useCanvasPermissionsStore.getState();
       expect(s.collaborators).toHaveLength(2);
@@ -66,12 +82,16 @@ describe('canvasPermissionsStore — S85-E1', () => {
     it('sets myRole to null when user is not in collaborators', async () => {
       mockFetchJson({ collaborators: [] });
       await useCanvasPermissionsStore.getState().initCanvas('canvas-1', 'user-1');
+      // After initCanvas, myRole is already null. Explicitly re-fetch.
+      mockFetchJson({ collaborators: [] });
       await useCanvasPermissionsStore.getState().fetchCollaborators();
       expect(useCanvasPermissionsStore.getState().myRole).toBeNull();
     });
 
     it('sets error on fetch failure', async () => {
+      // Set up rejection in test body (beforeEach resets mocks)
       mockFetch.mockRejectedValueOnce(new Error('Network error'));
+      useCanvasPermissionsStore.setState({ canvasId: 'canvas-1' });
       try {
         await useCanvasPermissionsStore.getState().fetchCollaborators();
       } catch { /* expected */ }
@@ -109,7 +129,7 @@ describe('canvasPermissionsStore — S85-E1', () => {
 
   describe('addCollaborator', () => {
     it('sets error when user is not owner/admin', async () => {
-      useCanvasPermissionsStore.setState({ myRole: 'viewer' });
+      useCanvasPermissionsStore.setState({ myRole: 'viewer', canvasId: 'canvas-1' });
       await useCanvasPermissionsStore.getState().addCollaborator('user-2', 'editor');
       expect(useCanvasPermissionsStore.getState().error).toBe(
         'Permission denied: only owner or admin can add collaborators'
@@ -131,7 +151,7 @@ describe('canvasPermissionsStore — S85-E1', () => {
 
   describe('removeCollaborator', () => {
     it('sets error when user is not owner/admin', async () => {
-      useCanvasPermissionsStore.setState({ myRole: 'editor' });
+      useCanvasPermissionsStore.setState({ myRole: 'editor', canvasId: 'canvas-1' });
       await useCanvasPermissionsStore.getState().removeCollaborator('user-2');
       expect(useCanvasPermissionsStore.getState().error).toBe(
         'Permission denied: only owner or admin can remove collaborators'

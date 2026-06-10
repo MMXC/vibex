@@ -20,8 +20,8 @@
 
 ## DoD (Definition of Done)
 
-### E1: 画布版本 Diff 对比
-- [ ] `DiffPanel.tsx` 组件实现（新增绿色/删除红色/修改黄色三色高亮）
+### E1: 画布版本 Diff 对比 ✅
+- [x] `DiffPanel.tsx` 组件实现（新增绿色/删除红色/修改黄色三色高亮）
 - [ ] `/api/canvas/:id/diff` 后端 API 实现并返回 JSON diff
 - [ ] `canvasTimelineStore.ts` 新增 diff 状态 slice
 - [ ] 时间轴节点右键菜单增加「与当前版本对比」入口

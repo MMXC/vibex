@@ -27,6 +27,7 @@ const CATEGORIES: { key: CategoryTabValue; label: string; icon: string }[] = [
   { key: 'uml', label: 'UML', icon: '📐' },
   { key: 'other', label: '其他', icon: '📄' },
   { key: 'discover', label: '发现', icon: '🔗' },
+  { key: 'favorites', label: '我的收藏', icon: '⭐' },
 ];
 
 const CATEGORY_COLORS: Record<string, string> = {

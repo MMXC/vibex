@@ -7047,3 +7047,20 @@ See git history for complete changelog.
 - **vibex-fronted/src/lib/api/canvasDiff.ts**: 新建 `canvasDiffApi.getDiff()` — 调用 `/v1/canvas/diff` 获取版本差异数据
 - **vibex-backend/src/app/api/canvas/diff/route.ts**: 新建 `GET /api/canvas/diff?projectId=&from=&to=&mode=` — D1 查询两个快照、计算节点 diff、返回结构化结果
 
+
+## [Unreleased] S84-E4: 模板搜索增强与收藏 — 2026-06-19
+
+**类型**: `feat`
+
+**功能概述**: Fuse.js 模糊搜索集成（typo 容错，支持名称+标签组合搜索）、我的收藏 Tab、收藏 API 路由、D1 持久化、templateStore 前后端同步。
+
+**变更文件**:
+- `vibex-backend/src/app/api/templates/favorites/route.ts` — GET/POST 用户收藏列表 API（含自动建表迁移）
+- `vibex-backend/src/app/api/templates/[id]/favorite/route.ts` — POST/DELETE 单个模板收藏 API
+- `vibex-backend/src/lib/logger/safeError.ts` — safeError re-export（API 路由错误日志）
+- `vibex-fronted/src/components/dds/templates/TemplateGallery.tsx` — Fuse.js 模糊搜索（name/displayName/description/tags 加权）+ 收藏 Tab 空状态提示
+- `vibex-fronted/src/components/dds/templates/CategoryTab.tsx` — 新增 ⭐ 我的收藏 Tab
+- `vibex-fronted/src/stores/templateStore.ts` — toggleFavorite 同步后端 + onRehydrateStorage 合并后端收藏列表
+- `vibex-fronted/src/components/dds/templates/__tests__/TemplateGallery.favorites.test.tsx` — 10+ 测试用例
+
+**测试**: vitest TemplateGallery.favorites.test.tsx ✅

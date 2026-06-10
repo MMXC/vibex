@@ -6986,3 +6986,12 @@ See git history for complete changelog.
 - **shortcutStore.ts**: 新增 Ctrl+K 快捷键绑定
 - **DDSCanvasPage.tsx**: 集成 CommandPalette，canvasPage 加载时注册快捷键
 
+
+## [Unreleased] S84-E4: 模板搜索增强与收藏 — 2026-06-19
+- **TemplateGallery.tsx**: Fuse.js 模糊搜索集成 — `useMemo` 创建 Fuse 实例，搜索 name(0.4)/displayName(0.3)/description(0.2)/tags(0.1)，threshold 0.4，支持 typo 容错
+- **TemplateGallery.tsx**: 收藏 Tab 空状态提示「还没有收藏任何模板，点击卡片上的⭐添加收藏」
+- **CategoryTab.tsx**: 新增 `{ key: 'favorites', label: '我的收藏', icon: '⭐' }` Tab 项
+- **templateStore.ts**: `toggleFavorite` 增加 fire-and-forget `POST/DELETE /api/templates/[id]/favorite` 后端同步
+- **templateStore.ts**: `onRehydrateStorage` 钩子从 `GET /api/templates/favorites` 拉取后端收藏列表并与本地状态合并（dedup）
+- **TemplateGallery.favorites.test.tsx**: 10 个 S84-E4 单元测试（Fuzzy 搜索/收藏 Tab/空状态/星标按钮 API 调用）
+- **vitest**: TemplateGallery.favorites.test.tsx ✅

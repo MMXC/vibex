@@ -490,7 +490,7 @@ export const useTemplateStore = create<TemplateState>()(
         return usageScore + tagScore + recencyScore;
       },
 
-      // 切换收藏状态
+      // 切换收藏状态（fire-and-forget 同步到后端）
       toggleFavorite: (templateId) => {
         const { favoriteTemplateIds } = get();
         const isFav = favoriteTemplateIds.includes(templateId);
@@ -498,6 +498,11 @@ export const useTemplateStore = create<TemplateState>()(
           ? favoriteTemplateIds.filter(id => id !== templateId)
           : [...favoriteTemplateIds, templateId];
         set({ favoriteTemplateIds: newFavorites });
+        // Fire-and-forget: sync to backend
+        fetch(`/api/templates/${templateId}/favorite`, {
+          method: isFav ? 'DELETE' : 'POST',
+          headers: { 'Content-Type': 'application/json' },
+        }).catch(() => { /* silent — local state already updated */ });
       },
       
       // 根据模板内容推断分类
@@ -929,6 +934,21 @@ export const useTemplateStore = create<TemplateState>()(
     {
       name: 'vibex-template-store',
       partialize: (state) => ({ stats: state.stats }),
+      onRehydrateStorage: () => (state) => {
+        // S84-E4: fetch favorites from backend on store init (fire-and-forget)
+        if (!state) return;
+        fetch('/api/templates/favorites', { credentials: 'include' })
+          .then(res => res.ok ? res.json() : null)
+          .then(data => {
+            if (data?.favorites && Array.isArray(data.favorites)) {
+              const backendIds = data.favorites.map((f: { templateId: string }) => f.templateId);
+              // Merge: keep local favorites + add any missing from backend (dedup)
+              const merged = Array.from(new Set([...state.favoriteTemplateIds, ...backendIds]));
+              state.favoriteTemplateIds = merged;
+            }
+          })
+          .catch(() => { /* silent — local state is source of truth */ });
+      },
     }
   )
 );

@@ -7,7 +7,8 @@
  */
 'use client';
 
-import React, { useEffect, useState, useCallback, useRef } from 'react';
+import React, { useEffect, useState, useCallback, useRef, useMemo } from 'react';
+import Fuse from 'fuse.js';
 import {
   listTemplates,
   getTemplate,
@@ -225,18 +226,37 @@ export function TemplateGallery({ isOpen, onClose, onTemplateApplied }: Template
     }
   }, [isOpen, loadTemplates]);
 
+  // ---- E4: Fuse.js fuzzy search — typo-tolerant, searches name/displayName/description/tags ----
+  const fuse = useMemo(() => {
+    return new Fuse(templates, {
+      keys: [
+        { name: 'name', weight: 0.4 },
+        { name: 'displayName', weight: 0.3 },
+        { name: 'description', weight: 0.2 },
+        { name: 'tags', weight: 0.1 },
+      ],
+      threshold: 0.4,
+      includeScore: true,
+      minMatchCharLength: 1,
+    });
+  }, [templates]);
+
   // E5: Fuse.js search + category filter + 标签交集过滤
   const filtered = templates.filter((t) => {
-    const matchSearch =
-      !searchQuery ||
-      t.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      t.description.toLowerCase().includes(searchQuery.toLowerCase());
+    // ---- E4: Fuzzy search via Fuse.js ----
+    let matchSearch = true;
+    if (searchQuery.trim()) {
+      const results = fuse.search(searchQuery.trim());
+      const matchedIds = new Set(results.map(r => r.item.id));
+      matchSearch = matchedIds.has(t.id);
+    }
     if (!matchSearch) return false;
     // Category filter (canvas layout category from IndexedDB)
     const cat = t.category || 'other';
     const matchCat =
       selectedCategory === 'all' ||
-      (selectedCategory === cat);
+      (selectedCategory === cat) ||
+      (selectedCategory === 'favorites' && templateStore.isFavorite(t.id));
     if (!matchCat) return false;
     // ---- E5: 标签交集过滤 + ---- E4: 日期范围过滤 ----
     if (selectedTags.length > 0) {
@@ -494,7 +514,10 @@ export function TemplateGallery({ isOpen, onClose, onTemplateApplied }: Template
           ref={gridRef}
         >
           {loading && <p className={styles.loading}>加载中...</p>}
-          {!loading && filtered.length === 0 && (
+          {!loading && filtered.length === 0 && selectedCategory === 'favorites' && (
+            <p className={styles.empty}>还没有收藏任何模板，点击卡片上的⭐添加收藏</p>
+          )}
+          {!loading && filtered.length === 0 && selectedCategory !== 'favorites' && (
             <p className={styles.empty}>没有找到匹配的模板</p>
           )}
           {!loading &&

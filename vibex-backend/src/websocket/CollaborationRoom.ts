@@ -213,6 +213,13 @@ export class CollaborationRoom extends DurableObject {
           timestamp: Date.now(),
         }, connectionId);
         break;
+      // S85-E2: Session history events — broadcast to other connections in the same project room
+      case 'collab:session':
+        this.broadcast({
+          ...message,
+          timestamp: Date.now(),
+        }, connectionId);
+        break;
       default:
         devLog('Unknown message type:', message.type);
     }

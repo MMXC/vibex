@@ -95,6 +95,11 @@ import { SelectionToolbar } from '@/components/dds/SelectionToolbar';
 import { useSelectionBox } from '@/hooks/dds/useSelectionBox';
 // S79-E1: Start/stop the scheduled export runner on mount/unmount
 import { ScheduledExportRunner } from '@/services/export/ScheduledExportRunner';
+// S84-E3: Command Palette
+import { CommandPalette } from '@/components/dds/command-palette/CommandPalette';
+import { registerShortcutAction, unregisterShortcutAction } from '@/hooks/useKeyboardShortcuts';
+import { useCommandPaletteStore } from '@/stores/commandPaletteStore';
+import { useCanvasListStore } from '@/stores/canvasListStore';
 
 // E1 (Sprint70): reloadFromSnapshot — reads a snapshot from IndexedDB and replaces canvas nodes
 async function reloadFromSnapshot(canvasId: string, snapshotId: string): Promise<void> {
@@ -1154,6 +1159,10 @@ const { onCursorMove, broadcastCursor } = useWebSocketPresence({
       {/* Keyboard shortcut edit modal */}
       <ShortcutEditModalPortal />
 
+      {/* S84-E3: Command Palette */}
+      <CommandPalettePortal />
+      <CommandPaletteShortcut />
+
       {/* E3: Search Panel */}
       <DDSSearchPanel
         open={searchPanelOpen}
@@ -1412,6 +1421,27 @@ function ShortcutEditModalPortal() {
   const editingAction = useShortcutStore((s) => s.editingAction);
   if (!editingAction) return null;
   return <ShortcutEditModal />;
+}
+
+/** S84-E3: CommandPalette portal — always mounted, visibility driven by store */
+function CommandPalettePortal() {
+  // Build search index from canvasListStore canvases
+  const canvases = useCanvasListStore((s) =>
+    s.canvases.map((c) => ({ id: c.id, name: c.name }))
+  );
+  return <CommandPalette canvases={canvases} />;
+}
+
+/** S84-E3: Register Ctrl+K shortcut on mount, unregister on unmount */
+function CommandPaletteShortcut() {
+  const toggle = useCommandPaletteStore((s) => s.toggle);
+
+  useEffect(() => {
+    registerShortcutAction('open-command-palette', () => toggle());
+    return () => unregisterShortcutAction('open-command-palette');
+  }, [toggle]);
+
+  return null;
 }
 
 export default DDSCanvasPage;

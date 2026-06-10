@@ -66,6 +66,8 @@ const DEFAULT_SHORTCUTS: ShortcutConfig[] = [
   { action: 'go-to-flows', description: '切换到流程', defaultKey: 'Cmd+2', currentKey: 'Cmd+2', category: 'navigation' },
   { action: 'go-to-components', description: '切换到组件', defaultKey: 'Cmd+3', currentKey: 'Cmd+3', category: 'navigation' },
   { action: 'go-to-settings', description: '打开设置', defaultKey: 'Cmd+,', currentKey: 'Cmd+,', category: 'navigation' },
+  // S84-E3: Command Palette (Ctrl+K / Cmd+K)
+  { action: 'open-command-palette', description: '快速跳转面板', defaultKey: 'Cmd+K', currentKey: 'Cmd+K', category: 'navigation' },
   
   // Edit
   { action: 'undo', description: '撤销', defaultKey: 'Cmd+Z', currentKey: 'Cmd+Z', category: 'edit' },

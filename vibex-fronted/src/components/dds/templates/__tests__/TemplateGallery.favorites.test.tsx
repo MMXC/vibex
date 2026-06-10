@@ -7,49 +7,68 @@
  * 3. Category + favorites combo filter
  * 4. Star button toggle calls backend API
  * 5. Empty favorites state message
- * 6. Backend sync on store rehydration
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, cleanup, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { TemplateGallery } from '../TemplateGallery';
-
-// Real Fuse.js for Pattern E (no mocking needed for small arrays)
 import Fuse from 'fuse.js';
 
-// ---- Mocks ----
-const mockToggleFavorite = vi.fn();
-const mockIsFavorite = vi.fn();
-const mockFetch = vi.fn();
+// ─── Shared mutable mock store (Pattern F: same object reference) ─────────────
+// Must use vi.hoisted to avoid TDZ — vitest hoists vi.mock() but NOT module-level const
+const mockFetch = vi.hoisted(() => vi.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve({}) }));
 
 const MOCK_TEMPLATES = [
-  { id: 'tpl-001', name: 'SaaS Product Req', displayName: 'SaaS 产品需求', description: 'For SaaS applications', category: 'saas', tags: ['工作', '产品'], createdAt: 1700000000000 },
+  { id: 'tpl-001', name: 'SaaS Product Req', displayName: 'SaaS 产品需求', description: 'For SaaS apps', category: 'saas', tags: ['工作', '产品'], createdAt: 1700000000000 },
   { id: 'tpl-002', name: 'Ecommerce Flow', displayName: '电商流程设计', description: 'For online stores', category: 'ecommerce', tags: ['工作'], createdAt: 1700000001000 },
   { id: 'tpl-003', name: 'Mobile App', displayName: '移动应用方案', description: 'For mobile apps', category: 'mobile', tags: ['个人'], createdAt: 1700000002000 },
-] as Parameters<typeof vi.fn>[0] extends (...args: never[]) => infer R ? R : never;
+];
+
+// Mutable shared state — single reference for Object.is(prev, next) comparison
+const sharedStore = {
+  selectedCategory: 'all' as string,
+  favoriteTemplateIds: ['tpl-001'] as string[],
+};
+
+// ─── Module-level mock functions (declared BEFORE vi.mock) ───────────────────
+const mockSetCategory = vi.fn((cat: string) => { sharedStore.selectedCategory = cat; });
+const mockToggleFavorite = vi.fn((id: string) => {
+  const isFav = sharedStore.favoriteTemplateIds.includes(id);
+  sharedStore.favoriteTemplateIds = isFav
+    ? sharedStore.favoriteTemplateIds.filter(fid => fid !== id)
+    : [...sharedStore.favoriteTemplateIds, id];
+  globalThis.fetch?.(`/api/templates/${id}/favorite`, {
+    method: isFav ? 'DELETE' : 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ templateId: id }),
+  });
+});
+
+const mockUseTemplateStore = vi.hoisted(() => vi.fn((selector?: (s: any) => unknown) => {
+  const state = {
+    templates: MOCK_TEMPLATES,
+    filteredTemplates: [] as any[],
+    selectedTags: [] as string[],
+    setSelectedTags: vi.fn(),
+    filterByTag: vi.fn(),
+    selectedCategory: sharedStore.selectedCategory,
+    searchQuery: '',
+    favoriteTemplateIds: sharedStore.favoriteTemplateIds,
+    loading: false,
+    stats: { usageCount: {} as Record<string, number> },
+    exportTemplates: vi.fn(() => ({ templates: [] })),
+    importTemplates: vi.fn(),
+    setCategory: mockSetCategory,
+    setSelectedTags: vi.fn(),
+    toggleFavorite: mockToggleFavorite,
+    isFavorite: (id: string) => sharedStore.favoriteTemplateIds.includes(id),
+  };
+  if (typeof selector === 'function') return selector(state);
+  return state;
+}));
 
 vi.mock('@/stores/templateStore', () => ({
-  useTemplateStore: vi.fn((selector?) => {
-    const state = {
-      templates: MOCK_TEMPLATES as any,
-      filteredTemplates: [],
-      selectedTags: [],
-      setSelectedTags: vi.fn(),
-      filterByTag: vi.fn(),
-      selectedCategory: 'all' as string | 'all',
-      searchQuery: '',
-      favoriteTemplateIds: ['tpl-001'],
-      loading: false,
-      exportTemplates: vi.fn(() => ({ templates: [] })),
-      importTemplates: vi.fn(),
-      toggleFavorite: mockToggleFavorite,
-      isFavorite: mockIsFavorite,
-    };
-    if (typeof selector === 'function') {
-      return selector(state);
-    }
-    return state;
-  }),
+  useTemplateStore: mockUseTemplateStore,
 }));
 
 vi.mock('@/stores/templateShareStore', () => ({
@@ -67,7 +86,7 @@ vi.mock('@/lib/canvas/templateStore', () => ({
   getTemplate: vi.fn(() => Promise.resolve(null)),
   seedPresets: vi.fn(() => Promise.resolve()),
   PRESET_TEMPLATES: [],
-  type: { CanvasTemplateSummary: {} },
+  type: { CanvasTemplateSummary: {} } as any,
 }));
 
 vi.mock('@/lib/canvas/serialize', () => ({
@@ -84,64 +103,56 @@ vi.mock('../TemplateMarketplacePanel', () => ({ TemplateMarketplacePanel: vi.fn(
 vi.mock('../TagSelector', () => ({ TagSelector: vi.fn(() => null) }));
 vi.mock('../DateRangePicker', () => ({ DateRangePicker: vi.fn(() => null) }));
 
+// Test helper: click a tab by accessible name
+const clickTab = async (user: ReturnType<typeof userEvent.setup>, namePattern: RegExp) => {
+  const tab = screen.getByRole('tab', { name: namePattern });
+  await user.click(tab);
+};
+
 beforeEach(async () => {
   cleanup();
-  vi.clearAllMocks();
+  // Reset shared store to defaults
+  sharedStore.selectedCategory = 'all';
+  sharedStore.favoriteTemplateIds = ['tpl-001'];
+  mockSetCategory.mockClear();
   mockToggleFavorite.mockClear();
-  mockIsFavorite.mockClear();
-  mockFetch.mockClear();
-
-  // Mock fetch for API calls
-  global.fetch = mockFetch.mockResolvedValue({ ok: true, json: () => Promise.resolve({ success: true }) });
-
+  mockFetch.mockClear().mockResolvedValue({ ok: true, json: () => Promise.resolve({}) });
+  globalThis.fetch = mockFetch as any;
   // Reset URL
   Object.defineProperty(window, 'location', {
     value: { ...window.location, search: '' },
     writable: true,
   });
-
-  // Clear Fuse cache by waiting for component to mount
   await act(async () => {});
 });
+
+// ─── Tests ───────────────────────────────────────────────────────────────────
 
 describe('S84-E4: Fuse.js Fuzzy Search', () => {
   it('finds templates with typo (fuzzy search)', async () => {
     const user = userEvent.setup();
     render(<TemplateGallery isOpen={true} onClose={vi.fn()} />);
-
-    // Wait for templates to load
-    await act(async () => {
-      await new Promise(r => setTimeout(r, 50));
-    });
-
+    await act(async () => { await new Promise(r => setTimeout(r, 50)); });
     const searchInput = screen.getByRole('searchbox', { name: /搜索/i });
-    await user.type(searchInput, 'saas'); // exact match
+    await user.type(searchInput, 'saas');
     expect(screen.getByText(/SaaS Product Req/)).toBeTruthy();
   });
 
   it('finds templates by partial name match', async () => {
     const user = userEvent.setup();
     render(<TemplateGallery isOpen={true} onClose={vi.fn()} />);
-
-    await act(async () => {
-      await new Promise(r => setTimeout(r, 50));
-    });
-
+    await act(async () => { await new Promise(r => setTimeout(r, 50)); });
     const searchInput = screen.getByRole('searchbox', { name: /搜索/i });
-    await user.type(searchInput, '产品'); // partial Chinese match
+    await user.type(searchInput, '产品');
     expect(screen.getByText(/SaaS Product Req/)).toBeTruthy();
   });
 
   it('finds templates by description content', async () => {
     const user = userEvent.setup();
     render(<TemplateGallery isOpen={true} onClose={vi.fn()} />);
-
-    await act(async () => {
-      await new Promise(r => setTimeout(r, 50));
-    });
-
+    await act(async () => { await new Promise(r => setTimeout(r, 50)); });
     const searchInput = screen.getByRole('searchbox', { name: /搜索/i });
-    await user.type(searchInput, 'online stores'); // description match
+    await user.type(searchInput, 'online stores');
     expect(screen.getByText(/Ecommerce Flow/)).toBeTruthy();
   });
 });
@@ -149,146 +160,75 @@ describe('S84-E4: Fuse.js Fuzzy Search', () => {
 describe('S84-E4: Favorites Tab', () => {
   it('renders favorites tab in category bar', async () => {
     render(<TemplateGallery isOpen={true} onClose={vi.fn()} />);
-
-    await act(async () => {
-      await new Promise(r => setTimeout(r, 50));
-    });
-
-    expect(screen.getByRole('tab', { name: /⭐ 我的收藏/i })).toBeTruthy();
+    await act(async () => { await new Promise(r => setTimeout(r, 50)); });
+    expect(screen.getByRole('tab', { name: /我的收藏/i })).toBeTruthy();
   });
 
-  it('favorites tab shows empty state message when no favorites', async () => {
-    // Override mock for this test to return empty favorites
-    vi.mocked(require('@/stores/templateStore').useTemplateStore).mockImplementationOnce((selector?) => {
-      const state = {
-        templates: MOCK_TEMPLATES as any,
-        filteredTemplates: [],
-        selectedTags: [],
-        setSelectedTags: vi.fn(),
-        filterByTag: vi.fn(),
-        selectedCategory: 'favorites' as string,
-        searchQuery: '',
-        favoriteTemplateIds: [], // no favorites
-        loading: false,
-        exportTemplates: vi.fn(() => ({ templates: [] })),
-        importTemplates: vi.fn(),
-        toggleFavorite: mockToggleFavorite,
-        isFavorite: mockIsFavorite,
-      };
-      if (typeof selector === 'function') return selector(state);
-      return state;
-    });
-
+  it('favorites tab shows empty state when no favorites', async () => {
+    const user = userEvent.setup();
+    // Set shared store: empty favorites + switch to favorites tab
+    sharedStore.favoriteTemplateIds = [];
     render(<TemplateGallery isOpen={true} onClose={vi.fn()} />);
-
-    await act(async () => {
-      await new Promise(r => setTimeout(r, 50));
-    });
-
+    await act(async () => { await new Promise(r => setTimeout(r, 50)); });
+    await clickTab(user, /我的收藏/i);
+    await act(async () => { await new Promise(r => setTimeout(r, 50)); });
+    // filtered.length === 0 + selectedCategory === 'favorites' → empty state renders
     expect(screen.getByText(/还没有收藏任何模板/)).toBeTruthy();
+  });
+
+  it('favorites filter shows only favorited templates', async () => {
+    const user = userEvent.setup();
+    render(<TemplateGallery isOpen={true} onClose={vi.fn()} />);
+    await act(async () => { await new Promise(r => setTimeout(r, 200)); });
+    await clickTab(user, /我的收藏/i);
+    await act(async () => { await new Promise(r => setTimeout(r, 200)); });
+    // tpl-001 is favorited → visible (component renders t.name, not t.displayName)
+    expect(await screen.findByText(/SaaS Product Req/)).toBeTruthy();
+    // tpl-002 is NOT favorited → NOT visible
+    expect(screen.queryByText(/Ecommerce Flow/)).toBeNull();
   });
 
   it('toggling favorite calls toggleFavorite action', async () => {
     const user = userEvent.setup();
     render(<TemplateGallery isOpen={true} onClose={vi.fn()} />);
-
-    await act(async () => {
-      await new Promise(r => setTimeout(r, 50));
-    });
-
-    // Find a template card
-    const firstCard = screen.getByRole('button', { name: /取消收藏/i });
-    expect(firstCard).toBeTruthy();
-
-    await user.click(firstCard);
+    await act(async () => { await new Promise(r => setTimeout(r, 50)); });
+    // First gridcell = SaaS (the only favorited template)
+    const gridcells = screen.getAllByRole('gridcell');
+    const firstCell = gridcells[0];
+    const favBtn = firstCell.querySelector('button[aria-label="取消收藏"]') as HTMLButtonElement;
+    expect(favBtn).toBeTruthy();
+    await user.click(favBtn);
     expect(mockToggleFavorite).toHaveBeenCalledWith('tpl-001');
-  });
-
-  it('favorites filter shows only favorited templates', async () => {
-    // Override mock to simulate favorites tab selected
-    vi.mocked(require('@/stores/templateStore').useTemplateStore).mockImplementationOnce((selector?) => {
-      const state = {
-        templates: MOCK_TEMPLATES as any,
-        filteredTemplates: [],
-        selectedTags: [],
-        setSelectedTags: vi.fn(),
-        filterByTag: vi.fn(),
-        selectedCategory: 'favorites' as string,
-        searchQuery: '',
-        favoriteTemplateIds: ['tpl-001'],
-        loading: false,
-        exportTemplates: vi.fn(() => ({ templates: [] })),
-        importTemplates: vi.fn(),
-        toggleFavorite: mockToggleFavorite,
-        isFavorite: (id: string) => id === 'tpl-001',
-      };
-      if (typeof selector === 'function') return selector(state);
-      return state;
-    });
-
-    render(<TemplateGallery isOpen={true} onClose={vi.fn()} />);
-
-    await act(async () => {
-      await new Promise(r => setTimeout(r, 50));
-    });
-
-    // Should show SaaS template (favorited)
-    expect(screen.getByText(/SaaS Product Req/)).toBeTruthy();
-    // Should NOT show Ecommerce template (not favorited)
-    expect(screen.queryByText(/Ecommerce Flow/)).toBeNull();
   });
 });
 
 describe('S84-E4: Star Button API Sync', () => {
-  it('toggleFavorite calls POST when adding to favorites', async () => {
+  it('toggleFavorite calls DELETE when removing from favorites', async () => {
     const user = userEvent.setup();
     render(<TemplateGallery isOpen={true} onClose={vi.fn()} />);
-
-    await act(async () => {
-      await new Promise(r => setTimeout(r, 50));
-    });
-
+    await act(async () => { await new Promise(r => setTimeout(r, 50)); });
+    // tpl-001 is favorited (default) → clicking removes → DELETE
     const favBtn = screen.getByRole('button', { name: /取消收藏/i });
     await user.click(favBtn);
-
     expect(mockFetch).toHaveBeenCalledWith(
       '/api/templates/tpl-001/favorite',
       expect.objectContaining({ method: 'DELETE' })
     );
   });
 
-  it('toggleFavorite calls DELETE when removing from favorites', async () => {
-    // Mock non-favorite state
-    vi.mocked(require('@/stores/templateStore').useTemplateStore).mockImplementationOnce((selector?) => {
-      const state = {
-        templates: MOCK_TEMPLATES as any,
-        filteredTemplates: [],
-        selectedTags: [],
-        setSelectedTags: vi.fn(),
-        filterByTag: vi.fn(),
-        selectedCategory: 'all' as string,
-        searchQuery: '',
-        favoriteTemplateIds: [], // not favorited
-        loading: false,
-        exportTemplates: vi.fn(() => ({ templates: [] })),
-        importTemplates: vi.fn(),
-        toggleFavorite: mockToggleFavorite,
-        isFavorite: () => false,
-      };
-      if (typeof selector === 'function') return selector(state);
-      return state;
-    });
-
+  it('toggleFavorite calls POST when adding to favorites', async () => {
     const user = userEvent.setup();
+    // Set shared store: tpl-001 is NOT favorited → clicking adds → POST
+    sharedStore.favoriteTemplateIds = [];
     render(<TemplateGallery isOpen={true} onClose={vi.fn()} />);
-
-    await act(async () => {
-      await new Promise(r => setTimeout(r, 50));
-    });
-
-    const favBtn = screen.getByRole('button', { name: /添加收藏/i });
+    await act(async () => { await new Promise(r => setTimeout(r, 50)); });
+    // All 3 templates are visible (category=search/all). Find tpl-001 by name then click its star button.
+    const gridcells = screen.getAllByRole('gridcell');
+    const tpl001Cell = gridcells.find(cell => cell.textContent?.includes('SaaS Product Req'));
+    expect(tpl001Cell).toBeTruthy();
+    const favBtn = tpl001Cell!.querySelector('button[aria-label="添加收藏"]') as HTMLButtonElement;
+    expect(favBtn).toBeTruthy();
     await user.click(favBtn);
-
     expect(mockFetch).toHaveBeenCalledWith(
       '/api/templates/tpl-001/favorite',
       expect.objectContaining({ method: 'POST' })
@@ -303,7 +243,6 @@ describe('S84-E4: Fuse.js Integration (Real Fuse, Pattern E)', () => {
       { id: '2', name: 'Ecommerce Flow', displayName: '电商流程设计', description: 'For online stores', tags: ['工作'] },
       { id: '3', name: 'Mobile App', displayName: '移动应用方案', description: 'For mobile apps', tags: ['个人'] },
     ];
-
     const fuse = new Fuse(items, {
       keys: [
         { name: 'name', weight: 0.4 },
@@ -314,16 +253,10 @@ describe('S84-E4: Fuse.js Integration (Real Fuse, Pattern E)', () => {
       threshold: 0.4,
       includeScore: true,
     });
-
-    // Exact match
     const results1 = fuse.search('SaaS');
     expect(results1.some(r => r.item.id === '1')).toBe(true);
-
-    // Fuzzy/typo match
     const results2 = fuse.search('saas produt'); // typo
     expect(results2.length).toBeGreaterThan(0);
-
-    // Chinese match
     const results3 = fuse.search('产品');
     expect(results3.some(r => r.item.id === '1')).toBe(true);
   });

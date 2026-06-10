@@ -6969,3 +6969,11 @@ See git history for complete changelog.
 - **HistoryPanel.module.css**: timeline Tab 相关样式
 - **VersionTimeline.test.tsx**: 21 个单元测试全部通过 ✅
 
+
+## [Unreleased] S84-E1: 画布版本 Diff 对比 — 2026-06-10
+- **VersionDiffPanel.tsx**: 新增 `VersionDiffPanel` 组件 — 画布版本对比面板，支持新增/删除/修改三色高亮
+- **VersionDiffPanel.tsx**: 支持单向对比 (A→B) 和双向对比 (A↔B) 两种模式
+- **VersionDiffPanel.module.css**: 新建样式文件
+- **VersionDiffPanel.test.tsx**: 11 个 vitest 测试用例
+- **canvasTimelineStore.ts**: 新增 diff state (`isDiffPanelOpen`, `compareSnapshotId`, `diffData`, `diffMode`)
+- **canvasDiff.ts**: 新建 API client — `canvasDiffApi.getDiff()`

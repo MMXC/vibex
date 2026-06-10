@@ -6999,3 +6999,14 @@ See git history for complete changelog.
 - **URL State**: Gallery filters persisted to URL params (`?tags=&start=&end=&q=&cat=`)
 - **Data Model**: `CanvasTemplateSummary.tags: string[]` + `CanvasTemplateSummary.category` fields
 - **Tests**: `TagSelector.test.tsx` — 8 vitest cases covering render/dropdown/toggle/outside-click
+
+## [Unreleased] S84-E1: 画布版本 Diff 对比 — 2026-06-10
+- **vibex-fronted/src/stores/dds/canvasTimelineStore.ts**: 新增 diff state slice — `isDiffPanelOpen`, `compareSnapshotId`, `diffData`, `diffMode`
+- **vibex-fronted/src/stores/dds/canvasTimelineStore.ts**: 新增 `DiffMode` / `DiffNode` / `CanvasDiff` TypeScript 类型导出
+- **vibex-fronted/src/components/dds/history/VersionDiffPanel.tsx**: 新增 `VersionDiffPanel` 组件 — 右侧浮层面板，展示新增/删除/修改三种 diff 类型
+- **vibex-fronted/src/components/dds/history/VersionDiffPanel.tsx**: 支持「单向对比」和「双向对比」两种模式切换
+- **vibex-fronted/src/components/dds/history/VersionDiffPanel.tsx**: 11 个 vitest 测试用例覆盖渲染/加载/错误/交互场景
+- **vibex-fronted/src/components/dds/history/VersionDiffPanel.module.css**: 新建样式文件 — 绿色(新增)/红色(删除)/黄色(修改)三色体系
+- **vibex-fronted/src/lib/api/canvasDiff.ts**: 新建 `canvasDiffApi.getDiff()` — 调用 `/v1/canvas/diff` 获取版本差异数据
+- **vibex-backend/src/app/api/canvas/diff/route.ts**: 新建 `GET /api/canvas/diff?projectId=&from=&to=&mode=` — D1 查询两个快照、计算节点 diff、返回结构化结果
+

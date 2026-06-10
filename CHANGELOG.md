@@ -7117,3 +7117,16 @@ See git history for complete changelog.
 
 **依赖**: 无
 
+
+## [S85-E4] 分支合并预览与回滚 (2026-06-11)
+
+- feat(frontend): MergePreviewPanel — overlay merge preview with diff + execute button
+- feat(frontend): VersionTimeline onMerge prop + inline merge button (↪) for non-main branches
+- feat(backend): POST /api/canvas/:id/merge — branch merge audit trail (D1 branch_events)
+- feat(backend): POST /api/canvas/:id/rollback — version rollback audit trail (D1 rollback_events)
+- feat(migration): 0016_branch_events.sql — branch_events + rollback_events tables with indexes
+- test(frontend): MergePreviewPanel vitest — 10 cases covering render/merge flow/error states
+- test(backend): merge + rollback API route tests — 16 cases (8+8) covering validation + success paths
+
+类型: feat
+影响: canvas-history, canvas-history-store, backend-api

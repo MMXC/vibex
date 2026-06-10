@@ -28,6 +28,8 @@ interface VersionTimelineProps {
   onDelete: (snap: Snapshot) => void;
   /** Callback when zoom level changes */
   onZoomChange?: (level: TimelineZoomLevel) => void;
+  /** Callback to merge a branch snapshot */
+  onMerge?: (snap: Snapshot) => void;
 }
 
 const ZOOM_LABELS: Record<TimelineZoomLevel, string> = {
@@ -66,6 +68,7 @@ const VersionTimeline = memo(function VersionTimeline({
   onRestore,
   onDelete,
   onZoomChange,
+  onMerge,
 }: VersionTimelineProps) {
   const zoomLevel = useCanvasTimelineStore((s) => s.zoomLevel);
   const setZoomLevel = useCanvasTimelineStore((s) => s.setZoomLevel);
@@ -231,6 +234,16 @@ const VersionTimeline = memo(function VersionTimeline({
                     aria-label="恢复到此版本"
                   >
                     ↩
+                  </button>
+                )}
+                {!isFirst && snap.branchName && snap.branchName !== 'main' && (
+                  <button
+                    className={`${styles.actionBtn} ${styles.actionMerge}`}
+                    onClick={(e) => { e.stopPropagation(); onMerge?.(snap); }}
+                    title="合并此分支"
+                    aria-label="合并此分支"
+                  >
+                    ↪
                   </button>
                 )}
                 {!isFirst && (

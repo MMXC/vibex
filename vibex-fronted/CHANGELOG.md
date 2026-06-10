@@ -1,3 +1,10 @@
+## [Unreleased] S85-E3: 通知中心面板 — 2026-06-11
+- **Backend D1 notifications API**: 新增 `/api/notifications` GET/POST + `/api/notifications/[id]/read` POST + `/api/notifications/read-all` POST
+- **Backend D1 Schema**: 新增 `0015_notifications.sql` — `notifications` 表（支持 mention/reply/collaborator_join/system/info/template_update/comment_reply 类型）
+- **Backend 测试**: `route.test.ts` — 8 个测试用例（GET list/filter/pagination/error + POST create/validate/error）
+- **Frontend 集成**: `notificationStore.ts` 已调用 `/api/notifications` GET（`fetchUnreadFromServer`），D1 持久化后端已就绪
+- **前端 无需改动**: `NotificationPanel.tsx` + `DDSToolbar.tsx` 已集成 `notificationStore`，`getUnreadCount()` 已在 Toolbar 显示角标
+
 ## [Unreleased] S85-E2: 协作会话历史记录 — 2026-06-11
 - **stores/dds/sessionHistoryStore.ts**: 新增 Zustand store — 分页/筛选/搜索/追加会话记录状态管理
 - **stores/dds/__tests__/sessionHistoryStore.test.ts**: 14 个 vitest 测试用例

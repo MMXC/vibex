@@ -1,6 +1,14 @@
 
 
 
+## [Unreleased] S85-E3: 通知中心面板 — 2026-06-11
+- **通知中心 API**: 新增 `/api/notifications` GET（列表+筛选+分页）+ POST（创建通知）
+- **标记已读 API**: 新增 `/api/notifications/[id]/read` POST（标记单条已读）+ `/api/notifications/read-all` POST（全部已读）
+- **D1 Schema**: 新增 `0015_notifications.sql` — `notifications` 表（支持 mention/reply/collaborator_join/system/info/template_update/comment_reply 类型，含 user_id + created_at 索引）
+- **Backend 测试**: `route.test.ts` — 8 个测试用例（GET list/filter/pagination/error + POST create/validate/error）
+类型: feat
+影响: vibex-backend
+
 ## [Unreleased] S85-E2: 协作会话历史记录 — 2026-06-11
 - **sessionHistoryStore.ts**: 新增 `sessionHistoryStore` Zustand store — 管理会话历史列表状态（initCanvas / loadMore / setFilter / appendSession / reset），支持分页、类型/用户筛选、关键词搜索
 - **sessionHistoryStore.test.ts**: 14 个 S85-E2 vitest 测试用例（initCanvas、loadMore、setFilter、appendSession、reset 覆盖）

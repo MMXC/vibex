@@ -37,6 +37,7 @@ import { OnlineUsers } from './OnlineUsers';
 import { OfflineIndicator } from './OfflineIndicator';
 import { PresencePanel } from '@/components/presence/PresencePanel';
 import { ShareDialog } from '@/components/dds/share/ShareDialog';
+import { PublishTemplateDialog } from '@/components/templates/PublishTemplateDialog/PublishTemplateDialog';
 import { useCanvasListStore } from '@/stores/canvasListStore';
 import { ViewPresetsPanel } from './ViewPresetsPanel';
 import { useTranslations } from '@/hooks/useTranslations';
@@ -288,6 +289,7 @@ export const DDSToolbar = memo(function DDSToolbar({
   const unreadCount = useNotificationStore((s) => s.getUnreadCount());
   // S82-E3: Share dialog state
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
+  const [isPublishDialogOpen, setIsPublishDialogOpen] = useState(false);
   const activeCanvasId = useCanvasListStore((s) => s.activeCanvasId);
   const activeCanvas = useCanvasListStore((s) =>
     s.canvases.find((c) => c.id === activeCanvasId)
@@ -577,6 +579,17 @@ export const DDSToolbar = memo(function DDSToolbar({
             title="分享画布"
           >
             🔗
+          </button>
+
+          {/* S85-E5: Publish as template */}
+          <button
+            type="button"
+            className={styles.exportBtn}
+            onClick={() => setIsPublishDialogOpen(true)}
+            aria-label="发布为模板"
+            title="发布为模板"
+          >
+            📤
           </button>
 
           {/* S77-E2: Connection status indicator */}
@@ -1223,6 +1236,18 @@ export const DDSToolbar = memo(function DDSToolbar({
         onTeamShareRequest={() => {
           setIsShareDialogOpen(false);
           setShareToTeamModalOpen(true);
+        }}
+      />
+
+      {/* S85-E5: Publish Template Dialog */}
+      <PublishTemplateDialog
+        isOpen={isPublishDialogOpen}
+        canvasId={activeCanvasId ?? undefined}
+        onClose={() => setIsPublishDialogOpen(false)}
+        onPublished={(templateId) => {
+          setIsPublishDialogOpen(false);
+          // Navigate to the template detail page
+          window.open(`/templates?detail=${templateId}`, '_blank');
         }}
       />
     </>

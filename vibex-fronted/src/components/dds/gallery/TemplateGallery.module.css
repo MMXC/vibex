@@ -258,3 +258,20 @@
   font-size: 0.75rem;
   color: var(--color-text-muted, #9CA3AF);
 }
+
+/* Sort dropdown */
+.sortSelect {
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--color-border, #E5E7EB);
+  border-radius: 6px;
+  background: var(--color-surface, #fff);
+  color: var(--color-text, #374151);
+  font-size: 0.75rem;
+  cursor: pointer;
+  outline: none;
+}
+
+.sortSelect:focus {
+  border-color: var(--color-primary, #6366F1);
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+}

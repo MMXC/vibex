@@ -1,6 +1,20 @@
 
 
 
+## [Unreleased] S85-E5: 模板发布与评分系统 — 2026-06-11
+- **D1 Schema**: 新增 `0017_templates.sql` — `templates` 表 + `template_ratings` 表（含 avg_rating/rating_count 索引）
+- **POST /api/templates**: 发布画布为模板（name/description/tags/thumbnail/canvasId/contentJson）
+- **GET /api/templates**: 模板列表（支持 sort: recent/rating/usage + limit 参数）
+- **POST /api/templates/:id/rate**: 提交/更新模板评分（1-5星 + 可选评论，upsert 模式）
+- **templateStore**: 新增 `publishTemplate()` + `submitRating()` 方法
+- **PublishTemplateDialog**: 新增发布模板对话框（表单验证、API 调用）
+- **TemplateGallery**: 评分排序选项（最近/评分/使用量）
+- **TemplateDetail**: 评分统计展示区
+- **TemplateStats**: 评分数据统计组件
+- **DDSToolbar**: 发布按钮集成
+类型: feat
+影响: vibex-backend, vibex-fronted
+
 ## [Unreleased] S85-E3: 通知中心面板 — 2026-06-11
 - **通知中心 API**: 新增 `/api/notifications` GET（列表+筛选+分页）+ POST（创建通知）
 - **标记已读 API**: 新增 `/api/notifications/[id]/read` POST（标记单条已读）+ `/api/notifications/read-all` POST（全部已读）

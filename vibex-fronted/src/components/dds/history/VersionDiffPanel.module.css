@@ -1,0 +1,294 @@
+/**
+ * VersionDiffPanel — Styles
+ * S84-E1: Canvas Version Diff
+ */
+
+.panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 400px;
+  height: 100vh;
+  background: var(--bg-primary, #ffffff);
+  border-left: 1px solid var(--border-color, #e5e7eb);
+  box-shadow: -4px 0 16px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  z-index: 50;
+  overflow: hidden;
+}
+
+/* Header */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-color, #e5e7eb);
+  flex-shrink: 0;
+}
+
+.title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary, #111827);
+  margin: 0;
+}
+
+.headerControls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.modeSelect {
+  padding: 4px 8px;
+  border: 1px solid var(--border-color, #e5e7eb);
+  border-radius: 4px;
+  font-size: 12px;
+  background: var(--bg-secondary, #f9fafb);
+  cursor: pointer;
+}
+
+.closeBtn {
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--text-secondary, #6b7280);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+}
+
+.closeBtn:hover {
+  background: var(--bg-secondary, #f3f4f6);
+}
+
+/* Snapshot labels */
+.snapshotLabels {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background: var(--bg-secondary, #f9fafb);
+  border-bottom: 1px solid var(--border-color, #e5e7eb);
+  flex-shrink: 0;
+  font-size: 13px;
+}
+
+.snapshotLabel {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--text-primary, #111827);
+}
+
+.labelTag {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary, #6b7280);
+  background: var(--bg-primary, #ffffff);
+  padding: 1px 6px;
+  border-radius: 4px;
+  border: 1px solid var(--border-color, #e5e7eb);
+}
+
+.arrow {
+  color: var(--text-muted, #9ca3af);
+  font-weight: 600;
+}
+
+/* Loading / Error */
+.loading,
+.error {
+  padding: 20px;
+  font-size: 14px;
+  text-align: center;
+}
+
+.loading {
+  color: var(--text-secondary, #6b7280);
+}
+
+.error {
+  color: #dc2626;
+  background: #fef2f2;
+  border-radius: 0;
+}
+
+/* Summary stats */
+.summaryBar {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 0;
+  border-bottom: 1px solid var(--border-color, #e5e7eb);
+  flex-shrink: 0;
+}
+
+.summaryStat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px 0;
+  font-size: 12px;
+  color: var(--text-secondary, #6b7280);
+  gap: 2px;
+  border-right: 1px solid var(--border-color, #e5e7eb);
+}
+
+.summaryStat:last-child {
+  border-right: none;
+}
+
+.summaryStat span:first-child {
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.statAdded { color: #16a34a; }
+.statRemoved { color: #dc2626; }
+.statModified { color: #d97706; }
+.statUnchanged { color: var(--text-secondary, #6b7280); }
+
+/* Diff sections */
+.diffSections {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0;
+}
+
+.diffSection {
+  border-bottom: 1px solid var(--border-color, #e5e7eb);
+}
+
+.sectionHeader {
+  padding: 10px 20px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.addedSection {
+  background: #f0fdf4;
+  color: #15803d;
+}
+
+.removedSection {
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+.modifiedSection {
+  background: #fffbeb;
+  color: #b45309;
+}
+
+.sectionBody {
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Diff rows */
+.diffRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 4px;
+  font-size: 13px;
+  background: var(--bg-primary, #ffffff);
+  border: 1px solid var(--border-color, #e5e7eb);
+}
+
+.diffRow.added {
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+}
+
+.diffRow.removed {
+  background: #fef2f2;
+  border-color: #fecaca;
+}
+
+.diffRow.modified {
+  background: #fffbeb;
+  border-color: #fde68a;
+}
+
+.changeBadge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 3px;
+  flex-shrink: 0;
+  line-height: 18px;
+}
+
+.diffRow.added .changeBadge {
+  background: #16a34a;
+  color: white;
+}
+
+.diffRow.removed .changeBadge {
+  background: #dc2626;
+  color: white;
+}
+
+.diffRow.modified .changeBadge {
+  background: #d97706;
+  color: white;
+}
+
+.nodeName {
+  font-weight: 600;
+  color: var(--text-primary, #111827);
+  flex: 1;
+}
+
+.nodeType {
+  font-size: 11px;
+  color: var(--text-secondary, #6b7280);
+  background: var(--bg-secondary, #f3f4f6);
+  padding: 1px 6px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.modifiedFields {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 11px;
+}
+
+.fieldBefore {
+  color: #dc2626;
+  text-decoration: line-through;
+}
+
+.fieldAfter {
+  color: #16a34a;
+}
+
+/* No changes */
+.noChanges {
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--text-secondary, #6b7280);
+  font-size: 14px;
+}

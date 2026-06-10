@@ -1,0 +1,255 @@
+/**
+ * BatchExportPanel.module.css — S83-E5: Batch Canvas Export ZIP Panel
+ *
+ * Panel + dialog overlay styles for the batch canvas export progress panel.
+ * Follows VibeX design-tokens.css variable conventions.
+ */
+
+/* ============================================
+   Overlay + Panel
+   ============================================ */
+
+.panel-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.panel {
+  background: var(--color-surface, #ffffff);
+  border-radius: 12px;
+  padding: 24px;
+  width: 480px;
+  max-width: 90vw;
+  max-height: 80vh;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow: hidden;
+}
+
+/* ============================================
+   Header
+   ============================================ */
+
+.panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.panel__title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text-primary, #1e293b);
+}
+
+.panel__close-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--color-text-muted, #94a3b8);
+  font-size: 14px;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.15s, color 0.15s;
+}
+
+.panel__close-btn:hover {
+  background: var(--color-surface-hover, #f1f5f9);
+  color: var(--color-text-secondary, #64748b);
+}
+
+/* ============================================
+   Status text
+   ============================================ */
+
+.panel__status-text {
+  margin: 0;
+  font-size: 13px;
+  color: var(--color-text-secondary, #64748b);
+  line-height: 1.4;
+}
+
+.panel__status-text--success {
+  color: var(--color-success, #16a34a);
+  font-weight: 500;
+}
+
+.panel__status-text--warning {
+  color: var(--color-warning, #d97706);
+  font-weight: 500;
+}
+
+.panel__status-text--error {
+  color: var(--color-error, #dc2626);
+  font-weight: 500;
+}
+
+/* ============================================
+   Overall progress
+   ============================================ */
+
+.overall-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.overall-progress__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.overall-progress__label {
+  font-size: 13px;
+  color: var(--color-text-secondary, #64748b);
+}
+
+.overall-progress__pct {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-primary, #1e293b);
+}
+
+.overall-progress__bar {
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--color-surface-hover, #f1f5f9);
+  overflow: hidden;
+}
+
+.overall-progress__fill {
+  height: 100%;
+  background: var(--color-primary, #3b82f6);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+/* ============================================
+   Per-canvas list
+   ============================================ */
+
+.canvas-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  overflow-y: auto;
+  max-height: 300px;
+  padding-right: 4px;
+}
+
+/* ============================================
+   Per-canvas row
+   ============================================ */
+
+.canvas-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  background: var(--color-surface-hover, #f1f5f9);
+}
+
+.canvas-row__icon {
+  font-size: 14px;
+  flex-shrink: 0;
+  width: 20px;
+  text-align: center;
+}
+
+.canvas-row__name {
+  flex: 1;
+  font-size: 13px;
+  color: var(--color-text-primary, #1e293b);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.canvas-row__progress-bar {
+  flex-shrink: 0;
+  width: 80px;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.canvas-row__progress-fill {
+  height: 100%;
+  background: var(--color-primary, #3b82f6);
+  border-radius: 2px;
+  transition: width 0.2s ease;
+}
+
+.canvas-row__progress-fill--error {
+  background: var(--color-error, #dc2626);
+}
+
+.canvas-row__status {
+  flex-shrink: 0;
+  font-size: 11px;
+  color: var(--color-text-muted, #94a3b8);
+  white-space: nowrap;
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ============================================
+   Actions
+   ============================================ */
+
+.panel__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding-top: 4px;
+}
+
+.panel__cancel-btn {
+  padding: 8px 16px;
+  border: 1px solid var(--color-border, #e2e8f0);
+  border-radius: 6px;
+  background: var(--color-surface, #ffffff);
+  color: var(--color-text-secondary, #64748b);
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.panel__cancel-btn:hover {
+  background: var(--color-surface-hover, #f1f5f9);
+}
+
+.panel__close-action-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  background: var(--color-primary, #3b82f6);
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.panel__close-action-btn:hover {
+  opacity: 0.9;
+}

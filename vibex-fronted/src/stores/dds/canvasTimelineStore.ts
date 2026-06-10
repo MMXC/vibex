@@ -1,16 +1,52 @@
 'use client';
 
 /**
- * canvasTimelineStore — Timeline zoom and branch state for S83-E1
- * 
+ * canvasTimelineStore — Timeline zoom/branch state (S83-E1) + diff state (S84-E1)
+ *
  * Manages timeline-specific UI state:
  * - Zoom level: hour | day | week | month (controls how many snapshots visible)
  * - Branch filter: which branch to show (null = all)
  * - Time range: selected time range for the current view
  * - Snapshot preview: which snapshot is being previewed
+ * - Diff state: version comparison panel (S84-E1)
  */
 
 import { create } from 'zustand';
+
+// ─── S84-E1: Diff Types ────────────────────────────────────────────────────────
+
+export type DiffMode = 'unidirectional' | 'bidirectional';
+
+export interface DiffNode {
+  nodeId: string;
+  name: string;
+  type: string;
+  changeType: 'added' | 'removed' | 'modified';
+  before?: Record<string, unknown>;
+  after?: Record<string, unknown>;
+}
+
+export interface CanvasDiff {
+  fromSnapshotId: string;
+  toSnapshotId: string;
+  mode: DiffMode;
+  fromName: string | null;
+  toName: string | null;
+  fromVersion: number;
+  toVersion: number;
+  diff: {
+    added: DiffNode[];
+    removed: DiffNode[];
+    modified: DiffNode[];
+    unchanged: number;
+    stats: {
+      added: number;
+      removed: number;
+      modified: number;
+      unchanged: number;
+    };
+  };
+}
 
 export type TimelineZoomLevel = 'hour' | 'day' | 'week' | 'month';
 
@@ -43,6 +79,30 @@ interface TimelineState {
   previewSnapshotId: string | null;
   /** Set the snapshot being previewed */
   setPreviewSnapshotId: (id: string | null) => void;
+
+  // ─── S84-E1: Diff State ──────────────────────────────────────────────────────
+
+  /** Whether the diff panel is open */
+  isDiffPanelOpen: boolean;
+  /** Open the diff panel */
+  openDiffPanel: () => void;
+  /** Close the diff panel */
+  closeDiffPanel: () => void;
+
+  /** The snapshot to compare against current */
+  compareSnapshotId: string | null;
+  /** Set the snapshot to compare */
+  setCompareSnapshotId: (id: string | null) => void;
+
+  /** Diff result data */
+  diffData: CanvasDiff | null;
+  /** Set diff result data */
+  setDiffData: (data: CanvasDiff | null) => void;
+
+  /** Diff mode */
+  diffMode: DiffMode;
+  /** Set diff mode */
+  setDiffMode: (mode: DiffMode) => void;
 }
 
 const ZOOM_LEVELS: TimelineZoomLevel[] = ['hour', 'day', 'week', 'month'];
@@ -85,6 +145,20 @@ export const useCanvasTimelineStore = create<TimelineState>((set, get) => ({
 
   previewSnapshotId: null,
   setPreviewSnapshotId: (id) => set({ previewSnapshotId: id }),
+
+  // S84-E1: Diff state
+  isDiffPanelOpen: false,
+  openDiffPanel: () => set({ isDiffPanelOpen: true }),
+  closeDiffPanel: () => set({ isDiffPanelOpen: false, diffData: null, compareSnapshotId: null }),
+
+  compareSnapshotId: null,
+  setCompareSnapshotId: (id) => set({ compareSnapshotId: id }),
+
+  diffData: null,
+  setDiffData: (data) => set({ diffData: data }),
+
+  diffMode: 'unidirectional',
+  setDiffMode: (mode) => set({ diffMode: mode }),
 }));
 
 /** Helper: filter snapshots by the current zoom level */

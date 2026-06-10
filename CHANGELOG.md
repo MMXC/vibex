@@ -7064,3 +7064,13 @@ See git history for complete changelog.
 - `vibex-fronted/src/components/dds/templates/__tests__/TemplateGallery.favorites.test.tsx` — 10+ 测试用例
 
 **测试**: vitest TemplateGallery.favorites.test.tsx ✅
+
+## [Unreleased] S84-E5: 全局键盘快捷键体系 — 2026-06-10
+- **E5.1**: `shortcutStore.ts` — Zustand store，shortcuts 配置 + localStorage 持久化，addBinding/removeBinding/import/export
+- **E5.2**: `useKeyboardShortcuts.ts` — 组合键解析 hook，支持 Ctrl/Alt/Shift/Meta + key 组合
+- **E5.3**: `ShortcutHelpPanel.tsx` — Ctrl+/ 触发，显示所有已注册快捷键
+- **E5.4**: `ShortcutSettingsPanel.tsx` — 可配置快捷键 + 冲突检测
+- **E5.5**: `shortcutManager.ts` — 全局快捷键管理器，冲突检测
+- **E5.6**: 全局快捷键在 AppShell 注册：Ctrl+S 保存, Ctrl+Z 撤销, Ctrl+Y 重做, Ctrl+K 跳转, F11 全屏, Ctrl+B 侧边栏
+- **vitest**: shortcutStore(9) + useKeyboardShortcuts(131) + shortcutManager(25) + ShortcutPanel(11) + ShortcutSettingsPanel(11) = 187 测试用例
+

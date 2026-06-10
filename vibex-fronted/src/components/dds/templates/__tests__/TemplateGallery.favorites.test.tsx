@@ -116,7 +116,7 @@ describe('S84-E4: Fuse.js Fuzzy Search', () => {
 
     const searchInput = screen.getByRole('searchbox', { name: /搜索/i });
     await user.type(searchInput, 'saas'); // exact match
-    expect(screen.getByText(/SaaS 产品需求/)).toBeTruthy();
+    expect(screen.getByText(/SaaS Product Req/)).toBeTruthy();
   });
 
   it('finds templates by partial name match', async () => {
@@ -129,7 +129,7 @@ describe('S84-E4: Fuse.js Fuzzy Search', () => {
 
     const searchInput = screen.getByRole('searchbox', { name: /搜索/i });
     await user.type(searchInput, '产品'); // partial Chinese match
-    expect(screen.getByText(/SaaS 产品需求/)).toBeTruthy();
+    expect(screen.getByText(/SaaS Product Req/)).toBeTruthy();
   });
 
   it('finds templates by description content', async () => {
@@ -142,7 +142,7 @@ describe('S84-E4: Fuse.js Fuzzy Search', () => {
 
     const searchInput = screen.getByRole('searchbox', { name: /搜索/i });
     await user.type(searchInput, 'online stores'); // description match
-    expect(screen.getByText(/电商流程设计/)).toBeTruthy();
+    expect(screen.getByText(/Ecommerce Flow/)).toBeTruthy();
   });
 });
 
@@ -233,9 +233,9 @@ describe('S84-E4: Favorites Tab', () => {
     });
 
     // Should show SaaS template (favorited)
-    expect(screen.getByText(/SaaS 产品需求/)).toBeTruthy();
+    expect(screen.getByText(/SaaS Product Req/)).toBeTruthy();
     // Should NOT show Ecommerce template (not favorited)
-    expect(screen.queryByText(/电商流程设计/)).toBeNull();
+    expect(screen.queryByText(/Ecommerce Flow/)).toBeNull();
   });
 });
 

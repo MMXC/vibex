@@ -19,6 +19,24 @@
 
 **依赖**: S83-E3 (ConflictConfirmToast), S83-E1 (canvasTimelineStore)
 
+## [Unreleased] S84-E3: 命令面板 — Ctrl+K 快速跳转、模糊搜索、最近历史 — 2026-06-10
+
+**类型**: `feat`
+
+**功能概述**: Ctrl+K 全局快捷键呼出命令面板，fuse.js 模糊搜索（画布/模板/操作），最近使用历史（最近10条），DDSCanvasPage 集成。
+
+**变更文件**:
+- `command-palette/CommandPalette.tsx` — 模糊搜索、键盘导航、ESC 关闭
+- `command-palette/CommandPalette.module.css` — 174 行样式（输入框、下拉列表、键盘高亮、动画）
+- `command-palette/CommandPalette.test.tsx` — 333 行测试（渲染、搜索、键盘导航、历史）
+- `stores/commandPaletteStore.ts` — 149 行 Zustand store（搜索状态、最近历史、快捷键注册）
+- `stores/shortcutStore.ts` — Ctrl+K 注册
+- `DDSCanvasPage.tsx` — 集成 CommandPalette
+
+**测试**: vitest CommandPalette.test.tsx ✅
+
+**依赖**: S83-E3 (ConflictConfirmToast)
+
 ## [Unreleased] S83-E5: 批量画布ZIP导出 — 2026-06-10
 ## [Unreleased] S83-E3: 协作者冲突确认反馈 — 2026-06-17
 - **Component**: 新增 `ConflictConfirmToast.tsx` — 冲突自动解决后的确认 Toast，3秒自动消失

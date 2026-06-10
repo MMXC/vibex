@@ -6977,3 +6977,12 @@ See git history for complete changelog.
 - **VersionDiffPanel.test.tsx**: 11 个 vitest 测试用例
 - **canvasTimelineStore.ts**: 新增 diff state (`isDiffPanelOpen`, `compareSnapshotId`, `diffData`, `diffMode`)
 - **canvasDiff.ts**: 新建 API client — `canvasDiffApi.getDiff()`
+
+## [Unreleased] S84-E3: 命令面板 — Ctrl+K 快速跳转、模糊搜索、最近历史 — 2026-06-10
+- **CommandPalette.tsx**: 新增 `CommandPalette` 组件 — Ctrl+K 全局快捷键呼出，fuse.js 模糊搜索画布/模板/操作，键盘导航（↑↓ Enter ESC），最近使用历史（最近10条）
+- **CommandPalette.module.css**: CommandPalette 样式（174 行：输入框、下拉列表、键盘高亮、动画过渡）
+- **CommandPalette.test.tsx**: 333 行 vitest 测试（渲染、搜索过滤、键盘导航、最近历史、ESC 关闭）
+- **commandPaletteStore.ts**: Zustand store — 搜索状态、最近历史、快捷键注册/注销
+- **shortcutStore.ts**: 新增 Ctrl+K 快捷键绑定
+- **DDSCanvasPage.tsx**: 集成 CommandPalette，canvasPage 加载时注册快捷键
+

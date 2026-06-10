@@ -31,8 +31,8 @@
 - [ ] CHANGELOG.md 更新 (S84-E1 entry)
 - [ ] **Dependencies**: S83-E1 (VersionTimeline), S83-E5 (canvasTimelineStore)
 
-### E2: 协作者在线状态与光标显示
-- [ ] `CollaboratorAvatars.tsx` 组件（头像栏 + 状态点）
+### E2: 协作者在线状态与光标显示 ✅
+- [x] `CollaboratorAvatars.tsx` 组件（头像栏 + 状态点）
 - [ ] `CollaboratorCursors.tsx` 组件（SVG 光标 + 昵称标签）
 - [ ] `presenceStore.ts` Zustand store 实现
 - [ ] WebSocket `presence` 事件订阅/发布逻辑

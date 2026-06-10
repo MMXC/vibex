@@ -23,8 +23,8 @@ const mockIsFavorite = vi.fn();
 const mockFetch = vi.fn();
 
 const MOCK_TEMPLATES = [
-  { id: 'tpl-001', name: 'SaaS Product Req', displayName: 'SaaS 产品需求', description: 'For SaaS applications', category: 'saas', tags: ['工作', '产品'], createdAt: 1700000000000 },
-  { id: 'tpl-002', name: 'Ecommerce Flow', displayName: '电商流程设计', description: 'For online stores', category: 'ecommerce', tags: ['工作'], createdAt: 1700000001000 },
+  { id: 'tpl-001', name: 'SaaS Product Req', displayName: 'SaaS Product Req', description: 'For SaaS applications', category: 'saas', tags: ['工作', '产品'], createdAt: 1700000000000 },
+  { id: 'tpl-002', name: 'Ecommerce Flow', displayName: 'Ecommerce Flow', description: 'For online stores', category: 'ecommerce', tags: ['工作'], createdAt: 1700000001000 },
   { id: 'tpl-003', name: 'Mobile App', displayName: '移动应用方案', description: 'For mobile apps', category: 'mobile', tags: ['个人'], createdAt: 1700000002000 },
 ] as Parameters<typeof vi.fn>[0] extends (...args: never[]) => infer R ? R : never;
 
@@ -60,8 +60,8 @@ vi.mock('@/lib/canvas/templateExport', () => ({ downloadTemplatesAsFile: vi.fn()
 
 vi.mock('@/lib/canvas/templateStore', () => ({
   listTemplates: vi.fn(() => Promise.resolve([
-    { id: 'tpl-001', name: 'SaaS Product Req', displayName: 'SaaS 产品需求', description: 'For SaaS apps', category: 'saas', tags: ['工作', '产品'] },
-    { id: 'tpl-002', name: 'Ecommerce Flow', displayName: '电商流程设计', description: 'For online stores', category: 'ecommerce', tags: ['工作'] },
+    { id: 'tpl-001', name: 'SaaS Product Req', displayName: 'SaaS Product Req', description: 'For SaaS apps', category: 'saas', tags: ['工作', '产品'] },
+    { id: 'tpl-002', name: 'Ecommerce Flow', displayName: 'Ecommerce Flow', description: 'For online stores', category: 'ecommerce', tags: ['工作'] },
     { id: 'tpl-003', name: 'Mobile App', displayName: '移动应用方案', description: 'For mobile apps', category: 'mobile', tags: ['个人'] },
   ])),
   getTemplate: vi.fn(() => Promise.resolve(null)),
@@ -116,7 +116,7 @@ describe('S84-E4: Fuse.js Fuzzy Search', () => {
 
     const searchInput = screen.getByRole('searchbox', { name: /搜索/i });
     await user.type(searchInput, 'saas'); // exact match
-    expect(screen.getByText(/SaaS 产品需求/)).toBeTruthy();
+    expect(screen.getByText(/SaaS Product Req/)).toBeTruthy();
   });
 
   it('finds templates by partial name match', async () => {
@@ -129,7 +129,7 @@ describe('S84-E4: Fuse.js Fuzzy Search', () => {
 
     const searchInput = screen.getByRole('searchbox', { name: /搜索/i });
     await user.type(searchInput, '产品'); // partial Chinese match
-    expect(screen.getByText(/SaaS 产品需求/)).toBeTruthy();
+    expect(screen.getByText(/SaaS Product Req/)).toBeTruthy();
   });
 
   it('finds templates by description content', async () => {
@@ -142,7 +142,7 @@ describe('S84-E4: Fuse.js Fuzzy Search', () => {
 
     const searchInput = screen.getByRole('searchbox', { name: /搜索/i });
     await user.type(searchInput, 'online stores'); // description match
-    expect(screen.getByText(/电商流程设计/)).toBeTruthy();
+    expect(screen.getByText(/Ecommerce Flow/)).toBeTruthy();
   });
 });
 
@@ -233,9 +233,9 @@ describe('S84-E4: Favorites Tab', () => {
     });
 
     // Should show SaaS template (favorited)
-    expect(screen.getByText(/SaaS 产品需求/)).toBeTruthy();
+    expect(screen.getByText(/SaaS Product Req/)).toBeTruthy();
     // Should NOT show Ecommerce template (not favorited)
-    expect(screen.queryByText(/电商流程设计/)).toBeNull();
+    expect(screen.queryByText(/Ecommerce Flow/)).toBeNull();
   });
 });
 
@@ -299,8 +299,8 @@ describe('S84-E4: Star Button API Sync', () => {
 describe('S84-E4: Fuse.js Integration (Real Fuse, Pattern E)', () => {
   it('real Fuse.js works correctly on small dataset without mocking', () => {
     const items = [
-      { id: '1', name: 'SaaS Product Req', displayName: 'SaaS 产品需求', description: 'For SaaS apps', tags: ['工作'] },
-      { id: '2', name: 'Ecommerce Flow', displayName: '电商流程设计', description: 'For online stores', tags: ['工作'] },
+      { id: '1', name: 'SaaS Product Req', displayName: 'SaaS Product Req', description: 'For SaaS apps', tags: ['工作'] },
+      { id: '2', name: 'Ecommerce Flow', displayName: 'Ecommerce Flow', description: 'For online stores', tags: ['工作'] },
       { id: '3', name: 'Mobile App', displayName: '移动应用方案', description: 'For mobile apps', tags: ['个人'] },
     ];
 

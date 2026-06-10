@@ -7012,3 +7012,12 @@ See git history for complete changelog.
 - **E5.6**: 全局快捷键在 AppShell 注册：Ctrl+S 保存, Ctrl+Z 撤销, Ctrl+Y 重做, Ctrl+K 跳转, F11 全屏, Ctrl+B 侧边栏
 - **vitest**: shortcutStore(9) + useKeyboardShortcuts(131) + shortcutManager(25) + ShortcutPanel(11) + ShortcutSettingsPanel(11) = 187 测试用例
 
+
+## [Unreleased] S85-E1: 画布级权限体系 — 2026-06-11
+- **canvasPermissionsStore.ts**: Zustand store — per-canvas role management (owner/admin/editor/viewer)
+- **canvasPermissionsStore.test.ts**: 176 lines vitest 14/14 ✅
+- **CanvasSettingsPanel.tsx**: collaboration settings tab — collaborator list, add/remove/change role
+- **DDSCanvasPage.tsx**: ViewerModeBanner — readonly notice bar for viewer role
+- **CanvasSettingsDrawer.tsx**: CollaborationSettings integration (replaces placeholder)
+- **/api/canvas/[id]/permissions**: backend API — collaborator CRUD
+- **/api/canvas/[id]/share**: backend API — share link generation

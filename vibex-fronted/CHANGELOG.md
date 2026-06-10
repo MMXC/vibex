@@ -7028,3 +7028,12 @@ See git history for complete changelog.
 - **CanvasSettingsDrawer.tsx**: CollaborationSettings integration (replaces placeholder)
 - **/api/canvas/[id]/permissions**: backend API — collaborator CRUD
 - **/api/canvas/[id]/share**: backend API — share link generation
+
+## [S85-E4] 分支合并预览与回滚 (2026-06-11)
+
+- feat: MergePreviewPanel — overlay merge preview with diff + execute button
+- feat: VersionTimeline onMerge prop + inline merge button (↪) for non-main branches
+- test: MergePreviewPanel vitest — 10 cases covering render/merge flow/error states
+
+类型: feat
+影响: canvas-history

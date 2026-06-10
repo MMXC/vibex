@@ -277,6 +277,15 @@
   background-color: #ecfdf5;
 }
 
+.actionMerge {
+  color: #8b5cf6;
+}
+
+.actionMerge:hover {
+  border-color: #8b5cf6;
+  background-color: #f5f3ff;
+}
+
 .actionDelete {
   color: #ef4444;
 }

@@ -7074,3 +7074,25 @@ See git history for complete changelog.
 - **E5.6**: 全局快捷键在 AppShell 注册：Ctrl+S 保存, Ctrl+Z 撤销, Ctrl+Y 重做, Ctrl+K 跳转, F11 全屏, Ctrl+B 侧边栏
 - **vitest**: shortcutStore(9) + useKeyboardShortcuts(131) + shortcutManager(25) + ShortcutPanel(11) + ShortcutSettingsPanel(11) = 187 测试用例
 
+
+
+## [Unreleased] S85-E1: 画布级权限体系 — 2026-06-11
+
+**类型**: `feat`
+
+**功能概述**: 画布级 RBAC 权限体系，支持 owner/admin/editor/viewer 四级角色，新增 CanvasSettingsPanel 协作设置面板、ViewerModeBanner 只读提示、/api/canvas/[id]/permissions + /api/canvas/[id]/share 后端 API、canvasPermissionsStore Zustand 状态管理。
+
+**变更文件**:
+- `migrations/0013_canvas_permissions.sql` — D1 migration: canvas_permissions + canvas_collaborators 表
+- `src/app/api/canvas/[id]/permissions/route.ts` — 权限 CRUD API (GET/POST/PATCH/DELETE)
+- `src/app/api/canvas/[id]/share/route.ts` — 分享链接生成 API (POST)
+- `src/stores/dds/canvasPermissionsStore.ts` — Zustand store (232 行, 8 actions)
+- `src/stores/dds/__tests__/canvasPermissionsStore.test.ts` — 176 行 vitest 覆盖
+- `src/components/dds/canvas/CanvasSettingsPanel.tsx` — 协作设置面板 (311 行)
+- `src/components/dds/DDSCanvasPage.tsx` — ViewerModeBanner 只读模式提示条
+- `src/components/dds/settings/CanvasSettingsDrawer.tsx` — CollaborationSettings 集成
+
+**测试**: canvasPermissionsStore.test.ts (14 tests ✅)
+
+**依赖**: 无
+

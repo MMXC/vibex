@@ -1,3 +1,10 @@
+## [Unreleased] S85-E2: 协作会话历史记录 — 2026-06-11
+- **stores/dds/sessionHistoryStore.ts**: 新增 Zustand store — 分页/筛选/搜索/追加会话记录状态管理
+- **stores/dds/__tests__/sessionHistoryStore.test.ts**: 14 个 vitest 测试用例
+- **components/dds/canvas/SessionHistoryPanel.tsx**: 会话历史面板（搜索 + 筛选 + 可展开行 + 懒加载）
+- **components/dds/canvas/SessionHistoryPanel.module.css**: 完整样式
+- **components/dds/canvas/CanvasSettingsPanel.tsx**: 新增「会话历史」Tab，渲染 SessionHistoryPanel
+
 ## [Unreleased] S83-E2: 导入链接画布 — 2026-06-10
 - **ImportShareDialog.tsx**: 新增 `ImportShareDialog` 组件 — 分享链接导入弹窗，支持 token 验证、画布预览、导入确认
 - **ImportShareDialog.module.css**: ImportShareDialog 样式（overlay、dialog、header、body、footer、preview、footer 按钮）

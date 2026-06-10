@@ -92,15 +92,18 @@ describe('sessionHistoryStore — S85-E2', () => {
 
   describe('loadMore', () => {
     it('appends second page to existing sessions', async () => {
+<D
       mockFetchJson(SAMPLE_PAGE({ id: 'sess_pg1' }));
       await useSessionHistoryStore.getState().initCanvas('canvas-1');
-
+ain
       mockFetchJson({
         sessions: [{ ...SAMPLE_SESSION, id: 'sess_pg2' }] as SessionRecord[],
         total: 2,
         page: 2,
         limit: 20,
+<D
         totalPages: 1,
+ain
       });
       await useSessionHistoryStore.getState().loadMore();
 
@@ -111,6 +114,7 @@ describe('sessionHistoryStore — S85-E2', () => {
     });
 
     it('sets loadingMore flag while fetching', async () => {
+<D
       mockFetchJson(SAMPLE_PAGE({ id: 'sess_pg1' }));
       await useSessionHistoryStore.getState().initCanvas('canvas-1');
 
@@ -120,6 +124,7 @@ describe('sessionHistoryStore — S85-E2', () => {
       const loadMorePromise = useSessionHistoryStore.getState().loadMore();
       expect(useSessionHistoryStore.getState().loadingMore).toBe(true);
       resolve!({ ok: true, status: 200, json: () => Promise.resolve({ sessions: [], total: 1, page: 2, limit: 20, totalPages: 1 }) });
+ain
       await loadMorePromise;
       expect(useSessionHistoryStore.getState().loadingMore).toBe(false);
     });
@@ -135,16 +140,20 @@ describe('sessionHistoryStore — S85-E2', () => {
   });
 
   describe('setFilter', () => {
+<D
+ain
     it('applies operationType filter and re-fetches', async () => {
       mockFetchJson(SAMPLE_PAGE({ operationType: 'merge' }));
       await useSessionHistoryStore.getState().setFilter({ operationType: 'merge' });
       const s = useSessionHistoryStore.getState();
       expect(s.filterType).toBe('merge');
       expect(s.sessions[0].operationType).toBe('merge');
+<D
       // Verify the filter param was sent
       expect(mockFetch).toHaveBeenCalledWith(
         expect.stringContaining('operationType=merge'),
         undefined
+ain
       );
     });
 
@@ -152,9 +161,11 @@ describe('sessionHistoryStore — S85-E2', () => {
       mockFetchJson(SAMPLE_PAGE({ userId: 'user-bob' }));
       await useSessionHistoryStore.getState().setFilter({ userId: 'user-bob' });
       expect(useSessionHistoryStore.getState().filterUserId).toBe('user-bob');
+<D
       expect(mockFetch).toHaveBeenCalledWith(
         expect.stringContaining('userId=user-bob'),
         undefined
+ain
       );
     });
 
@@ -162,16 +173,20 @@ describe('sessionHistoryStore — S85-E2', () => {
       mockFetchJson(SAMPLE_PAGE({ operationDetail: 'edited chapter 2' }));
       await useSessionHistoryStore.getState().setFilter({ search: 'chapter 2' });
       expect(useSessionHistoryStore.getState().searchKeyword).toBe('chapter 2');
+<D
       expect(mockFetch).toHaveBeenCalledWith(
         expect.stringContaining('search=chapter%202'),
         undefined
+ain
       );
     });
 
     it('clears sessions and resets to page 1 when applying new filter', async () => {
+<D
       mockFetchJson(SAMPLE_PAGE());
       await useSessionHistoryStore.getState().initCanvas('canvas-1');
       expect(useSessionHistoryStore.getState().sessions).toHaveLength(1);
+ain
 
       mockFetchJson(SAMPLE_PAGE({ operationType: 'comment' }));
       await useSessionHistoryStore.getState().setFilter({ operationType: 'comment' });

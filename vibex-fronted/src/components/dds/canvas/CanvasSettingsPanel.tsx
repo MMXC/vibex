@@ -14,6 +14,7 @@
 
 import React, { useState, useCallback } from 'react';
 import { useCanvasPermissionsStore, selectCanManage, selectCollaborators, type CanvasRole } from '@/stores/dds/canvasPermissionsStore';
+import { SessionHistoryPanel } from '@/components/dds/canvas/SessionHistoryPanel';
 import { useTranslations } from '@/hooks/useTranslations';
 
 interface CanvasSettingsPanelProps {
@@ -41,7 +42,7 @@ export function CanvasSettingsPanel({ canvasId, userId, onClose }: CanvasSetting
   const canManage = selectCanManage(store);
   const collaborators = selectCollaborators(store);
 
-  const [activeTab, setActiveTab] = useState<'collaborators' | 'share'>('collaborators');
+  const [activeTab, setActiveTab] = useState<'collaborators' | 'share' | 'history'>('collaborators');
   const [addUserId, setAddUserId] = useState('');
   const [addRole, setAddRole] = useState<CanvasRole>('editor');
   const [editingUserId, setEditingUserId] = useState<string | null>(null);
@@ -111,6 +112,14 @@ export function CanvasSettingsPanel({ canvasId, userId, onClose }: CanvasSetting
           onClick={() => setActiveTab('share')}
         >
           分享链接
+        </button>
+        <button
+          role="tab"
+          aria-selected={activeTab === 'history'}
+          className={`tab-btn ${activeTab === 'history' ? 'active' : ''}`}
+          onClick={() => setActiveTab('history')}
+        >
+          会话历史
         </button>
       </div>
 
@@ -303,6 +312,13 @@ export function CanvasSettingsPanel({ canvasId, userId, onClose }: CanvasSetting
                 </button>
               </div>
             )}
+          </div>
+        )}
+
+        {/* === Session history tab === */}
+        {activeTab === 'history' && (
+          <div className="tab-content" role="tabpanel">
+            <SessionHistoryPanel canvasId={canvasId} />
           </div>
         )}
       </div>

@@ -1,5 +1,24 @@
 
 
+
+## [Unreleased] S84-E2: 协作者在线状态与光标显示 — 2026-06-10
+
+**类型**: `feat`
+
+**功能概述**: WebSocket presence 事件订阅 (join/leave/update/heartbeat)、8 色协作池分配、300ms 断线淡出动画、CollaboratorAvatars + CollaboratorCursors 双组件。
+
+**变更文件**:
+- `presence/wsPresenceHandler.ts` — WS presence 事件处理 + 8 色池 + reconnect handler
+- `presence/CollaboratorAvatars.tsx` + `.module.css` — 协作者头像栏 + 状态点 + 淡出动画
+- `presence/CollaboratorCursors.tsx` + `.module.css` — SVG 光标 + 昵称标签
+- `__tests__/CollaboratorAvatars.test.tsx` — 10 cases ✅
+- `__tests__/CollaboratorCursors.test.tsx` — 8 cases ✅
+- `__tests__/wsPresenceHandler.test.ts` — 8 cases ✅
+
+**测试**: 26 vitest ✅ (CollaboratorAvatars 10 + CollaboratorCursors 8 + wsPresenceHandler 8)
+
+**依赖**: S83-E3 (ConflictConfirmToast), S83-E1 (canvasTimelineStore)
+
 ## [Unreleased] S83-E5: 批量画布ZIP导出 — 2026-06-10
 ## [Unreleased] S83-E3: 协作者冲突确认反馈 — 2026-06-17
 - **Component**: 新增 `ConflictConfirmToast.tsx` — 冲突自动解决后的确认 Toast，3秒自动消失

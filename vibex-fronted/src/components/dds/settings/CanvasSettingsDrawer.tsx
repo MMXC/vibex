@@ -15,6 +15,10 @@ import { GridSettings } from './GridSettings';
 import { ZoomSettings } from './ZoomSettings';
 import { SnapshotManagerPanel } from '@/components/dds/history/SnapshotManagerPanel';
 import { PerformanceSettings } from './PerformanceSettings';
+// S85-E1: 画布级权限体系 — collaboration tab
+import { CanvasSettingsPanel } from '@/components/dds/canvas/CanvasSettingsPanel';
+import { useDDSCanvasStore } from '@/stores/dds/DDSCanvasStore';
+import { useAuthStore } from '@/stores/authStore';
 import styles from './CanvasSettingsDrawer.module.css';
 
 type TabId = 'presets' | 'canvas' | 'nodes' | 'snapshots' | 'performance' | 'collaboration';
@@ -37,6 +41,30 @@ function NodeSettingsPlaceholder() {
   );
 }
 
+// S85-E1: Collaboration settings — reads canvasId from DDSCanvasStore, userId from auth store
+function CollaborationSettings() {
+  // Get canvasId from DDSCanvasStore
+  const canvasId = useDDSCanvasStore ? useDDSCanvasStore.getState().projectId : '';
+  // Get current user ID — default to 'local-user' if not authenticated
+  const currentUserId = useAuthStore ? (useAuthStore.getState().currentUser?.id ?? 'local-user') : 'local-user';
+
+  if (!canvasId) {
+    return (
+      <div style={{ padding: 16 }}>
+        <p style={{ color: '#64748b', fontSize: 13 }}>加载中...</p>
+      </div>
+    );
+  }
+
+  return (
+    <CanvasSettingsPanel
+      canvasId={canvasId}
+      userId={currentUserId}
+    />
+  );
+}
+
+// S85-E1: Collaboration settings — reads canvasId from DDSCanvasStore, userId from auth store
 interface CanvasSettingsDrawerProps {
   isOpen: boolean;
   onClose: () => void;
@@ -134,9 +162,7 @@ export function CanvasSettingsDrawer({ isOpen, onClose }: CanvasSettingsDrawerPr
           {activeTab === 'snapshots' && <SnapshotManagerPanel />}
           {activeTab === 'performance' && <PerformanceSettings />}
           {activeTab === 'collaboration' && (
-            <div style={{ padding: 16 }}>
-              <p style={{ color: '#64748b', fontSize: 13 }}>协作设置待实现</p>
-            </div>
+            <CollaborationSettings />
           )}
         </div>
       </div>

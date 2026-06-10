@@ -27,6 +27,8 @@ import { CrossChapterEdgesOverlay } from '@/components/dds/canvas/CrossChapterEd
 import { AIDraftDrawer } from '@/components/dds/ai-draft';
 import { DDSFlow } from '@/components/dds/DDSFlow';
 import { useDDSCanvasStore, ddsChapterActions } from '@/stores/dds/DDSCanvasStore';
+// S85-E1: 画布级权限体系 — viewer mode
+import { useCanvasPermissionsStore, selectIsViewerMode, selectMyRole } from '@/stores/dds/canvasPermissionsStore';
 import { useCanvasHistoryStore, saveHistoryToStorage, loadHistoryFromStorage } from '@/stores/dds/canvasHistoryStore';
 import { loadSnapshotFromDB } from '@/lib/canvas/historyDB';
 import { canvasStoreRegistry } from '@/lib/canvas/canvasStoreRegistry';
@@ -998,6 +1000,9 @@ const { onCursorMove, broadcastCursor } = useWebSocketPresence({
       {/* Toolbar */}
       <DDSToolbar onAIGenerate={handleAIGenerate} agentSession={agentSession} projectId={projectId ?? ''} />
 
+      {/* S85-E1: 画布级权限体系 — viewer mode banner (reads from canvasPermissionsStore) */}
+      <ViewerModeBanner projectId={projectId ?? ''} />
+
       {/* S76-E5: ConflictWarningBanner — shows when a remote user is editing the selected node */}
       <ConflictWarningBannerWrapper />
 
@@ -1380,6 +1385,66 @@ const { onCursorMove, broadcastCursor } = useWebSocketPresence({
 // ShortcutEditModal rendered outside the main div, always mounted
 // Visibility controlled by shortcutStore.editingAction
 // The ? key handler above toggles shortcutModalOpen which drives editingAction via ShortcutEditModal internals
+/**
+ * S85-E1: 画布级权限体系 — Viewer Mode Banner
+ * Shows when the current user has 'viewer' role on the canvas.
+ * Displays a notice banner and disables editing capabilities.
+ */
+function ViewerModeBanner({ projectId }: { projectId: string }) {
+  const store = useCanvasPermissionsStore();
+
+  // Initialize store with projectId as canvasId
+  React.useEffect(() => {
+    if (projectId && (store.canvasId !== projectId || store.myUserId === null)) {
+      store.initCanvas(projectId, 'local-user');
+    }
+  }, [projectId]);
+
+  const isViewerMode = selectIsViewerMode(store);
+  const myRole = selectMyRole(store);
+
+  if (!isViewerMode || myRole === null) return null;
+
+  return (
+    <div
+      style={{
+        background: '#fef3c7',
+        borderBottom: '1px solid #f59e0b',
+        padding: '6px 16px',
+        fontSize: 13,
+        color: '#92400e',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 8,
+      }}
+      role="status"
+      aria-live="polite"
+    >
+      <span>👁 只读模式 — 您目前以「{myRole === 'viewer' ? '只读' : myRole}」身份访问此画布</span>
+      <button
+        onClick={() => {
+          // Open canvas settings drawer (collaboration tab)
+          // Trigger the settings drawer by dispatching a custom event
+          window.dispatchEvent(new CustomEvent('open-canvas-settings', { detail: { tab: 'collaboration' } }));
+        }}
+        style={{
+          background: '#f59e0b',
+          color: '#fff',
+          border: 'none',
+          borderRadius: 4,
+          padding: '2px 10px',
+          cursor: 'pointer',
+          fontSize: 12,
+        }}
+        type="button"
+      >
+        查看权限
+      </button>
+    </div>
+  );
+}
+
 /**
  * S76-E5: ConflictWarningBannerWrapper
  * Shows ConflictWarningBanner when a remote user is editing the selected node.

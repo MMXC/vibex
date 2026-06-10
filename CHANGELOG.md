@@ -1,6 +1,19 @@
 
 
 
+## [Unreleased] S85-E2: 协作会话历史记录 — 2026-06-11
+- **sessionHistoryStore.ts**: 新增 `sessionHistoryStore` Zustand store — 管理会话历史列表状态（initCanvas / loadMore / setFilter / appendSession / reset），支持分页、类型/用户筛选、关键词搜索
+- **sessionHistoryStore.test.ts**: 14 个 S85-E2 vitest 测试用例（initCanvas、loadMore、setFilter、appendSession、reset 覆盖）
+- **SessionHistoryPanel.tsx**: 新增 `SessionHistoryPanel` 组件 — 会话历史面板，支持搜索、类型/协作者筛选、可展开行详情、IntersectionObserver 懒加载更多
+- **SessionHistoryPanel.module.css**: SessionHistoryPanel 完整样式（chip 筛选、skeleton 加载态、展开详情、load-more 按钮）
+- **/api/canvas/:id/sessions GET**: 新增 API 路由 — 分页查询会话历史（page / limit / operationType / userId / search 参数）
+- **/api/canvas/:id/sessions POST**: 新增 API 路由 — 记录会话事件并通过 WebSocket `collab:session` 广播
+- **0014_collab_sessions.sql**: D1 schema — `collab_sessions` 表（含 operation_type CHECK + canvas_id + created_at 索引）
+- **CollaborationRoom.ts**: `collab:session` WebSocket 消息广播支持
+- **CanvasSettingsPanel.tsx**: 新增「会话历史」Tab，渲染 `SessionHistoryPanel`
+类型: feat
+影响: vibex-fronted / vibex-backend
+
 ## [Unreleased] S84-E2: 协作者在线状态与光标显示 — 2026-06-10
 
 **类型**: `feat`

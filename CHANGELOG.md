@@ -7324,3 +7324,12 @@ See git history for complete changelog.
 ### 技术细节
 - 标签评分公式：`score = usage_count * 0.6 + avg_rating * rating_count * 0.4`
 - 预览对话框使用现有 TemplateEditDialog 模式，集成使用量和星级显示
+
+## [S88-E4] 画布嵌入与分享增强 (2026-06-12)
+
+- **嵌入预览**: ShareDialog 新增 live embed iframe 预览区域，实时反映分享设置
+- **嵌入参数表单**: 支持自定义 width/height/theme/toolbar 参数，生成 iframe 代码并支持一键复制
+- **仅查看评论权限**: 新增 `comment-only` 权限级别，模式下隐藏画布节点内容，显示水印
+- **Backend API**: `GET /api/canvas/[id]/share` 支持 `mode: 'comment-only'`，返回 `embedUrl`
+- **测试**: 9 backend Jest + 30 frontend Vitest 全部通过
+

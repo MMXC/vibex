@@ -7185,3 +7185,10 @@ See git history for complete changelog.
 ### 技术细节
 - 标签评分公式：`score = usage_count * 0.6 + avg_rating * rating_count * 0.4`
 - 预览对话框使用现有 TemplateEditDialog 模式，集成使用量和星级显示
+
+## [S88-E4] 画布嵌入与分享增强 (2026-06-12)
+
+- ShareDialog 新增 embed preview iframe + param form (width/height/theme/toolbar)
+- 新增 `comment-only` 权限模式：节点内容隐藏，显示"仅显示评论"水印
+- `canvas-share.ts`: embedUrl 生成逻辑
+

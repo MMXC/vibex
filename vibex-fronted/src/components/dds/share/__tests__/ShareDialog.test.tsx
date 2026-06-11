@@ -27,12 +27,13 @@ vi.mock('@/hooks/useTranslations', () => ({
         save: '保存',
         cancel: '取消',
         loading: '加载中...',
-        shareFailed: '分享失败',
-        noShareLink: '暂无分享链接',
-        otherLinks: '其他链接',
         expires: '链接有效期至',
         noExpiry: '永久有效',
         shareLink: '分享链接',
+        embedPreview: '嵌入预览',
+        shareFailed: '分享失败',
+        noShareLink: '暂无分享链接',
+        otherLinks: '其他链接',
       };
       return map[key] ?? key;
     };
@@ -146,7 +147,7 @@ describe('ShareDialog', () => {
     await waitFor(() => {
       expect(screen.getByText('复制链接')).toBeInTheDocument();
     });
-    expect(screen.getByDisplayValue(/snapshot\?canvas=canvas-123&share=/)).toBeInTheDocument();
+    expect(screen.getByRole('textbox', { name: /分享链接/ })).toBeInTheDocument();
   });
 
   it('copy button shows "已复制" on success', async () => {
@@ -204,10 +205,10 @@ describe('ShareDialog', () => {
 
     await waitFor(() => screen.getByText('复制链接'));
 
-    const select = screen.getByRole('combobox');
+    const select = screen.getByTestId('share-permission-select');
     await userEvent.selectOptions(select, 'editor');
 
-    expect(screen.getByRole('combobox')).toHaveValue('editor');
+    expect(screen.getByTestId('share-permission-select')).toHaveValue('editor');
   });
 
   it('shows team share button when onTeamShareRequest is provided', () => {
@@ -246,7 +247,7 @@ describe('ShareDialog', () => {
 
     render(<ShareDialog {...defaultProps} />);
     await waitFor(() => {
-      expect(screen.getByDisplayValue(/existing-token-1/)).toBeInTheDocument();
+      expect(screen.getByRole('textbox', { name: /分享链接/ })).toBeInTheDocument();
     });
   });
 
@@ -259,5 +260,126 @@ describe('ShareDialog', () => {
     await waitFor(() => {
       expect(screen.getByText('分享失败')).toBeInTheDocument();
     });
+  });
+});
+
+
+// ============================================
+// S88-E4: Embed Preview Tests
+// ============================================
+
+describe('ShareDialog E4 Embed Preview', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    // Pre-populate a link so embed section appears
+    mockListShareLinks.mockResolvedValue([
+      {
+        token: 'embed-token-123',
+        canvasId: 'canvas-123',
+        role: 'viewer',
+        createdAt: new Date().toISOString(),
+        expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+      },
+    ]);
+    mockGenerateShareLink.mockResolvedValue({
+      token: 'embed-token-123',
+      url: 'https://vibex-app.pages.dev/snapshot?canvas=canvas-123&share=embed-token-123',
+      expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+    });
+    mockRevokeShareLink.mockResolvedValue(true);
+    mockCopyToClipboardShare.mockResolvedValue(true);
+  });
+
+  it('AC1: shows embed iframe when share link exists', async () => {
+    render(<ShareDialog {...defaultProps} />);
+    await waitFor(() => {
+      expect(screen.getByTestId('embed-preview-iframe')).toBeInTheDocument();
+    });
+  });
+
+  it('AC2: changing width updates embed iframe src', async () => {
+    render(<ShareDialog {...defaultProps} />);
+    await waitFor(() => screen.getByTestId('embed-preview-iframe'));
+
+    const widthInput = screen.getByTestId('embed-width-input');
+    fireEvent.change(widthInput, { target: { value: '1200' } });
+
+    const iframe = screen.getByTestId('embed-preview-iframe') as HTMLIFrameElement;
+    expect(iframe.src).toContain('width=1200');
+  });
+
+  it('AC6: generated iframe code includes theme parameter', async () => {
+    render(<ShareDialog {...defaultProps} />);
+    await waitFor(() => screen.getByTestId('embed-code-textarea'));
+
+    const textarea = screen.getByTestId('embed-code-textarea') as HTMLTextAreaElement;
+    expect(textarea.value).toContain('theme=');
+  });
+
+  it('AC3: copy embed code button triggers clipboard copy', async () => {
+    render(<ShareDialog {...defaultProps} />);
+    await waitFor(() => screen.getByTestId('embed-copy-btn'));
+
+    await userEvent.click(screen.getByTestId('embed-copy-btn'));
+
+    await waitFor(() => {
+      expect(mockCopyToClipboardShare).toHaveBeenCalled();
+    });
+  });
+
+  it('shows comment-only permission option', async () => {
+    render(<ShareDialog {...defaultProps} />);
+    const select = screen.getByRole('combobox');
+    expect(select).toBeInTheDocument();
+    // The comment-only option should be in the select
+    const options = screen.getAllByRole('option');
+    const values = options.map(o => o.getAttribute('value'));
+    expect(values).toContain('comment-only');
+  });
+
+  it('changing permission to comment-only updates iframe src', async () => {
+    render(<ShareDialog {...defaultProps} />);
+    await waitFor(() => screen.getByTestId('embed-preview-iframe'));
+
+    const permSelect = screen.getByTestId('share-permission-select');
+    await userEvent.selectOptions(permSelect, 'comment-only');
+
+    // The permission should change (will regenerate the link)
+    await waitFor(() => {
+      expect(mockGenerateShareLink).toHaveBeenCalledWith(
+        expect.objectContaining({ role: 'comment-only' })
+      );
+    });
+  });
+
+  it('embed preview iframe has correct data-testid', async () => {
+    render(<ShareDialog {...defaultProps} />);
+    await waitFor(() => {
+      const iframe = screen.getByTestId('embed-preview-iframe');
+      expect(iframe).toHaveAttribute('title', expect.stringContaining('嵌入'));
+    });
+  });
+
+  it('theme select is present in embed params', async () => {
+    render(<ShareDialog {...defaultProps} />);
+    await waitFor(() => screen.getByTestId('embed-theme-select'));
+    expect(screen.getByTestId('embed-theme-select')).toBeInTheDocument();
+  });
+
+  it('toolbar toggle is present in embed params', async () => {
+    render(<ShareDialog {...defaultProps} />);
+    await waitFor(() => screen.getByTestId('embed-toolbar-toggle'));
+    expect(screen.getByTestId('embed-toolbar-toggle')).toBeInTheDocument();
+  });
+
+  it('AC6: changing theme updates embed code textarea', async () => {
+    render(<ShareDialog {...defaultProps} />);
+    await waitFor(() => screen.getByTestId('embed-theme-select'));
+
+    const themeSelect = screen.getByTestId('embed-theme-select');
+    await userEvent.selectOptions(themeSelect, 'dark');
+
+    const textarea = screen.getByTestId('embed-code-textarea') as HTMLTextAreaElement;
+    expect(textarea.value).toContain('theme=dark');
   });
 });

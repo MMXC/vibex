@@ -88,6 +88,10 @@ export function TemplateCard({ template, selected = false, onSelect }: TemplateC
   const icon = CATEGORY_ICONS[template.category] ?? '📄';
   const tags = template.tags?.slice(0, 3) ?? [];
 
+  // S88-E3: usage and rating from published template API
+  const usageCount = (template as any).usage_count ?? 0;
+  const avgRating = (template as any).avg_rating ?? 0;
+
   return (
     <div
       className={`${styles.card} ${selected ? styles.selected : ''}`}
@@ -143,6 +147,16 @@ export function TemplateCard({ template, selected = false, onSelect }: TemplateC
       {/* Footer meta */}
       <div className={styles.meta}>
         <span className={styles.category}>{categoryLabel}</span>
+        {usageCount > 0 && (
+          <span className={styles.usageCount} aria-label={`已使用 ${usageCount} 次`}>
+            已使用 {usageCount >= 1000 ? `${(usageCount / 1000).toFixed(1)}k` : usageCount} 次
+          </span>
+        )}
+        {avgRating > 0 && (
+          <span className={styles.ratingStars} aria-label={`评分 ${avgRating}`}>
+            {'★'.repeat(Math.round(avgRating))}{'☆'.repeat(5 - Math.round(avgRating))}
+          </span>
+        )}
       </div>
     </div>
   );

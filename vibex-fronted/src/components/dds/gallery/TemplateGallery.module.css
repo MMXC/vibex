@@ -275,3 +275,35 @@
   border-color: var(--color-primary, #6366F1);
   box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
 }
+
+/* S88-E3: Recommended section */
+.recommendedSection {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sectionTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text, #374151);
+  margin: 0;
+}
+
+.recommendedGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+@media (max-width: 900px) {
+  .recommendedGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .recommendedGrid {
+    grid-template-columns: 1fr;
+  }
+}

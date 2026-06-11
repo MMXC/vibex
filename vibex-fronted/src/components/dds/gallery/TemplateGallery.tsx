@@ -18,6 +18,7 @@ import React, { useState, useCallback, useMemo } from 'react';
 import { useTemplateStore } from '@/stores/templateStore';
 import type { RequirementTemplate, TemplateCategory } from '@/data/templates';
 import { TemplateCard } from './TemplateCard';
+import { TemplatePreviewDialog } from './TemplatePreviewDialog';
 import styles from './TemplateGallery.module.css';
 
 /** All available category tabs */
@@ -129,6 +130,19 @@ export function TemplateGallery({ onInsert, open = true }: TemplateGalleryProps)
     [previewTemplate]
   );
 
+  // S88-E3: Recommended templates section — top 6 by score
+  const recommendedTemplates = useMemo(() => {
+    const scored = templates.map((t) => {
+      const usageCount = (t as any).usage_count ?? 0;
+      const avgRating = (t as any).avg_rating ?? 0;
+      const ratingCount = (t as any).rating_count ?? 0;
+      const score = usageCount * 0.6 + avgRating * ratingCount * 0.4;
+      return { template: t, score };
+    });
+    scored.sort((a, b) => b.score - a.score);
+    return scored.slice(0, 6).map((s) => s.template);
+  }, [templates]);
+
   if (!open) return null;
 
   return (
@@ -149,9 +163,25 @@ export function TemplateGallery({ onInsert, open = true }: TemplateGalleryProps)
             aria-label="搜索模板"
           />
 
-          {/* Category tabs */}
-          <div className={styles.categoryTabs} role="tablist" aria-label="模板分类">
-            {CATEGORIES.map((cat) => (
+      {/* S88-E3: Recommended section */}
+      {recommendedTemplates.length > 0 && (
+        <div className={styles.recommendedSection}>
+          <h2 className={styles.sectionTitle}>推荐模板</h2>
+          <div className={styles.recommendedGrid}>
+            {recommendedTemplates.map((tpl) => (
+              <TemplateCard
+                key={tpl.id}
+                template={tpl}
+                onSelect={(t) => setPreviewTemplate(t)}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Category tabs */}
+      <div className={styles.categoryTabs} role="tablist" aria-label="模板分类">
+        {CATEGORIES.map((cat) => (
               <button
                 key={cat.id}
                 className={`${styles.categoryTab} ${selectedCategory === cat.id ? styles.active : ''}`}
@@ -204,56 +234,16 @@ export function TemplateGallery({ onInsert, open = true }: TemplateGalleryProps)
         )}
       </div>
 
-      {/* Preview overlay */}
-      {previewTemplate && (
-        <div
-          className={styles.previewOverlay}
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="preview-title"
-          onClick={(e) => {
-            if (e.target === e.currentTarget) handleClosePreview();
-          }}
-        >
-          <div className={styles.previewPanel}>
-            <div className={styles.previewHeader}>
-              <h2 className={styles.previewTitle} id="preview-title">
-                {previewTemplate.displayName ?? previewTemplate.name}
-              </h2>
-              <button
-                className={styles.closeBtn}
-                onClick={handleClosePreview}
-                aria-label="关闭预览"
-              >
-                ✕
-              </button>
-            </div>
-
-            {previewTemplate.description && (
-              <p className={styles.previewDesc}>{previewTemplate.description}</p>
-            )}
-
-            {previewTemplate.tags && previewTemplate.tags.length > 0 && (
-              <div className={styles.previewTags} aria-label="标签">
-                {previewTemplate.tags.map((tag) => (
-                  <span key={tag} className={styles.previewTag}>
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            )}
-
-            <div className={styles.previewActions}>
-              <button className={styles.insertBtn} onClick={handleInsert}>
-                插入画布
-              </button>
-              <button className={styles.cancelBtn} onClick={handleClosePreview}>
-                取消
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* S88-E3: TemplatePreviewDialog */}
+      <TemplatePreviewDialog
+        isOpen={!!previewTemplate}
+        template={previewTemplate}
+        onInsert={(t) => {
+          onInsert?.(t);
+          setPreviewTemplate(null);
+        }}
+        onClose={handleClosePreview}
+      />
     </div>
   );
 }

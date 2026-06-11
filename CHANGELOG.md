@@ -7178,3 +7178,15 @@ See git history for complete changelog.
 
 类型: feat
 影响: canvas-history, canvas-history-store, backend-api
+## S86-E5 (2026-06-11) — VersionDiffPanel side-by-side two-column layout mode
+
+- `VersionDiffPanel` adds togglable side-by-side view mode (default=list mode preserved)
+- `diffViewMode` state: `'list'` | `'sideBySide'`; `ViewModeSelect` dropdown added above the panel
+- `SideBySideContent` component: dual-column layout with `基准` / `对比` column headers
+- Removed nodes appear in left column (red `移除` badge); added in right (green `添加` badge); modified in right (orange `修改` badge)
+- Empty cells rendered for rows where a node doesn't exist in that version
+- Snapshot labels bar hidden in side-by-side mode to avoid duplication with column headers
+- 23 vitest pass (13 list-mode + 10 side-by-side tests)
+- Commits: `b00087499` on main, `c91f352ad` on epic branch
+- S86-E5 self-impl (dev ghost)
+

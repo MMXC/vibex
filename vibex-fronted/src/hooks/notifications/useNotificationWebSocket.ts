@@ -29,13 +29,15 @@ interface UseNotificationWebSocketOptions {
   onDisconnect?: () => void;
 }
 
-interface UseNotificationWebSocketReturn {
-  /** 是否已连接 */
+export interface UseNotificationWebSocketReturn {
+  /** 当前是否已连接 */
   isConnected: boolean;
   /** 主动断开连接 */
   disconnect: () => void;
-  /** 手动重连 */
+  /** 手动触发重连 */
   reconnect: () => void;
+  /** @internal 全局 WebSocket 实例（仅用于测试） */
+  _ws: WebSocket | null;
 }
 
 /** 连接配置 */
@@ -248,5 +250,5 @@ export function useNotificationWebSocket({
     connectGlobal(userIdRef.current, onConnectRef.current, onDisconnectRef.current);
   }, []);
 
-  return { isConnected, disconnect, reconnect };
+  return { isConnected, disconnect, reconnect, _ws: globalWs };
 }

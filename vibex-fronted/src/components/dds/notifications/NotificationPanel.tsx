@@ -255,6 +255,17 @@ const NotificationPanel = memo(function NotificationPanel({
     if (open) setPage(1);
   }, [open, activeTab]);
 
+  // S86-E4: Auto-scroll to top when new notification arrives via WebSocket
+  // Tracks previous notification count to detect WS-pushed additions
+  const prevCountRef = useRef(notifications.length);
+  useEffect(() => {
+    if (open && notifications.length > prevCountRef.current) {
+      // New notification arrived (via wsNotificationHandler) — scroll to top
+      listRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    prevCountRef.current = notifications.length;
+  }, [open, notifications.length]);
+
   // S73-E3: ESC 关闭设置抽屉
   useEffect(() => {
     if (!isSettingsOpen) return;

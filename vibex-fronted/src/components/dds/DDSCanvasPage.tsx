@@ -74,6 +74,7 @@ import { usePresenceStore } from '@/lib/collaboration/presenceStore';
 import { CollabConflictDialog } from '@/components/dds/collaboration/ConflictResolutionDialog';
 import { PresenceOverlay } from '@/components/dds/presence/PresenceOverlay';
 import { useWebSocketPresence } from '@/lib/collaboration/useWebSocketPresence';
+import { useNotificationWebSocket } from '@/hooks/notifications/useNotificationWebSocket';
 // S62-E1: Collaboration editing broadcast
 import { useCollabEditing } from '@/lib/collaboration/useCollabEditing';
 import { usePresenceStore } from '@/lib/collaboration/presenceStore';
@@ -494,6 +495,9 @@ const { onCursorMove, broadcastCursor } = useWebSocketPresence({
     userId,
     userName: user?.name ?? 'Anonymous',
   });
+
+  // S86-E4: Notification WebSocket — listens for notification:new events
+  useNotificationWebSocket({ userId });
 
   // E1-S1.4: cursorVisible setting controls PresenceOverlay display
   const cursorVisible = useUserPreferencesStore((s) => s.cursorVisible);

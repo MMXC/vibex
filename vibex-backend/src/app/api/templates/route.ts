@@ -45,11 +45,25 @@ export async function GET(
     const { env } = context;
     const { searchParams } = new URL(request.url);
     const sort = searchParams.get('sort') || 'recent'; // recent | rating | usage
+    const tagsParam = searchParams.get('tags'); // comma-separated, OR query
     const limit = Math.min(parseInt(searchParams.get('limit') || '50'), 200);
 
     let orderBy = 'published_at DESC';
     if (sort === 'rating') orderBy = 'avg_rating DESC, rating_count DESC';
     else if (sort === 'usage') orderBy = 'usage_count DESC';
+
+    // Build WHERE clause for tags (multi-tag OR filter)
+    let whereClause = '';
+    const queryParams: (string | number)[] = [];
+    if (tagsParam && tagsParam.trim().length > 0) {
+      const tagList = tagsParam.split(',').map(t => t.trim()).filter(Boolean);
+      if (tagList.length > 0) {
+        // OR query: tags JSON contains any of the requested tags
+        const tagConditions = tagList.map(() => `tags LIKE ?`).join(' OR ');
+        whereClause = `WHERE (${tagConditions})`;
+        queryParams.push(...tagList.map(tag => `%${tag}%`));
+      }
+    }
 
     const rows = await queryDB<TemplateRow>(
       env,
@@ -57,9 +71,10 @@ export async function GET(
               thumbnail, canvas_id, usage_count, avg_rating, rating_count,
               created_at, published_at
        FROM templates
+       ${whereClause}
        ORDER BY ${orderBy}
        LIMIT ?`,
-      [limit]
+      [...queryParams, limit]
     );
 
     return NextResponse.json({

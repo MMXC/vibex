@@ -206,6 +206,12 @@ interface TemplateState {
   // 获取所有市场模板
   getMarketplaceTemplates: () => RequirementTemplate[];
 
+  // ---- E3: 模板增强搜索与筛选 ----
+  // 通过 API 搜索模板（支持多标签 OR 过滤 + 排序）
+  searchByTags: (tags: string[], sort?: 'recent' | 'rating' | 'usage') => Promise<RequirementTemplate[]>;
+  // 客户端本地按标签过滤（无需 API 调用）
+  filterByTags: (tags: string[]) => RequirementTemplate[];
+
   // ---- E4: 模板导入/导出管理 ----
   // 导出所有模板为 JSON
   exportTemplates: () => { version: string; exportedAt: string; templates: RequirementTemplate[] };
@@ -661,6 +667,49 @@ export const useTemplateStore = create<TemplateState>()(
       // 获取所有市场模板
       getMarketplaceTemplates: () => {
         return get().templates;
+      },
+
+      // ---- E3: 模板增强搜索与筛选 ----
+      // 通过 API 搜索模板（支持多标签 OR 过滤 + 排序）
+      searchByTags: async (tags, sort = 'recent') => {
+        try {
+          const params = new URLSearchParams();
+          if (tags.length > 0) params.set('tags', tags.join(','));
+          params.set('sort', sort);
+          const res = await globalThis.fetch(`/api/templates?${params}`);
+          const data = await res.json();
+          if (data.ok && Array.isArray(data.templates)) {
+            // Merge API results into local store
+            set(state => {
+              const updated = [...state.templates];
+              for (const t of data.templates) {
+                const idx = updated.findIndex(x => x.id === t.id);
+                if (idx >= 0) updated[idx] = { ...updated[idx], ...t };
+                else updated.push(t as unknown as RequirementTemplate);
+              }
+              return { templates: updated };
+            });
+            return data.templates as RequirementTemplate[];
+          }
+          return [];
+        } catch {
+          return [];
+        }
+      },
+
+      // 客户端本地按标签过滤（无需 API 调用）
+      filterByTags: (tags) => {
+        const { templates } = get();
+        if (!tags || tags.length === 0) return templates;
+        return templates.filter(t => {
+          const templateTags: string[] = t.metadata?.tags ?? t.tags ?? [];
+          // OR: match any of the requested tags
+          return tags.some(tag =>
+            templateTags.some(tTag =>
+              tTag.toLowerCase().includes(tag.toLowerCase())
+            )
+          );
+        });
       },
 
       // ---- E4: 模板版本管理 ----

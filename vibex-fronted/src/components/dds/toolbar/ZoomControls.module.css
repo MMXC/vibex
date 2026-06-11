@@ -1,0 +1,147 @@
+/**
+ * ZoomControls — Toolbar Zoom & Grid Controls Styles
+ * S88-E1: Canvas Zoom & Navigation Enhancement
+ *
+ * Dark glassmorphism style matching DDSToolbar.
+ * E1-F1: Zoom buttons with smooth transitions
+ * E1-F2: Grid spacing cycle button
+ */
+
+.container {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  position: relative;
+}
+
+/* E1-F1: Zoom control buttons */
+.zoomBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 6px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background-color: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: inherit;
+  line-height: 1;
+}
+
+.zoomBtn:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.zoomBtn:active {
+  background-color: rgba(255, 255, 255, 0.12);
+  transform: scale(0.95);
+}
+
+.zoomBtn:focus-visible {
+  outline: 2px solid rgba(99, 102, 241, 0.5);
+  outline-offset: 1px;
+}
+
+.active {
+  background-color: rgba(99, 102, 241, 0.15);
+  border-color: rgba(99, 102, 241, 0.4);
+  color: #818cf8;
+}
+
+.active:hover {
+  background-color: rgba(99, 102, 241, 0.2);
+  color: #818cf8;
+}
+
+/* E1-F2: Grid spacing button */
+.gridBtn {
+  font-size: 11px;
+  min-width: 24px;
+}
+
+/* Zoom percent display */
+.zoomPercent {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  height: 28px;
+  padding: 0 4px;
+  border-radius: 6px;
+  background-color: transparent;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 11px;
+  font-weight: 600;
+  font-family: 'SF Mono', 'Consolas', monospace;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+  letter-spacing: -0.02em;
+}
+
+.zoomPercent:hover {
+  background-color: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Presets dropdown */
+.presetsDropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 200;
+  display: none;
+  flex-direction: column;
+  gap: 1px;
+  padding: 4px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background-color: rgba(31, 41, 55, 0.95);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  min-width: 72px;
+}
+
+.presetsDropdown[aria-hidden='false'] {
+  display: flex;
+}
+
+.presetItem {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 28px;
+  padding: 0 8px;
+  border-radius: 6px;
+  border: none;
+  background-color: transparent;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.1s ease;
+  font-family: inherit;
+  text-align: center;
+}
+
+.presetItem:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.presetActive {
+  background-color: rgba(99, 102, 241, 0.15);
+  color: #818cf8;
+}
+
+.presetActive:hover {
+  background-color: rgba(99, 102, 241, 0.2);
+}

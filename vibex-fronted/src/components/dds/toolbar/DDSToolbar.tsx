@@ -32,6 +32,7 @@ import { useCanvasImport } from '@/hooks/canvas/useCanvasImport';
 import { useCanvasRBAC } from '@/hooks/useCanvasRBAC';
 import { ShareToTeamModal } from '@/components/team-share/ShareToTeamModal';
 import { ExportMenu } from './ExportMenu';
+import { ZoomControls } from './ZoomControls';
 import { ImportMenu } from './ImportMenu';
 import { OnlineUsers } from './OnlineUsers';
 import { OfflineIndicator } from './OfflineIndicator';
@@ -547,6 +548,9 @@ export const DDSToolbar = memo(function DDSToolbar({
             disabled={!rbac.canShare && !rbac.loading}
             className={styles.exportMenuWrapper}
           />
+
+          {/* S88-E1: Zoom controls (zoom in/out, fit view, reset, grid spacing) */}
+          <ZoomControls />
 
           {/* S78-E4: Scheduled export & webhook */}
           <button

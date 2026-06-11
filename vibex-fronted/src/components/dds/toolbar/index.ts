@@ -5,3 +5,4 @@
 
 export { DDSToolbar } from './DDSToolbar';
 export type { DDSToolbarProps } from './DDSToolbar';
+export { ZoomControls } from './ZoomControls';

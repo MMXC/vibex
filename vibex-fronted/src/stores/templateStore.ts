@@ -63,6 +63,17 @@ export interface AuthorSubscription {
   lastUpdateCheck: number;
 }
 
+/** ---- S87-E5: 模板文件夹 ---- */
+export interface TemplateFolder {
+  folderId: string;
+  name: string;
+  icon: string;
+  sortOrder: number;
+  templateCount: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
 interface TemplateState {
   // 状态
   templates: RequirementTemplate[];
@@ -73,6 +84,22 @@ interface TemplateState {
   isSelectorOpen: boolean;
   stats: TemplateStats;
   favoriteTemplateIds: string[];  // 收藏模板ID列表
+
+  // ---- S87-E5: 模板文件夹 ----
+  /** 用户文件夹列表 */
+  folders: TemplateFolder[];
+  /** 加载文件夹列表 */
+  loadFolders: () => Promise<void>;
+  /** 创建文件夹 */
+  createFolder: (name: string, icon?: string) => Promise<{ ok: boolean; folder?: TemplateFolder; error?: string }>;
+  /** 更新文件夹 */
+  updateFolder: (folderId: string, data: { name?: string; icon?: string; sortOrder?: number }) => Promise<{ ok: boolean; error?: string }>;
+  /** 删除文件夹 */
+  deleteFolder: (folderId: string) => Promise<{ ok: boolean; error?: string }>;
+  /** 将模板移动到文件夹 */
+  moveToFolder: (templateId: string, folderId: string | null) => Promise<{ ok: boolean; error?: string }>;
+  /** 获取某个文件夹中的模板 */
+  getTemplatesByFolder: (folderId: string | null) => RequirementTemplate[];
 
   // ---- S78-E2: 模板订阅 ----
   /** 订阅的模板 ID → 订阅状态 */
@@ -274,6 +301,9 @@ export const useTemplateStore = create<TemplateState>()(
       stats: getInitialStats(),
       favoriteTemplateIds: [],
 
+      // ---- S87-E5: 模板文件夹 ----
+      folders: [],
+
       // ---- S78-E2: 模板订阅 ----
       subscribedTemplates: {},
       subscribedAuthors: {},
@@ -287,6 +317,109 @@ export const useTemplateStore = create<TemplateState>()(
       thumbnailCache: {},
 
       // ---- S78-E2: 模板订阅 actions ----
+      loadFolders: async () => {
+        try {
+          const res = await fetch('/api/templates/folders');
+          const data = await res.json() as { success: boolean; folders: TemplateFolder[] };
+          if (data.success) {
+            set({ folders: data.folders });
+          }
+        } catch {
+          // Silent fail — folders are optional
+        }
+      },
+
+      createFolder: async (name, icon = '📁') => {
+        try {
+          const res = await fetch('/api/templates/folders', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, icon }),
+          });
+          const data = await res.json() as { success: boolean; folder?: TemplateFolder; error?: string };
+          if (data.success && data.folder) {
+            set(state => ({ folders: [...state.folders, data.folder!] }));
+            return { ok: true, folder: data.folder };
+          }
+          return { ok: false, error: data.error ?? 'Failed to create folder' };
+        } catch (err) {
+          return { ok: false, error: String(err) };
+        }
+      },
+
+      updateFolder: async (folderId, data) => {
+        try {
+          const res = await fetch(`/api/templates/folders/${folderId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data),
+          });
+          const json = await res.json() as { success: boolean; folder?: TemplateFolder; error?: string };
+          if (json.success && json.folder) {
+            set(state => ({
+              folders: state.folders.map(f => f.folderId === folderId ? json.folder! : f),
+            }));
+            return { ok: true };
+          }
+          return { ok: false, error: json.error ?? 'Failed to update folder' };
+        } catch (err) {
+          return { ok: false, error: String(err) };
+        }
+      },
+
+      deleteFolder: async (folderId) => {
+        try {
+          const res = await fetch(`/api/templates/folders/${folderId}`, { method: 'DELETE' });
+          const data = await res.json() as { success: boolean; error?: string };
+          if (data.success) {
+            set(state => ({ folders: state.folders.filter(f => f.folderId !== folderId) }));
+            return { ok: true };
+          }
+          return { ok: false, error: data.error ?? 'Failed to delete folder' };
+        } catch (err) {
+          return { ok: false, error: String(err) };
+        }
+      },
+
+      moveToFolder: async (templateId, folderId) => {
+        try {
+          const res = await fetch(`/api/templates/${templateId}/folder`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ folderId }),
+          });
+          const data = await res.json() as { success: boolean; error?: string };
+          if (data.success) {
+            // Update folder template counts locally
+            const { folders, templates } = get();
+            const updatedFolders = folders.map(f => {
+              if (f.folderId === folderId) {
+                return { ...f, templateCount: f.templateCount + 1 };
+              }
+              const wasInFolder = templates.some(t => t.id === templateId);
+              if (wasInFolder) {
+                return { ...f, templateCount: Math.max(0, f.templateCount - 1) };
+              }
+              return f;
+            });
+            set({ folders: updatedFolders });
+            return { ok: true };
+          }
+          return { ok: false, error: data.error ?? 'Failed to move template' };
+        } catch (err) {
+          return { ok: false, error: String(err) };
+        }
+      },
+
+      getTemplatesByFolder: (folderId) => {
+        const { templates } = get();
+        if (folderId === null) {
+          // Return templates not in any folder (for "uncategorized" tab)
+          return templates.filter(t => !(t as { folderId?: string }).folderId);
+        }
+        return templates.filter(t => (t as { folderId?: string }).folderId === folderId);
+      },
+
       subscribeTemplate: (templateId) => {
         const { subscribedTemplates } = get();
         if (subscribedTemplates[templateId]) return; // already subscribed

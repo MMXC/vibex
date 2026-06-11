@@ -101,8 +101,19 @@ describe('useNotificationWebSocket', () => {
     vi.clearAllMocks();
   });
 
+  it('connects to WebSocket when userId is provided', async () => {
+    const { result } = renderHook(() =>
+      useNotificationWebSocket({ userId: 'user-123', enabled: true })
+    );
+
     expect(result.current.isConnected).toBe(false);
-    expect(wsNotificationHandler.wsNotificationHandler.activate).not.toHaveBeenCalled();
+
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 20));
+    });
+
+    expect(result.current.isConnected).toBe(true);
+    expect(wsNotificationHandler.wsNotificationHandler.activate).toHaveBeenCalled();
   });
 
   it('does not connect when userId is null', async () => {

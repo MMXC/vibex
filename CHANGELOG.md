@@ -7364,3 +7364,22 @@ See git history for complete changelog.
 - **Backend API**: `GET /api/canvas/[id]/share` 支持 `mode: 'comment-only'`，返回 `embedUrl`
 - **测试**: 9 backend Jest + 30 frontend Vitest 全部通过
 
+## S89-E1 · Canvas Analytics Dashboard · 2026-06-12
+
+### Features
+- **Settings Analytics Section**: `src/app/settings/analytics/UsageAnalyticsSection.tsx` — 画布分析仪表板，显示总体概览卡片（总画布数/协作者数/本月活跃）和饼图类型分布
+- **canvasAccessHistoryStore**: `src/stores/dds/canvasAccessHistoryStore.ts` — Zustand persist store，追踪当前画布的最近访问者（最多 5 条记录），支持 recordAccess / getRecentAccessors / clearHistory
+- **GET /api/canvas/stats**: 返回用户所有画布列表及协作者数量统计
+- **GET /api/canvas/[id]/access-history**: 获取指定画布最近 N 条访问记录（默认 5 条）
+- **POST /api/canvas/[id]/access-history**: 记录一次画布访问（去重：同一用户访问同一画布仅保留最新时间戳）
+- **D1 迁移**: `0020_access_history.sql` — `canvas_access_history` 表，含 user_name / avatar_url / accessed_at 及索引
+
+### Tests
+- `UsageAnalyticsSection.test.tsx`: 10 vitest（概览卡片渲染 / 加载状态 / 空状态 / 饼图 / 柱状图）
+- `canvasAccessHistoryStore.test.ts`: 8 vitest（记录访问 / 去重 / 最多 5 条 / 清空历史）
+- `stats/route.test.ts`: 5 Jest（认证 / 统计数据 / canvasId 过滤）
+- `access-history/route.test.ts`: 8 Jest（GET auth / 记录 / limit / POST body validation / 去重 / 幂等性 / 错误）
+
+### Variant W' self-impl
+- dev-e1 phantom（workspace 文件存在但未提交）；预探索确认现有代码 → 仅补全缺失部分（access-history 路由 + 迁移 + 集成 page.tsx）
+

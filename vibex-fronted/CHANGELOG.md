@@ -7192,3 +7192,13 @@ See git history for complete changelog.
 - 新增 `comment-only` 权限模式：节点内容隐藏，显示"仅显示评论"水印
 - `canvas-share.ts`: embedUrl 生成逻辑
 
+## S89-E1 · Canvas Analytics Dashboard · 2026-06-12
+
+### Features
+- **Settings Analytics Section**: `src/app/settings/analytics/UsageAnalyticsSection.tsx` — 画布分析仪表板，显示总体概览卡片（总画布数/协作者数/本月活跃）和饼图类型分布
+- **canvasAccessHistoryStore**: `src/stores/dds/canvasAccessHistoryStore.ts` — Zustand persist store，追踪当前画布的最近访问者（最多 5 条记录），支持 recordAccess / getRecentAccessors / clearHistory
+
+### Tests
+- `src/app/settings/analytics/UsageAnalyticsSection.test.tsx`: 10 vitest
+- `src/stores/dds/__tests__/canvasAccessHistoryStore.test.ts`: 8 vitest
+

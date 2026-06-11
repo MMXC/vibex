@@ -1,18 +1,24 @@
 'use client';
 
 /**
- * CommentPanel — Sprint49 E5: 协作评论系统
+ * CommentPanel — Sprint49 E5 + S88-E2: 协作评论系统
  *
  * 右侧边栏评论面板。
  * 列出当前画布所有评论，支持添加、回复、标记已解决。
+ *
+ * S88-E2 增强：
+ * - 筛选栏（全部/未解决/已解决/@我）
+ * - 虚拟滚动（>20条评论时启用）
+ * - @mention 高亮显示
  */
 
-import React, { useState, useCallback, useRef } from 'react';
+import React, { useState, useCallback, useRef, useMemo } from 'react';
 import { useCommentStore } from '@/stores/dds/commentStore';
-import type { Comment } from '@/stores/dds/commentStore';
+import type { Comment, CommentFilter } from '@/stores/dds/commentStore';
 import { parseMentions } from '@/lib/canvas/parseMentions';
 import { useMentionsStore } from '@/stores/dds/mentionsStore';
 import { useMentionCompletion, getMentionQueryAtCursor } from '@/hooks/useMentionCompletion';
+import { useVirtualizer } from '@tanstack/react-virtual';
 import styles from './CommentPanel.module.css';
 
 interface CommentPanelProps {
@@ -20,7 +26,11 @@ interface CommentPanelProps {
   onClose: () => void;
   /** 当前选中的节点 ID（用于新评论自动关联） */
   activeNodeId?: string;
+  /** 当前用户 ID（用于 @我 筛选） */
+  currentUserId?: string;
 }
+
+const VIRTUAL_SCROLL_THRESHOLD = 20;
 
 function formatTime(timestamp: number): string {
   const now = Date.now();
@@ -34,6 +44,43 @@ function formatTime(timestamp: number): string {
     hour: '2-digit',
     minute: '2-digit',
   });
+}
+
+/** S88-E2: 将 @mention 文本转换为高亮 JSX */
+function HighlightMentions({ text }: { text: string }) {
+  const mentions = parseMentions(text);
+  if (mentions.length === 0) {
+    return <>{text}</>;
+  }
+
+  const MENTION_REGEX = /@([\w\u4e00-\u9fa5]+)/g;
+  const parts: React.ReactNode[] = [];
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+
+  while ((match = MENTION_REGEX.exec(text)) !== null) {
+    if (match.index > lastIndex) {
+      parts.push(text.slice(lastIndex, match.index));
+    }
+    const username = match[1];
+    parts.push(
+      <a
+        key={`mention-${match.index}`}
+        href={`/profile/${encodeURIComponent(username)}`}
+        className={styles.mentionLink}
+        onClick={e => e.stopPropagation()}
+      >
+        @{username}
+      </a>
+    );
+    lastIndex = match.index + match[0].length;
+  }
+
+  if (lastIndex < text.length) {
+    parts.push(text.slice(lastIndex));
+  }
+
+  return <>{parts}</>;
 }
 
 function CommentItem({
@@ -64,7 +111,10 @@ function CommentItem({
           ×
         </button>
       </div>
-      <p className={styles.commentText}>{comment.text}</p>
+      {/* S88-E2: @mention highlighted text */}
+      <p className={styles.commentText}>
+        <HighlightMentions text={comment.text} />
+      </p>
       <div className={styles.commentActions}>
         {comment.resolved ? (
           <button
@@ -86,12 +136,16 @@ function CommentItem({
   );
 }
 
-export function CommentPanel({ open, onClose, activeNodeId }: CommentPanelProps) {
+export function CommentPanel({ open, onClose, activeNodeId, currentUserId }: CommentPanelProps) {
   const [newText, setNewText] = useState('');
   const [targetNodeId, setTargetNodeId] = useState(activeNodeId ?? '');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const listContainerRef = useRef<HTMLDivElement>(null);
 
   const comments = useCommentStore(s => s.comments);
+  const filterStatus = useCommentStore(s => s.filterStatus);
+  const setFilterStatus = useCommentStore(s => s.setFilterStatus);
+  const getFilteredComments = useCommentStore(s => s.getFilteredComments);
   const addComment = useCommentStore(s => s.addComment);
   const resolveComment = useCommentStore(s => s.resolveComment);
   const unresolveComment = useCommentStore(s => s.unresolveComment);
@@ -100,22 +154,44 @@ export function CommentPanel({ open, onClose, activeNodeId }: CommentPanelProps)
 
   const mention = useMentionCompletion();
 
+  // S88-E2: Filtered + sorted comments
+  const filteredComments = useMemo(() => {
+    const filtered = filterStatus === 'all'
+      ? comments
+      : getFilteredComments(currentUserId);
+
+    // Group unresolved first, then resolved, sort by timestamp desc
+    return [...filtered].sort((a, b) => {
+      if (a.resolved !== b.resolved) return a.resolved ? 1 : -1;
+      return b.timestamp - a.timestamp;
+    });
+  }, [comments, filterStatus, getFilteredComments, currentUserId]);
+
+  const unresolvedCount = comments.filter(c => !c.resolved).length;
+
+  // S88-E2: Virtual scrolling for large lists
+  const useVirtual = filteredComments.length > VIRTUAL_SCROLL_THRESHOLD;
+  const virtualizer = useVirtualizer({
+    count: filteredComments.length,
+    getScrollElement: () => listContainerRef.current,
+    estimateSize: () => 120, // estimated row height
+    enabled: useVirtual,
+  });
+
   const handleAddComment = useCallback(() => {
     if (!newText.trim()) return;
     const nodeId = targetNodeId.trim() || `node-${Date.now()}`;
 
-    // S51-E5: parse @mentions before saving comment
     const mentionedUsers = parseMentions(newText);
     addComment(nodeId, newText.trim());
 
-    // S51-E5: trigger mention notifications for each @mentioned user
     mentionedUsers.forEach(username => {
       addMention({
         commentId: `mention-${Date.now()}-${username}`,
-        fromUser: 'current-user', // replace with actual user from auth
+        fromUser: 'current-user',
         toUser: username,
         commentText: newText.trim(),
-        projectId: 'current-project', // replace with actual projectId
+        projectId: 'current-project',
         nodeId,
         timestamp: Date.now(),
       });
@@ -133,7 +209,6 @@ export function CommentPanel({ open, onClose, activeNodeId }: CommentPanelProps)
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-      // S51-E5: 如果 mention 下拉打开，交给 hook 处理
       if (mention.isOpen) {
         mention.handleKeyDown(e);
         return;
@@ -148,13 +223,12 @@ export function CommentPanel({ open, onClose, activeNodeId }: CommentPanelProps)
 
   if (!open) return null;
 
-  // Group unresolved first, then resolved
-  const sorted = [...comments].sort((a, b) => {
-    if (a.resolved !== b.resolved) return a.resolved ? 1 : -1;
-    return b.timestamp - a.timestamp;
-  });
-
-  const unresolvedCount = comments.filter(c => !c.resolved).length;
+  const FILTER_OPTIONS: { key: CommentFilter; label: string }[] = [
+    { key: 'all', label: '全部' },
+    { key: 'unresolved', label: '未解决' },
+    { key: 'resolved', label: '已解决' },
+    { key: 'mentioned', label: '@我' },
+  ];
 
   return (
     <div className={styles.panel} role="complementary" aria-label="评论面板">
@@ -168,6 +242,21 @@ export function CommentPanel({ open, onClose, activeNodeId }: CommentPanelProps)
         <button className={styles.closeBtn} onClick={onClose} aria-label="关闭">
           ×
         </button>
+      </div>
+
+      {/* S88-E2: Filter bar */}
+      <div className={styles.filterBar} role="tablist" aria-label="评论筛选">
+        {FILTER_OPTIONS.map(opt => (
+          <button
+            key={opt.key}
+            role="tab"
+            aria-selected={filterStatus === opt.key}
+            className={`${styles.filterTab} ${filterStatus === opt.key ? styles.filterTabActive : ''}`}
+            onClick={() => setFilterStatus(opt.key)}
+          >
+            {opt.label}
+          </button>
+        ))}
       </div>
 
       {/* Add comment form */}
@@ -190,7 +279,6 @@ export function CommentPanel({ open, onClose, activeNodeId }: CommentPanelProps)
           rows={3}
           aria-label="评论内容"
         />
-        {/* S51-E5: @mention autocomplete dropdown */}
         {mention.isOpen && mention.suggestions.length > 0 && (
           <div className={styles.mentionDropdown} role="listbox" aria-label="@提及补全">
             {mention.suggestions.map((s, i) => (
@@ -200,7 +288,7 @@ export function CommentPanel({ open, onClose, activeNodeId }: CommentPanelProps)
                 aria-selected={i === mention.selectedIndex}
                 className={`${styles.mentionOption} ${i === mention.selectedIndex ? styles.selected : ''}`}
                 onMouseDown={(e) => {
-                  e.preventDefault(); // prevent textarea blur
+                  e.preventDefault();
                   mention.insertMention(s.username);
                 }}
               >
@@ -219,12 +307,47 @@ export function CommentPanel({ open, onClose, activeNodeId }: CommentPanelProps)
         </button>
       </div>
 
-      {/* Comment list */}
-      <div className={styles.list}>
-        {sorted.length === 0 ? (
+      {/* Comment list — regular or virtual scrolling */}
+      <div className={styles.list} ref={listContainerRef}>
+        {filteredComments.length === 0 ? (
           <p className={styles.empty}>暂无评论</p>
+        ) : useVirtual ? (
+          // S88-E2: Virtual scrolling for large lists
+          <div
+            style={{
+              height: `${virtualizer.getTotalSize()}px`,
+              width: '100%',
+              position: 'relative',
+            }}
+          >
+            {virtualizer.getVirtualItems().map(virtualRow => {
+              const comment = filteredComments[virtualRow.index];
+              return (
+                <div
+                  key={comment.commentId}
+                  data-index={virtualRow.index}
+                  ref={virtualizer.measureElement}
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    transform: `translateY(${virtualRow.start}px)`,
+                  }}
+                >
+                  <CommentItem
+                    comment={comment}
+                    onResolve={resolveComment}
+                    onUnresolve={unresolveComment}
+                    onDelete={deleteComment}
+                  />
+                </div>
+              );
+            })}
+          </div>
         ) : (
-          sorted.map(comment => (
+          // Regular rendering for small lists
+          filteredComments.map(comment => (
             <CommentItem
               key={comment.commentId}
               comment={comment}

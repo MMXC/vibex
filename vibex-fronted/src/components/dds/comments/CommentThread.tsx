@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * CommentThread — S69-E4 + S71-E2: 节点评论系统
+ * CommentThread — S69-E4 + S71-E2 + S88-E2: 节点评论系统
  *
  * 右键节点 → 上下文菜单"查看评论" → 浮层显示评论列表
  * 区别于 S49-E5 CommentPanel:
@@ -13,11 +13,17 @@
  * - WS 事件监听：comment:created / comment:resolved / comment:deleted 实时刷新
  * - Emoji 反应按钮 (👍❤️😂)：addReaction / removeReaction
  * - addListener 订阅 commentStore 事件
+ *
+ * S88-E2: 评论线程折叠/展开功能
+ * - 每条根评论支持折叠/展开
+ * - 折叠时显示回复数量
+ * - @提及高亮显示为可点击链接
  */
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useCommentStore } from '@/stores/dds/commentStore';
 import type { Comment, ReactionType } from '@/stores/dds/commentStore';
 import { MentionInput } from '@/components/dds/collaboration/MentionInput';
+import { parseMentions } from '@/lib/canvas/parseMentions';
 import styles from './CommentThread.module.css';
 
 interface CommentThreadProps {
@@ -46,10 +52,47 @@ function formatTime(timestamp: number): string {
   });
 }
 
-/** 从文本中提取 @提及的用户名列表 */
+/** 从文本中提取 @提及的用户名列表 (S88-E2: 使用 parseMentions) */
 function extractMentions(text: string): string[] {
-  const matches = text.match(/@(\S+)/g);
-  return matches ? matches.map(m => m.slice(1)) : [];
+  return parseMentions(text);
+}
+
+/** S88-E2: 将 @mention 文本转换为高亮 JSX */
+function HighlightMentions({ text }: { text: string }) {
+  const mentions = parseMentions(text);
+  if (mentions.length === 0) {
+    return <>{text}</>;
+  }
+
+  // Split text by @mentions and render highlighted links
+  const MENTION_REGEX = /@([\w\u4e00-\u9fa5]+)/g;
+  const parts: React.ReactNode[] = [];
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+
+  while ((match = MENTION_REGEX.exec(text)) !== null) {
+    if (match.index > lastIndex) {
+      parts.push(text.slice(lastIndex, match.index));
+    }
+    const username = match[1];
+    parts.push(
+      <a
+        key={`mention-${match.index}`}
+        href={`/profile/${encodeURIComponent(username)}`}
+        className={styles.mentionLink}
+        onClick={e => e.stopPropagation()}
+      >
+        @{username}
+      </a>
+    );
+    lastIndex = match.index + match[0].length;
+  }
+
+  if (lastIndex < text.length) {
+    parts.push(text.slice(lastIndex));
+  }
+
+  return <>{parts}</>;
 }
 
 /** Emoji reaction type mapping */
@@ -77,6 +120,9 @@ export function CommentThread({
   const getReactionCounts = useCommentStore(s => s.getReactionCounts);
   const getReactionsByComment = useCommentStore(s => s.getReactionsByComment);
   const addListener = useCommentStore(s => s.addListener);
+  // S88-E2: collapse support
+  const toggleCollapse = useCommentStore(s => s.toggleCollapse);
+  const isCollapsed = useCommentStore(s => s.isCollapsed);
 
   // S71-E2: Subscribe to commentStore events for real-time updates
   useEffect(() => {
@@ -161,16 +207,19 @@ export function CommentThread({
             const counts = getReactionCounts(comment.commentId);
             const reactions = getReactionsByComment(comment.commentId);
             const myReaction = reactions.find(r => r.userId === currentUserId);
+            const collapsed = isCollapsed(comment.commentId);
             return (
               <CommentItem
                 key={comment.commentId}
                 comment={comment}
                 counts={counts}
                 myReaction={myReaction}
+                collapsed={collapsed}
                 onResolve={() => resolveComment(comment.commentId)}
                 onUnresolve={() => unresolveComment(comment.commentId)}
                 onDelete={() => deleteComment(comment.commentId)}
                 onReaction={(type) => handleReaction(comment.commentId, type)}
+                onToggleCollapse={() => toggleCollapse(comment.commentId)}
               />
             );
           })
@@ -195,24 +244,40 @@ function CommentItem({
   comment,
   counts,
   myReaction,
+  collapsed,
   onResolve,
   onUnresolve,
   onDelete,
   onReaction,
+  onToggleCollapse,
 }: {
   comment: Comment;
   counts: Record<ReactionType, number>;
   myReaction?: { type: ReactionType; userId: string };
+  collapsed: boolean;
   onResolve: () => void;
   onUnresolve: () => void;
   onDelete: () => void;
   onReaction: (type: ReactionType) => void;
+  onToggleCollapse: () => void;
 }) {
   const REACTION_TYPES: ReactionType[] = ['thumbsup', 'heart', 'laugh'];
+  const totalReactions = Object.values(counts).reduce((a, b) => a + b, 0);
 
   return (
-    <div className={`${styles.commentItem} ${comment.resolved ? styles.resolved : ''}`}>
+    <div className={`${styles.commentItem} ${comment.resolved ? styles.resolved : ''} ${collapsed ? styles.collapsed : ''}`}>
       <div className={styles.commentHeader}>
+        {/* S88-E2: Collapse/expand button */}
+        {totalReactions > 0 && (
+          <button
+            className={styles.collapseBtn}
+            onClick={onToggleCollapse}
+            aria-label={collapsed ? '展开评论' : '收起评论'}
+            title={collapsed ? '展开评论' : '收起评论'}
+          >
+            {collapsed ? '▶' : '▼'}
+          </button>
+        )}
         <span className={styles.author}>{comment.author}</span>
         <span className={styles.timestamp}>{formatTime(comment.timestamp)}</span>
         <button
@@ -223,42 +288,62 @@ function CommentItem({
           ×
         </button>
       </div>
-      <div className={styles.commentText}>{comment.text}</div>
-
-      {/* S71-E2: Emoji reaction bar */}
-      <div className={styles.reactionBar}>
-        {REACTION_TYPES.map(type => {
-          const count = counts[type] ?? 0;
-          const isActive = myReaction?.type === type;
-          return (
-            <button
-              key={type}
-              className={`${styles.reactionBtn} ${isActive ? styles.reactionActive : ''}`}
-              onClick={() => onReaction(type)}
-              aria-label={`${REACTION_EMOJI[type]} 反应 (${count})`}
-              aria-pressed={isActive}
-            >
-              {REACTION_EMOJI[type]}
-              {count > 0 && <span className={styles.reactionCount}>{count}</span>}
-            </button>
-          );
-        })}
+      {/* S88-E2: @mention highlighted text */}
+      <div className={styles.commentText}>
+        <HighlightMentions text={comment.text} />
       </div>
 
-      <div className={styles.commentActions}>
-        {comment.resolved ? (
-          <button className={styles.actionBtn} onClick={onUnresolve}>
-            重新打开
-          </button>
-        ) : (
-          <button
-            className={`${styles.actionBtn} ${styles.resolveBtn}`}
-            onClick={onResolve}
-          >
-            标记已解决
-          </button>
-        )}
-      </div>
+      {/* S88-E2: Show reply count summary when collapsed */}
+      {collapsed && totalReactions > 0 && (
+        <div className={styles.collapsedSummary}>
+          {Object.entries(counts)
+            .filter(([, count]) => count > 0)
+            .map(([type, count]) => (
+              <span key={type} className={styles.collapsedReactionCount}>
+                {REACTION_EMOJI[type as ReactionType]} {count}
+              </span>
+            ))}
+        </div>
+      )}
+
+      {!collapsed && (
+        <>
+          {/* S71-E2: Emoji reaction bar */}
+          <div className={styles.reactionBar}>
+            {REACTION_TYPES.map(type => {
+              const count = counts[type] ?? 0;
+              const isActive = myReaction?.type === type;
+              return (
+                <button
+                  key={type}
+                  className={`${styles.reactionBtn} ${isActive ? styles.reactionActive : ''}`}
+                  onClick={() => onReaction(type)}
+                  aria-label={`${REACTION_EMOJI[type]} 反应 (${count})`}
+                  aria-pressed={isActive}
+                >
+                  {REACTION_EMOJI[type]}
+                  {count > 0 && <span className={styles.reactionCount}>{count}</span>}
+                </button>
+              );
+            })}
+          </div>
+
+          <div className={styles.commentActions}>
+            {comment.resolved ? (
+              <button className={styles.actionBtn} onClick={onUnresolve}>
+                重新打开
+              </button>
+            ) : (
+              <button
+                className={`${styles.actionBtn} ${styles.resolveBtn}`}
+                onClick={onResolve}
+              >
+                标记已解决
+              </button>
+            )}
+          </div>
+        </>
+      )}
     </div>
   );
 }

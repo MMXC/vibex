@@ -9,6 +9,20 @@
 影响: vibex-fronted
 
 
+
+## S87-E1 · 通知偏好设置面板 · 2026-06-11
+
+### Features
+- **Settings 页面通知偏好设置**: 将通知偏好设置集成为 Settings 页面的标准区块，支持应用内/浏览器渠道开关和 6 种通知类型（@提及/回复/系统/通知/模板更新/评论回复）开关，变更实时保存 IndexedDB
+- 新增 `src/app/settings/NotificationPreferencesSection.tsx` — Settings 内联通知偏好区块
+- 新增 `src/app/settings/__tests__/NotificationPreferencesSection.test.tsx` — 10 个 Vitest 测试全部通过
+
+### Files
+- `src/app/settings/NotificationPreferencesSection.tsx`
+- `src/app/settings/__tests__/NotificationPreferencesSection.test.tsx`
+- `src/app/settings/settings.module.css`
+- `src/app/settings/page.tsx`
+
 ## [Unreleased] S86-E4: 通知 WebSocket 实时推送 — 2026-06-11
 - **useNotificationWebSocket hook**: 全局单例 WebSocket 连接, 调用 wsNotificationHandler 处理 notification:new 事件, 指数退避重连
 - **DDSCanvasPage**: 集成 useNotificationWebSocket hook (S86-E4)

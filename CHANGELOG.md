@@ -1,5 +1,20 @@
 
 
+## S87-E4 · Canvas 批量导出增强 · 2026-06-11
+
+### Features
+- **canvasExportStore**: 新建 Zustand store，管理导出状态（isExporting / loadingFormat / exportScale / exportError / resetExportState）
+- **ExportMenu 批量导出**: ExportMenu 测试覆盖（17 vitest），覆盖下拉菜单、导出格式、PNG 缩放选择器、批量导出对话框开关
+
+### 测试
+- `canvasExportStore.test.ts`: 14 vitest（初始状态 / setExporting / setExportScale / setExportError / resetExportState / 状态持久化）
+- `ExportMenu.test.tsx`: 17 vitest（下拉菜单开关 / 各格式选项 / 批量导出对话框 / PNG 缩放选择器 / 键盘与点击外部关闭）
+
+### 备注
+- ExportMenu.tsx 与 useCanvasExport.ts 已在 main（S85-E3），本 commit 仅补充缺失的 store 与测试文件
+- Variant W' self-impl: running_agents=null → 预探索发现现有代码 → 仅补全缺失部分
+
+
 ## S87-E1 · 通知偏好设置面板 · 2026-06-11
 
 ### Features

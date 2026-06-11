@@ -1,3 +1,14 @@
+
+
+## S87-E4 · Canvas 批量导出增强 · 2026-06-11
+
+### Features
+- **canvasExportStore**: 新建 Zustand store，管理导出状态（isExporting / loadingFormat / exportScale / exportError / resetExportState）
+- **ExportMenu 测试**: ExportMenu 组件测试（17 vitest），覆盖下拉菜单、导出格式、PNG 缩放、批量导出对话框
+
+### 测试
+- `stores/__tests__/canvasExportStore.test.ts`: 14 vitest
+- `components/dds/toolbar/__tests__/ExportMenu.test.tsx`: 17 vitest
 ## [Unreleased] S86-E5: VersionDiffPanel side-by-side two-column layout mode — 2026-06-11
 - **VersionDiffPanel**: 新增 `diffViewMode` 状态 (`'list'` | `'sideBySide'`) + `ViewModeSelect` 下拉选择器
 - **SideBySideContent 组件**: 双栏布局，左栏基准版本(移除节点红色)，右栏对比版本(新增绿色，修改橙色)

@@ -292,3 +292,164 @@
   color: var(--text-secondary, #6b7280);
   font-size: 14px;
 }
+
+/* S86-E5: Side-by-side view mode */
+.viewModeSelect {
+  padding: 4px 8px;
+  border: 1px solid var(--border-color, #e5e7eb);
+  border-radius: 4px;
+  font-size: 12px;
+  background: var(--bg-secondary, #f9fafb);
+  cursor: pointer;
+}
+
+.sideBySideContainer {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.sideBySideHeaders {
+  display: flex;
+  border-bottom: 2px solid var(--border-color, #e5e7eb);
+  flex-shrink: 0;
+  background: var(--bg-secondary, #f9fafb);
+}
+
+.sideBySideScroller {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+.sideColumn {
+  flex: 1;
+  overflow-y: auto;
+  min-width: 0;
+}
+
+.sideColumn:first-child {
+  border-right: 1px solid var(--border-color, #e5e7eb);
+}
+
+.sideColumn:last-child {
+  border-right: none;
+}
+
+.sideRow {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border-color, #e5e7eb);
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+}
+
+.sideRow.added {
+  background: #f0fdf4;
+}
+
+.sideRow.removed {
+  background: #fef2f2;
+}
+
+.sideRow.modified {
+  background: #fffbeb;
+}
+
+.sideCell {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.columnLabel {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary, #111827);
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border-color, #e5e7eb);
+}
+
+.cellContent {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.cellEmpty {
+  opacity: 0.3;
+}
+
+.cellAdded {
+  background: #dcfce7;
+  border-radius: 4px;
+  padding: 4px 6px;
+}
+
+.cellRemoved {
+  background: #fee2e2;
+  border-radius: 4px;
+  padding: 4px 6px;
+}
+
+.cellModified {
+  background: #fef3c7;
+  border-radius: 4px;
+  padding: 4px 6px;
+}
+
+.cellName {
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--text-primary, #111827);
+}
+
+.cellType {
+  font-size: 11px;
+  color: var(--text-secondary, #6b7280);
+  background: var(--bg-secondary, #f3f4f6);
+  padding: 1px 6px;
+  border-radius: 3px;
+}
+
+.emptyMarker {
+  font-size: 16px;
+  color: var(--text-secondary, #6b7280);
+}
+
+.badgeAdded {
+  background: #16a34a !important;
+  color: white !important;
+}
+
+.badgeRemoved {
+  background: #dc2626 !important;
+  color: white !important;
+}
+
+.badgeModified {
+  background: #d97706 !important;
+  color: white !important;
+}
+
+/* Side-by-side row in single-row layout */
+.sideBySideRow {
+  display: flex;
+  border-bottom: 1px solid var(--border-color, #e5e7eb);
+}
+
+.sideBySideRow > .sideCell {
+  flex: 1;
+  padding: 8px 10px;
+  border-right: 1px solid var(--border-color, #e5e7eb);
+}
+
+.sideBySideRow > .sideCell:last-child {
+  border-right: none;
+}

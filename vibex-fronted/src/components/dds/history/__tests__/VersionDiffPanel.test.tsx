@@ -1,6 +1,7 @@
 /**
  * VersionDiffPanel — vitest tests
  * S84-E1: Canvas Version Diff
+ * S86-E5: Add side-by-side two-column layout mode
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
@@ -54,9 +55,8 @@ vi.mock('@/stores/dds/canvasTimelineStore', () => ({
   useCanvasTimelineStore: () => mockStore,
 }));
 
-// ─── Tests ────────────────────────────────────────────────────────────────────
+// ─── Component import ─────────────────────────────────────────────────────────
 
-// Dynamic import after mocking
 let VersionDiffPanel: React.ComponentType<{
   projectId: string;
   currentSnapshotId: string | null;
@@ -70,12 +70,13 @@ beforeEach(async () => {
   mockStore.diffData = null;
   mockStore.diffMode = 'unidirectional';
 
-  // Re-import to get fresh component with current mock
   const mod = await import('@/components/dds/history/VersionDiffPanel');
   VersionDiffPanel = mod.VersionDiffPanel;
 });
 
-describe('VersionDiffPanel', () => {
+// ─── Tests ────────────────────────────────────────────────────────────────────
+
+describe('VersionDiffPanel — list mode (S84-E1)', () => {
   it('renders nothing when panel is closed', () => {
     mockStore.isDiffPanelOpen = false;
     const { container } = render(
@@ -101,7 +102,6 @@ describe('VersionDiffPanel', () => {
     render(<VersionDiffPanel projectId="proj-1" currentSnapshotId="snap-001" />);
 
     expect(screen.getByTestId('diff-stats')).toBeInTheDocument();
-    // Stats display: +2, -1, ~1, 5
     expect(screen.getByText('+2')).toBeInTheDocument();
     expect(screen.getByText('−1')).toBeInTheDocument();
     expect(screen.getByText('~1')).toBeInTheDocument();
@@ -215,6 +215,160 @@ describe('VersionDiffPanel', () => {
     render(<VersionDiffPanel projectId="proj-1" currentSnapshotId="snap-001" />);
 
     expect(screen.getByTestId('diff-snapshot-labels')).toBeInTheDocument();
+    expect(screen.getByText('v1.0.0')).toBeInTheDocument();
+    expect(screen.getByText('v1.1.0')).toBeInTheDocument();
+  });
+});
+
+describe('VersionDiffPanel — side-by-side mode (S86-E5)', () => {
+  it('renders view mode select with list and sideBySide options', () => {
+    mockStore.isDiffPanelOpen = true;
+    mockStore.diffData = mockDiffData;
+
+    render(<VersionDiffPanel projectId="proj-1" currentSnapshotId="snap-001" />);
+
+    expect(screen.getByTestId('diff-view-mode-select')).toBeInTheDocument();
+    expect(screen.getByRole('option', { name: '列表视图' })).toBeInTheDocument();
+    expect(screen.getByRole('option', { name: '双栏对比' })).toBeInTheDocument();
+  });
+
+  it('defaults to list mode', () => {
+    mockStore.isDiffPanelOpen = true;
+    mockStore.diffData = mockDiffData;
+
+    render(<VersionDiffPanel projectId="proj-1" currentSnapshotId="snap-001" />);
+
+    const select = screen.getByTestId('diff-view-mode-select') as HTMLSelectElement;
+    expect(select.value).toBe('list');
+  });
+
+  it('switches to side-by-side mode when selected', () => {
+    mockStore.isDiffPanelOpen = true;
+    mockStore.diffData = mockDiffData;
+
+    render(<VersionDiffPanel projectId="proj-1" currentSnapshotId="snap-001" />);
+
+    const select = screen.getByTestId('diff-view-mode-select');
+    fireEvent.change(select, { target: { value: 'sideBySide' } });
+
+    expect(screen.getByTestId('diff-side-by-side')).toBeInTheDocument();
+  });
+
+  it('renders side-by-side column headers with snapshot labels', () => {
+    mockStore.isDiffPanelOpen = true;
+    mockStore.diffData = mockDiffData;
+
+    render(<VersionDiffPanel projectId="proj-1" currentSnapshotId="snap-001" />);
+
+    // Switch to side-by-side mode
+    fireEvent.change(screen.getByTestId('diff-view-mode-select'), { target: { value: 'sideBySide' } });
+
+    expect(screen.getByText('v1.0.0')).toBeInTheDocument();
+    expect(screen.getByText('v1.1.0')).toBeInTheDocument();
+    expect(screen.getByText('基准')).toBeInTheDocument();
+    expect(screen.getByText('对比')).toBeInTheDocument();
+  });
+
+  it('renders left and right columns in side-by-side mode', () => {
+    mockStore.isDiffPanelOpen = true;
+    mockStore.diffData = mockDiffData;
+
+    render(<VersionDiffPanel projectId="proj-1" currentSnapshotId="snap-001" />);
+
+    fireEvent.change(screen.getByTestId('diff-view-mode-select'), { target: { value: 'sideBySide' } });
+
+    expect(screen.getByTestId('diff-side-left')).toBeInTheDocument();
+    expect(screen.getByTestId('diff-side-right')).toBeInTheDocument();
+    expect(screen.getByTestId('diff-side-scroller')).toBeInTheDocument();
+  });
+
+  it('renders removed node in left column with red highlight', () => {
+    mockStore.isDiffPanelOpen = true;
+    mockStore.diffData = mockDiffData;
+
+    render(<VersionDiffPanel projectId="proj-1" currentSnapshotId="snap-001" />);
+
+    fireEvent.change(screen.getByTestId('diff-view-mode-select'), { target: { value: 'sideBySide' } });
+
+    // OldComponent was removed — appears in left column with 移除 badge
+    expect(screen.getByText('OldComponent')).toBeInTheDocument();
+  });
+
+  it('renders added nodes in right column with green highlight', () => {
+    mockStore.isDiffPanelOpen = true;
+    mockStore.diffData = mockDiffData;
+
+    render(<VersionDiffPanel projectId="proj-1" currentSnapshotId="snap-001" />);
+
+    fireEvent.change(screen.getByTestId('diff-view-mode-select'), { target: { value: 'sideBySide' } });
+
+    // NewComponent was added — appears in right column
+    expect(screen.getByText('NewComponent')).toBeInTheDocument();
+  });
+
+  it('renders modified node with orange badge in right column', () => {
+    mockStore.isDiffPanelOpen = true;
+    mockStore.diffData = mockDiffData;
+
+    render(<VersionDiffPanel projectId="proj-1" currentSnapshotId="snap-001" />);
+
+    fireEvent.change(screen.getByTestId('diff-view-mode-select'), { target: { value: 'sideBySide' } });
+
+    // Right column has at least one row containing 修改 badge
+    const rightRows = screen.getAllByTestId('diff-side-right-row');
+    const rightText = rightRows.map(r => r.textContent).join(' ');
+    expect(rightText).toContain('App');
+    expect(rightText).toContain('修改');
+  });
+
+  it('shows empty cell (—) for nodes only in right column on left side', () => {
+    mockStore.isDiffPanelOpen = true;
+    mockStore.diffData = mockDiffData;
+
+    render(<VersionDiffPanel projectId="proj-1" currentSnapshotId="snap-001" />);
+
+    fireEvent.change(screen.getByTestId('diff-view-mode-select'), { target: { value: 'sideBySide' } });
+
+    // Left column should have at least one empty cell marker for added nodes
+    const leftColumn = screen.getByTestId('diff-side-left');
+    expect(leftColumn.textContent).toContain('—');
+  });
+
+  it('switches back to list mode when list option selected', () => {
+    mockStore.isDiffPanelOpen = true;
+    mockStore.diffData = mockDiffData;
+
+    render(<VersionDiffPanel projectId="proj-1" currentSnapshotId="snap-001" />);
+
+    // Switch to side-by-side
+    fireEvent.change(screen.getByTestId('diff-view-mode-select'), { target: { value: 'sideBySide' } });
+    expect(screen.getByTestId('diff-side-by-side')).toBeInTheDocument();
+
+    // Switch back to list
+    fireEvent.change(screen.getByTestId('diff-view-mode-select'), { target: { value: 'list' } });
+    expect(screen.queryByTestId('diff-side-by-side')).not.toBeInTheDocument();
+    expect(screen.getByTestId('diff-stats')).toBeInTheDocument();
+  });
+
+  it('renders side-by-side mode even with empty diff', () => {
+    mockStore.isDiffPanelOpen = true;
+    mockStore.diffData = {
+      ...mockDiffData,
+      diff: {
+        added: [],
+        removed: [],
+        modified: [],
+        unchanged: 10,
+        stats: { added: 0, removed: 0, modified: 0, unchanged: 10 },
+      },
+    };
+
+    render(<VersionDiffPanel projectId="proj-1" currentSnapshotId="snap-001" />);
+
+    fireEvent.change(screen.getByTestId('diff-view-mode-select'), { target: { value: 'sideBySide' } });
+
+    // Renders container and column headers (snapshotLabels hidden in side-by-side)
+    expect(screen.getByTestId('diff-side-by-side')).toBeInTheDocument();
     expect(screen.getByText('v1.0.0')).toBeInTheDocument();
     expect(screen.getByText('v1.1.0')).toBeInTheDocument();
   });

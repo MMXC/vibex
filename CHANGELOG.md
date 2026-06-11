@@ -7237,3 +7237,28 @@ See git history for complete changelog.
 
 类型: feat
 影响: vibex-fronted
+
+## S87-E5: 模板文件夹管理 (2026-06-11)
+
+**Epic**: E5 模板文件夹管理  
+**Epic Lead**: dev-e5 (coord self-impl)  
+**Status**: ✅ Completed (2026-06-11)
+
+### 实现内容
+
+- D1 migration 0019: `template_folders` + `template_folder_templates` 表结构
+- GET `/api/templates/folders` — 列出用户文件夹，含 templateCount
+- POST `/api/templates/folders` — 创建文件夹（支持 icon）
+- PUT `/api/templates/folders/[id]` — 更新文件夹名称/图标
+- DELETE `/api/templates/folders/[id]` — 删除文件夹（级联移除模板关联）
+- POST `/api/templates/[id]/folder` — 将模板移入/移出文件夹
+- `templateStore.ts` 新增 `TemplateFolder` 接口 + 6 个文件夹管理方法
+- 8 backend Jest tests ✅ | 11 frontend Vitest tests ✅
+
+### 技术细节
+
+- Backend: Cloudflare Workers D1，auth via `getAuthUserFromRequest`
+- Frontend: Zustand store，文件夹状态 + 模板关联管理
+- 文件夹图标: emoji，默认 📁
+- 未分类模板: `folderId === null`
+

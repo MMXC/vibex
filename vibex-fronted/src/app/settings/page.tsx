@@ -13,6 +13,7 @@ import { useUserPreferencesStore } from '@/stores/userPreferencesStore';
 import type { ThemePreference, LocalePreference } from '@/stores/userPreferencesStore';
 import { useShortcutStore } from '@/stores/shortcutStore';
 import { NotificationPreferencesSection } from './NotificationPreferencesSection';
+import { UsageAnalyticsSection } from './analytics/UsageAnalyticsSection';
 import styles from './settings.module.css';
 
 const THEME_OPTIONS: { value: ThemePreference; label: string }[] = [
@@ -203,6 +204,9 @@ export default function SettingsPage() {
         </section>
 
         {/* S87-E1: Notification Preferences Section */}
+
+        {/* S89-E1: Usage Analytics Section */}
+        <UsageAnalyticsSection />
         <NotificationPreferencesSection />
 
         {/* P003-E3: AI Scores panel */}

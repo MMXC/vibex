@@ -7150,3 +7150,19 @@ See git history for complete changelog.
 **Tests**: 16 new vitest tests
 **SHA**: `6400b622b`
 
+
+## S88-E2 · 协作评论增强 · 2026-06-11
+
+### Features
+- **commentStore filterStatus + collapsedThreadIds**: 筛选状态 + 线程折叠状态管理
+- **getFilteredComments(currentUser?)**: 支持 all/unresolved/resolved/mentioned 四种筛选
+- **toggleCollapse / isCollapsed**: 折叠/展开状态（Set<string>）
+- **CommentThread 折叠 UI**: 折叠按钮 + 折叠摘要
+- **HighlightMentions**: @mention 高亮组件（@Alice → 蓝色链接）
+- **CommentPanel 筛选栏 + 虚拟滚动**: 4 Tab + @tanstack/react-virtual (>20条)
+
+### 测试
+- `stores/dds/__tests__/commentStore.e2.test.ts`: 11 vitest ✅
+
+类型: feat
+影响: vibex-fronted

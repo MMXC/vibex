@@ -7281,3 +7281,27 @@ See git history for complete changelog.
 **Tests**: 16 new vitest tests (gridSettingsStore: 8, ZoomControls: 8)
 **SHA**: `6400b622b`
 
+
+## S88-E2 · 协作评论增强 · 2026-06-11
+
+### Features
+- **commentStore filterStatus + collapsedThreadIds**: 新增筛选状态 (all/unresolved/resolved/mentioned) + 线程折叠状态管理
+- **getFilteredComments()**: 根据 filterStatus 筛选评论，支持 @mention 过滤（传入 currentUser）
+- **toggleCollapse / isCollapsed**: 线程折叠/展开状态管理（Set<string>）
+- **CommentThread 折叠 UI**: 每个根评论支持折叠/展开按钮，折叠时显示折叠摘要（回复数）
+- **HighlightMentions 组件**: @mention 高亮显示，@Alice → 可点击蓝色链接
+- **CommentPanel 筛选栏**: 4 个 Tab（全部/未解决/已解决/@我）+ 虚拟滚动（>20 条启用 @tanstack/react-virtual）
+- **parseMentions 集成**: 使用 /lib/canvas/parseMentions 解析 @mention
+
+### Files
+- `vibex-fronted/src/stores/dds/commentStore.ts`
+- `vibex-fronted/src/components/dds/comments/CommentThread.tsx`
+- `vibex-fronted/src/components/dds/comments/CommentThread.module.css`
+- `vibex-fronted/src/components/dds/comments/CommentPanel.tsx`
+- `vibex-fronted/src/components/dds/comments/CommentPanel.module.css`
+- `vibex-fronted/src/stores/dds/__tests__/commentStore.e2.test.ts`
+
+### 测试
+- `commentStore.e2.test.ts`: 11 vitest（filterStatus 默认值 / setFilterStatus / getFilteredComments 4种筛选 / toggleCollapse 3种场景）
+
+类型: feat

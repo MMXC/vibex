@@ -41,6 +41,7 @@ import { useConflictStore } from '@/lib/canvas/stores/conflictStore';
 import { useMiniMapPanelStore, useMiniMapStore } from '@/lib/canvas/stores/miniMapStore';
 import { useViewportBoundsStore } from '@/lib/canvas/stores/viewportBoundsStore';
 import { usePresenceStore } from '@/lib/collaboration/presenceStore';
+import { useBatchCanvasStore } from '@/stores/dds/batchCanvasStore';
 import { useNodeFocus } from '@/lib/collaboration/useNodeFocus';
 import { useNodeLockedToast } from '@/components/dds/notifications/NodeLockedToast';
 import { RemoteCursorsLayer } from './canvas-dashboard/RemoteCursorsLayer';
@@ -398,7 +399,16 @@ function DDSFlowInner({
     [toggleCollapse]
   );
 
-  // S69-E4: Right-click context menu → "查看评论" → open CommentThread
+  // S87-E3: ReactFlow built-in selection change → batchCanvasStore
+  const handleSelectionChange = useCallback(
+    (event: { nodes: Node[] }) => {
+      useBatchCanvasStore.getState().setSelection(
+        event.nodes.map((n) => n.id)
+      );
+    },
+    []
+  );
+
   const handleNodeContextMenu = useCallback(
     (event: React.MouseEvent, node: Node) => {
       event.preventDefault();
@@ -424,6 +434,7 @@ function DDSFlowInner({
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
         onNodeClick={handleNodeClick}
+        onSelectionChange={handleSelectionChange}
         onNodeContextMenu={handleNodeContextMenu}
         nodeTypes={nodeTypes}
         /* E5: In touch mode, useTouchGestures hook handles ALL gestures — disable ReactFlow built-in */

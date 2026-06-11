@@ -95,6 +95,7 @@ import { useAIAgent } from '@/hooks/useAIAgent';
 import { useResponsiveMode } from '@/hooks/useResponsiveMode';
 import { TouchModeIndicator } from '@/components/shared/TouchModeIndicator';
 import { SelectionToolbar } from '@/components/dds/SelectionToolbar';
+import { BatchCanvasToolbar } from '@/components/dds/batch-ops/BatchCanvasToolbar';
 import { useSelectionBox } from '@/hooks/dds/useSelectionBox';
 // S79-E1: Start/stop the scheduled export runner on mount/unmount
 import { ScheduledExportRunner } from '@/services/export/ScheduledExportRunner';
@@ -1085,6 +1086,8 @@ const { onCursorMove, broadcastCursor } = useWebSocketPresence({
           selectionBox={selectionBox}
           onClearSelection={clearSelection}
         />
+        {/* S87-E3: BatchCanvasToolbar — shown when 2+ canvas nodes selected */}
+        <BatchCanvasToolbar />
         <DDSScrollContainer
           className="dds-scroll-container"
           rootRef={scrollContainerRef}

@@ -284,3 +284,53 @@
   border-color: #16a34a;
   color: #16a34a;
 }
+
+/* S88-E2: Filter bar */
+.filterBar {
+  display: flex;
+  gap: 2px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--color-border, #e2e8f0);
+  flex-shrink: 0;
+  background: var(--color-surface, #ffffff);
+}
+
+.filterTab {
+  flex: 1;
+  padding: 4px 8px;
+  font-size: 12px;
+  border: none;
+  background: none;
+  color: #6b7280;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background 0.15s, color 0.15s;
+  text-align: center;
+}
+
+.filterTab:hover {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.filterTab.filterTabActive {
+  background: #3b82f6;
+  color: white;
+  font-weight: 500;
+}
+
+/* S88-E2: @mention link highlight */
+.mentionLink {
+  color: #3b82f6;
+  text-decoration: none;
+  font-weight: 500;
+  border-radius: 3px;
+  padding: 0 1px;
+}
+
+.mentionLink:hover {
+  color: #1d4ed8;
+  text-decoration: underline;
+  background: #eff6ff;
+}
+

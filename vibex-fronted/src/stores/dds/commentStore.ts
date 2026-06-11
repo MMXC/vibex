@@ -1,10 +1,11 @@
 /**
- * commentStore — Sprint49 E5 + Sprint50 E3 + S69-E4 + S71-E2
+ * commentStore — Sprint49 E5 + Sprint50 E3 + S69-E4 + S71-E2 + S88-E2
  *
  * S49-E5: commentStore + IndexedDB 持久化 + CommentBadge + CommentPanel
  * S50-E3: addListener/removeListener 事件订阅 + unreadCount 追踪 + WebSocket 集成
  * S69-E4: 评论后触发 notificationStore 通知 (addCommentNotification)
  * S71-E2: subscribeToCanvas(canvasId) + broadcastComment() + Reaction 系统
+ * S88-E2: filterStatus 筛选状态 + collapsedThreadIds 折叠状态 + getFilteredComments()
  *
  * 设计决策：
  * - commentId 使用 crypto.randomUUID() 生成，确保全局唯一
@@ -14,10 +15,12 @@
  * - 事件订阅机制：listeners Set 在 store 外维护，通过 emit() 触发
  * - unreadCount：全局计数器，addComment++ / resolveComment-- / markAllAsRead=0
  * - S71-E2: canvasScope 用于 WS 消息路由；reactions map 存储评论 Reactions
+ * - S88-E2: filterStatus 支持 all/unresolved/resolved/mentioned 筛选；collapsedThreadIds 支持线程折叠
  */
 import { create } from 'zustand';
 import { openDB } from 'idb';
 import { useNotificationStore } from '@/stores/notificationStore';
+import { parseMentions } from '@/lib/canvas/parseMentions';
 
 // ==================== Types ====================
 
@@ -47,6 +50,8 @@ export interface Reaction {
   timestamp: number;
 }
 
+export type CommentFilter = 'all' | 'unresolved' | 'resolved' | 'mentioned';
+
 export interface ReactionEvent {
   type: 'reaction:added' | 'reaction:removed';
   reaction: Reaction;
@@ -61,6 +66,10 @@ export interface CommentStoreState {
   subscribedCanvasId: string | null;
   // S71-E2: reactions map — keyed by commentId
   reactions: Record<string, Reaction[]>;
+  // S88-E2: filter status for CommentPanel
+  filterStatus: CommentFilter;
+  // S88-E2: collapsed thread IDs (root comment IDs that are collapsed)
+  collapsedThreadIds: Set<string>;
 
   // CRUD
   addComment: (nodeId: string, text: string, author?: string) => Comment;
@@ -91,6 +100,12 @@ export interface CommentStoreState {
   removeReaction: (commentId: string, type: ReactionType, userId: string) => void;
   getReactionsByComment: (commentId: string) => Reaction[];
   getReactionCounts: (commentId: string) => Record<ReactionType, number>;
+
+  // S88-E2: Filter & collapse
+  setFilterStatus: (status: CommentFilter) => void;
+  toggleCollapse: (commentId: string) => void;
+  isCollapsed: (commentId: string) => boolean;
+  getFilteredComments: (currentUser?: string) => Comment[];
 }
 
 // ==================== Event System (S50-E3) ====================
@@ -212,6 +227,8 @@ export const useCommentStore = create<CommentStoreState>((set, get) => ({
   unreadCount: 0,
   subscribedCanvasId: null,
   reactions: {},
+  filterStatus: 'all',
+  collapsedThreadIds: new Set<string>(),
 
   addComment: (nodeId, text, author = 'User') => {
     const comment: Comment = {
@@ -430,6 +447,49 @@ export const useCommentStore = create<CommentStoreState>((set, get) => ({
       counts[r.type]++;
     }
     return counts;
+  },
+
+  // S88-E2: Set filter status for CommentPanel
+  setFilterStatus: (status) => {
+    set({ filterStatus: status });
+  },
+
+  // S88-E2: Toggle collapse state for a root comment thread
+  toggleCollapse: (commentId) => {
+    set(state => {
+      const next = new Set(state.collapsedThreadIds);
+      if (next.has(commentId)) {
+        next.delete(commentId);
+      } else {
+        next.add(commentId);
+      }
+      return { collapsedThreadIds: next };
+    });
+  },
+
+  // S88-E2: Check if a thread is collapsed
+  isCollapsed: (commentId) => {
+    return get().collapsedThreadIds.has(commentId);
+  },
+
+  // S88-E2: Get filtered comments based on filterStatus
+  // If filter is 'mentioned', pass currentUser to filter by @mention of that user
+  getFilteredComments: (currentUser?: string) => {
+    const { comments, filterStatus } = get();
+
+    let filtered = comments;
+
+    if (filterStatus === 'unresolved') {
+      filtered = comments.filter(c => !c.resolved);
+    } else if (filterStatus === 'resolved') {
+      filtered = comments.filter(c => c.resolved);
+    } else if (filterStatus === 'mentioned' && currentUser) {
+      filtered = comments.filter(c =>
+        parseMentions(c.text).some(m => m.toLowerCase() === currentUser!.toLowerCase())
+      );
+    }
+
+    return filtered;
   },
 }));
 

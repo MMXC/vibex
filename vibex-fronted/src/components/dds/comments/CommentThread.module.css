@@ -255,3 +255,60 @@
   color: inherit;
   margin-left: 2px;
 }
+
+/* S88-E2: Collapse button */
+.collapseBtn {
+  background: none;
+  border: none;
+  font-size: 10px;
+  color: #9ca3af;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.collapseBtn:hover {
+  color: #6b7280;
+}
+
+/* S88-E2: Collapsed state */
+.commentItem.collapsed {
+  padding-bottom: 6px;
+}
+
+/* S88-E2: @mention link highlight */
+.mentionLink {
+  color: #3b82f6;
+  text-decoration: none;
+  font-weight: 500;
+  border-radius: 3px;
+  padding: 0 1px;
+}
+
+.mentionLink:hover {
+  color: #1d4ed8;
+  text-decoration: underline;
+  background: #eff6ff;
+}
+
+/* S88-E2: Collapsed summary row */
+.collapsedSummary {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 4px;
+}
+
+.collapsedReactionCount {
+  font-size: 12px;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}

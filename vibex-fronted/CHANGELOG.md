@@ -1,3 +1,14 @@
+
+## [Unreleased] S86-E2: 画布缩略图导航 — 2026-06-11
+- **canvasViewportStore**: Zustand store 管理画布视口状态（flow coordinates: x/y/zoom）+ zoomTo/panTo/setViewport/resetViewport actions + sessionStorage persist
+- **canvasViewportStore.test.ts**: 17 vitest 测试覆盖所有 store actions + getViewportCenter 工具函数
+- **useCanvasViewport.ts**: React hook 封装 canvasViewportStore，提供 stable callback refs
+- **MiniMapPanel.e2.test.tsx**: 11 vitest 组件测试（Pattern F Zustand mock: real Zustand create() + @xyflow/react mock）
+- **前置基础设施**: `MiniMapPanel.tsx`, `miniMapStore.ts`, `viewportBoundsStore.ts`, `DDSCanvasPage` 已存在于 origin/main
+- **Variant W''' self-impl**: dev-e2 ghosted，仅补建缺失的 viewport store + hook + 测试
+类型: feat
+影响: vibex-fronted
+
 ## [Unreleased] S85-E5: 模板发布与评分系统 — 2026-06-11
 - **templateStore**: 新增 `publishTemplate()` + `submitRating()` 方法（Zustand store）
 - **PublishTemplateDialog**: 新增发布模板对话框组件（表单验证 + API 调用）

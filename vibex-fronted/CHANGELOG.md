@@ -7202,3 +7202,7 @@ See git history for complete changelog.
 - `src/app/settings/analytics/UsageAnalyticsSection.test.tsx`: 10 vitest
 - `src/stores/dds/__tests__/canvasAccessHistoryStore.test.ts`: 8 vitest
 
+
+### Fixes
+- **Backend Jest tests**: `stats/route.test.ts` + `access-history/route.test.ts` — 使用 jest globals（describe/it/expect 无需 import），改用静态 `import { GET, POST } from './route'` 替代动态 `await import('../route')`；修复 `TypeError: (0, jest_1.describe) is not a function`
+

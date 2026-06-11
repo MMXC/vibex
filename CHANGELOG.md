@@ -7383,3 +7383,7 @@ See git history for complete changelog.
 ### Variant W' self-impl
 - dev-e1 phantom（workspace 文件存在但未提交）；预探索确认现有代码 → 仅补全缺失部分（access-history 路由 + 迁移 + 集成 page.tsx）
 
+
+### Fixes
+- **Backend Jest tests**: `stats/route.test.ts` + `access-history/route.test.ts` — 使用 jest globals（describe/it/expect 无需 import），改用静态 `import { GET, POST } from './route'` 替代动态 `await import('../route')`；修复 `TypeError: (0, jest_1.describe) is not a function`
+

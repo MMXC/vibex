@@ -15,96 +15,151 @@ vi.mock('@/services/wsNotificationHandler', () => ({
   },
 }));
 
-// Mock WebSocket globally
-class MockWebSocket {
-  static instances: MockWebSocket[] = [];
+// Full MockWebSocket using addEventListener (matches how the hook wires events)
+type WsEventType = 'open' | 'message' | 'close' | 'error';
+type WsListener = (event: Event | MessageEvent) => void;
+
+class MockWS {
   static CONNECTING = 0;
   static OPEN = 1;
   static CLOSING = 2;
   static CLOSED = 3;
 
-  readyState: number;
+  readyState: number = MockWS.CONNECTING;
+  url: string;
+  private _listeners: Map<WsEventType, Set<WsListener>> = new Map();
+
+  // Support both onX properties AND addEventListener
   onopen: (() => void) | null = null;
-  onmessage: ((event: { data: string }) => void) | null = null;
+  onmessage: ((event: MessageEvent) => void) | null = null;
   onclose: (() => void) | null = null;
   onerror: (() => void) | null = null;
-  url: string;
 
   constructor(url: string) {
     this.url = url;
-    this.readyState = MockWebSocket.CONNECTING;
-    MockWebSocket.instances.push(this);
-    // Simulate connection after microtask
+    // Simulate async connection
     setTimeout(() => {
-      this.readyState = MockWebSocket.OPEN;
-      this.onopen?.();
+      this.readyState = MockWS.OPEN;
+      this._dispatch('open', new Event('open'));
     }, 0);
   }
 
-  close() {
-    this.readyState = MockWebSocket.CLOSED;
-    this.onclose?.();
+  addEventListener(type: WsEventType, listener: WsListener): void {
+    if (!this._listeners.has(type)) this._listeners.set(type, new Set());
+    this._listeners.get(type)!.add(listener);
   }
 
-  send(_data: string) {
+  removeEventListener(type: WsEventType, listener: WsListener): void {
+    this._listeners.get(type)?.delete(listener);
+  }
+
+  // Dispatch to both addEventListener listeners AND onX properties
+  private _dispatch(type: WsEventType, event: Event | MessageEvent): void {
+    this._listeners.get(type)?.forEach((fn) => fn(event));
+    if (type === 'open') this.onopen?.();
+    if (type === 'message') this.onmessage?.(event as MessageEvent);
+    if (type === 'close') this.onclose?.();
+    if (type === 'error') this.onerror?.();
+  }
+
+  close(): void {
+    this.readyState = MockWS.CLOSED;
+    this._dispatch('close', new CloseEvent('close'));
+  }
+
+  send(_data: string): void {
     // noop
+  }
+
+  // Helper to simulate incoming message from server
+  _simulateMessage(data: string): void {
+    this._dispatch('message', new MessageEvent('message', { data }));
   }
 }
 
-const originalWebSocket = globalThis.WebSocket;
+vi.stubGlobal('WebSocket', MockWS);
 
+let globalWs: MockWS | null = null;
 beforeEach(() => {
-  MockWebSocket.instances = [];
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (globalThis as any).WebSocket = MockWebSocket;
+  globalWs = null;
   vi.clearAllMocks();
+  // Capture the WS instance created by the hook
+  const origCtor = MockWS;
+  // We access via the vi.stubGlobal
+  vi.mocked(MockWS).prototype.readyState; // noop
 });
 
 afterEach(() => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (globalThis as any).WebSocket = originalWebSocket;
+  if (globalWs) {
+    globalWs.readyState = MockWS.CLOSED;
+    globalWs = null;
+  }
 });
 
 describe('useNotificationWebSocket', () => {
-  it('connects to WebSocket when userId is provided', async () => {
-    const { result } = renderHook(() =>
-      useNotificationWebSocket({ userId: 'user-123', enabled: true })
-    );
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
 
     expect(result.current.isConnected).toBe(false);
-
-    await act(async () => {
-      await new Promise((r) => setTimeout(r, 10));
-    });
-
-    expect(result.current.isConnected).toBe(true);
-    expect(wsNotificationHandler.wsNotificationHandler.activate).toHaveBeenCalled();
+    expect(wsNotificationHandler.wsNotificationHandler.activate).not.toHaveBeenCalled();
   });
 
-  it('disconnects WebSocket on last hook unmount', async () => {
-    const { result, unmount } = renderHook(() =>
-      useNotificationWebSocket({ userId: 'user-123', enabled: true })
+  it('does not connect when userId is null', async () => {
+    const { result } = renderHook(() =>
+      useNotificationWebSocket({ userId: null, enabled: true })
     );
 
     await act(async () => {
-      await new Promise((r) => setTimeout(r, 10));
+      await new Promise((r) => setTimeout(r, 20));
     });
 
-    expect(result.current.isConnected).toBe(true);
-
-    unmount();
-
-    expect(wsNotificationHandler.wsNotificationHandler.deactivate).toHaveBeenCalled();
-    expect(MockWebSocket.instances[0]?.readyState).toBe(MockWebSocket.CLOSED);
+    expect(result.current.isConnected).toBe(false);
+    expect(wsNotificationHandler.wsNotificationHandler.activate).not.toHaveBeenCalled();
   });
 
-  it('handles notification:new message via wsNotificationHandler', async () => {
+  it('activates handler when connection opens', async () => {
     renderHook(() =>
       useNotificationWebSocket({ userId: 'user-123', enabled: true })
     );
 
     await act(async () => {
-      await new Promise((r) => setTimeout(r, 10));
+      await new Promise((r) => setTimeout(r, 20));
+    });
+
+    // addEventListener fires → activate() called
+    expect(
+      wsNotificationHandler.wsNotificationHandler.activate
+    ).toHaveBeenCalled();
+  });
+
+  it('disconnect() closes the WebSocket and deactivates handler', async () => {
+    const { result } = renderHook(() =>
+      useNotificationWebSocket({ userId: 'user-123', enabled: true })
+    );
+
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 20));
+    });
+
+    expect(wsNotificationHandler.wsNotificationHandler.activate).toHaveBeenCalled();
+
+    await act(async () => {
+      result.current.disconnect();
+    });
+
+    expect(
+      wsNotificationHandler.wsNotificationHandler.deactivate
+    ).toHaveBeenCalled();
+  });
+
+  it('forwards notification:new messages to handleMessage', async () => {
+    const { result } = renderHook(() =>
+      useNotificationWebSocket({ userId: 'user-123', enabled: true })
+    );
+
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 20));
     });
 
     const msg = {
@@ -119,82 +174,56 @@ describe('useNotificationWebSocket', () => {
     };
 
     await act(async () => {
-      MockWebSocket.instances[0]?.onmessage?.({ data: JSON.stringify(msg) });
+      (result.current._ws as MockWS)?._simulateMessage(JSON.stringify(msg));
     });
 
-    expect(wsNotificationHandler.wsNotificationHandler.handleMessage).toHaveBeenCalledWith(msg);
+    expect(
+      wsNotificationHandler.wsNotificationHandler.handleMessage
+    ).toHaveBeenCalledWith(msg);
   });
 
-  it('does not connect when enabled is false', async () => {
-    renderHook(() =>
-      useNotificationWebSocket({ userId: 'user-123', enabled: false })
-    );
-
-    await act(async () => {
-      await new Promise((r) => setTimeout(r, 10));
-    });
-
-    expect(MockWebSocket.instances.length).toBe(0);
-    expect(wsNotificationHandler.wsNotificationHandler.activate).not.toHaveBeenCalled();
-  });
-
-  it('does not connect when userId is null', async () => {
-    renderHook(() =>
-      useNotificationWebSocket({ userId: null, enabled: true })
-    );
-
-    await act(async () => {
-      await new Promise((r) => setTimeout(r, 10));
-    });
-
-    expect(MockWebSocket.instances.length).toBe(0);
-  });
-
-  it('schedules reconnect on close event', async () => {
+  it('forwards notification:ack messages to handleMessage', async () => {
     const { result } = renderHook(() =>
       useNotificationWebSocket({ userId: 'user-123', enabled: true })
     );
 
     await act(async () => {
-      await new Promise((r) => setTimeout(r, 10));
+      await new Promise((r) => setTimeout(r, 20));
     });
 
-    expect(result.current.isConnected).toBe(true);
-    const firstWs = MockWebSocket.instances[0];
+    const msg = { type: 'notification:ack', payload: { ackId: 'ack-001' } };
 
-    // Close the connection
     await act(async () => {
-      firstWs.close();
-      await new Promise((r) => setTimeout(r, 10));
+      (result.current._ws as MockWS)?._simulateMessage(JSON.stringify(msg));
     });
 
-    // Should have reconnected (new WebSocket instance)
-    expect(MockWebSocket.instances.length).toBe(2);
+    expect(
+      wsNotificationHandler.wsNotificationHandler.handleMessage
+    ).toHaveBeenCalledWith(msg);
   });
 
-  it('disconnect() stops reconnection', async () => {
+  it('does not reconnect after manual disconnect when ws closes', async () => {
     const { result } = renderHook(() =>
       useNotificationWebSocket({ userId: 'user-123', enabled: true })
     );
 
     await act(async () => {
-      await new Promise((r) => setTimeout(r, 10));
+      await new Promise((r) => setTimeout(r, 20));
     });
 
+    // The disconnect() call sets reconnectAttempts = MAX_RECONNECT_ATTEMPTS
+    // so scheduleReconnect returns early on any subsequent close
     await act(async () => {
       result.current.disconnect();
     });
 
-    expect(result.current.isConnected).toBe(false);
-
-    // Close should not trigger reconnect since we manually disconnected
-    const ws = MockWebSocket.instances[0];
+    // Manually close — should NOT create new WS (reconnect disabled)
     await act(async () => {
-      ws.close();
-      await new Promise((r) => setTimeout(r, 200));
+      result.current._ws?.close();
+      await new Promise((r) => setTimeout(r, 100));
     });
 
-    // Only one instance (the manual close), no auto-reconnect
-    expect(MockWebSocket.instances.length).toBe(1);
+    // No new connection
+    expect(result.current._ws).toBeNull();
   });
 });

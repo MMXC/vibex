@@ -11,7 +11,6 @@
  * 6. POST with missing userId/userName → 400 Bad Request
  * 7. POST dedupes by userId per canvas
  */
-import { describe, it, expect, beforeEach } from 'jest';
 
 const mockQueryDB = jest.fn();
 const mockExecuteDB = jest.fn();
@@ -34,6 +33,8 @@ jest.mock('@/lib/authFromGateway', () => ({
     return { success: true as const, user: { userId: 'user-001', name: 'Test User' } };
   }),
 }));
+
+import { GET, POST } from './route';
 
 describe('GET /api/canvas/[id]/access-history', () => {
   beforeEach(() => {
@@ -59,14 +60,12 @@ describe('GET /api/canvas/[id]/access-history', () => {
   });
 
   it('returns 401 without auth', async () => {
-    const { GET } = await import('../route');
     const req = new Request('http://localhost/api/canvas/c1/access-history');
     const res = await GET(req, { params: Promise.resolve({ id: 'c1' }), env: {} as any });
     expect(res.status).toBe(401);
   });
 
   it('returns access records for authenticated user', async () => {
-    const { GET } = await import('../route');
     const req = new Request('http://localhost/api/canvas/c1/access-history', {
       headers: { Authorization: 'Bearer test' },
     });
@@ -91,7 +90,6 @@ describe('GET /api/canvas/[id]/access-history', () => {
   });
 
   it('respects limit parameter', async () => {
-    const { GET } = await import('../route');
     const req = new Request('http://localhost/api/canvas/c1/access-history?limit=1', {
       headers: { Authorization: 'Bearer test' },
     });
@@ -107,7 +105,6 @@ describe('GET /api/canvas/[id]/access-history', () => {
 
   it('returns 500 on DB error', async () => {
     mockQueryDB.mockRejectedValue(new Error('DB error'));
-    const { GET } = await import('../route');
     const req = new Request('http://localhost/api/canvas/c1/access-history', {
       headers: { Authorization: 'Bearer test' },
     });
@@ -123,7 +120,6 @@ describe('POST /api/canvas/[id]/access-history', () => {
   });
 
   it('returns 401 without auth', async () => {
-    const { POST } = await import('../route');
     const req = new Request('http://localhost/api/canvas/c1/access-history', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -134,7 +130,6 @@ describe('POST /api/canvas/[id]/access-history', () => {
   });
 
   it('records access for authenticated user', async () => {
-    const { POST } = await import('../route');
     const req = new Request('http://localhost/api/canvas/c1/access-history', {
       method: 'POST',
       headers: { Authorization: 'Bearer test', 'Content-Type': 'application/json' },
@@ -160,7 +155,6 @@ describe('POST /api/canvas/[id]/access-history', () => {
   });
 
   it('returns 400 when userId is missing', async () => {
-    const { POST } = await import('../route');
     const req = new Request('http://localhost/api/canvas/c1/access-history', {
       method: 'POST',
       headers: { Authorization: 'Bearer test', 'Content-Type': 'application/json' },
@@ -171,7 +165,6 @@ describe('POST /api/canvas/[id]/access-history', () => {
   });
 
   it('returns 400 when userName is missing', async () => {
-    const { POST } = await import('../route');
     const req = new Request('http://localhost/api/canvas/c1/access-history', {
       method: 'POST',
       headers: { Authorization: 'Bearer test', 'Content-Type': 'application/json' },
@@ -183,7 +176,6 @@ describe('POST /api/canvas/[id]/access-history', () => {
 
   it('returns 500 on DB error during insert', async () => {
     mockExecuteDB.mockRejectedValue(new Error('DB error'));
-    const { POST } = await import('../route');
     const req = new Request('http://localhost/api/canvas/c1/access-history', {
       method: 'POST',
       headers: { Authorization: 'Bearer test', 'Content-Type': 'application/json' },

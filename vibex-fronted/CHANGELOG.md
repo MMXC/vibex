@@ -1,4 +1,11 @@
 
+## [Unreleased] S86-E4: 通知 WebSocket 实时推送 — 2026-06-11
+- **useNotificationWebSocket hook**: 全局单例 WebSocket 连接, 调用 wsNotificationHandler 处理 notification:new 事件, 指数退避重连
+- **DDSCanvasPage**: 集成 useNotificationWebSocket hook (S86-E4)
+- **NotificationPanel**: 新增 auto-scroll 到顶部逻辑 (wsNotificationHandler 推送新通知时触发)
+- **useNotificationWebSocket.test.ts**: 9 vitest 测试
+类型: feat
+
 ## [Unreleased] S86-E2: 画布缩略图导航 — 2026-06-11
 - **canvasViewportStore**: Zustand store 管理画布视口状态（flow coordinates: x/y/zoom）+ zoomTo/panTo/setViewport/resetViewport actions + sessionStorage persist
 - **canvasViewportStore.test.ts**: 17 vitest 测试覆盖所有 store actions + getViewportCenter 工具函数

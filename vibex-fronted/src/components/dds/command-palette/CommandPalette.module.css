@@ -172,3 +172,11 @@
   font-size: 10px;
   line-height: 1;
 }
+
+/* S88-E5: Shortcut conflict warning badge */
+.conflictBadge {
+  color: #f59e0b;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}

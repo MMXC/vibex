@@ -7114,3 +7114,20 @@ See git history for complete changelog.
 
 类型: feat
 影响: vibex-fronted
+
+## S87-E5: 模板文件夹管理 (2026-06-11)
+
+**Epic**: E5 模板文件夹管理  
+**Status**: ✅ Completed (2026-06-11)
+
+### Frontend 变更
+
+- `templateStore.ts` 新增 `TemplateFolder` interface + 6 个方法
+  - `loadFolders()` — 加载文件夹列表
+  - `createFolder(name, icon?)` — 创建文件夹
+  - `updateFolder(folderId, name, icon?)` — 更新文件夹
+  - `deleteFolder(folderId)` — 删除文件夹
+  - `moveToFolder(templateId, folderId)` — 移动模板
+  - `getTemplatesByFolder(folderId)` — 筛选模板
+- `folders: []` + `foldersLoaded: false` 初始状态
+- 11 Vitest tests ✅

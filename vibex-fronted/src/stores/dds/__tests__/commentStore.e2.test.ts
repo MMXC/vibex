@@ -7,34 +7,43 @@
  * - getFilteredComments() 筛选逻辑
  * - toggleCollapse / isCollapsed
  */
-import { describe, it, expect, beforeEach } from 'vitest';
-import { act } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { useCommentStore } from '../commentStore';
+
+// Mock parseMentions for 'mentioned' filter tests
+vi.mock('@/lib/canvas/parseMentions', () => ({
+  parseMentions: vi.fn((text: string) => {
+    const mentions: string[] = [];
+    const regex = /@([a-zA-Z0-9_-]+)/g;
+    let match;
+    while ((match = regex.exec(text)) !== null) {
+      mentions.push(match[1]);
+    }
+    return mentions;
+  }),
+}));
 
 describe('commentStore — S88-E2 filter & collapse', () => {
   beforeEach(() => {
-    // Reset store state
-    act(() => {
-      useCommentStore.setState({
-        comments: [],
-        initialized: true,
-        unreadCount: 0,
-        subscribedCanvasId: null,
-        reactions: {},
-        filterStatus: 'all',
-        collapsedThreadIds: new Set<string>(),
-      });
+    // Reset store state — no act() needed, Zustand updates are synchronous
+    useCommentStore.setState({
+      comments: [],
+      initialized: true,
+      unreadCount: 0,
+      subscribedCanvasId: null,
+      reactions: {},
+      filterStatus: 'all',
+      collapsedThreadIds: new Set<string>(),
     });
   });
 
   function addComment(text: string, author = 'Alice', resolved = false) {
-    act(() => {
-      const store = useCommentStore.getState();
-      const comment = store.addComment('node-1', text, author);
-      if (resolved) {
-        store.resolveComment(comment.commentId);
-      }
-    });
+    const store = useCommentStore.getState();
+    const comment = store.addComment('node-1', text, author);
+    if (resolved) {
+      store.resolveComment(comment.commentId);
+    }
+    return comment;
   }
 
   describe('filterStatus', () => {
@@ -43,36 +52,25 @@ describe('commentStore — S88-E2 filter & collapse', () => {
     });
 
     it('setFilterStatus changes filterStatus', () => {
-      act(() => {
-        useCommentStore.getState().setFilterStatus('unresolved');
-      });
+      useCommentStore.getState().setFilterStatus('unresolved');
       expect(useCommentStore.getState().filterStatus).toBe('unresolved');
 
-      act(() => {
-        useCommentStore.getState().setFilterStatus('resolved');
-      });
+      useCommentStore.getState().setFilterStatus('resolved');
       expect(useCommentStore.getState().filterStatus).toBe('resolved');
 
-      act(() => {
-        useCommentStore.getState().setFilterStatus('mentioned');
-      });
+      useCommentStore.getState().setFilterStatus('mentioned');
       expect(useCommentStore.getState().filterStatus).toBe('mentioned');
     });
   });
 
   describe('getFilteredComments', () => {
     beforeEach(() => {
-      act(() => {
-        useCommentStore.setState({ filterStatus: 'all' });
-      });
+      useCommentStore.setState({ filterStatus: 'all' });
     });
 
     it('returns all comments when filterStatus is all', () => {
       addComment('Hello world');
       addComment('Another comment');
-      act(() => {
-        useCommentStore.getState().setFilterStatus('all');
-      });
 
       const filtered = useCommentStore.getState().getFilteredComments();
       expect(filtered).toHaveLength(2);
@@ -83,9 +81,7 @@ describe('commentStore — S88-E2 filter & collapse', () => {
       addComment('Unresolved 2', 'Bob', false);
       addComment('Resolved comment', 'Charlie', true);
 
-      act(() => {
-        useCommentStore.getState().setFilterStatus('unresolved');
-      });
+      useCommentStore.getState().setFilterStatus('unresolved');
 
       const filtered = useCommentStore.getState().getFilteredComments();
       expect(filtered).toHaveLength(2);
@@ -96,9 +92,7 @@ describe('commentStore — S88-E2 filter & collapse', () => {
       addComment('Unresolved 1', 'Alice', false);
       addComment('Resolved comment', 'Bob', true);
 
-      act(() => {
-        useCommentStore.getState().setFilterStatus('resolved');
-      });
+      useCommentStore.getState().setFilterStatus('resolved');
 
       const filtered = useCommentStore.getState().getFilteredComments();
       expect(filtered).toHaveLength(1);
@@ -110,9 +104,7 @@ describe('commentStore — S88-E2 filter & collapse', () => {
       addComment('Hello @charlie how are you', 'Bob', false);
       addComment('No mentions here', 'Charlie', false);
 
-      act(() => {
-        useCommentStore.getState().setFilterStatus('mentioned');
-      });
+      useCommentStore.getState().setFilterStatus('mentioned');
 
       const filtered = useCommentStore.getState().getFilteredComments('alice');
       expect(filtered).toHaveLength(1);
@@ -132,12 +124,10 @@ describe('commentStore — S88-E2 filter & collapse', () => {
       addComment('Hello @alice', 'Bob', false);
       addComment('Hello @bob', 'Alice', false);
 
-      act(() => {
-        useCommentStore.getState().setFilterStatus('mentioned');
-      });
+      useCommentStore.getState().setFilterStatus('mentioned');
 
-      const filtered = useCommentStore.getState().getFilteredComments();
       // Without currentUser, 'mentioned' returns all (no user to filter by)
+      const filtered = useCommentStore.getState().getFilteredComments();
       expect(filtered).toHaveLength(2);
     });
   });
@@ -150,9 +140,7 @@ describe('commentStore — S88-E2 filter & collapse', () => {
 
     it('toggleCollapse adds comment to collapsed set', () => {
       const id = 'comment-1';
-      act(() => {
-        useCommentStore.getState().toggleCollapse(id);
-      });
+      useCommentStore.getState().toggleCollapse(id);
 
       expect(useCommentStore.getState().isCollapsed(id)).toBe(true);
     });
@@ -161,32 +149,24 @@ describe('commentStore — S88-E2 filter & collapse', () => {
       const id = 'comment-1';
 
       // Toggle on
-      act(() => {
-        useCommentStore.getState().toggleCollapse(id);
-      });
+      useCommentStore.getState().toggleCollapse(id);
       expect(useCommentStore.getState().isCollapsed(id)).toBe(true);
 
       // Toggle off
-      act(() => {
-        useCommentStore.getState().toggleCollapse(id);
-      });
+      useCommentStore.getState().toggleCollapse(id);
       expect(useCommentStore.getState().isCollapsed(id)).toBe(false);
     });
 
     it('multiple comments can be collapsed independently', () => {
-      act(() => {
-        useCommentStore.getState().toggleCollapse('comment-1');
-        useCommentStore.getState().toggleCollapse('comment-2');
-      });
+      useCommentStore.getState().toggleCollapse('comment-1');
+      useCommentStore.getState().toggleCollapse('comment-2');
 
       expect(useCommentStore.getState().isCollapsed('comment-1')).toBe(true);
       expect(useCommentStore.getState().isCollapsed('comment-2')).toBe(true);
       expect(useCommentStore.getState().isCollapsed('comment-3')).toBe(false);
 
       // Uncollapse only comment-1
-      act(() => {
-        useCommentStore.getState().toggleCollapse('comment-1');
-      });
+      useCommentStore.getState().toggleCollapse('comment-1');
 
       expect(useCommentStore.getState().isCollapsed('comment-1')).toBe(false);
       expect(useCommentStore.getState().isCollapsed('comment-2')).toBe(true);

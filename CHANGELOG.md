@@ -9,6 +9,17 @@
 类型: feat
 影响: vibex-fronted
 
+## [Unreleased] S86-E3: 模板增强搜索与筛选 — 2026-06-11
+- **GET /api/templates**: 新增 `tags` 查询参数（逗号分隔，多标签 OR 查询）+ 动态 WHERE 注入
+- **PUT /api/templates/:id/tags**: 更新模板标签接口（认证校验、数组验证）
+- **templateStore**: 新增 `searchByTags()` 调用 GET /api/templates?tags=... + `filterByTags()` 客户端过滤
+- **Backend 测试**: `route-tags.test.ts` (5 tests) + `[id]/tags/route.test.ts` (4 tests)
+- **DoD 误判**: `incrementUsage()`、`usage_count` 列、`sort=usage` 参数均已存在于 main；E3 实际实现为 tags 查询 + tags 更新 API + store 方法
+- 类型: feat
+- 影响: vibex-backend, vibex-fronted
+
+
+
 
 
 

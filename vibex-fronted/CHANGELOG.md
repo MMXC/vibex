@@ -9,6 +9,13 @@
 类型: feat
 影响: vibex-fronted
 
+
+## [Unreleased] S86-E3: 模板增强搜索与筛选 — 2026-06-11
+- **templateStore**: 新增 `searchByTags()` + `filterByTags()` 方法
+- **DoD 误判**: `incrementUsage()`、`usage_count` 列、`sort=usage` 均已存在于 main；E3 实际实现为 tags 查询 API + tags 更新 API + store 方法
+- 类型: feat
+- 影响: vibex-fronted
+
 ## [Unreleased] S85-E5: 模板发布与评分系统 — 2026-06-11
 - **templateStore**: 新增 `publishTemplate()` + `submitRating()` 方法（Zustand store）
 - **PublishTemplateDialog**: 新增发布模板对话框组件（表单验证 + API 调用）

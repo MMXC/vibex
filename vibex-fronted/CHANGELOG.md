@@ -7131,3 +7131,22 @@ See git history for complete changelog.
   - `getTemplatesByFolder(folderId)` — 筛选模板
 - `folders: []` + `foldersLoaded: false` 初始状态
 - 11 Vitest tests ✅
+
+
+## 2026-06-11 — Sprint 88
+
+### S88-E1: Canvas Zoom & Navigation Enhancement ✅
+
+**E1-F1: Zoom control buttons in DDSToolbar**
+- Added zoom in/out (±25%), fit view, reset to 100% buttons in the toolbar
+- Zoom percentage display in the toolbar
+- Leverages `canvasViewportStore` (S86-E2) `zoomTo`/`resetViewport` methods
+
+**E1-F2: Grid spacing switch**
+- Added grid spacing cycle button: small (10px) / medium (20px) / large (40px) / none
+- New `gridSettingsStore` with sessionStorage persistence
+
+**Files**: `stores/dds/gridSettingsStore.ts`, `components/dds/toolbar/ZoomControls.tsx`, `DDSToolbar.tsx`
+**Tests**: 16 new vitest tests
+**SHA**: `6400b622b`
+

@@ -5,7 +5,6 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useNotificationWebSocket } from '../useNotificationWebSocket';
 import * as wsNotificationHandler from '@/services/wsNotificationHandler';
-import * as websocketConfig from '@/config/websocket';
 
 // Mock dependencies
 vi.mock('@/services/wsNotificationHandler', () => ({
@@ -16,18 +15,14 @@ vi.mock('@/services/wsNotificationHandler', () => ({
   },
 }));
 
-vi.mock('@/config/websocket', () => ({
-  WEBSOCKET_CONFIG: {
-    collabUrl: 'ws://localhost:8787/api/v1/ws/notifications',
-    connectTimeout: 5000,
-    maxReconnectAttempts: 3,
-    baseReconnectDelay: 100,
-  },
-}));
-
-// Mock WebSocket
+// Mock WebSocket globally
 class MockWebSocket {
   static instances: MockWebSocket[] = [];
+  static CONNECTING = 0;
+  static OPEN = 1;
+  static CLOSING = 2;
+  static CLOSED = 3;
+
   readyState: number;
   onopen: (() => void) | null = null;
   onmessage: ((event: { data: string }) => void) | null = null;
@@ -51,19 +46,13 @@ class MockWebSocket {
     this.onclose?.();
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   send(_data: string) {
     // noop
   }
-
-  static CONNECTING = 0;
-  static OPEN = 1;
-  static CLOSING = 2;
-  static CLOSED = 3;
 }
 
-// Make MockWebSocket available globally
 const originalWebSocket = globalThis.WebSocket;
+
 beforeEach(() => {
   MockWebSocket.instances = [];
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -82,10 +71,8 @@ describe('useNotificationWebSocket', () => {
       useNotificationWebSocket({ userId: 'user-123', enabled: true })
     );
 
-    // Initially not connected
     expect(result.current.isConnected).toBe(false);
 
-    // Wait for connection
     await act(async () => {
       await new Promise((r) => setTimeout(r, 10));
     });
@@ -94,7 +81,7 @@ describe('useNotificationWebSocket', () => {
     expect(wsNotificationHandler.wsNotificationHandler.activate).toHaveBeenCalled();
   });
 
-  it('disconnects WebSocket on unmount', async () => {
+  it('disconnects WebSocket on last hook unmount', async () => {
     const { result, unmount } = renderHook(() =>
       useNotificationWebSocket({ userId: 'user-123', enabled: true })
     );
@@ -120,7 +107,6 @@ describe('useNotificationWebSocket', () => {
       await new Promise((r) => setTimeout(r, 10));
     });
 
-    // Simulate incoming message
     const msg = {
       type: 'notification:new',
       payload: {
@@ -164,7 +150,7 @@ describe('useNotificationWebSocket', () => {
     expect(MockWebSocket.instances.length).toBe(0);
   });
 
-  it('reconnects on close event', async () => {
+  it('schedules reconnect on close event', async () => {
     const { result } = renderHook(() =>
       useNotificationWebSocket({ userId: 'user-123', enabled: true })
     );
@@ -208,7 +194,7 @@ describe('useNotificationWebSocket', () => {
       await new Promise((r) => setTimeout(r, 200));
     });
 
-    // Only one extra instance (the manual close), no auto-reconnect
+    // Only one instance (the manual close), no auto-reconnect
     expect(MockWebSocket.instances.length).toBe(1);
   });
 });

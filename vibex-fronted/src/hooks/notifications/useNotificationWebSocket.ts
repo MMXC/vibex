@@ -2,7 +2,6 @@
 
 import React, { useEffect, useRef, useCallback, useState } from 'react';
 import { wsNotificationHandler } from '@/services/wsNotificationHandler';
-import { WEBSOCKET_CONFIG } from '@/config/websocket';
 
 /**
  * useNotificationWebSocket — S86-E4: 通知 WebSocket 实时推送
@@ -10,12 +9,11 @@ import { WEBSOCKET_CONFIG } from '@/config/websocket';
  * 职责：
  * - 建立到通知 WebSocket 端点的连接
  * - 调用 wsNotificationHandler.handleMessage() 处理 notification:new 等消息
- * - 处理重连逻辑（基于 WEBSOCKET_CONFIG）
- * - 离线重连后通过 HTTP GET /api/notifications 拉取离线期间的通知
+ * - 处理重连逻辑（指数退避）
  *
  * 设计决策：
  * - 使用全局 WebSocket 连接（单例模式），避免多个 hook 实例创建多个连接
- * - 重连使用指数退避（参考 WEBSOCKET_CONFIG.baseReconnectDelay）
+ * - 重连使用指数退避
  *
  * DoD: 新通知在 < 2s 内出现在面板中
  */
@@ -39,6 +37,17 @@ interface UseNotificationWebSocketReturn {
   /** 手动重连 */
   reconnect: () => void;
 }
+
+/** 连接配置 */
+const NOTIFICATION_WS_BASE = (() => {
+  if (process.env.NODE_ENV === 'development') {
+    return 'ws://localhost:8787/api/v1/ws/notifications';
+  }
+  return 'wss://api.vibex.top/api/v1/ws/notifications';
+})();
+const CONNECT_TIMEOUT_MS = 10_000;
+const MAX_RECONNECT_ATTEMPTS = 3;
+const BASE_RECONNECT_DELAY_MS = 1_000;
 
 /** WebSocket 单例 — 全局共享一个连接 */
 let globalWs: WebSocket | null = null;
@@ -65,15 +74,11 @@ function clearReconnectTimer() {
 }
 
 function getNotificationWsUrl(userId: string): string {
-  // 使用与协作 WS 相同的 base URL，但指向 notification 路径
-  const collabBase = WEBSOCKET_CONFIG.collabUrl;
-  const base = collabBase.replace('/collaboration', '/notifications');
-  return `${base}?userId=${encodeURIComponent(userId)}`;
+  return `${NOTIFICATION_WS_BASE}?userId=${encodeURIComponent(userId)}`;
 }
 
 /**
  * 全局 WebSocket 连接建立
- * 幂等：已连接则直接通知，不重复创建
  */
 async function connectGlobal(
   userId: string,
@@ -114,7 +119,6 @@ async function connectGlobal(
       notifyState(false);
       onDisconnect?.();
       globalWs = null;
-      // 有活跃 hook 时才重连
       if (activeHookCount > 0) {
         scheduleReconnect(userId, onConnect, onDisconnect);
       }
@@ -125,14 +129,21 @@ async function connectGlobal(
     });
 
     // 连接超时
-    setTimeout(() => {
+    const timeout = setTimeout(() => {
       if (ws.readyState !== WebSocket.OPEN) {
         ws.close();
         if (activeHookCount > 0) {
           scheduleReconnect(userId, onConnect, onDisconnect);
         }
       }
-    }, WEBSOCKET_CONFIG.connectTimeout);
+    }, CONNECT_TIMEOUT_MS);
+
+    // 清理 timeout 当连接成功
+    const originalOpen = ws.onopen;
+    ws.addEventListener('open', () => {
+      clearTimeout(timeout);
+      originalOpen?.();
+    });
   } catch {
     if (activeHookCount > 0) {
       scheduleReconnect(userId, onConnect, onDisconnect);
@@ -148,12 +159,12 @@ function scheduleReconnect(
   onConnect?: () => void,
   onDisconnect?: () => void
 ): void {
-  if (reconnectAttempts >= WEBSOCKET_CONFIG.maxReconnectAttempts) {
+  if (reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
     return;
   }
 
   clearReconnectTimer();
-  const delay = WEBSOCKET_CONFIG.baseReconnectDelay * Math.pow(2, reconnectAttempts);
+  const delay = BASE_RECONNECT_DELAY_MS * Math.pow(2, reconnectAttempts);
   reconnectAttempts++;
 
   reconnectTimer = setTimeout(() => {
@@ -166,7 +177,7 @@ function scheduleReconnect(
  */
 function disconnectGlobal(): void {
   clearReconnectTimer();
-  reconnectAttempts = WEBSOCKET_CONFIG.maxReconnectAttempts; // 防止自动重连
+  reconnectAttempts = MAX_RECONNECT_ATTEMPTS; // 防止自动重连
   if (globalWs) {
     globalWs.close();
     globalWs = null;
@@ -193,7 +204,6 @@ export function useNotificationWebSocket({
   const onDisconnectRef = useRef(onDisconnect);
   const userIdRef = useRef(userId);
 
-  // 保持回调引用最新
   useEffect(() => {
     onConnectRef.current = onConnect;
     onDisconnectRef.current = onDisconnect;
@@ -203,7 +213,6 @@ export function useNotificationWebSocket({
     userIdRef.current = userId;
   }, [userId]);
 
-  // 连接状态
   const [isConnected, setIsConnected] = useState(globalIsConnected);
 
   useEffect(() => {
@@ -215,19 +224,16 @@ export function useNotificationWebSocket({
     return () => {
       stateListeners.delete(listener);
       activeHookCount--;
-      // 最后一个 hook unmount 时断开连接
       if (activeHookCount === 0) {
         disconnectGlobal();
       }
     };
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);
 
-  // 建立 / 断开连接
   useEffect(() => {
     if (!enabled || !userId) {
       return;
     }
-
     connectGlobal(userId, onConnectRef.current, onDisconnectRef.current);
   }, [enabled, userId]); // eslint-disable-line react-hooks/exhaustive-deps
 

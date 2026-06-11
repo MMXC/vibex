@@ -7305,3 +7305,22 @@ See git history for complete changelog.
 - `commentStore.e2.test.ts`: 11 vitest（filterStatus 默认值 / setFilterStatus / getFilteredComments 4种筛选 / toggleCollapse 3种场景）
 
 类型: feat
+
+## S88-E3 · 模板市场增强 · 2026-06-12
+
+### Features
+- **D1 Migration 0019**: 新建 `template_tags` 和 `template_tag_assignments` 表，支持模板多标签关联
+- **GET/POST /api/templates/tags**: 标签列表查询（带模板数量）+ 创建新标签
+- **PATCH/DELETE /api/templates/tags/:id**: 更新标签名称/颜色 + 删除标签
+- **TemplatePreviewDialog**: 预览对话框，新增使用量（已使用 N 次）、星级评分（⭐ × N）、标签展示
+- **/templates/tags 页面**: 管理员标签管理页面，支持添加/删除标签
+- **TemplateCard 增强**: footer 显示 usage_count 和 avg_rating
+- **TemplateGallery 推荐区**: 新增"推荐模板"区域，显示评分最高的 6 个模板
+
+### 测试
+- `route.test.ts` (backend): 8 Jest tests — 认证保护、GET/POST/PATCH/DELETE CRUD、参数校验
+- `TemplatePreviewDialog.test.tsx` (frontend): 8 Vitest — 渲染、使用量/评分显示、标签展示、插入/关闭回调
+
+### 技术细节
+- 标签评分公式：`score = usage_count * 0.6 + avg_rating * rating_count * 0.4`
+- 预览对话框使用现有 TemplateEditDialog 模式，集成使用量和星级显示

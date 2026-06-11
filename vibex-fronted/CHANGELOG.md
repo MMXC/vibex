@@ -7088,3 +7088,18 @@ See git history for complete changelog.
 
 类型: feat
 影响: canvas-history
+
+
+## S87-E2 · Canvas 全文搜索 · 2026-06-11
+
+### Features
+- **CanvasSearchDialog**: DoD 指定的 Dialog 文件名变体，从 search/CanvasSearchPanel.tsx 重导出 (S65-E4 组件)
+- **前置基础设施**: canvasSearchStore.ts (S60-S75), CanvasSearchPanel.tsx (S65-E4), DDSCanvasPage Ctrl+F (S73-E1) 已存在
+- **测试**: 10 Vitest 测试覆盖 Dialog 渲染/搜索/键盘导航/关闭行为/历史记录
+
+### Files
+- `src/components/dds/search/CanvasSearchDialog.tsx`
+- `src/components/dds/search/__tests__/CanvasSearchDialog.test.tsx`
+
+类型: feat
+影响: vibex-fronted

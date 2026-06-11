@@ -2,15 +2,20 @@
  * /api/canvas/:id/share — Canvas Share Link API
  *
  * S85-E1: 画布级权限体系
+ * S88-E4: 画布嵌入与分享增强 — 添加 comment-only 权限级别
  *
- * POST /api/canvas/:id/share — Create a share link with viewer/editor permission
+ * POST /api/canvas/:id/share — Create a share link with viewer/editor/comment-only permission
+ * GET  /api/canvas/:id/share — Get share info by token; supports ?embed=1 for embed URL
  *
- * Body: { role?: 'viewer' | 'editor', expiresInHours?: number }
- * Returns: { token, shareUrl, expiresAt }
+ * S88-E4: 新增 comment-only 权限级别，嵌入模式下仅显示评论不显示节点内容
  */
 import { NextRequest, NextResponse } from 'next/server';
 import { queryOne, executeDB, generateId, Env } from '@/lib/db';
 import { safeError } from '@/lib/logger/safeError';
+
+export type ShareRole = 'viewer' | 'editor' | 'comment-only';
+
+const VALID_ROLES: ShareRole[] = ['viewer', 'editor', 'comment-only'];
 
 function generateShareToken(): string {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -41,15 +46,17 @@ export async function POST(
       return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
     }
 
-    const role = (body.role ?? 'viewer') as 'viewer' | 'editor';
-    if (!['viewer', 'editor'].includes(role)) {
-      return NextResponse.json({ error: "role must be 'viewer' or 'editor'" }, { status: 400 });
+    const role = (body.role ?? 'viewer') as ShareRole;
+    if (!VALID_ROLES.includes(role)) {
+      return NextResponse.json(
+        { error: `role must be one of: ${VALID_ROLES.join(', ')}` },
+        { status: 400 }
+      );
     }
 
     const expiresInHours = body.expiresInHours ?? 720; // default 30 days
     const expiresAt = new Date(Date.now() + expiresInHours * 3600 * 1000).toISOString();
 
-    // Get the creator from auth header or use a default
     const authHeader = request.headers.get('Authorization') ?? '';
     const createdBy = authHeader.replace('Bearer ', '').split('-')[0] || 'anonymous';
 
@@ -63,11 +70,13 @@ export async function POST(
     );
 
     const shareUrl = `/canvas/share?token=${token}`;
+    const embedUrl = `/canvas/share?token=${token}&embed=1&mode=${role}`;
 
     return NextResponse.json({
       id: shareId,
       token,
       shareUrl,
+      embedUrl,
       role,
       expiresAt,
     }, { status: 201 });
@@ -78,6 +87,7 @@ export async function POST(
 }
 
 // GET /api/canvas/:id/share — Get share info by token
+// Supports ?embed=1 for embed mode URL generation
 export async function GET(
   request: NextRequest,
   context: { params: Promise<{ id: string }>; env: Env }
@@ -87,6 +97,7 @@ export async function GET(
     const env = context.env;
     const { searchParams } = new URL(request.url);
     const token = searchParams.get('token');
+    const embedMode = searchParams.get('embed') === '1';
 
     if (!token) {
       return NextResponse.json({ error: 'token query param is required' }, { status: 400 });
@@ -108,12 +119,21 @@ export async function GET(
       return NextResponse.json({ error: 'Share link has expired' }, { status: 410 });
     }
 
+    const shareUrl = `/canvas/share?token=${token}`;
+    let embedUrl: string | undefined;
+    if (embedMode) {
+      embedUrl = `/canvas/share?token=${token}&embed=1&mode=${share.role}`;
+    }
+
     return NextResponse.json({
       id: share.id,
       canvasId: share.canvas_id,
       role: share.role,
+      mode: share.role,
       createdAt: share.created_at,
       expiresAt: share.expires_at,
+      shareUrl,
+      ...(embedUrl ? { embedUrl } : {}),
     }, { status: 200 });
   } catch (err) {
     safeError('[Share GET] error:', err);

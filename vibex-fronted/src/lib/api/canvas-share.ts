@@ -7,7 +7,7 @@ import { getAuthToken } from '@/lib/auth-token';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://api.vibex.top';
 
-export type ShareRole = 'viewer' | 'editor';
+export type ShareRole = 'viewer' | 'editor' | 'comment-only';
 
 export interface CanvasShareRecord {
   canvasId: string;

@@ -1,15 +1,19 @@
 /**
  * ShareDialog.tsx — Sprint82 E3: Canvas Share Dialog
+ * S88-E4: Extended with embed preview + comment-only permission
  *
  * A modal dialog for sharing a canvas via link.
  * Supports: generate share link, copy URL, revoke link, change permission.
+ * E4-F1: Live embed preview with iframe
+ * E4-F2: Embed code customization (width, height, theme, toolbar)
+ * E4-F3: comment-only permission mode
  * Uses shareService.ts for API operations.
  *
  * data-testid="share-dialog"
  */
 'use client';
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { useTranslations } from '@/hooks/useTranslations';
 import {
   generateShareLink,
@@ -38,6 +42,20 @@ interface ShareDialogProps {
   onTeamShareRequest?: () => void;
 }
 
+// Embed parameter defaults
+const DEFAULT_EMBED_WIDTH = 800;
+const DEFAULT_EMBED_HEIGHT = 600;
+const DEFAULT_EMBED_THEME = 'auto';
+const EMBED_DEBOUNCE_MS = 500;
+
+function debounce<T extends (...args: unknown[]) => void>(fn: T, delay: number): T {
+  let timer: ReturnType<typeof setTimeout>;
+  return ((...args: Parameters<T>) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn(...args), delay);
+  }) as T;
+}
+
 export function ShareDialog({
   isOpen,
   canvasId,
@@ -62,16 +80,23 @@ export function ShareDialog({
   /** Loading state */
   const [loading, setLoading] = useState(false);
 
+  // --- E4-F2: Embed parameters ---
+  const [embedWidth, setEmbedWidth] = useState(DEFAULT_EMBED_WIDTH);
+  const [embedHeight, setEmbedHeight] = useState(DEFAULT_EMBED_HEIGHT);
+  const [embedTheme, setEmbedTheme] = useState<'light' | 'dark' | 'auto'>(DEFAULT_EMBED_THEME);
+  const [embedShowToolbar, setEmbedShowToolbar] = useState(true);
+  const [embedCodeCopied, setEmbedCodeCopied] = useState(false);
+
   // Build display object from service result
   const toDisplay = useCallback(
-    (result: GenerateShareLinkResult): ShareLinkDisplay => ({
+    (result: GenerateShareLinkResult, role: ShareRole): ShareLinkDisplay => ({
       token: result.token,
-      role: permission,
+      role,
       createdAt: new Date().toISOString(),
       expiresAt: result.expiresAt,
       url: `${window.location.origin}/snapshot?canvas=${canvasId}&share=${result.token}`,
     }),
-    [canvasId, permission]
+    [canvasId]
   );
 
   // Load existing share links when dialog opens
@@ -96,7 +121,7 @@ export function ShareDialog({
             (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
           )[0];
           setCurrentLink(latest);
-          setPermission(latest.role);
+          setPermission(latest.role as ShareRole);
         }
       })
       .catch(() => setError('加载分享链接失败'))
@@ -117,7 +142,7 @@ export function ShareDialog({
             canvasName: canvasName ?? '',
             role: newPerm,
           });
-          const display = toDisplay(result);
+          const display = toDisplay(result, newPerm);
           setCurrentLink(display);
           setAllLinks((prev) => {
             const filtered = prev.filter((l) => l.token !== currentLink.token);
@@ -142,7 +167,7 @@ export function ShareDialog({
         canvasName: canvasName ?? '',
         role: permission,
       });
-      const display = toDisplay(result);
+      const display = toDisplay(result, permission);
       setCurrentLink(display);
       setAllLinks((prev) => [...prev, display]);
     } catch {
@@ -195,6 +220,47 @@ export function ShareDialog({
     setError(null);
   }, []);
 
+  // --- E4-F2: Build iframe src URL ---
+  const iframeSrc = useMemo(() => {
+    if (!currentLink) return '';
+    const params = new URLSearchParams({
+      canvas: canvasId,
+      share: currentLink.token,
+      embed: '1',
+      mode: permission,
+      theme: embedTheme,
+      toolbar: embedShowToolbar ? '1' : '0',
+      width: String(embedWidth),
+      height: String(embedHeight),
+    });
+    return `/snapshot?${params.toString()}`;
+  }, [currentLink, canvasId, permission, embedTheme, embedShowToolbar, embedWidth, embedHeight]);
+
+  // --- E4-F2: Build generated iframe code ---
+  const embedCode = useMemo(() => {
+    if (!iframeSrc) return '';
+    const fullSrc = `${window.location.origin}${iframeSrc}`;
+    return `<iframe src="${fullSrc}" width="${embedWidth}" height="${embedHeight}" frameborder="0" allow="clipboard-read; clipboard-write"></iframe>`;
+  }, [iframeSrc, embedWidth, embedHeight]);
+
+  const handleCopyEmbedCode = useCallback(async () => {
+    if (!embedCode) return;
+    const ok = await copyToClipboardShare(embedCode);
+    if (ok) {
+      setEmbedCodeCopied(true);
+      setTimeout(() => setEmbedCodeCopied(false), 3000);
+    }
+  }, [embedCode]);
+
+  // Role display helper
+  const roleLabel = (role: ShareRole) => {
+    switch (role) {
+      case 'viewer': return t('viewer') || '仅查看';
+      case 'editor': return t('editor') || '可编辑';
+      case 'comment-only': return t('commentOnly') || '仅查看评论';
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -239,9 +305,11 @@ export function ShareDialog({
               value={permission}
               onChange={handlePermissionChange}
               disabled={loading}
+              data-testid="share-permission-select"
             >
               <option value="viewer">{t('viewer') || '仅查看'}</option>
               <option value="editor">{t('editor') || '可编辑'}</option>
+              <option value="comment-only">{t('commentOnly') || '仅查看评论'}</option>
             </select>
           </div>
 
@@ -263,39 +331,158 @@ export function ShareDialog({
                   className={`${styles.copyBtn} ${copied ? styles.copied : ''}`}
                   onClick={handleCopyUrl}
                   disabled={loading}
+                  aria-label={t('copyLink') || '复制链接'}
+                  data-testid="share-dialog-copy-url"
                 >
-                  {copied ? t('copied') || '已复制' : t('copyLink') || '复制链接'}
+                  {copied ? (t('copied') || '已复制') : (t('copyLink') || '复制链接')}
+                </button>
+                <button
+                  type="button"
+                  className={styles.revokeBtn}
+                  onClick={() => handleRevoke(currentLink.token)}
+                  disabled={loading}
+                >
+                  {t('revokeLink') || '撤销链接'}
                 </button>
               </div>
               <p className={styles.hint}>
                 {currentLink.expiresAt
-                  ? `${t('expires') || '链接有效期至'}: ${new Date(currentLink.expiresAt).toLocaleDateString('zh-CN')}`
+                  ? `${t('expires') || '链接有效期至'} ${new Date(currentLink.expiresAt).toLocaleDateString('zh-CN')}`
                   : t('noExpiry') || '永久有效'}
               </p>
-              <button
-                type="button"
-                className={styles.revokeBtn}
-                onClick={() => handleRevoke(currentLink.token)}
-                disabled={loading}
-              >
-                {t('revokeLink') || '撤销链接'}
-              </button>
             </div>
           ) : (
-            <div className={styles.linkArea}>
+            <>
               <p className={styles.noLink}>{t('noShareLink') || '暂无分享链接'}</p>
               <button
                 type="button"
                 className={styles.generateBtn}
                 onClick={handleGenerateLink}
                 disabled={loading}
+                data-testid="share-dialog-generate-link"
               >
                 {t('generateLink') || '生成链接'}
+              </button>
+            </>
+          )}
+
+          {/* Error */}
+          {error && (
+            <div className={styles.error}>
+              <span>{error}</span>
+              <button type="button" onClick={handleDismissError} className={styles.dismissError}>
+                ✕
               </button>
             </div>
           )}
 
-          {/* Other links list */}
+          {/* === E4-F1 + E4-F2: Embed Preview Section === */}
+          {currentLink && (
+            <div className={styles.embedSection}>
+              <div className={styles.embedSectionTitle}>
+                {t('embedPreview') || '嵌入预览'}
+              </div>
+
+              {/* Embed preview iframe */}
+              <div className={styles.embedPreview} data-testid="embed-preview-container">
+                <iframe
+                  src={iframeSrc}
+                  title={t('embedPreview') || '嵌入预览'}
+                  className={styles.embedIframe}
+                  data-testid="embed-preview-iframe"
+                  allow="clipboard-read; clipboard-write"
+                />
+                {permission === 'comment-only' && (
+                  <div className={styles.embedCommentOnlyWatermark}>
+                    {t('commentOnlyWatermark') || '仅显示评论'}
+                  </div>
+                )}
+              </div>
+
+              {/* Embed parameter form */}
+              <div className={styles.embedParams}>
+                <div className={styles.embedParamsRow}>
+                  <div className={styles.embedParamField}>
+                    <label className={styles.embedParamLabel}>{t('embedWidth') || '宽度'}</label>
+                    <input
+                      type="number"
+                      className={styles.embedParamInput}
+                      value={embedWidth}
+                      onChange={(e) => setEmbedWidth(isNaN(parseInt(e.target.value)) ? DEFAULT_EMBED_WIDTH : Math.max(200, parseInt(e.target.value)))}
+                      min={200}
+                      max={2000}
+                      data-testid="embed-width-input"
+                    />
+                  </div>
+                  <div className={styles.embedParamField}>
+                    <label className={styles.embedParamLabel}>{t('embedHeight') || '高度'}</label>
+                    <input
+                      type="number"
+                      className={styles.embedParamInput}
+                      value={embedHeight}
+                      onChange={(e) => setEmbedHeight(Math.max(150, parseInt(e.target.value) || DEFAULT_EMBED_HEIGHT))}
+                      min={150}
+                      max={2000}
+                      data-testid="embed-height-input"
+                    />
+                  </div>
+                </div>
+                <div className={styles.embedParamsRow}>
+                  <div className={styles.embedParamField}>
+                    <label className={styles.embedParamLabel}>{t('embedTheme') || '主题'}</label>
+                    <select
+                      className={styles.embedParamSelect}
+                      value={embedTheme}
+                      onChange={(e) => setEmbedTheme(e.target.value as 'light' | 'dark' | 'auto')}
+                      data-testid="embed-theme-select"
+                    >
+                      <option value="auto">{t('themeAuto') || '自动'}</option>
+                      <option value="light">{t('themeLight') || '浅色'}</option>
+                      <option value="dark">{t('themeDark') || '深色'}</option>
+                    </select>
+                  </div>
+                  <div className={styles.embedParamToggle}>
+                    <label className={styles.embedParamLabel}>{t('embedShowToolbar') || '显示工具栏'}</label>
+                    <label className={styles.toggleSwitch}>
+                      <input
+                        type="checkbox"
+                        checked={embedShowToolbar}
+                        onChange={(e) => setEmbedShowToolbar(e.target.checked)}
+                        data-testid="embed-toolbar-toggle"
+                      />
+                      <span className={styles.toggleSlider} />
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              {/* Generated iframe code */}
+              {embedCode && (
+                <div className={styles.embedCodeArea}>
+                  <label className={styles.label}>{t('embedCode') || '嵌入代码'}</label>
+                  <div className={styles.embedCodeRow}>
+                    <textarea
+                      readOnly
+                      className={styles.embedCodeTextarea}
+                      value={embedCode}
+                      rows={3}
+                      data-testid="embed-code-textarea"
+                    />
+                    <button
+                      type="button"
+                      className={`${styles.copyBtn} ${embedCodeCopied ? styles.copied : ''}`}
+                      onClick={handleCopyEmbedCode}
+                      data-testid="embed-copy-btn"
+                    >
+                      {embedCodeCopied ? (t('copied') || '已复制') : (t('copyCode') || '复制代码')}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Other links */}
           {allLinks.length > 1 && (
             <div className={styles.otherLinks}>
               <h3 className={styles.otherLinksTitle}>{t('otherLinks') || '其他链接'}</h3>
@@ -303,9 +490,7 @@ export function ShareDialog({
                 .filter((l) => l.token !== currentLink?.token)
                 .map((l) => (
                   <div key={l.token} className={styles.otherLinkItem}>
-                    <span className={styles.otherLinkRole}>
-                      {l.role === 'viewer' ? t('viewer') || '仅查看' : t('editor') || '可编辑'}
-                    </span>
+                    <span className={styles.otherLinkRole}>{roleLabel(l.role)}</span>
                     <span className={styles.otherLinkDate}>
                       {new Date(l.createdAt).toLocaleDateString('zh-CN')}
                     </span>
@@ -319,16 +504,6 @@ export function ShareDialog({
                     </button>
                   </div>
                 ))}
-            </div>
-          )}
-
-          {/* Error */}
-          {error && (
-            <div className={styles.error}>
-              <span>{error}</span>
-              <button type="button" onClick={handleDismissError} className={styles.dismissError}>
-                ✕
-              </button>
             </div>
           )}
         </div>

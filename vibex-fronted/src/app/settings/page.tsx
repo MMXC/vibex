@@ -12,6 +12,7 @@ import { useState } from 'react';
 import { useUserPreferencesStore } from '@/stores/userPreferencesStore';
 import type { ThemePreference, LocalePreference } from '@/stores/userPreferencesStore';
 import { useShortcutStore } from '@/stores/shortcutStore';
+import { NotificationPreferencesSection } from './NotificationPreferencesSection';
 import styles from './settings.module.css';
 
 const THEME_OPTIONS: { value: ThemePreference; label: string }[] = [
@@ -200,6 +201,9 @@ export default function SettingsPage() {
             </p>
           </div>
         </section>
+
+        {/* S87-E1: Notification Preferences Section */}
+        <NotificationPreferencesSection />
 
         {/* P003-E3: AI Scores panel */}
         <section className={styles.section}>

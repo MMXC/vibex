@@ -162,3 +162,16 @@
   - SPEC-09 compliance for template listing and filtering
   - Migration: `prisma/migrations/004_template_columns.sql`
   - Commits: `c12f3de2`, `95336b1b`
+## [Unreleased] S89-E1: Canvas Analytics Dashboard — 2026-06-12
+
+### Backend Core
+
+#### 2026-06-12
+
+- **S89-E1 Canvas Analytics Dashboard** (epic/s89-e1-canvas-analytics)
+  - `src/app/api/canvas/stats/route.ts`: GET /api/canvas/stats — 返回用户所有画布列表及协作者数量统计，`runtime = 'edge'`
+  - `src/app/api/canvas/[id]/access-history/route.ts`: GET /api/canvas/[id]/access-history（获取最近访问记录）+ POST（记录访问，去重逻辑）；`runtime = 'edge'`
+  - `migrations/0020_access_history.sql`: D1 迁移 `canvas_access_history` 表，含 user_name / avatar_url / accessed_at 及联合索引
+  - 类型: feat
+  - 影响: vibex-backend
+

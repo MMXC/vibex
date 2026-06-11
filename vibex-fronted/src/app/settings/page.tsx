@@ -204,6 +204,9 @@ export default function SettingsPage() {
         </section>
 
         {/* S87-E1: Notification Preferences Section */}
+
+        {/* S89-E1: Usage Analytics Section */}
+        <UsageAnalyticsSection />
         <NotificationPreferencesSection />
 
         {/* S89-E1: Usage Analytics Section */}

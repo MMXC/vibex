@@ -38,6 +38,37 @@
 - **前置基础设施**: wsNotificationHandler.ts (S68-E2) + notificationStore.addNotification() (已存在) + DDSToolbar bell badge (已存在)
 - **Variant W''' self-impl**: dev-e4 ghosted，仅补建 WebSocket hook + DDSCanvasPage 集成 + NotificationPanel autoScroll
 类型: feat
+
+## S88-E5 · 命令面板增强 · 2026-06-12
+
+### Features
+- **命令分类边栏**: 新增左侧分类边栏组件 `CommandCategorySidebar.tsx`，支持 `[全部] [画布] [模板] [协作] [视图] [设置]` 六分类切换，分类状态持久化
+- **快捷键冲突检测**: 新增 `useKeyboardConflict.ts` hook + `detectShortcutConflict` store 方法，检测 `Ctrl+C/V/S/W` 等系统保留快捷键冲突，命令项旁显示黄色警告图标 ⚠
+- **最近使用命令**: `commandPaletteStore` 新增 `recentCommands` 字段（localStorage 持久化，最多 5 条），执行命令后自动移至顶部
+- **分类搜索**: 支持 `>` 前缀分类搜索（如 `>canvas zoom`），结合 Fuse.js 模糊匹配
+
+### Files
+- `vibex-fronted/src/components/dds/command-palette/CommandPalette.tsx` — 分类边栏集成 + 冲突检测 UI
+- `vibex-fronted/src/components/dds/command-palette/CommandPalette.test.tsx` — 371 行更新，测试覆盖 E5 功能
+- `vibex-fronted/src/components/dds/command-palette/CommandCategorySidebar.tsx` — 分类边栏组件
+- `vibex-fronted/src/components/dds/command-palette/CommandCategorySidebar.test.tsx` — ≥8 测试用例
+- `vibex-fronted/src/components/dds/command-palette/CommandCategorySidebar.module.css` — 边栏样式
+- `vibex-fronted/src/components/dds/command-palette/CommandPaletteWithSidebar.module.css` — Sidebar 布局样式
+- `vibex-fronted/src/hooks/useKeyboardConflict.ts` — 快捷键冲突检测 hook
+- `vibex-fronted/src/hooks/__tests__/useKeyboardConflict.test.ts` — 冲突检测测试
+- `vibex-fronted/src/stores/commandPaletteStore.ts` — `recentCommands` + `detectShortcutConflict` + `filterCategory`
+
+### 测试
+- `CommandCategorySidebar.test.tsx`: ≥8 vitest（render / category select / ARIA attributes）
+- `useKeyboardConflict.test.ts`: 冲突检测单元测试
+- `CommandPalette.test.tsx`: 更新覆盖分类筛选 + 冲突图标 + recentCommands
+
+### 备注
+- Variant W' self-impl: `dev-command-palette-enhance` phantom ghost → running_agents=null → 预发现 workspace 有完整 staged 文件未提交 → 补 commit + cherry-pick + cascade
+类型: feat
+影响: vibex-fronted
+
+
 影响: vibex-fronted
 
 ## [Unreleased] S86-E2: 画布缩略图导航 — 2026-06-11

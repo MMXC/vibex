@@ -15,6 +15,19 @@
 类型: feat
 影响: vibex-backend, vibex-fronted
 
+
+## [Unreleased] S86-E1: 画布评论标注系统 — 2026-06-11
+- **D1 Schema**: 新增 `0018_comments.sql` — `comments` 表 + `comment_reactions` 表（含 canvas_id/node_id/parent_id 索引）
+- **GET /api/canvas/[id]/comments**: 获取画布评论列表（支持 nodeId 筛选 + 分页）
+- **POST /api/canvas/[id]/comments**: 创建评论（支持 mentions/@提及 + parentId 嵌套回复）
+- **POST /api/canvas/[id]/comments/[commentId]/read**: 标记评论已解决（is_resolved=1）
+- **POST /api/canvas/[id]/comments/[commentId]/reactions**: 添加评论反应（thumbsup/heart/laugh）
+- **Backend 测试**: `route.test.ts` — 12 个 Jest 测试用例
+- **Frontend 基础设施**: `commentStore.ts` (S49-E5/S50-E3/S69-E4/S71-E2)、`CommentThread.tsx`、`NodeCommentBadge.tsx`、`MentionInput.tsx` 已存在于 main
+- **Backend-only self-impl**: Variant W' — 前端基础设施已就绪，仅补建后端 API + D1 schema
+类型: feat
+影响: vibex-backend
+
 ## [Unreleased] S85-E3: 通知中心面板 — 2026-06-11
 - **通知中心 API**: 新增 `/api/notifications` GET（列表+筛选+分页）+ POST（创建通知）
 - **标记已读 API**: 新增 `/api/notifications/[id]/read` POST（标记单条已读）+ `/api/notifications/read-all` POST（全部已读）

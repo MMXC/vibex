@@ -1,3 +1,13 @@
+## [Unreleased] S86-E5: VersionDiffPanel side-by-side two-column layout mode — 2026-06-11
+- **VersionDiffPanel**: 新增 `diffViewMode` 状态 (`'list'` | `'sideBySide'`) + `ViewModeSelect` 下拉选择器
+- **SideBySideContent 组件**: 双栏布局，左栏基准版本(移除节点红色)，右栏对比版本(新增绿色，修改橙色)
+- **emptyCell 占位**: 当某版本中不存在对应节点时，渲染空单元格保持行对齐
+- **snapshotLabels 隐藏**: sideBySide 模式下隐藏版本标签栏，改为列头显示，避免重复
+- **VersionDiffPanel.test.tsx**: 23 vitest 测试 (13 S84-E1 list mode + 10 S86-E5 side-by-side)
+- **Variant W''' self-impl**: dev-e5 ghosted，仅补建 side-by-side 视图模式
+类型: feat
+影响: vibex-fronted
+
 
 ## [Unreleased] S86-E4: 通知 WebSocket 实时推送 — 2026-06-11
 - **useNotificationWebSocket hook**: 全局单例 WebSocket 连接, 调用 wsNotificationHandler 处理 notification:new 事件, 指数退避重连

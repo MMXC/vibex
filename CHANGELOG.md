@@ -1,3 +1,20 @@
+## S90-E3 · Template Sharing & Public Gallery · 2026-06-12
+
+### Features
+- **D1 Schema**: `0022_template_sharing` migration — templates 表新增 `is_public`、`share_token`、`avg_rating` 字段
+- **POST /api/templates/[id]/publish**: 切换模板公开/私有状态，生成 32 字符 share_token
+- **GET /api/templates/public**: 公开模板分页列表，支持 category/sort/page 参数
+- **GET /api/templates/public/[id]**: 通过 share_token 访问公开模板
+- **TemplateGallery Gallery Tab**: 新增"公开模板"选项卡，调用 `/api/templates/public` 获取公开模板
+- **API Client**: template.ts 新增 `getPublicTemplates()`、`getPublicTemplate()`、`publishTemplate()` 方法
+
+### 测试
+- `api/templates/[id]/publish/route.test.ts`: 7 Jest 测试用例
+- `api/templates/public/route.test.ts`: 7 Jest 测试用例
+
+类型: feat
+影响: vibex-backend, vibex-fronted
+
 
 
 ## S87-E4 · Canvas 批量导出增强 · 2026-06-11

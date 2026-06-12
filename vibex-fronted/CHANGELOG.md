@@ -1,3 +1,6 @@
+## S91-E4 (2026-06-13)
+- **Template Analytics Dashboard** — `/api/templates/analytics` API + `TemplateAnalyticsSection` component + `RatingDistributionChart` + CSV export (feat/S91-E4)
+
 
 ## S90-E4 · Canvas Annotation Layer · 2026-06-12
 

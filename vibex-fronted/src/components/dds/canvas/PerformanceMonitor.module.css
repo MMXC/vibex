@@ -50,9 +50,11 @@
 
 .metrics {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
   padding: 8px 10px;
   align-items: center;
+  max-width: 220px;
 }
 
 .metric {

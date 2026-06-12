@@ -43,7 +43,7 @@ export function useWebSocketPresence({
   projectId,
   userId,
   userName = 'Anonymous',
-  throttleMs = 50,
+  throttleMs = 80,
 }: UseWebSocketPresenceOptions) {
   const { setRemoteUsers, clearAll, updateCursor: updateCursorInStore } =
     usePresenceStore();

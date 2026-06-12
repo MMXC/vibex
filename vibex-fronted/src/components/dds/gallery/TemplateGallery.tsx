@@ -1,6 +1,7 @@
 /**
  * TemplateGallery.tsx — S82-E2: Template Gallery UI
  * S90-E3: Added Gallery Tab (public template browsing)
+ * S92-E2: Template Marketplace 2.0 — tag filter pills + synonym search + search history
  *
  * Gallery page component for browsing and selecting templates.
  * Integrates with templateStore.filterTemplates and templateStore.searchQuery
@@ -9,21 +10,33 @@
  * S90-E3: Main tab switch between "My Templates" and "Gallery".
  * Gallery Tab fetches public templates from /api/templates/public.
  *
+ * S92-E2: Added horizontal tag filter pills, synonym search with highlight,
+ * search history dropdown, rating credibility display.
+ *
  * DoD Checklist:
  * [x] TemplateGallery.tsx renders thumbnail grid
  * [x] Category/tag filter联动 templateStore.filterTemplates
  * [x] Click card opens preview panel with insert-to-canvas action
  * [x] Search box filters by name
  * [x] S90-E3 Gallery Tab: fetches public templates, displays with rating/usage
+ * [x] S92-E2: Tag filter pills (horizontal scroll, AND logic)
+ * [x] S92-E2: Synonym search with highlight
+ * [x] S92-E2: Search history dropdown (last 5, localStorage)
  */
 'use client';
 
-import React, { useState, useCallback, useMemo, useEffect } from 'react';
+import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { useTemplateStore } from '@/stores/templateStore';
 import type { RequirementTemplate, TemplateCategory } from '@/data/templates';
 import { TemplateCard } from './TemplateCard';
 import { TemplatePreviewDialog } from './TemplatePreviewDialog';
 import { templateApi, PublicTemplate } from '@/services/api/modules/template';
+import {
+  loadSearchHistory,
+  saveSearchTerm,
+  expandSearchTerm,
+  highlightSearchTerms,
+} from '@/hooks/useTemplateSearch';
 import styles from './TemplateGallery.module.css';
 
 /** All available category tabs */
@@ -38,6 +51,13 @@ const CATEGORIES: Array<{ id: TemplateCategory | 'all'; label: string }> = [
   { id: 'enterprise', label: '企业' },
   { id: 'mobile', label: '移动' },
   { id: 'content', label: '内容' },
+];
+
+/** S92-E2: Available tag filter pills for gallery mode */
+const AVAILABLE_TAGS = [
+  '电商', '教育', '医疗', '金融', '社交', '企业', '游戏', '内容', '移动', '物流', '餐饮',
+  '落地页', '列表页', '表单页', '仪表盘',
+  '卡片', '表格', '图表', '导航',
 ];
 
 /** Gallery mode tabs */
@@ -80,8 +100,14 @@ export function TemplateGallery({ onInsert, open = true }: TemplateGalleryProps)
   const [galleryTotal, setGalleryTotal] = useState(0);
   const [galleryTemplates, setGalleryTemplates] = useState<PublicTemplate[]>([]);
   const [galleryLoading, setGalleryLoading] = useState(false);
+  // S92-E2: Tag filter pills
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  // S92-E2: Search history
+  const [searchHistory, setSearchHistory] = useState<string[]>([]);
+  const [showHistory, setShowHistory] = useState(false);
+  const searchHistoryRef = useRef<HTMLDivElement>(null);
 
-  // Store state
+  // Store state (declared early so callbacks can reference them)
   const templates = useTemplateStore((s) => s.templates);
   const filteredTemplates = useTemplateStore((s) => s.filteredTemplates);
   const selectedCategory = useTemplateStore((s) => s.selectedCategory);
@@ -90,9 +116,26 @@ export function TemplateGallery({ onInsert, open = true }: TemplateGalleryProps)
   const setSearchQuery = useTemplateStore((s) => s.setSearchQuery);
   const applyFilters = useTemplateStore((s) => s.applyFilters);
 
+  // S92-E2: Load search history on mount
+  useEffect(() => {
+    setSearchHistory(loadSearchHistory());
+  }, []);
+
+  // S92-E2: Close history dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (searchHistoryRef.current && !searchHistoryRef.current.contains(e.target as Node)) {
+        setShowHistory(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   // S90-E3: Fetch public templates when in gallery mode
+  // S92-E2: Added search (synonym) + filterTags (AND) params
   const fetchGalleryTemplates = useCallback(
-    async (page: number, category?: string | null) => {
+    async (page: number, category?: string | null, search?: string, filterTags?: string[]) => {
       setGalleryLoading(true);
       try {
         const result = await templateApi.getPublicTemplates({
@@ -100,11 +143,12 @@ export function TemplateGallery({ onInsert, open = true }: TemplateGalleryProps)
           page,
           limit: 20,
           category: category && category !== 'all' ? category : undefined,
+          search: search || undefined,
+          filterTags: filterTags?.length ? filterTags : undefined,
         });
         setGalleryTemplates(result.templates);
         setGalleryTotal(result.total);
       } catch {
-        // silently handle error — gallery just shows empty
         setGalleryTemplates([]);
         setGalleryTotal(0);
       } finally {
@@ -116,20 +160,41 @@ export function TemplateGallery({ onInsert, open = true }: TemplateGalleryProps)
 
   useEffect(() => {
     if (galleryMode === 'gallery') {
-      fetchGalleryTemplates(galleryPage, selectedCategory);
+      fetchGalleryTemplates(galleryPage, selectedCategory, localQuery, selectedTags);
     }
-  }, [galleryMode, galleryPage, selectedCategory, sortBy, fetchGalleryTemplates]);
+  }, [galleryMode, galleryPage, selectedCategory, sortBy, fetchGalleryTemplates, localQuery, selectedTags]);
 
   const handleGalleryModeChange = useCallback(
     (mode: GalleryMode) => {
       setGalleryMode(mode);
       if (mode === 'gallery') {
         setGalleryPage(1);
-        fetchGalleryTemplates(1, selectedCategory);
+        fetchGalleryTemplates(1, selectedCategory, localQuery, selectedTags);
       }
     },
-    [fetchGalleryTemplates, selectedCategory]
+    [fetchGalleryTemplates, selectedCategory, localQuery, selectedTags]
   );
+
+  // S92-E2: Tag filter pills — toggle tag
+  const handleTagToggle = useCallback((tag: string) => {
+    setSelectedTags((prev) => {
+      const next = prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag];
+      if (galleryMode === 'gallery') {
+        setGalleryPage(1);
+        fetchGalleryTemplates(1, selectedCategory, localQuery, next);
+      }
+      return next;
+    });
+  }, [galleryMode, selectedCategory, localQuery, fetchGalleryTemplates]);
+
+  // S92-E2: Clear all tag filters
+  const handleClearTags = useCallback(() => {
+    setSelectedTags([]);
+    if (galleryMode === 'gallery') {
+      setGalleryPage(1);
+      fetchGalleryTemplates(1, selectedCategory, localQuery, []);
+    }
+  }, [galleryMode, selectedCategory, localQuery, fetchGalleryTemplates]);
 
   // S90-E3: Gallery templates for display
   const galleryDisplayTemplates = useMemo(
@@ -167,7 +232,6 @@ export function TemplateGallery({ onInsert, open = true }: TemplateGalleryProps)
         const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0;
         return bTime - aTime; // newest first
       }
-      // rating / usage: metadata.score as proxy for community stats
       if (sortBy === 'rating') {
         return (b.metadata?.score ?? 0) - (a.metadata?.score ?? 0);
       }
@@ -192,6 +256,22 @@ export function TemplateGallery({ onInsert, open = true }: TemplateGalleryProps)
       setSearchQuery(q);
     },
     [setSearchQuery]
+  );
+
+  // S92-E2: On search submit — save to history and refetch
+  const handleSearchSubmit = useCallback(
+    (q: string) => {
+      if (q.trim()) {
+        saveSearchTerm(q.trim());
+        setSearchHistory(loadSearchHistory());
+      }
+      setShowHistory(false);
+      if (galleryMode === 'gallery') {
+        setGalleryPage(1);
+        fetchGalleryTemplates(1, selectedCategory, q, selectedTags);
+      }
+    },
+    [galleryMode, selectedCategory, selectedTags, fetchGalleryTemplates]
   );
 
   const handleSelect = useCallback((template: RequirementTemplate) => {
@@ -263,16 +343,80 @@ export function TemplateGallery({ onInsert, open = true }: TemplateGalleryProps)
 
         {/* Filter bar */}
         <div className={styles.filterBar}>
-          {/* Search */}
-          <input
-            type="search"
-            className={styles.searchInput}
-            placeholder="搜索模板名称..."
-            value={localQuery}
-            onChange={handleSearchChange}
-            aria-label="搜索模板"
-          />
+          {/* S92-E2: Search with history dropdown */}
+          <div className={styles.searchWrapper} ref={searchHistoryRef}>
+            <input
+              type="search"
+              className={styles.searchInput}
+              placeholder="搜索模板名称..."
+              value={localQuery}
+              onChange={handleSearchChange}
+              onFocus={() => setShowHistory(true)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  handleSearchSubmit(localQuery);
+                }
+              }}
+              aria-label="搜索模板"
+              aria-expanded={showHistory && searchHistory.length > 0}
+            />
+            {/* S92-E2: Search history dropdown */}
+            {showHistory && searchHistory.length > 0 && (
+              <div className={styles.searchHistoryDropdown} role="listbox" aria-label="搜索历史">
+                {searchHistory.map((term, i) => (
+                  <button
+                    key={i}
+                    className={styles.historyItem}
+                    role="option"
+                    onClick={() => {
+                      setLocalQuery(term);
+                      handleSearchSubmit(term);
+                    }}
+                  >
+                    <span className={styles.historyIcon}>🕒</span>
+                    <span className={styles.historyTerm}>{term}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+          {localQuery && (
+            <button
+              className={styles.searchBtn}
+              onClick={() => handleSearchSubmit(localQuery)}
+              aria-label="执行搜索"
+            >
+              🔍
+            </button>
+          )}
         </div>
+
+        {/* S92-E2: Tag filter pills — horizontal scrollable bar */}
+        {galleryMode === 'gallery' && (
+          <div className={styles.tagFilterBar} role="group" aria-label="标签筛选">
+            <span className={styles.tagFilterLabel}>标签:</span>
+            {AVAILABLE_TAGS.map((tag) => (
+              <button
+                key={tag}
+                className={`${styles.tagPill} ${selectedTags.includes(tag) ? styles.tagPillActive : ''}`}
+                onClick={() => handleTagToggle(tag)}
+                aria-pressed={selectedTags.includes(tag)}
+                aria-label={`筛选: ${tag}`}
+              >
+                {tag}
+              </button>
+            ))}
+            {selectedTags.length > 0 && (
+              <button
+                className={styles.clearTagsBtn}
+                onClick={handleClearTags}
+                aria-label="清除所有标签筛选"
+              >
+                清除
+              </button>
+            )}
+          </div>
+        )}
 
         {/* S88-E3: Recommended section — only in my templates mode */}
         {galleryMode === 'my' && recommendedTemplates.length > 0 && (

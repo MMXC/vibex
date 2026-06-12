@@ -12,6 +12,7 @@ import type { Template, TemplateFilter } from '@/types/template';
 import { useTemplateManager } from '@/hooks/useTemplateManager';
 import { useTemplateStore } from '@/stores/templateStore';
 import { TemplateHistoryPanel } from './TemplateHistoryPanel/TemplateHistoryPanel';
+import { AIGenerateTab } from './AIGenerateTab/AIGenerateTab';
 import styles from './TemplateGallery.module.css';
 
 // 子组件
@@ -31,8 +32,10 @@ export interface TemplateGalleryProps {
 }
 
 /** 分类定义 */
+// E1: AI 生成 Tab — S91
 const CATEGORIES = [
   { id: 'all', name: '全部', icon: '🌟' },
+  { id: 'ai-generate', name: 'AI 生成', icon: '✨' },
   { id: 'favorites', name: '收藏', icon: '★' },
   { id: 'ecommerce', name: '电商', icon: '🛒' },
   { id: 'education', name: '教育', icon: '📚' },
@@ -302,13 +305,18 @@ export function TemplateGallery({
           </div>
         )}
 
-        {!loading && !error && filteredTemplates.length === 0 && (
+        {/* E1: AI 生成 Tab content — shown instead of grid */}
+        {selectedCategory === 'ai-generate' && (
+          <AIGenerateTab />
+        )}
+
+        {!loading && !error && selectedCategory !== 'ai-generate' && filteredTemplates.length === 0 && (
           <div className={styles.empty}>
             <span>没有找到匹配的模板</span>
           </div>
         )}
 
-        {!loading && !error && sortedFilteredTemplates.length > 0 && (
+        {!loading && !error && selectedCategory !== 'ai-generate' && sortedFilteredTemplates.length > 0 && (
           <div className={styles.grid}>
             {sortedFilteredTemplates.map(template => (
               <TemplateCard

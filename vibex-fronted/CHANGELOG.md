@@ -7206,3 +7206,12 @@ See git history for complete changelog.
 ### Fixes
 - **Backend Jest tests**: `stats/route.test.ts` + `access-history/route.test.ts` — 使用 jest globals（describe/it/expect 无需 import），改用静态 `import { GET, POST } from './route'` 替代动态 `await import('../route')`；修复 `TypeError: (0, jest_1.describe) is not a function`
 
+
+## v Next
+
+### ✨ New Features
+
+- **S89-E2 AI Design Suggestions** (2026-06-12)  
+  Canvas analytics hook generates 1-3 design suggestions based on canvas content. Right-side drawer panel with stats bar, suggestion cards, and Apply/Dismiss actions. Floating toggle button on canvas page.  
+  Tests: 23 vitest (store 7, hook 6, panel 10)  
+  `2ac171607`

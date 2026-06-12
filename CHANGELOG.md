@@ -7406,3 +7406,32 @@ See git history for complete changelog.
   Fixes: existing `removeStaleUsers keeps users with recent heartbeat` (10s boundary) + 2 `CollaboratorAvatars` status tests  
   `HEARTBEAT_TIMEOUT_MS` 10_000, `getStatusDot` online threshold 10s  
   `863febe04`
+
+
+## S89-E4 · GitHub Integration Deep Link · 2026-06-12
+
+### Features
+- **PR Status Badge**: `src/components/dds/github/PRStatusBadge.tsx` — 画布页面右上角显示 GitHub PR 状态徽章，支持 open/merged/closed 状态 + 点击跳转 GitHub
+- **GitHub Link Settings Section**: `src/components/dds/settings/GitHubLinkSection.tsx` — 画布设置抽屉新增 GitHub Tab，支持输入/保存/清除 GitHub PR URL
+- **Embed GitHub PR Metadata**: `ShareDialog.tsx` — 嵌入分享 URL 支持 `?github_pr=<url>` 参数传递
+- **GET /api/canvas/[id]/github**: 返回画布关联的 GitHub PR URL
+- **POST /api/canvas/[id]/github**: 保存/清除画布的 GitHub PR URL
+- **GET /api/github/pr/[owner]/[repo]/[number]**: 查询 GitHub PR 状态（标题/状态/作者/合流图标）
+- **GET /api/github/repos/[owner]/[repo]**: 查询 GitHub 仓库元数据
+- **GET /api/github/repos/[owner]/[repo]/readme**: 查询 README 内容
+- **GET /api/github/repos/[owner]/[repo]/contents/[...path]**: 查询仓库文件内容
+- **D1 迁移**: `0021_canvas_github_link.sql` — `canvas.github_pr_url` 字段 + 索引
+
+### Tests
+- `PRStatusBadge.test.tsx`: 6 vitest（open/merged/closed 徽章渲染 / 点击跳转 / loading 状态）
+- `GitHubLinkSection.test.tsx`: 8 vitest（输入框 / 保存成功 / 清除 / 错误处理）
+- `useGitHubPR.test.ts`: 10 vitest（parseGitHubUrl 工具函数 / 挂载获取 URL / 保存 / 清除）
+- `canvas/[id]/github/route.test.ts`: 8 Jest（GET auth / GET 返回 / POST 保存 / POST 清除 / body validation）
+- `github/pr/[owner]/[repo]/[number]/route.test.ts`: 6 Jest（PR 查询 / 404 / 合流状态）
+- `github/repos/[owner]/[repo]/route.test.ts`: 3 Jest（仓库查询）
+- `github/repos/[owner]/[repo]/readme/route.test.ts`: 3 Jest（README 查询）
+- `github/repos/[owner]/[repo]/contents/[...path]/route.test.ts`: 4 Jest（文件查询 / 目录 / 404 / 错误）
+
+### Variant W' self-impl
+- dev-e4 phantom（workspace 文件存在但未提交）；预探索确认现有代码 → Variant W' workspace-complete → 13 文件 commit + cherry-pick
+

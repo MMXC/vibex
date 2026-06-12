@@ -40,12 +40,14 @@ export interface UseVersionHistoryReturn {
   selectSnapshot: (snapshot: CanvasSnapshot | null) => void;
   /** 加载快照列表 */
   loadSnapshots: () => Promise<void>;
-  /** 创建手动快照 */
-  createSnapshot: (label?: string) => Promise<import('@/lib/canvas/types').CanvasSnapshot | null>;
+  /** 创建手动快照 — S90-E2: 支持可选 epicId */
+  createSnapshot: (label?: string, epicId?: string) => Promise<import('@/lib/canvas/types').CanvasSnapshot | null>;
   /** 创建 AI 完成快照 */
   createAiSnapshot: () => Promise<void>;
   /** 恢复到指定快照 */
   restoreSnapshot: (snapshotId: string) => Promise<boolean>;
+  /** S90-E2: 选择性回滚 — 回滚指定 Epic 的所有变更（恢复到该 Epic 之前的版本） */
+  rollbackToEpic: (epicId: string) => Promise<boolean>;
   /** 清空所有版本历史（E2-S6） */
   clearAllSnapshots: () => Promise<boolean>;
   /** 最近一次加载/操作错误消息 */
@@ -100,7 +102,7 @@ export function useVersionHistory(): UseVersionHistoryReturn {
     }
   }, [projectId]);
 
-  const createSnapshot = useCallback(async (label?: string): Promise<import('@/lib/canvas/types').CanvasSnapshot | null> => {
+  const createSnapshot = useCallback(async (label?: string, epicId?: string): Promise<import('@/lib/canvas/types').CanvasSnapshot | null> => {
     // === Phase 1: projectId null 拦截 ===
     if (!projectId) {
       setError('请先创建项目后再保存历史版本');
@@ -118,6 +120,7 @@ export function useVersionHistory(): UseVersionHistoryReturn {
         projectId,
         label: label ?? `手动保存 (${new Date().toLocaleString('zh-CN')})`,
         trigger: 'manual',
+        epicId,
         contextNodes,
         flowNodes,
         componentNodes,
@@ -184,6 +187,57 @@ export function useVersionHistory(): UseVersionHistoryReturn {
     }
   }, [setContextNodes, setFlowNodes, setComponentNodes]);
 
+  // === S90-E2: Selective Rollback — rollback changes from a specific Epic ===
+  const rollbackToEpic = useCallback(async (epicId: string): Promise<boolean> => {
+    if (!projectId) {
+      setError('请先创建项目后再回滚');
+      return false;
+    }
+
+    // Find all snapshots with this epicId, sorted by creation time (newest first)
+    const epicSnapshots = snapshots
+      .filter(s => s.epicId === epicId)
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+    if (epicSnapshots.length === 0) {
+      setError(`未找到 Epic "${epicId}" 相关的版本记录`);
+      return false;
+    }
+
+    // Find the oldest snapshot for this Epic
+    const oldestEpicSnapshot = epicSnapshots[epicSnapshots.length - 1]!;
+    // Find the snapshot just before the oldest Epic snapshot (the rollback target)
+    const rollbackTarget = snapshots.find(
+      s => new Date(s.createdAt).getTime() < new Date(oldestEpicSnapshot.createdAt).getTime()
+    );
+
+    if (!rollbackTarget) {
+      setError('无法确定回滚目标版本');
+      return false;
+    }
+
+    try {
+      const result = await canvasApi.restoreSnapshot(rollbackTarget.snapshotId);
+
+      if (result.success) {
+        setContextNodes(result.contextNodes);
+        setFlowNodes(result.flowNodes);
+        setComponentNodes(result.componentNodes);
+        // Auto-create a new snapshot to mark the rollback point
+        await createSnapshot(
+          `回滚 Epic "${epicId}" (${new Date().toLocaleString('zh-CN')})`,
+          epicId
+        );
+        return true;
+      }
+      return false;
+    } catch (err) {
+      canvasLogger.default.error('[useVersionHistory] rollbackToEpic error:', err);
+      setError(err instanceof Error ? err.message : '回滚失败，请重试');
+      return false;
+    }
+  }, [snapshots, projectId, setContextNodes, setFlowNodes, setComponentNodes, createSnapshot]);
+
   // === E2-S6: Clear all snapshots ===
   const clearAllSnapshots = useCallback(async (): Promise<boolean> => {
     if (!projectId) {
@@ -237,6 +291,7 @@ export function useVersionHistory(): UseVersionHistoryReturn {
     createSnapshot,
     createAiSnapshot,
     restoreSnapshot,
+    rollbackToEpic,
     clearAllSnapshots,
     restoring,
     creating,

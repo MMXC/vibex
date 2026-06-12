@@ -7474,3 +7474,26 @@ See git history for complete changelog.
 - AC4: 9th tab marks earliest active as dormant (max 8 active) ✅
 
 **Tests**: 42 vitest passing
+
+## S90-E2 (2026-06-12)
+
+### Canvas Version Diff & Restore
+**Type**: Feature
+
+**Files Changed**:
+- `vibex-fronted/src/components/dds/history/VersionDiffPanel.tsx` — Side-by-side + list diff view with stats bar
+- `vibex-fronted/src/components/dds/history/VersionDiffPanel.module.css` — Diff panel styles
+- `vibex-fronted/src/components/dds/history/__tests__/VersionDiffPanel.test.tsx` — Panel vitest (19 tests)
+- `vibex-fronted/src/lib/canvasDiff.ts` — Canvas diff engine (compareCanvasProjects, exportDiffReport)
+- `vibex-fronted/src/lib/__tests__/canvasDiff.test.ts` — Diff engine vitest (6 tests)
+- `vibex-fronted/src/lib/api/canvasDiff.ts` — Diff API client (canvasDiffApi.getDiff)
+- `vibex-fronted/src/components/dds/history/BranchPermissionDialog.tsx` — Merge preview tab (S90-E2-F3)
+- `vibex-fronted/src/components/dds/history/BranchPermissionDialog.module.css` — Merge preview styles
+
+**Acceptance Criteria**:
+- AC1: Two-node selection shows side-by-side diff view ✅
+- AC2: Diff highlights added/removed/modified sections ✅
+- AC3: Selective rollback of single Epic ✅
+- AC4: Merge preview shows conflict warnings ✅
+
+**Tests**: 33 vitest passing

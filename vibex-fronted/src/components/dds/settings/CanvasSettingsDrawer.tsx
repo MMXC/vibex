@@ -17,11 +17,13 @@ import { SnapshotManagerPanel } from '@/components/dds/history/SnapshotManagerPa
 import { PerformanceSettings } from './PerformanceSettings';
 // S85-E1: 画布级权限体系 — collaboration tab
 import { CanvasSettingsPanel } from '@/components/dds/canvas/CanvasSettingsPanel';
+// S89-E4: GitHub Integration Deep Link — github tab
+import { GitHubLinkSection } from './GitHubLinkSection';
 import { useDDSCanvasStore } from '@/stores/dds/DDSCanvasStore';
 import { useAuthStore } from '@/stores/authStore';
 import styles from './CanvasSettingsDrawer.module.css';
 
-type TabId = 'presets' | 'canvas' | 'nodes' | 'snapshots' | 'performance' | 'collaboration';
+type TabId = 'presets' | 'canvas' | 'nodes' | 'snapshots' | 'performance' | 'collaboration' | 'github';
 
 const TABS: { id: TabId; label: string }[] = [
   { id: 'presets', label: '预设' },
@@ -30,6 +32,7 @@ const TABS: { id: TabId; label: string }[] = [
   { id: 'snapshots', label: '快照管理' },
   { id: 'performance', label: '性能' },
   { id: 'collaboration', label: '协作' },
+  { id: 'github', label: 'GitHub' },
 ];
 
 /** Placeholder for node-specific settings (future extension) */
@@ -62,6 +65,21 @@ function CollaborationSettings() {
       userId={currentUserId}
     />
   );
+}
+
+// S89-E4: GitHub Integration Deep Link
+function GitHubSettings() {
+  const canvasId = useDDSCanvasStore ? useDDSCanvasStore.getState().projectId : '';
+
+  if (!canvasId) {
+    return (
+      <div style={{ padding: 16 }}>
+        <p style={{ color: '#64748b', fontSize: 13 }}>加载中...</p>
+      </div>
+    );
+  }
+
+  return <GitHubLinkSection canvasId={canvasId} />;
 }
 
 // S85-E1: Collaboration settings — reads canvasId from DDSCanvasStore, userId from auth store
@@ -163,6 +181,9 @@ export function CanvasSettingsDrawer({ isOpen, onClose }: CanvasSettingsDrawerPr
           {activeTab === 'performance' && <PerformanceSettings />}
           {activeTab === 'collaboration' && (
             <CollaborationSettings />
+          )}
+          {activeTab === 'github' && (
+            <GitHubSettings />
           )}
         </div>
       </div>

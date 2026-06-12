@@ -62,6 +62,9 @@ import { HistoryPanel } from '@/components/canvas/features/HistoryPanel';
 import { NodeCommentPanel } from '@/components/dds/canvas/NodeCommentPanel';
 import { CanvasImportPanel } from '@/components/dds/canvas-dashboard/CanvasImportPanel';
 import { ImportShareDialog } from '@/components/dds/share/ImportShareDialog';
+// S89-E4: GitHub Integration Deep Link
+import { PRStatusBadge } from '@/components/dds/github/PRStatusBadge';
+import { useGitHubPR, parseGitHubUrl } from '@/hooks/useGitHubPR';
 import { useFileDrop } from '@/hooks/canvas/useFileDrop';
 import { useCollabSessionStore } from '@/lib/collaboration/collabSessionStore';
 import { useConflictStore } from '@/stores/dds/conflictStore';
@@ -135,6 +138,8 @@ export interface DDSCanvasPageProps {
   templateRequirement?: string;
   /** S83-E2: Share token from URL ?import= param — triggers ImportShareDialog */
   importShareToken?: string | null;
+  /** S89-E4: GitHub PR URL from ?github_pr= embed param — shows PRStatusBadge */
+  githubPr?: string | null;
 }
 
 // ==================== Page State ====================
@@ -260,6 +265,7 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
   agentSession,
   templateRequirement: templateReqProp,
   importShareToken,
+  githubPr,
 }: DDSCanvasPageProps) {
   /** E1-S2: 从 prop 或 localStorage 读取模板 requirement */
   const templateRequirement = (() => {
@@ -296,6 +302,19 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
       window.history.replaceState({}, '', url.toString());
     }
   }, []);
+
+  // ---- S89-E4: GitHub PR Badge from ?github_pr= embed param ----
+  // When canvas is loaded as embed with ?github_pr=<url>, fetch and display PR status
+  const { prUrl: githubPrUrl, prStatus: githubPrStatus, isLoading: githubPrLoading } = useGitHubPR(projectId);
+
+  // Also support reading githubPr prop directly (passed from parent / URL param)
+  const effectiveGithubPrUrl = githubPr ?? githubPrUrl ?? null;
+
+  const handleGithubPrClick = useCallback(() => {
+    if (effectiveGithubPrUrl) {
+      window.open(effectiveGithubPrUrl, '_blank', 'noopener,noreferrer');
+    }
+  }, [effectiveGithubPrUrl]);
 
   // ---- S16-P0-2: Conflict Resolution Dialog ----
   const [conflictDialogOpen, setConflictDialogOpen] = useState(false);
@@ -1050,6 +1069,13 @@ const { onCursorMove, broadcastCursor } = useWebSocketPresence({
       <div style={{ position: 'absolute', top: '60px', right: '16px', zIndex: 50 }}>
         <OnlinePresenceIndicator />
       </div>
+
+      {/* S89-E4: GitHub PR status badge — shown when canvas is loaded with ?github_pr= param */}
+      {effectiveGithubPrUrl && githubPrStatus && (
+        <div style={{ position: 'absolute', top: '108px', right: '16px', zIndex: 50 }}>
+          <PRStatusBadge pr={githubPrStatus} onClick={handleGithubPrClick} isLoading={githubPrLoading} />
+        </div>
+      )}
 
       {/* E10-E1: CodeGenPanel — always visible */}
       <CodeGenPanelWrapper />

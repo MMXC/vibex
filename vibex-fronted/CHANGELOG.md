@@ -7370,3 +7370,20 @@ See git history for complete changelog.
 
 **Tests**: 31 vitest passing
 
+## S92-E1 (2026-06-13)
+- **Canvas Workflow Automation** — macro panel + recorder + player + Zustand store + 9 Vitest tests (feat/s92-e1-canvas-workflow-automation)
+
+### Features
+- **MacroPanel**: 主面板 — 工具栏（Record 按钮）、宏列表、空状态引导
+- **MacroRecorder**: 录制 UI — record/stop 按钮、step 计数器、elapsed timer
+- **MacroPlayer**: 重放按钮 — idle/executing/success/error 四态
+- **MacroCard**: 单个宏卡片 — name、date、step type badges、play/delete 按钮
+- **macroStore**: Zustand store — macros 列表、recordingState、currentSteps、API 集成（fetch/create/replay/delete）
+
+### 测试
+- `components/macro/MacroPanel.test.tsx`: 5 Vitest 测试（empty state、macro list、record button states）
+- `components/macro/MacroPlayer.test.tsx`: 4 Vitest 测试（render、executing、success、error）
+
+类型: feat
+影响: vibex-fronted
+

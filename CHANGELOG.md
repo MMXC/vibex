@@ -7621,3 +7621,30 @@ See git history for complete changelog.
 
 **Tests**: 31 vitest passing
 
+## S92-E1 (2026-06-13)
+- **Canvas Workflow Automation** — macro panel + recorder + player + D1 schema + 4 API routes + 25 tests (feat/s92-e1-canvas-workflow-automation)
+
+### Features
+- **D1 Schema**: `0026_canvas_macros` migration — canvas_macros 表（id, userId, name, description, steps JSON, canvasId, isFavorite, createdAt）
+- **GET /api/canvas/macros**: 用户宏列表
+- **POST /api/canvas/macros**: 创建宏（name 必填，steps JSON 必填）
+- **GET /api/canvas/macros/[id]**: 获取单个宏
+- **PUT /api/canvas/macros/[id]**: 更新宏（name/description/steps/canvasId/isFavorite）
+- **DELETE /api/canvas/macros/[id]**: 删除宏（仅所有者可操作）
+- **POST /api/canvas/macros/replay**: 重放宏，支持可选参数替换（{canvasId} 占位符）
+- **POST /api/canvas/macros/batch**: 批量重放宏
+- **MacroPanel**: 主面板 — 工具栏（Record 按钮）、宏列表、空状态
+- **MacroRecorder**: 录制 UI — record/stop 按钮、step 计数器、elapsed timer
+- **MacroPlayer**: 重放按钮 — idle/executing/success/error 四态
+- **MacroCard**: 单个宏卡片 — name、date、step type badges、play/delete 按钮
+- **useMacroStore**: Zustand store — macros 列表、recordingState、currentSteps、API 集成
+
+### 测试
+- `api/canvas/macros/route.test.ts`: 10 Jest 测试（auth、GET list、POST create/validation、DB error）
+- `api/canvas/macros/replay/route.test.ts`: 7 Jest 测试（auth、validation、not-found、forbidden、replay、param substitution）
+- `MacroPanel.test.tsx`: 5 Vitest 测试（empty state、macro list、record button states）
+- `MacroPlayer.test.tsx`: 4 Vitest 测试（render、executing、success、error）
+
+类型: feat
+影响: vibex-backend, vibex-fronted
+

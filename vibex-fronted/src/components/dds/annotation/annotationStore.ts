@@ -35,6 +35,10 @@ export interface Annotation {
   status: AnnotationStatus;
   createdAt: number;
   updatedAt: number;
+  // S91-E2: GitHub Design Review Loop
+  githubIssueUrl?: string;
+  githubIssueNumber?: number;
+  githubCommitSha?: string;
 }
 
 /** Input payload for creating an annotation (id/timestamps auto-generated). */
@@ -46,6 +50,10 @@ export interface AnnotationUpdateInput {
   status?: AnnotationStatus;
   x?: number;
   y?: number;
+  // S91-E2: GitHub Design Review Loop
+  githubIssueUrl?: string;
+  githubIssueNumber?: number;
+  githubCommitSha?: string;
 }
 
 export interface AnnotationStoreState {

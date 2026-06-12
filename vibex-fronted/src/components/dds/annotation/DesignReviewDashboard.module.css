@@ -1,0 +1,353 @@
+/* DesignReviewDashboard.module.css — Sprint91 E2 */
+
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: var(--color-surface, #fff);
+}
+
+/* Header */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--color-border, #e5e7eb);
+  background-color: var(--color-surface-elevated, #f9fafb);
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text-primary, #111827);
+  margin: 0;
+}
+
+.countBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  background-color: var(--color-primary, #6366f1);
+  color: #fff;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.refreshTime {
+  font-size: 11px;
+  color: var(--color-text-secondary, #6b7280);
+}
+
+.refreshButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: 1px solid var(--color-border, #e5e7eb);
+  background-color: var(--color-surface, #fff);
+  color: var(--color-text-primary, #111827);
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s;
+}
+
+.refreshButton:hover:not(:disabled) {
+  background-color: var(--color-surface-elevated, #f9fafb);
+  border-color: var(--color-border-hover, #d1d5db);
+}
+
+.refreshButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.refreshIcon {
+  width: 14px;
+  height: 14px;
+}
+
+.refreshIcon.spinning {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Error banner */
+.errorBanner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background-color: #fef2f2;
+  border-bottom: 1px solid #fecaca;
+  color: var(--color-error, #991b1b);
+  font-size: 13px;
+}
+
+.errorIcon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+/* Loading skeleton */
+.loadingState {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.skeletonGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.skeletonHeader {
+  height: 20px;
+  width: 200px;
+  background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+}
+
+.skeletonRow {
+  height: 60px;
+  background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 6px;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Empty state */
+.emptyState {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.emptyIcon {
+  width: 48px;
+  height: 48px;
+  color: var(--color-text-secondary, #d1d5db);
+  margin-bottom: 16px;
+}
+
+.emptyTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text-primary, #111827);
+  margin: 0 0 8px 0;
+}
+
+.emptyDescription {
+  font-size: 13px;
+  color: var(--color-text-secondary, #6b7280);
+  max-width: 320px;
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* Canvas groups */
+.canvasGroups {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.canvasGroup {
+  background-color: var(--color-surface-elevated, #f9fafb);
+  border: 1px solid var(--color-border, #e5e7eb);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.canvasGroupHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background-color: var(--color-surface, #fff);
+  border-bottom: 1px solid var(--color-border, #e5e7eb);
+}
+
+.canvasGroupTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-primary, #111827);
+  margin: 0;
+}
+
+.canvasGroupCount {
+  font-size: 12px;
+  color: var(--color-text-secondary, #6b7280);
+  background-color: var(--color-border, #e5e7eb);
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+.annotationList {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Annotation row */
+.annotationRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--color-border, #e5e7eb);
+  gap: 12px;
+}
+
+.annotationRow:last-child {
+  border-bottom: none;
+}
+
+.annotationRow:hover {
+  background-color: var(--color-surface, #fff);
+}
+
+.annotationRowMain {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.issueBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  background-color: #1f2937;
+  color: #fff;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.issueBadgeIcon {
+  width: 10px;
+  height: 10px;
+}
+
+.annotationContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.annotationText {
+  font-size: 13px;
+  color: var(--color-text-primary, #111827);
+  margin: 0 0 4px 0;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.annotationMeta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--color-text-secondary, #6b7280);
+  flex-wrap: wrap;
+}
+
+.metaDot {
+  color: var(--color-border, #e5e7eb);
+}
+
+.statusPill {
+  display: inline-flex;
+  padding: 1px 6px;
+  border-radius: 8px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.statusPill.active {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.statusPill.resolved {
+  background-color: #f3f4f6;
+  color: #6b7280;
+}
+
+.commitCode {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 10px;
+  background-color: var(--color-surface-elevated, #f9fafb);
+  padding: 1px 4px;
+  border-radius: 3px;
+  color: var(--color-text-secondary, #6b7280);
+}
+
+.annotationRowActions {
+  flex-shrink: 0;
+}
+
+.issueLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 10px;
+  background-color: var(--color-primary, #6366f1);
+  color: #fff;
+  text-decoration: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  transition: background-color 0.15s;
+  white-space: nowrap;
+}
+
+.issueLink:hover {
+  background-color: var(--color-primary-hover, #4f46e5);
+}
+
+.externalIcon {
+  width: 10px;
+  height: 10px;
+}

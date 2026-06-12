@@ -7291,3 +7291,28 @@ See git history for complete changelog.
 - AC4: 9th tab marks earliest active as dormant (max 8 active) ✅
 
 **Tests**: 42 vitest passing
+## S91-E1 · AI Template Generation · 2026-06-12
+
+### Frontend Core
+
+#### 2026-06-12
+
+- **S91-E1 AI Template Generation** (epic/s91-e1-ai-template-generation)
+  - `src/stores/aiGenerateStore.ts`: Zustand store with getState() static method, job polling support
+  - `src/components/template-gallery/AIGenerateDialog.tsx`: Modal dialog — prompt input, example chips, preview, polling status
+  - `src/components/template-gallery/AIGenerateDialog.module.css`: Dialog styles
+  - `src/components/template-gallery/AIGeneratedPreview.tsx`: Tree view of generated canvas JSON (nodes, domains, flow)
+  - `src/components/template-gallery/AIGeneratedPreview.module.css`: Preview styles
+  - `src/components/template-gallery/AIGenerateTab.tsx`: Gallery tab content with example prompts
+  - `src/components/template-gallery/AIGenerateTab.module.css`: Tab styles
+  - `src/components/template-gallery/AIGenerateDialog.test.tsx`: 5 vitest (dialog open/close, example chips, prompt validation)
+  - `src/components/templates/TemplateGallery.tsx`: Integrated AI 生成 category tab in category navigation
+
+**Acceptance Criteria**:
+- AC1: MiniMax LLM generates valid canvas JSON from natural language prompt ✅
+- AC2: Gallery includes AI 生成 Tab accessible from category nav ✅
+- AC3: Preview shows generated canvas structure before saving ✅
+- AC4: Job polling + status indicator (pending/generating/completed/failed) ✅
+
+**Tests**: 5 vitest passing
+

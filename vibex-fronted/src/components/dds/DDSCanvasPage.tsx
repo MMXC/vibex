@@ -25,6 +25,11 @@ import { PresenceIndicator } from '@/components/dds/presence/PresenceIndicator';
 import { usePresence } from '@/hooks/canvas/usePresence';
 import { DDSScrollContainer } from '@/components/dds/canvas';
 import { CrossChapterEdgesOverlay } from '@/components/dds/canvas/CrossChapterEdgesOverlay';
+// S90-E4: Canvas Annotation Layer
+import { AnnotationLayer } from '@/components/dds/annotation/AnnotationLayer';
+import { useCanvasViewportStore } from '@/lib/canvas/stores/canvasViewportStore';
+import { useAnnotationStore } from '@/components/dds/annotation/annotationStore';
+import { useAuthStore } from '@/stores/authStore';
 import { AIDraftDrawer } from '@/components/dds/ai-draft';
 import { AISuggestionsPanel } from '@/components/dds/ai-suggestions/AISuggestionsPanel';
 import { useAIDesignSuggestionsStore } from '@/stores/dds/aiDesignSuggestionsStore';
@@ -440,6 +445,9 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
   // ---- P003-E1: DiffOverlay state (AI result diff) ----
   const { lastResult } = useAIAgent();
   const [diffOverlayOpen, setDiffOverlayOpen] = useState(false);
+
+  // ---- S90-E4: Annotation placement mode toggle ----
+  const [annotationPlacementMode, setAnnotationPlacementMode] = useState(false);
 
   // Show DiffOverlay when lastResult becomes available
   useEffect(() => {
@@ -1211,6 +1219,15 @@ const { onCursorMove, broadcastCursor } = useWebSocketPresence({
           scrollContainerRef={scrollContainerRef}
           className="cross-chapter-edges-overlay"
         />
+        {/* S90-E4: Canvas Annotation Layer — placed inside grid container to inherit pan/zoom transform */}
+        {projectId && userId && (
+          <AnnotationLayer
+            canvasId={projectId}
+            currentUserId={userId}
+            currentUserName={user?.name}
+            placementMode={annotationPlacementMode}
+          />
+        )}
         {/* P003-E1: MiniMap Navigation Panel — E5: hide in touch mode */}
         {!touchMode && <MiniMapPanel />}
 

@@ -28,8 +28,6 @@ const mockLoadForCanvas = vi.fn();
 const CANVAS_ID = 'test-canvas-1';
 const USER_ID = 'user-1';
 
-const DEFAULT_VIEWPORT = { scale: 1, panX: 0, panY: 0 };
-
 function makeAnnotation(overrides: Partial<Annotation> = {}): Annotation {
   return {
     id: 'ann-1',
@@ -81,8 +79,6 @@ describe('AnnotationLayer', () => {
     setupMockStore([]);
   });
 
-  // ─── Rendering ───────────────────────────────────────────────────────────────
-
   it('renders nothing when no annotations', () => {
     setupMockStore([]);
     render(
@@ -97,7 +93,7 @@ describe('AnnotationLayer', () => {
     expect(screen.queryAllByTitle('Edit')).toHaveLength(0);
   });
 
-  it('renders annotation bubbles for active annotations', () => {
+  it('renders annotation pin for active annotations', () => {
     const ann = makeAnnotation();
     setupMockStore([ann]);
     render(
@@ -108,8 +104,13 @@ describe('AnnotationLayer', () => {
         placementMode={false}
       />
     );
-    expect(screen.getByText('Test annotation')).toBeInTheDocument();
-    expect(screen.getByText('Test User')).toBeInTheDocument();
+    // Annotation renders as a pin element (collapsed by default)
+    expect(screen.getByTestId('annotation-layer')).toBeTruthy();
+    const pin = screen.queryByTestId(/^$/); // no data-testid on pins; check via data-attr
+    // The pin div has data-annotation-id
+    const pinDiv = document.querySelector('[data-annotation-id="ann-1"]');
+    expect(pinDiv).toBeTruthy();
+    expect(pinDiv).toHaveAttribute('data-annotation-status', 'active');
   });
 
   it('hides owner action buttons for non-owner annotations', () => {
@@ -123,27 +124,11 @@ describe('AnnotationLayer', () => {
         placementMode={false}
       />
     );
+    // Non-owner pins should not have Edit button
     expect(screen.queryByTitle('Edit')).not.toBeInTheDocument();
   });
 
-  // ─── Transform ───────────────────────────────────────────────────────────────
-
-  it('applies CSS transform from viewport props', () => {
-    setupMockStore([]);
-    render(
-      <AnnotationLayer
-        canvasId={CANVAS_ID}
-        currentUserId={USER_ID}
-        placementMode={false}
-      />
-    );
-    // Layer renders without error
-    expect(screen.queryByRole('generic', { hidden: true })).toBeTruthy();
-  });
-
-  // ─── Annotation Creation ────────────────────────────────────────────────────
-
-  it('shows add button when placementMode=true', () => {
+  it('renders annotation layer with placement mode', () => {
     setupMockStore([]);
     render(
       <AnnotationLayer
@@ -152,10 +137,24 @@ describe('AnnotationLayer', () => {
         placementMode={true}
       />
     );
-    // In placement mode, some UI indicator should be present
+    // Layer renders with placement-mode data attribute
+    expect(screen.getByTestId('annotation-layer')).toHaveAttribute('data-placement-mode', 'on');
   });
 
-  it('calls addAnnotation when user submits new annotation', () => {
+  it('does not call addAnnotation when placementMode is false', () => {
+    setupMockStore([]);
+    render(
+      <AnnotationLayer
+        canvasId={CANVAS_ID}
+        currentUserId={USER_ID}
+        currentUserName="Test User"
+        placementMode={false}
+      />
+    );
+    expect(mockAddAnnotation).not.toHaveBeenCalled();
+  });
+
+  it('is ready to receive addAnnotation calls in placement mode', () => {
     setupMockStore([]);
     render(
       <AnnotationLayer
@@ -165,7 +164,7 @@ describe('AnnotationLayer', () => {
         placementMode={true}
       />
     );
-    // Test verifies the mock is set up correctly
-    expect(mockAddAnnotation).not.toHaveBeenCalled();
+    // Verify the layer renders in placement mode and mock is configured
+    expect(screen.getByTestId('annotation-layer')).toHaveAttribute('data-placement-mode', 'on');
   });
 });

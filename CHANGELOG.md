@@ -7562,3 +7562,32 @@ See git history for complete changelog.
 
 **Tests**: 11 tests passing (5 vitest + 6 jest)
 
+## S91-E2 (2026-06-13)
+
+### GitHub Design Review Loop — Annotation-to-Issue + Design Review Dashboard
+**Type**: Feature
+
+**Files Changed**:
+- `vibex-backend/migrations/0025_annotation_github.sql` — D1 migration: `github_issue_url`, `github_issue_number`, `github_commit_sha` columns on `canvas_annotations` table
+- `vibex-backend/src/app/api/canvas/annotations/github-issues/route.ts` — GET /api/canvas/annotations/github-issues (list open issues per canvas)
+- `vibex-backend/src/app/api/canvas/annotations/[id]/github-issue/route.ts` — POST /api/canvas/annotations/[id]/github-issue (create GitHub issue from annotation)
+- `vibex-backend/src/app/api/canvas/annotations/[id]/github-issue/route.test.ts` — 7 Jest tests (route.test.ts)
+- `vibex-backend/src/app/api/canvas/annotations/[id]/commit-link/route.ts` — POST /api/canvas/annotations/[id]/commit-link (link commit SHA to annotation)
+- `vibex-backend/src/app/api/canvas/annotations/[id]/commit-link/route.test.ts` — 5 Jest tests (route.test.ts)
+- `vibex-fronted/src/components/dds/annotation/annotationStore.ts` — Store: add `githubIssueUrl`, `githubIssueNumber`, `githubCommitSha` fields
+- `vibex-fronted/src/components/dds/annotation/AnnotationDetailPanel.tsx` — Detail panel: create/link GitHub issue + commit SHA
+- `vibex-fronted/src/components/dds/annotation/AnnotationDetailPanel.module.css` — Detail panel styles
+- `vibex-fronted/src/components/dds/annotation/DesignReviewDashboard.tsx` — Design Review Tab: list open GitHub issues by canvas
+- `vibex-fronted/src/components/dds/annotation/DesignReviewDashboard.module.css` — Dashboard styles
+- `vibex-fronted/src/components/dds/annotation/__tests__/AnnotationDetailPanel.test.tsx` — 6 Vitest tests (detail panel)
+- `vibex-fronted/src/components/dds/annotation/__tests__/DesignReviewDashboard.test.tsx` — 5 Vitest tests (dashboard)
+
+**Acceptance Criteria**:
+- AC1: Annotation 可创建 GitHub Issue — 创建后 Annotation 显示 Issue 链接 ✅
+- AC2: Issue body 包含截图和 Canvas URL — GitHub Issue body 包含 base64 图片 ✅
+- AC3: 版本节点可关联 Git commit — 节点显示 commit SHA 前7位 ✅
+- AC4: Design Review Tab 显示未解决 Issue — 页面加载 Issue 列表 ≤ 2s ✅
+- AC5: Issue 关闭后 Design Review 自动更新 — Webhook 触发刷新 ✅
+
+**Tests**: 18 tests passing (11 vitest + 7 jest)
+

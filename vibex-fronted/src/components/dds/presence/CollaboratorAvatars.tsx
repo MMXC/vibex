@@ -41,8 +41,9 @@ type StatusDot = 'online' | 'idle' | 'offline';
 function getStatusDot(lastActiveAt: number): StatusDot {
   const now = Date.now();
   const diffMs = now - lastActiveAt;
-  if (diffMs < 5 * 60 * 1000) return 'online';     // < 5 min
-  if (diffMs < 30 * 60 * 1000) return 'idle';     // < 30 min
+  // S89-E3: online threshold reduced to 10s (from 5min) per E3-F3 heartbeat optimization
+  if (diffMs < 10 * 1000) return 'online';     // < 10s
+  if (diffMs < 30 * 60 * 1000) return 'idle';  // < 30min
   return 'offline';
 }
 

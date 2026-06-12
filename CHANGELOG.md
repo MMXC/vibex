@@ -7397,3 +7397,11 @@ See git history for complete changelog.
   Files: `aiDesignSuggestionsStore.ts`, `useAISuggestions.ts`, `AISuggestionsPanel.tsx`, `AISuggestionsPanel.module.css`, `DDSCanvasPage.tsx` integration  
   Tests: 23 vitest (store 7, hook 6, panel 10)  
   `2ac171607`
+- **S89-E3 Real-time Collaboration Presence** (2026-06-12)  
+  Heartbeat optimization: reduce presence detection latency from 30s/5min to 10s/10s.  
+  - `presenceStore.ts`: `HEARTBEAT_TIMEOUT_MS` 30s→10s, `isOnline()` threshold 5min→10s  
+  - `CollaboratorAvatars.tsx`: `getStatusDot()` online threshold 5min→10s  
+  - Cursor throttle (50ms) already implemented in `useWebSocketPresence.ts` (S63-E1) — pre-existing ✅  
+  Tests: 4 new S89-E3 boundary tests in `presenceStore.test.ts` + 3 new in `CollaboratorAvatars.test.tsx`  
+  Fixes: existing `removeStaleUsers keeps users with recent heartbeat` (10s boundary) + 2 `CollaboratorAvatars` status tests  
+  `HEARTBEAT_TIMEOUT_MS` 10_000, `getStatusDot` online threshold 10s  

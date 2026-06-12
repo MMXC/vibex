@@ -100,8 +100,8 @@ export interface ConflictRecord {
   resolution: 'keep-local' | 'keep-remote' | 'pending';
 }
 
-/** Heartbeat timeout in milliseconds (30s) */
-const HEARTBEAT_TIMEOUT_MS = 30_000;
+/** S89-E3: Heartbeat timeout in milliseconds (10s — optimized from 30s) */
+const HEARTBEAT_TIMEOUT_MS = 10_000;
 
 /** S65-E2: Focus timeout in milliseconds (30s auto-release) */
 const FOCUS_TIMEOUT_MS = 30_000;
@@ -392,11 +392,11 @@ export const usePresenceStore = create<PresenceState>((set, get) => {
         lastActiveAt: { ...state.lastActiveAt, [userId]: Date.now() },
       })),
 
+    // S89-E3: 10-second threshold (optimized from 5 minutes)
     isOnline: (userId: string) => {
       const lastActive = get().lastActiveAt[userId];
       if (!lastActive) return false;
-      // 5-minute threshold
-      return Date.now() - lastActive < 5 * 60 * 1000;
+      return Date.now() - lastActive < 10 * 1000;
     },
 
     // S76-E5: Remote editing tracking

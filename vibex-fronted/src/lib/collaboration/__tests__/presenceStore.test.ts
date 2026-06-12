@@ -352,17 +352,18 @@ describe('presenceStore', () => {
     expect(remaining[0].userId).toBe('u2');
   });
 
+  // S89-E3: threshold reduced to 10s (was 30s)
   it('removeStaleUsers keeps users with recent heartbeat', () => {
     const state = usePresenceStore.getState();
     usePresenceStore.setState({
       onlineUsers: [
         { userId: 'u1', name: 'Alice', avatar: 'A', status: 'online', lastSeen: Date.now() },
-        { userId: 'u2', name: 'Bob', avatar: 'B', status: 'online', lastSeen: Date.now() - 10_000 },
+        { userId: 'u2', name: 'Bob', avatar: 'B', status: 'online', lastSeen: Date.now() - 5_000 }, // S89-E3: 5s within new 10s threshold
       ],
     });
 
     usePresenceStore.getState().removeStaleUsers();
-    expect(usePresenceStore.getState().onlineUsers).toHaveLength(2); // both within 30s
+    expect(usePresenceStore.getState().onlineUsers).toHaveLength(2); // both within 10s
   });
 
   it('clearOnlineUsers removes all online users', () => {
@@ -383,6 +384,38 @@ describe('presenceStore', () => {
     expect(state.onlineUsers).toHaveLength(0);
     expect(state.remoteUsers.size).toBe(0);
     expect(state.editingNodeIds.size).toBe(0);
+  });
+
+  // === S89-E3: Heartbeat optimization (30s → 10s, 5min → 10s) ===
+
+  it('S89-E3: isOnline returns true for user with lastSeen within 10 seconds', () => {
+    // Simulate user with recent activity
+    const now = Date.now();
+    usePresenceStore.setState({
+      lastActiveAt: { 'u1': now - 5_000 }, // 5 seconds ago — within 10s threshold
+    });
+    expect(usePresenceStore.getState().isOnline('u1')).toBe(true);
+  });
+
+  it('S89-E3: isOnline returns false at exactly 10 seconds (boundary — strictly less than)', () => {
+    const now = Date.now();
+    usePresenceStore.setState({
+      lastActiveAt: { 'u1': now - 10_000 }, // exactly 10 seconds ago
+    });
+    // strictly < 10_000, so exactly 10_000 → false
+    expect(usePresenceStore.getState().isOnline('u1')).toBe(false);
+  });
+
+  it('S89-E3: isOnline returns false for user inactive > 10 seconds', () => {
+    const now = Date.now();
+    usePresenceStore.setState({
+      lastActiveAt: { 'u1': now - 30_000 }, // 30 seconds ago
+    });
+    expect(usePresenceStore.getState().isOnline('u1')).toBe(false);
+  });
+
+  it('S89-E3: isOnline returns false for unknown user', () => {
+    expect(usePresenceStore.getState().isOnline('unknown')).toBe(false);
   });
 
   // === DoD expect() assertions (S64-E1) ===

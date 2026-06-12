@@ -7661,3 +7661,23 @@ See git history for complete changelog.
 
 类型: feat
 影响: vibex-backend, vibex-fronted
+
+
+## [Sprint92 E3] Collaboration Enhancement (2026-06-13)
+
+- `components/dds/comments/CommentBubble.tsx`: 新增画布评论气泡组件（浮动于画布组件之上，显示头像+缩略文字）
+- `components/dds/comments/CommentLayer.tsx`: 新增评论气泡层，管理气泡定位与交互
+- `components/dds/comments/CommentPanel.tsx`: 扩展评论面板，支持 x,y 坐标定位
+- `components/dds/comments/CommentThread.tsx`: 扩展评论线程，支持解决评论
+- `stores/dds/commentStore.ts`: 扩展评论 Store，支持未读计数 + 事件监听
+- `hooks/useCanvasComments.ts`: 新增 Canvas 评论数据获取 hook
+- `hooks/useMentionsNotifications.ts`: 新增 @mention → 通知集成 hook
+- `hooks/useNotifications.ts`: 新增通知管理 hook
+- `types/comment.ts`: 新增评论类型定义
+- `types/notification.ts`: 新增通知类型定义
+- `app/api/canvas/[id]/comments/route.ts`: 新增前端 API 路由（GET 评论列表）
+- `app/api/canvas/[id]/comments/[commentId]/route.ts`: 新增前端 API 路由（PATCH 更新评论）
+- `app/api/notifications/route.ts`: 新增通知创建 API（@mention 通知）
+
+类型: feat
+影响: vibex-fronted

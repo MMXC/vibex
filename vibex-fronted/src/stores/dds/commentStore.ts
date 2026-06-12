@@ -6,6 +6,7 @@
  * S69-E4: 评论后触发 notificationStore 通知 (addCommentNotification)
  * S71-E2: subscribeToCanvas(canvasId) + broadcastComment() + Reaction 系统
  * S88-E2: filterStatus 筛选状态 + collapsedThreadIds 折叠状态 + getFilteredComments()
+ * S92-E3: canvasBubbles 画布评论气泡状态 + openBubbleId 选中气泡 + CommentBubbleAction
  *
  * 设计决策：
  * - commentId 使用 crypto.randomUUID() 生成，确保全局唯一
@@ -16,6 +17,7 @@
  * - unreadCount：全局计数器，addComment++ / resolveComment-- / markAllAsRead=0
  * - S71-E2: canvasScope 用于 WS 消息路由；reactions map 存储评论 Reactions
  * - S88-E2: filterStatus 支持 all/unresolved/resolved/mentioned 筛选；collapsedThreadIds 支持线程折叠
+ * - S92-E3: canvasBubbles 管理画布级别评论气泡（x, y, node_id, comment_count）
  */
 import { create } from 'zustand';
 import { openDB } from 'idb';
@@ -57,6 +59,17 @@ export interface ReactionEvent {
   reaction: Reaction;
 }
 
+/** S92-E3: Canvas comment bubble */
+export interface CanvasBubble {
+  id: string;
+  x: number;
+  y: number;
+  node_id: string | null;
+  comment_count: number;
+  unresolved_count: number;
+  last_activity: number;
+}
+
 export interface CommentStoreState {
   comments: Comment[];
   initialized: boolean;
@@ -70,6 +83,11 @@ export interface CommentStoreState {
   filterStatus: CommentFilter;
   // S88-E2: collapsed thread IDs (root comment IDs that are collapsed)
   collapsedThreadIds: Set<string>;
+  // S92-E3: canvas comment bubbles (floating on canvas)
+  // Record<canvasId, Record<bubbleId, CanvasBubble>>
+  canvasBubbles: Record<string, Record<string, CanvasBubble>>;
+  openBubbleId: string | null;
+  openCanvasId: string | null;
 
   // CRUD
   addComment: (nodeId: string, text: string, author?: string) => Comment;
@@ -106,6 +124,12 @@ export interface CommentStoreState {
   toggleCollapse: (commentId: string) => void;
   isCollapsed: (commentId: string) => boolean;
   getFilteredComments: (currentUser?: string) => Comment[];
+
+  // S92-E3: Canvas bubbles
+  openBubble: (canvasId: string, bubbleId: string) => void;
+  closeBubble: () => void;
+  setCanvasBubbles: (canvasId: string, bubbles: CanvasBubble[]) => void;
+  getCanvasBubbles: (canvasId: string) => CanvasBubble[];
 }
 
 // ==================== Event System (S50-E3) ====================
@@ -229,6 +253,10 @@ export const useCommentStore = create<CommentStoreState>((set, get) => ({
   reactions: {},
   filterStatus: 'all',
   collapsedThreadIds: new Set<string>(),
+  // S92-E3
+  canvasBubbles: {},
+  openBubbleId: null,
+  openCanvasId: null,
 
   addComment: (nodeId, text, author = 'User') => {
     const comment: Comment = {
@@ -490,6 +518,36 @@ export const useCommentStore = create<CommentStoreState>((set, get) => ({
     }
 
     return filtered;
+  },
+
+  // S92-E3: Open a canvas comment bubble
+  openBubble: (canvasId, bubbleId) => {
+    set({ openCanvasId: canvasId, openBubbleId: bubbleId });
+  },
+
+  // S92-E3: Close the currently open bubble
+  closeBubble: () => {
+    set({ openBubbleId: null, openCanvasId: null });
+  },
+
+  // S92-E3: Set bubbles for a specific canvas
+  setCanvasBubbles: (canvasId, bubbles) => {
+    set(state => {
+      const map: Record<string, CanvasBubble> = {};
+      for (const b of bubbles) {
+        map[b.id] = b;
+      }
+      return {
+        canvasBubbles: { ...state.canvasBubbles, [canvasId]: map },
+      };
+    });
+  },
+
+  // S92-E3: Get bubbles for a specific canvas
+  getCanvasBubbles: (canvasId) => {
+    const bubbles = get().canvasBubbles[canvasId];
+    if (!bubbles) return [];
+    return Object.values(bubbles);
   },
 }));
 

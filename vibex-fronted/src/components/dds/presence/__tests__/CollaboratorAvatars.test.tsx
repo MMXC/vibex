@@ -1,5 +1,5 @@
 /**
- * CollaboratorAvatars.test.tsx — S84-E2 vitest
+ * CollaboratorAvatars.test.tsx — S84-E2 vitest + S89-E3 heartbeat optimization
  *
  * Uses mockImplementation to support Zustand selector pattern.
  */
@@ -88,18 +88,18 @@ describe('CollaboratorAvatars', () => {
     expect(screen.queryByTestId('collab-avatar-u6')).not.toBeInTheDocument();
   });
 
-  // Case 5: Online status (< 5 min)
-  it('shows online status dot when lastActiveAt < 5 minutes', () => {
+  // Case 5: Online status (< 10s, S89-E3 heartbeat optimization)
+  it('shows online status dot when lastActiveAt < 10 seconds (S89-E3)', () => {
     const now = Date.now();
-    const twoMinAgo = now - 2 * 60 * 1000;
-    addUser('u1', 'Alice', twoMinAgo);
+    const fiveSecAgo = now - 5_000; // S89-E3: online threshold reduced from 5min to 10s
+    addUser('u1', 'Alice', fiveSecAgo);
     render(<CollaboratorAvatars currentUserId="self-1" />);
     const statusDot = screen.getByTestId('collab-avatar-u1').querySelector('[data-status]');
     expect(statusDot).toHaveAttribute('data-status', 'online');
   });
 
-  // Case 6: Idle status (5-30 min)
-  it('shows idle status dot when lastActiveAt between 5 and 30 minutes', () => {
+  // Case 6: Idle status (10s–30min, S89-E3: formerly 5–30min)
+  it('shows idle status dot when lastActiveAt between 10 seconds and 30 minutes (S89-E3)', () => {
     const now = Date.now();
     const tenMinAgo = now - 10 * 60 * 1000;
     addUser('u1', 'Alice', tenMinAgo);
@@ -145,5 +145,36 @@ describe('CollaboratorAvatars', () => {
     render(<CollaboratorAvatars currentUserId="self-1" />);
     const img = screen.getByRole('img', { name: 'Alice' });
     expect(img).toHaveAttribute('src', 'https://example.com/alice.png');
+  });
+
+  // === S89-E3: Heartbeat optimization boundary tests ===
+  // S89-E3: online threshold = 10s, idle threshold = 30min
+
+  it('S89-E3: online at exactly 10 seconds (boundary — strictly less than)', () => {
+    const now = Date.now();
+    const exactly10SecAgo = now - 10_000;
+    addUser('u1', 'Alice', exactly10SecAgo);
+    render(<CollaboratorAvatars currentUserId="self-1" />);
+    // strictly < 10_000, so exactly 10_000 → idle, not online
+    const statusDot = screen.getByTestId('collab-avatar-u1').querySelector('[data-status]');
+    expect(statusDot).toHaveAttribute('data-status', 'idle');
+  });
+
+  it('S89-E3: idle at 15 seconds (above online, within idle range)', () => {
+    const now = Date.now();
+    const fifteenSecAgo = now - 15_000;
+    addUser('u1', 'Alice', fifteenSecAgo);
+    render(<CollaboratorAvatars currentUserId="self-1" />);
+    const statusDot = screen.getByTestId('collab-avatar-u1').querySelector('[data-status]');
+    expect(statusDot).toHaveAttribute('data-status', 'idle');
+  });
+
+  it('S89-E3: offline at 31 minutes (above idle threshold of 30 minutes)', () => {
+    const now = Date.now();
+    const thirtyOneMinAgo = now - 31 * 60 * 1000; // 31 minutes — beyond 30min idle threshold
+    addUser('u1', 'Alice', thirtyOneMinAgo);
+    render(<CollaboratorAvatars currentUserId="self-1" />);
+    const statusDot = screen.getByTestId('collab-avatar-u1').querySelector('[data-status]');
+    expect(statusDot).toHaveAttribute('data-status', 'offline');
   });
 });

@@ -7340,3 +7340,30 @@ See git history for complete changelog.
 
 **Tests**: 11 vitest passing
 
+
+#### 2026-06-13
+
+- **S91-E3 Collaborative Presence 2.0** (epic/s91-e3-collaborative-presence-2)
+  - `src/lib/collaboration/presenceStore.ts`: Add intent/broadcastIntent/updateRemoteIntent, operationHistory (FIFO max 10), nodeSelectionConflicts Map
+  - `src/lib/collaboration/presence/wsPresenceHandler.ts`: Handle intent_update message type
+  - `src/components/dds/presence/CollaboratorCursors.tsx`: Intent text label pill below cursor
+  - `src/components/dds/presence/CollaboratorAvatars.tsx`: Count badge (>5 users) + Popover with full list + intent
+  - `src/components/dds/presence/CollaboratorAvatars.module.css`: Count badge, Popover, intent pill styles
+  - `src/components/dds/presence/PresenceOverlay.tsx`: Mount OperationHistoryPanel
+  - `src/components/dds/presence/ConflictBadge.tsx`: Selection conflict red-border warning component
+  - `src/components/dds/presence/ConflictBadge.module.css`: Conflict badge styles
+  - `src/components/dds/presence/OperationHistoryPanel.tsx`: Collapsible operation history panel (add/delete/edit-property/move)
+  - `src/components/dds/presence/OperationHistoryPanel.module.css`: Panel styles
+  - `src/lib/collaboration/__tests__/presenceStore.intent.test.tsx`: 11 vitest (intent broadcast, conflict detection, operation history)
+  - `src/components/dds/presence/__tests__/OperationHistoryPanel.test.tsx`: 8 vitest (panel render, toggle, time formatting)
+  - `src/components/dds/presence/__tests__/CollaboratorAvatars.test.tsx`: 12 vitest (count badge, popover, intent display)
+
+**Acceptance Criteria**:
+- AC1: 操作意图 1s 内广播 — 旁观者看到意图更新延迟 ≤ 1.5s ✅
+- AC2: 同时选择同一组件时双方看到警告 — 警告高亮在双方页面同时出现 ✅
+- AC3: 操作历史显示最近 10 步 — 历史面板显示 ≤ 10 条记录 ✅
+- AC4: 协作人数 badge 实时更新 — 有人加入/离开时 badge 数字变化 ✅
+- AC5: 协作人数 > 5 时自动收起 — badge 仅显示数字 ✅
+
+**Tests**: 31 vitest passing
+

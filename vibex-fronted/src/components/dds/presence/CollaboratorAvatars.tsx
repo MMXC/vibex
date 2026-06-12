@@ -8,6 +8,10 @@
  * - Overflow "+N" badge
  * - WebSocket presence integration via presenceStore
  *
+ * S91-E3-F4: Extended with count badge on canvas top-right corner.
+ * When count > 5, shows numeric badge (e.g., "6+") instead of avatars.
+ * Clicking badge opens Popover with full list (avatar + name + current intent).
+ *
  * S84-E2 DoD:
  * - [x] `CollaboratorAvatars.tsx` component (avatar bar + status dots)
  * - [x] 8-color pool assignment logic
@@ -19,7 +23,7 @@
 
 'use client';
 
-import React, { memo, useState, useCallback } from 'react';
+import React, { memo, useState, useCallback, useRef, useEffect } from 'react';
 import { usePresenceStore } from '@/lib/collaboration/presenceStore';
 import { getCollaboratorColor } from '@/lib/collaboration/presence/wsPresenceHandler';
 import styles from './CollaboratorAvatars.module.css';
@@ -66,7 +70,7 @@ interface AvatarItemProps {
   color: string;
   status: StatusDot;
   showTooltip: boolean;
-  isOverflow?: boolean;
+  intent?: string;
 }
 
 const AvatarItem = memo(function AvatarItem({
@@ -76,6 +80,7 @@ const AvatarItem = memo(function AvatarItem({
   color,
   status,
   showTooltip,
+  intent,
 }: AvatarItemProps) {
   const initial = name.charAt(0).toUpperCase() || '?';
 
@@ -85,7 +90,7 @@ const AvatarItem = memo(function AvatarItem({
       data-testid={`collab-avatar-${userId}`}
       data-status={status}
       data-username={name}
-      title={showTooltip ? `${name} (${STATUS_DOT_LABEL[status]})` : undefined}
+      title={showTooltip ? `${name} (${STATUS_DOT_LABEL[status]})${intent ? ` — ${intent}` : ''}` : undefined}
       style={{ '--avatar-color': color } as React.CSSProperties}
       role="img"
       aria-label={`${name}: ${STATUS_DOT_LABEL[status]}`}
@@ -105,6 +110,13 @@ const AvatarItem = memo(function AvatarItem({
         data-status={status}
         aria-hidden="true"
       />
+
+      {/* S91-E3-F1: Intent pill below avatar */}
+      {intent && (
+        <div className={styles.intentPill} title={intent}>
+          {intent}
+        </div>
+      )}
     </div>
   );
 });
@@ -147,6 +159,113 @@ function OverflowBadge({ count }: { count: number }) {
   );
 }
 
+/** S91-E3-F4: Count badge shown on canvas top-right corner */
+function CountBadge({ count, onClick }: { count: number; onClick: () => void }) {
+  const label = count > 5 ? `${count - 5}+` : `+${count}`;
+  return (
+    <button
+      className={styles.countBadge}
+      onClick={onClick}
+      data-testid="collab-count-badge"
+      aria-label={`${count} 位协作者，点击查看全部`}
+      title={`${count} 位协作者`}
+      type="button"
+    >
+      <span className={styles.countBadgeIcon}>
+        <svg
+          width="12"
+          height="12"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+          <circle cx="9" cy="7" r="4" />
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+          <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+        </svg>
+      </span>
+      <span className={styles.countBadgeLabel}>{label}</span>
+    </button>
+  );
+}
+
+/** S91-E3-F4: Popover showing full list of collaborators with intent */
+function CollaboratorPopover({
+  collaborators,
+  onClose,
+}: {
+  collaborators: Array<{ userId: string; name: string; avatar?: string; status: StatusDot; intent?: string }>;
+  onClose: () => void;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        onClose();
+      }
+    }
+    function handleEscape(e: KeyboardEvent) {
+      if (e.key === 'Escape') onClose();
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleEscape);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [onClose]);
+
+  return (
+    <div
+      ref={ref}
+      className={styles.popover}
+      data-testid="collab-popover"
+      role="dialog"
+      aria-label="协作者列表"
+    >
+      <div className={styles.popoverHeader}>
+        <span className={styles.popoverTitle}>协作者</span>
+        <span className={styles.popoverCount}>{collaborators.length}</span>
+      </div>
+      <div className={styles.popoverList}>
+        {collaborators.map((user) => {
+          const color = getCollaboratorColor(user.userId);
+          return (
+            <div key={user.userId} className={styles.popoverItem}>
+              <AvatarItem
+                userId={user.userId}
+                name={user.name}
+                avatar={user.avatar}
+                color={color}
+                status={user.status}
+                showTooltip={false}
+                intent={user.intent}
+              />
+              <div className={styles.popoverItemInfo}>
+                <span className={styles.popoverItemName}>{user.name}</span>
+                {user.intent && (
+                  <span className={styles.popoverItemIntent}>{user.intent}</span>
+                )}
+              </div>
+              <div
+                className={styles.popoverItemStatus}
+                data-status={user.status}
+                title={STATUS_DOT_LABEL[user.status]}
+              />
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 export const CollaboratorAvatars = memo(function CollaboratorAvatars({
   currentUserId,
   maxDisplay = 5,
@@ -156,6 +275,9 @@ export const CollaboratorAvatars = memo(function CollaboratorAvatars({
   // Read remote users from presenceStore
   const remoteUsers = usePresenceStore((s) => s.remoteUsers);
   const connectionStatus = usePresenceStore((s) => s.connectionStatus);
+
+  // S91-E3-F4: Popover open state
+  const [popoverOpen, setPopoverOpen] = useState(false);
 
   // Filter out self and convert to array
   const collaborators = Array.from(remoteUsers.values()).filter(
@@ -168,6 +290,9 @@ export const CollaboratorAvatars = memo(function CollaboratorAvatars({
   const visible = collaborators.slice(0, maxDisplay);
   const overflowCount = Math.max(0, collaborators.length - maxDisplay);
 
+  // S91-E3-F4: When > 5 collaborators, show count badge instead of avatars
+  const showCountBadge = collaborators.length > 5;
+
   // Handle disconnect fade-out — collaborators that are offline fade out
   const handleFadeOut = useCallback((userId: string) => {
     setFadingUsers((prev) => new Set(prev).add(userId));
@@ -179,6 +304,14 @@ export const CollaboratorAvatars = memo(function CollaboratorAvatars({
         return next;
       });
     }, 350);
+  }, []);
+
+  const handleOpenPopover = useCallback(() => {
+    setPopoverOpen((prev) => !prev);
+  }, []);
+
+  const handleClosePopover = useCallback(() => {
+    setPopoverOpen(false);
   }, []);
 
   if (collaborators.length === 0) {
@@ -220,33 +353,54 @@ export const CollaboratorAvatars = memo(function CollaboratorAvatars({
         </div>
       )}
 
-      {/* Avatar stack */}
-      <div className={styles.avatarStack}>
-        {visible.map((user) => {
-          const status = getStatusDot(user.lastSeen);
-          const color = getCollaboratorColor(user.userId);
-          const isFading = fadingUsers.has(user.userId);
+      {/* S91-E3-F4: Count badge on canvas top-right corner */}
+      {showCountBadge && (
+        <CountBadge count={collaborators.length} onClick={handleOpenPopover} />
+      )}
 
-          return (
-            <div
-              key={user.userId}
-              className={`${styles.avatarWrapper} ${isFading ? styles.fadingOut : ''}`}
-            >
-              <AvatarItem
-                userId={user.userId}
-                name={user.name}
-                avatar={user.avatar}
-                color={color}
-                status={status}
-                showTooltip={showTooltip}
-              />
-            </div>
-          );
-        })}
+      {/* Avatar stack (hidden when count badge shown) */}
+      {!showCountBadge && (
+        <div className={styles.avatarStack}>
+          {visible.map((user) => {
+            const status = getStatusDot(user.lastSeen);
+            const color = getCollaboratorColor(user.userId);
+            const isFading = fadingUsers.has(user.userId);
 
-        {/* Overflow badge */}
-        {overflowCount > 0 && <OverflowBadge count={overflowCount} />}
-      </div>
+            return (
+              <div
+                key={user.userId}
+                className={`${styles.avatarWrapper} ${isFading ? styles.fadingOut : ''}`}
+              >
+                <AvatarItem
+                  userId={user.userId}
+                  name={user.name}
+                  avatar={user.avatar}
+                  color={color}
+                  status={status}
+                  showTooltip={showTooltip}
+                />
+              </div>
+            );
+          })}
+
+          {/* Overflow badge */}
+          {overflowCount > 0 && <OverflowBadge count={overflowCount} />}
+        </div>
+      )}
+
+      {/* S91-E3-F4: Popover with full list */}
+      {popoverOpen && (
+        <CollaboratorPopover
+          collaborators={collaborators.map((user) => ({
+            userId: user.userId,
+            name: user.name,
+            avatar: user.avatar,
+            status: getStatusDot(user.lastSeen),
+            intent: user.intent,
+          }))}
+          onClose={handleClosePopover}
+        />
+      )}
     </div>
   );
 });

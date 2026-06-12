@@ -9,11 +9,14 @@
  * useCollaboration's onPresence callback) and renders cursor indicators.
  * Replaces the Firebase-wired RemoteCursor usage in DDSCanvasPage.
  * Visibility gated by userPreferencesStore.cursorVisible.
+ *
+ * S91-E3-F3: Mounts OperationHistoryPanel.
  */
 
 import React, { useMemo } from 'react';
 import { usePresenceStore } from '@/lib/collaboration/presenceStore';
 import { useUserPreferencesStore } from '@/stores/userPreferencesStore';
+import { OperationHistoryPanel } from './OperationHistoryPanel';
 
 // Predefined cursor colors — consistent with Firebase hashUserColor
 const PRESENCE_COLORS = [
@@ -128,6 +131,8 @@ export function PresenceOverlay({ excludeUserId }: PresenceOverlayProps) {
       {cursors.map((cursor) => (
         <CursorInstance key={cursor.userId} {...cursor} />
       ))}
+      {/* S91-E3-F3: Operation history panel */}
+      <OperationHistoryPanel />
     </>
   );
 }

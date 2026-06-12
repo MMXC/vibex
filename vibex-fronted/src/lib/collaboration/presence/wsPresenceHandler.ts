@@ -39,7 +39,7 @@ export function getCollaboratorColor(userId: string): string {
 }
 
 /** S84-E2: Presence event types from WebSocket */
-export type PresenceEventType = 'presence:join' | 'presence:leave' | 'presence:update' | 'presence:heartbeat';
+export type PresenceEventType = 'presence:join' | 'presence:leave' | 'presence:update' | 'presence:heartbeat' | 'intent_update';
 
 export interface PresenceJoinPayload {
   userId: string;
@@ -59,6 +59,8 @@ export interface PresenceUpdatePayload {
   cursorX?: number;
   cursorY?: number;
   status?: 'online' | 'idle' | 'offline';
+  /** S91-E3-F1: Current user intent */
+  intent?: string;
 }
 
 export interface PresenceHeartbeatPayload {
@@ -66,11 +68,18 @@ export interface PresenceHeartbeatPayload {
   timestamp: number;
 }
 
+/** S91-E3-F1: Intent update payload */
+export interface IntentUpdatePayload {
+  userId: string;
+  intent: string;
+}
+
 export type PresenceMessage =
   | { type: 'presence:join'; payload: PresenceJoinPayload }
   | { type: 'presence:leave'; payload: PresenceLeavePayload }
   | { type: 'presence:update'; payload: PresenceUpdatePayload }
-  | { type: 'presence:heartbeat'; payload: PresenceHeartbeatPayload };
+  | { type: 'presence:heartbeat'; payload: PresenceHeartbeatPayload }
+  | { type: 'intent_update'; payload: IntentUpdatePayload };
 
 /**
  * Process a single presence WebSocket message — updates presenceStore.
@@ -145,6 +154,12 @@ export function handlePresenceMessage(msg: PresenceMessage): void {
       store.updateLastActive(userId);
       break;
     }
+
+    case 'intent_update': {
+      const { userId, intent } = msg.payload;
+      store.updateRemoteIntent(userId, intent);
+      break;
+    }
   }
 }
 
@@ -182,7 +197,8 @@ export function subscribePresenceMessages(
       msg.type === 'presence:join' ||
       msg.type === 'presence:leave' ||
       msg.type === 'presence:update' ||
-      msg.type === 'presence:heartbeat'
+      msg.type === 'presence:heartbeat' ||
+      msg.type === 'intent_update'
     ) {
       handlePresenceMessage(msg as PresenceMessage);
     }

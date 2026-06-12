@@ -15,6 +15,25 @@
 类型: feat
 影响: vibex-backend, vibex-fronted
 
+## S90-E4 · Canvas Annotation Layer · 2026-06-12
+
+### Features
+- **D1 Schema**: `0023_annotations` migration — annotations 表（id/canvas_id/content/x/y/type/author_id/status）
+- **GET /api/canvas/annotations**: 列出指定 canvasId 的所有批注
+- **POST /api/canvas/annotations**: 创建新批注于画布坐标 (x, y)
+- **PATCH /api/canvas/annotations/[id]**: 更新批注内容/状态/位置
+- **DELETE /api/canvas/annotations/[id]**: 删除批注
+- **annotationStore**: Zustand + IndexedDB 持久化（离线优先），optimistic updates
+- **AnnotationLayer**: 绝对定位覆盖层，继承画布 CSS transform（缩放/平移自动同步）
+- **AC1-AC4**: 点击放置 → 输入框 → 提交显示；作者颜色自动哈希；resolve→删除线；delete→移除
+- **DDSCanvasPage 集成**: AnnotationLayer 挂载于 gridRef 容器内，含 placementMode 状态
+
+### 测试
+- `annotation/__tests__/AnnotationLayer.test.tsx`: Vitest 覆盖 AC1-AC4
+- `annotation/__tests__/annotationStore.test.ts`: Vitest 覆盖 store CRUD + IndexedDB
+
+类型: feat
+影响: vibex-backend, vibex-fronted
 
 
 ## S87-E4 · Canvas 批量导出增强 · 2026-06-11

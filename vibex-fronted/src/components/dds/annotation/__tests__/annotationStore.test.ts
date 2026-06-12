@@ -1,9 +1,10 @@
 /**
  * annotationStore.test.ts — S90-E4
  * Tests for annotationStore state management
+ * NOTE: Fixed method names to match AnnotationStoreState interface
  */
 import { describe, it, expect, beforeEach } from 'vitest';
-import { useAnnotationStore, getActiveAnnotations, type Annotation } from '../annotationStore';
+import { useAnnotationStore, type Annotation } from '../annotationStore';
 
 const CANVAS_ID = 'canvas-001';
 
@@ -24,7 +25,7 @@ function makeAnnotation(overrides: Partial<Annotation> = {}): Omit<Annotation, '
 
 describe('annotationStore', () => {
   beforeEach(() => {
-    useAnnotationStore.getState().clearAnnotations();
+    useAnnotationStore.getState().clear();
   });
 
   // ─── addAnnotation ────────────────────────────────────────────────────────────
@@ -50,32 +51,32 @@ describe('annotationStore', () => {
     expect(annotations[1].content).toBe('Second');
   });
 
-  // ─── editAnnotation ──────────────────────────────────────────────────────────
+  // ─── updateAnnotation ────────────────────────────────────────────────────────
 
-  it('editAnnotation updates fields and refreshes updatedAt', () => {
+  it('updateAnnotation updates fields and refreshes updatedAt', () => {
     const { addAnnotation } = useAnnotationStore.getState();
     const ann = addAnnotation(makeAnnotation());
     const before = ann.updatedAt;
 
-    useAnnotationStore.getState().editAnnotation(ann.id, { content: 'Updated content' });
+    useAnnotationStore.getState().updateAnnotation(ann.id, { content: 'Updated content' });
 
     const updated = useAnnotationStore.getState().annotations.find(a => a.id === ann.id);
     expect(updated?.content).toBe('Updated content');
     expect(updated?.updatedAt).toBeGreaterThanOrEqual(before);
   });
 
-  it('editAnnotation only updates specified fields', () => {
+  it('updateAnnotation only updates specified fields', () => {
     const { addAnnotation } = useAnnotationStore.getState();
     const ann = addAnnotation(makeAnnotation({ x: 100, y: 200 }));
 
-    useAnnotationStore.getState().editAnnotation(ann.id, { x: 300 });
+    useAnnotationStore.getState().updateAnnotation(ann.id, { x: 300 });
 
     const updated = useAnnotationStore.getState().annotations.find(a => a.id === ann.id);
     expect(updated?.x).toBe(300);
     expect(updated?.y).toBe(200); // unchanged
   });
 
-  // ─── resolveAnnotation ──────────────────────────────────────────────────────
+  // ─── resolveAnnotation ────────────────────────────────────────────────────────
 
   it('resolveAnnotation sets status to resolved', () => {
     const { addAnnotation } = useAnnotationStore.getState();
@@ -87,7 +88,7 @@ describe('annotationStore', () => {
     expect(resolved?.status).toBe('resolved');
   });
 
-  // ─── deleteAnnotation ───────────────────────────────────────────────────────
+  // ─── deleteAnnotation ────────────────────────────────────────────────────────
 
   it('deleteAnnotation removes annotation from store', () => {
     const { addAnnotation } = useAnnotationStore.getState();
@@ -100,78 +101,62 @@ describe('annotationStore', () => {
     expect(useAnnotationStore.getState().annotations).toHaveLength(0);
   });
 
-  // ─── setAnnotations ─────────────────────────────────────────────────────────
+  // ─── getActive / getResolved ─────────────────────────────────────────────────
+  // NOTE: addAnnotation always sets status:'active', so all new items are active.
+  // Use resolveAnnotation to move items to resolved.
 
-  it('setAnnotations replaces all annotations', () => {
-    const { addAnnotation, setAnnotations } = useAnnotationStore.getState();
-    addAnnotation(makeAnnotation());
-    addAnnotation(makeAnnotation({ content: 'Two' }));
-
-    const newAnns: Annotation[] = [
-      {
-        id: 'existing-1',
-        canvasId: CANVAS_ID,
-        content: 'Loaded from API',
-        x: 0, y: 0,
-        type: 'text',
-        authorId: 'user-2',
-        color: '#EC4899',
-        status: 'active',
-        createdAt: 1000,
-        updatedAt: 1000,
-      },
-    ];
-
-    setAnnotations(newAnns);
-    const { annotations } = useAnnotationStore.getState();
-    expect(annotations).toHaveLength(1);
-    expect(annotations[0].content).toBe('Loaded from API');
-  });
-
-  // ─── subscribeToCanvas ──────────────────────────────────────────────────────
-
-  it('subscribeToCanvas clears annotations and updates canvasId', () => {
-    const { addAnnotation, subscribeToCanvas } = useAnnotationStore.getState();
-    addAnnotation(makeAnnotation());
-
-    subscribeToCanvas('new-canvas');
-
-    expect(useAnnotationStore.getState().subscribedCanvasId).toBe('new-canvas');
-    expect(useAnnotationStore.getState().annotations).toHaveLength(0);
-  });
-
-  it('subscribeToCanvas skips if same canvasId', () => {
-    const { subscribeToCanvas, addAnnotation } = useAnnotationStore.getState();
-    addAnnotation(makeAnnotation());
-
-    subscribeToCanvas(CANVAS_ID);
-
-    // Should not clear — same canvas
-    expect(useAnnotationStore.getState().annotations).toHaveLength(1);
-  });
-
-  // ─── getActiveAnnotations selector ──────────────────────────────────────────
-
-  it('getActiveAnnotations filters to active-only', () => {
+  it('getActive returns only active annotations', () => {
     const { addAnnotation } = useAnnotationStore.getState();
-    addAnnotation(makeAnnotation({ status: 'active' }));
-    addAnnotation(makeAnnotation({ content: 'resolved', status: 'resolved' }));
-    addAnnotation(makeAnnotation({ content: 'also active', status: 'active' }));
+    const ann1 = addAnnotation(makeAnnotation());
+    addAnnotation(makeAnnotation()); // second active
+    // Move one to resolved
+    useAnnotationStore.getState().resolveAnnotation(ann1.id);
 
-    const active = getActiveAnnotations(useAnnotationStore.getState());
-    expect(active).toHaveLength(2);
+    const active = useAnnotationStore.getState().getActive();
+    expect(active).toHaveLength(1);
     expect(active.every(a => a.status === 'active')).toBe(true);
   });
 
-  // ─── clearAnnotations ───────────────────────────────────────────────────────
+  it('getResolved returns only resolved annotations', () => {
+    const { addAnnotation } = useAnnotationStore.getState();
+    addAnnotation(makeAnnotation()); // active
+    const ann2 = addAnnotation(makeAnnotation());
 
-  it('clearAnnotations removes all annotations', () => {
-    const { addAnnotation, clearAnnotations } = useAnnotationStore.getState();
+    useAnnotationStore.getState().resolveAnnotation(ann2.id);
+
+    const resolved = useAnnotationStore.getState().getResolved();
+    expect(resolved).toHaveLength(1);
+    expect(resolved[0].status).toBe('resolved');
+  });
+
+  it('getById returns the correct annotation', () => {
+    const { addAnnotation } = useAnnotationStore.getState();
+    const ann = addAnnotation(makeAnnotation({ content: 'Target' }));
+
+    const found = useAnnotationStore.getState().getById(ann.id);
+    expect(found?.content).toBe('Target');
+  });
+
+  it('getByAuthor filters annotations by authorId', () => {
+    const { addAnnotation } = useAnnotationStore.getState();
+    addAnnotation(makeAnnotation({ authorId: 'user-1' }));
+    addAnnotation(makeAnnotation({ content: 'other', authorId: 'user-2' }));
+
+    const byAuthor = useAnnotationStore.getState().getByAuthor('user-1');
+    expect(byAuthor).toHaveLength(1);
+    expect(byAuthor[0].authorId).toBe('user-1');
+  });
+
+  // ─── clear ──────────────────────────────────────────────────────────────────
+
+  it('clear removes all annotations', () => {
+    const { addAnnotation, clear } = useAnnotationStore.getState();
     addAnnotation(makeAnnotation());
     addAnnotation(makeAnnotation({ content: 'Two' }));
 
-    clearAnnotations();
+    clear();
 
     expect(useAnnotationStore.getState().annotations).toHaveLength(0);
+    expect(useAnnotationStore.getState().initialized).toBe(false);
   });
 });

@@ -3,6 +3,7 @@
  *
  * E01: Onboarding → Canvas 无断点
  * 提取为独立 client component，配合 server page.tsx 使用
+ * S92-E4: Mobile UA 访问时路由到移动端预览模式
  */
 
 'use client';
@@ -12,6 +13,9 @@ import { CanvasPage } from '@/components/canvas/CanvasPage';
 import { CanvasPageSkeleton } from '@/components/canvas/CanvasPageSkeleton';
 import { useCanvasPrefill } from '@/hooks/useCanvasPrefill';
 import { useSessionStore } from '@/lib/canvas/stores/sessionStore';
+import { useIsMobileUA } from '@/hooks/useIsMobileUA';
+// S92-E4: Mobile preview
+import { MobilePreviewCanvas } from '@/components/mobile/MobilePreviewCanvas';
 
 interface CanvasPageClientProps {
   projectId: string;
@@ -31,6 +35,7 @@ function useIsMobile() {
 
 export function CanvasPageClient({ projectId }: CanvasPageClientProps) {
   const isMobile = useIsMobile();
+  const { isMobileUA } = useIsMobileUA();
 
   // E01: 读取 localStorage 预填充数据
   const { state: prefillState } = useCanvasPrefill();
@@ -48,6 +53,11 @@ export function CanvasPageClient({ projectId }: CanvasPageClientProps) {
 
   if (showSkeleton) {
     return <CanvasPageSkeleton />;
+  }
+
+  // S92-E4: Mobile UA 访问时显示只读预览模式
+  if (isMobileUA) {
+    return <MobilePreviewCanvas canvasId={projectId} />;
   }
 
   return <CanvasPage useTabMode={isMobile} />;

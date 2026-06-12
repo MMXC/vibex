@@ -174,3 +174,177 @@
     transform: rotate(360deg);
   }
 }
+
+/* S91-E3-F4: Count badge on canvas top-right corner */
+.countBadge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 16px;
+  background: rgba(99, 102, 241, 0.2);
+  border: 1px solid rgba(99, 102, 241, 0.4);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 150ms ease, transform 150ms ease;
+  backdrop-filter: blur(8px);
+  user-select: none;
+}
+
+.countBadge:hover {
+  background: rgba(99, 102, 241, 0.35);
+  transform: translateY(-1px);
+}
+
+.countBadge:active {
+  transform: translateY(0);
+}
+
+.countBadgeIcon {
+  display: flex;
+  align-items: center;
+  color: rgba(165, 180, 252, 0.9);
+}
+
+.countBadgeLabel {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+/* S91-E3-F4: Popover for full collaborator list */
+.popover {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 200;
+  min-width: 240px;
+  max-width: 320px;
+  background: rgba(30, 30, 40, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  backdrop-filter: blur(16px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+  animation: popoverFadeIn 150ms ease-out;
+}
+
+@keyframes popoverFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.popoverHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.popoverTitle {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.popoverCount {
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(165, 180, 252, 0.9);
+  background: rgba(99, 102, 241, 0.2);
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+.popoverList {
+  padding: 6px 0;
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.popoverItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 14px;
+  transition: background 150ms ease;
+}
+
+.popoverItem:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.popoverItemInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.popoverItemName {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.popoverItemIntent {
+  display: block;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 1px;
+}
+
+.popoverItemStatus {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.popoverItemStatus[data-status='online'] {
+  background: #22c55e;
+}
+
+.popoverItemStatus[data-status='idle'] {
+  background: #eab308;
+}
+
+.popoverItemStatus[data-status='offline'] {
+  background: #9ca3af;
+}
+
+/* S91-E3-F1: Intent pill below avatar in avatar bar */
+.intentPill {
+  position: absolute;
+  top: calc(100% + 2px);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 1px 6px;
+  border-radius: 8px;
+  font-size: 9px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.8);
+  background: rgba(0, 0, 0, 0.6);
+  white-space: nowrap;
+  max-width: 60px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: none;
+  user-select: none;
+  backdrop-filter: blur(4px);
+}

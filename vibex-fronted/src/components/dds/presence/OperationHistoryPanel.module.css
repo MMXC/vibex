@@ -1,0 +1,171 @@
+/**
+ * OperationHistoryPanel.module.css — S91-E3-F3
+ *
+ * Collapsible panel showing last 10 collaborative operations.
+ * Positioned at the bottom of the canvas overlay area.
+ */
+
+.panel {
+  background: rgba(30, 30, 40, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  backdrop-filter: blur(12px);
+  overflow: hidden;
+  min-width: 220px;
+  max-width: 280px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  transition: all 200ms ease;
+}
+
+.panelCollapsed {
+  min-width: unset;
+  max-width: unset;
+}
+
+/* Header / toggle button */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 8px 12px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.7);
+  transition: background 150ms ease;
+  text-align: left;
+}
+
+.header:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.headerIcon {
+  color: rgba(165, 180, 252, 0.8);
+  flex-shrink: 0;
+}
+
+.headerTitle {
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+.headerCount {
+  font-size: 10px;
+  font-weight: 600;
+  color: rgba(165, 180, 252, 0.9);
+  background: rgba(99, 102, 241, 0.2);
+  padding: 1px 6px;
+  border-radius: 8px;
+}
+
+.chevron {
+  color: rgba(255, 255, 255, 0.4);
+  transition: transform 200ms ease;
+  flex-shrink: 0;
+}
+
+.chevronCollapsed {
+  transform: rotate(-90deg);
+}
+
+/* Operation list */
+.list {
+  padding: 4px 0 6px;
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+/* Custom scrollbar */
+.list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 2px;
+}
+
+/* Single operation row */
+.opRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 5px 12px;
+  transition: background 150ms ease;
+}
+
+.opRow:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+/* Operation icon */
+.opIcon {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.opIconAdd {
+  color: #22c55e;
+}
+
+.opIconDelete {
+  color: #ef4444;
+}
+
+.opIconEdit {
+  color: #3b82f6;
+}
+
+.opIconMove {
+  color: #f59e0b;
+}
+
+/* Operation content */
+.opContent {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.opUser {
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.85);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.opDesc {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Relative timestamp */
+.opTime {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.35);
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin-top: 2px;
+}

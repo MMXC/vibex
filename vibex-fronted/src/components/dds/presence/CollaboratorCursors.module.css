@@ -67,3 +67,24 @@
   opacity: 0;
   pointer-events: none;
 }
+
+/* S91-E3-F1: Intent label pill — small text below cursor label */
+.intentLabel {
+  position: absolute;
+  top: 36px;
+  left: 10px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
+  background: rgba(0, 0, 0, 0.5);
+  white-space: nowrap;
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  user-select: none;
+  backdrop-filter: blur(4px);
+  animation: labelFadeIn 150ms ease-out;
+}

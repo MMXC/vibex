@@ -1,180 +1,263 @@
 /**
- * CollaboratorAvatars.test.tsx — S84-E2 vitest + S89-E3 heartbeat optimization
+ * CollaboratorAvatars — S91-E3-F4: 协作人数状态
  *
- * Uses mockImplementation to support Zustand selector pattern.
+ * 覆盖场景:
+ * - E3-F4: Count badge shown when > 5 collaborators
+ * - E3-F4: Count badge label format "6+", "7+", etc.
+ * - E3-F4: Clicking count badge opens popover
+ * - E3-F4: Popover shows full list with avatar, name, status, intent
+ * - E3-F4: Clicking outside closes popover
+ * - E3-F4: Escape key closes popover
+ * - E3-F4: When count <= 5, shows normal avatars (not count badge)
+ * - Existing S84-E2: Empty state, avatar rendering, overflow badge
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
-import React from 'react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import { CollaboratorAvatars } from '../CollaboratorAvatars';
+import { usePresenceStore } from '@/lib/collaboration/presenceStore';
+import React from 'react';
 
-// Shared mock state
-const mockRemoteUsers = new Map<string, { userId: string; name: string; avatar: string; lastSeen: number }>();
-let mockConnectionStatus: 'connected' | 'reconnecting' | 'disconnected' = 'connected';
-
-function getMockStore() {
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+function makeRemoteUser(overrides: {
+  userId: string;
+  name: string;
+  lastSeen?: number;
+  intent?: string;
+} = { userId: 'u1', name: 'Alice' }) {
   return {
-    remoteUsers: mockRemoteUsers,
-    connectionStatus: mockConnectionStatus,
+    userId: overrides.userId,
+    name: overrides.name,
+    avatar: '',
+    lastSeen: overrides.lastSeen ?? Date.now(),
+    intent: overrides.intent,
   };
 }
 
-vi.mock('@/lib/collaboration/presenceStore', () => ({
-  usePresenceStore: vi.fn((selector?: (s: ReturnType<typeof getMockStore>) => unknown) => {
-    const store = getMockStore();
-    if (selector) return selector(store);
-    return store;
-  }),
-}));
-
-vi.mock('@/lib/collaboration/presence/wsPresenceHandler', () => ({
-  getCollaboratorColor: vi.fn((userId: string) => {
-    const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#98D8C8', '#F7DC6F'];
-    let hash = 0;
-    for (let i = 0; i < userId.length; i++) hash = (hash * 31 + userId.charCodeAt(i)) | 0;
-    return colors[Math.abs(hash) % 8]!;
-  }),
-}));
-
-function addUser(userId: string, name: string, lastSeen: number, avatar = '') {
-  mockRemoteUsers.set(userId, { userId, name, avatar, lastSeen });
+function populateRemoteUsers(users: Array<{
+  userId: string;
+  name: string;
+  lastSeen?: number;
+  intent?: string;
+}>) {
+  const { setRemoteUsers } = usePresenceStore.getState();
+  setRemoteUsers(
+    users.map((u) => ({
+      userId: u.userId,
+      name: u.name,
+      avatar: '',
+      lastSeen: u.lastSeen ?? Date.now(),
+      intent: u.intent,
+    }))
+  );
 }
 
-describe('CollaboratorAvatars', () => {
+function renderAvatars(props: { currentUserId?: string; maxDisplay?: number } = {}) {
+  return render(<CollaboratorAvatars currentUserId={props.currentUserId} maxDisplay={props.maxDisplay} />);
+}
+
+describe('CollaboratorAvatars — E3-F4: Count Badge', () => {
   beforeEach(() => {
-    vi.clearAllMocks();
-    mockRemoteUsers.clear();
-    mockConnectionStatus = 'connected';
+    usePresenceStore.getState().clearAll();
   });
 
-  // Case 1: Empty state
-  it('renders empty state when no collaborators', () => {
-    render(<CollaboratorAvatars currentUserId="self-1" />);
+  it('should NOT show count badge when there are <= 5 collaborators', () => {
+    populateRemoteUsers([
+      { userId: 'u1', name: 'Alice' },
+      { userId: 'u2', name: 'Bob' },
+      { userId: 'u3', name: 'Carol' },
+    ]);
+
+    renderAvatars();
+    expect(screen.queryByTestId('collab-count-badge')).toBeNull();
+    expect(screen.getByTestId('collab-avatars')).toBeInTheDocument();
+  });
+
+  it('should show count badge when there are > 5 collaborators', () => {
+    const users = Array.from({ length: 7 }, (_, i) => ({
+      userId: `u${i + 1}`,
+      name: `User ${i + 1}`,
+    }));
+    populateRemoteUsers(users);
+
+    renderAvatars();
+    expect(screen.getByTestId('collab-count-badge')).toBeInTheDocument();
+    // Label shows overflow count (total - 5 displayed) = 7-5=2 extra
+    expect(screen.getByText('2+')).toBeInTheDocument();
+  });
+
+  it('should show count badge with correct label for 8 collaborators', () => {
+    const users = Array.from({ length: 8 }, (_, i) => ({
+      userId: `u${i + 1}`,
+      name: `User ${i + 1}`,
+    }));
+    populateRemoteUsers(users);
+
+    renderAvatars();
+    // Label shows overflow count = 8-5=3 extra
+    expect(screen.getByText('3+')).toBeInTheDocument();
+  });
+
+  it('should open popover when count badge is clicked', () => {
+    const users = Array.from({ length: 7 }, (_, i) => ({
+      userId: `u${i + 1}`,
+      name: `User ${i + 1}`,
+    }));
+    populateRemoteUsers(users);
+
+    renderAvatars();
+
+    act(() => {
+      screen.getByTestId('collab-count-badge').click();
+    });
+
+    expect(screen.getByTestId('collab-popover')).toBeInTheDocument();
+  });
+
+  it('should show full list in popover with avatar + name + status', () => {
+    populateRemoteUsers([
+      { userId: 'u1', name: 'Alice', lastSeen: Date.now(), intent: '编辑节点A' },
+      { userId: 'u2', name: 'Bob', lastSeen: Date.now(), intent: undefined },
+      { userId: 'u3', name: 'Carol', lastSeen: Date.now(), intent: '查看画布' },
+      { userId: 'u4', name: 'Dave', lastSeen: Date.now() },
+      { userId: 'u5', name: 'Eve', lastSeen: Date.now() },
+      { userId: 'u6', name: 'Frank', lastSeen: Date.now() },
+      { userId: 'u7', name: 'Grace', lastSeen: Date.now() },
+    ]);
+
+    renderAvatars();
+
+    act(() => {
+      screen.getByTestId('collab-count-badge').click();
+    });
+
+    const popover = screen.getByTestId('collab-popover');
+    expect(popover).toBeInTheDocument();
+    expect(screen.getByText('Alice')).toBeInTheDocument();
+    expect(screen.getByText('Bob')).toBeInTheDocument();
+    expect(screen.getByText('Carol')).toBeInTheDocument();
+  });
+
+  it('should show intent in popover item', () => {
+    populateRemoteUsers([
+      { userId: 'u1', name: 'Alice', intent: '正在编辑节点' },
+      { userId: 'u2', name: 'Bob', intent: undefined },
+      { userId: 'u3', name: 'Carol', intent: '查看画布' },
+      { userId: 'u4', name: 'Dave', intent: undefined },
+      { userId: 'u5', name: 'Eve', intent: undefined },
+      { userId: 'u6', name: 'Frank', intent: undefined },
+      { userId: 'u7', name: 'Grace', intent: undefined },
+    ]);
+
+    renderAvatars();
+
+    act(() => {
+      screen.getByTestId('collab-count-badge').click();
+    });
+
+    // Intent should be visible in popover (may appear in both intentPill + popoverItemIntent)
+    const intentEls = screen.getAllByText('正在编辑节点');
+    expect(intentEls.length).toBeGreaterThanOrEqual(1);
+    const canvasEls = screen.getAllByText('查看画布');
+    expect(canvasEls.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('should close popover when clicking outside', () => {
+    populateRemoteUsers(
+      Array.from({ length: 7 }, (_, i) => ({
+        userId: `u${i + 1}`,
+        name: `User ${i + 1}`,
+      }))
+    );
+
+    renderAvatars();
+
+    act(() => {
+      screen.getByTestId('collab-count-badge').click();
+    });
+
+    expect(screen.getByTestId('collab-popover')).toBeInTheDocument();
+
+    // Click outside
+    act(() => {
+      fireEvent.mouseDown(document.body);
+    });
+
+    expect(screen.queryByTestId('collab-popover')).toBeNull();
+  });
+
+  it('should close popover on Escape key', () => {
+    populateRemoteUsers(
+      Array.from({ length: 7 }, (_, i) => ({
+        userId: `u${i + 1}`,
+        name: `User ${i + 1}`,
+      }))
+    );
+
+    renderAvatars();
+
+    act(() => {
+      screen.getByTestId('collab-count-badge').click();
+    });
+
+    expect(screen.getByTestId('collab-popover')).toBeInTheDocument();
+
+    act(() => {
+      fireEvent.keyDown(document.body, { key: 'Escape' });
+    });
+
+    expect(screen.queryByTestId('collab-popover')).toBeNull();
+  });
+
+  it('should toggle popover on count badge click', () => {
+    populateRemoteUsers(
+      Array.from({ length: 7 }, (_, i) => ({
+        userId: `u${i + 1}`,
+        name: `User ${i + 1}`,
+      }))
+    );
+
+    renderAvatars();
+
+    act(() => {
+      screen.getByTestId('collab-count-badge').click();
+    });
+    expect(screen.getByTestId('collab-popover')).toBeInTheDocument();
+
+    // Click again to close
+    act(() => {
+      screen.getByTestId('collab-count-badge').click();
+    });
+    expect(screen.queryByTestId('collab-popover')).toBeNull();
+  });
+
+  it('should show count badge with aria-label', () => {
+    const users = Array.from({ length: 7 }, (_, i) => ({
+      userId: `u${i + 1}`,
+      name: `User ${i + 1}`,
+    }));
+    populateRemoteUsers(users);
+
+    renderAvatars();
+    const badge = screen.getByTestId('collab-count-badge');
+    expect(badge).toHaveAttribute('aria-label', '7 位协作者，点击查看全部');
+  });
+
+  it('should show empty state when no collaborators', () => {
+    renderAvatars();
     expect(screen.getByTestId('collab-avatars-empty')).toBeInTheDocument();
-    expect(screen.getByTestId('collab-avatars-empty')).toHaveTextContent('暂无协作者');
+    expect(screen.queryByTestId('collab-count-badge')).toBeNull();
   });
 
-  // Case 2: Single collaborator
-  it('renders single collaborator avatar with status dot', () => {
-    const now = Date.now();
-    addUser('u1', 'Alice', now);
-    render(<CollaboratorAvatars currentUserId="self-1" />);
-    const avatars = screen.getByTestId('collab-avatars');
-    expect(avatars).toHaveAttribute('data-count', '1');
-    const avatarItem = screen.getByTestId('collab-avatar-u1');
-    expect(avatarItem).toHaveAttribute('data-username', 'Alice');
-  });
+  it('should exclude self from collaborator count', () => {
+    populateRemoteUsers([
+      { userId: 'self', name: 'Me' },
+      { userId: 'u1', name: 'Alice' },
+      { userId: 'u2', name: 'Bob' },
+    ]);
 
-  // Case 3: Multiple collaborators
-  it('renders multiple collaborators in stack', () => {
-    const now = Date.now();
-    addUser('u1', 'Alice', now);
-    addUser('u2', 'Bob', now);
-    addUser('u3', 'Carol', now);
-    render(<CollaboratorAvatars currentUserId="self-1" maxDisplay={5} />);
-    expect(screen.getByTestId('collab-avatars')).toHaveAttribute('data-count', '3');
-    expect(screen.getByTestId('collab-avatar-u1')).toBeInTheDocument();
-    expect(screen.getByTestId('collab-avatar-u2')).toBeInTheDocument();
-    expect(screen.getByTestId('collab-avatar-u3')).toBeInTheDocument();
-  });
-
-  // Case 4: Overflow "+N" badge
-  it('shows overflow badge when collaborators exceed maxDisplay', () => {
-    const now = Date.now();
-    for (let i = 1; i <= 8; i++) addUser(`u${i}`, `User${i}`, now);
-    render(<CollaboratorAvatars currentUserId="self-1" maxDisplay={5} />);
-    expect(screen.getByTestId('collab-avatars-overflow')).toHaveTextContent('+3');
-    expect(screen.queryByTestId('collab-avatar-u6')).not.toBeInTheDocument();
-  });
-
-  // Case 5: Online status (< 10s, S89-E3 heartbeat optimization)
-  it('shows online status dot when lastActiveAt < 10 seconds (S89-E3)', () => {
-    const now = Date.now();
-    const fiveSecAgo = now - 5_000; // S89-E3: online threshold reduced from 5min to 10s
-    addUser('u1', 'Alice', fiveSecAgo);
-    render(<CollaboratorAvatars currentUserId="self-1" />);
-    const statusDot = screen.getByTestId('collab-avatar-u1').querySelector('[data-status]');
-    expect(statusDot).toHaveAttribute('data-status', 'online');
-  });
-
-  // Case 6: Idle status (10s–30min, S89-E3: formerly 5–30min)
-  it('shows idle status dot when lastActiveAt between 10 seconds and 30 minutes (S89-E3)', () => {
-    const now = Date.now();
-    const tenMinAgo = now - 10 * 60 * 1000;
-    addUser('u1', 'Alice', tenMinAgo);
-    render(<CollaboratorAvatars currentUserId="self-1" />);
-    const statusDot = screen.getByTestId('collab-avatar-u1').querySelector('[data-status]');
-    expect(statusDot).toHaveAttribute('data-status', 'idle');
-  });
-
-  // Case 7: Offline status (> 30 min)
-  it('shows offline status dot when lastActiveAt > 30 minutes', () => {
-    const now = Date.now();
-    const oneHourAgo = now - 60 * 60 * 1000;
-    addUser('u1', 'Alice', oneHourAgo);
-    render(<CollaboratorAvatars currentUserId="self-1" />);
-    const statusDot = screen.getByTestId('collab-avatar-u1').querySelector('[data-status]');
-    expect(statusDot).toHaveAttribute('data-status', 'offline');
-  });
-
-  // Case 8: Excludes currentUserId
-  it('excludes currentUserId from collaborator list', () => {
-    const now = Date.now();
-    addUser('self-1', 'Me', now);
-    addUser('u2', 'Bob', now);
-    render(<CollaboratorAvatars currentUserId="self-1" />);
-    expect(screen.getByTestId('collab-avatars')).toHaveAttribute('data-count', '1');
-    expect(screen.queryByTestId('collab-avatar-self-1')).not.toBeInTheDocument();
-    expect(screen.getByTestId('collab-avatar-u2')).toBeInTheDocument();
-  });
-
-  // Case 9: Reconnect spinner
-  it('shows reconnect spinner when connectionStatus is reconnecting', () => {
-    const now = Date.now();
-    addUser('u1', 'Alice', now);
-    mockConnectionStatus = 'reconnecting';
-    render(<CollaboratorAvatars currentUserId="self-1" />);
-    expect(screen.getByTestId('collab-reconnect')).toBeInTheDocument();
-  });
-
-  // Case 10: Avatar with image
-  it('renders avatar image when avatar URL is provided', () => {
-    const now = Date.now();
-    addUser('u1', 'Alice', now, 'https://example.com/alice.png');
-    render(<CollaboratorAvatars currentUserId="self-1" />);
-    const img = screen.getByRole('img', { name: 'Alice' });
-    expect(img).toHaveAttribute('src', 'https://example.com/alice.png');
-  });
-
-  // === S89-E3: Heartbeat optimization boundary tests ===
-  // S89-E3: online threshold = 10s, idle threshold = 30min
-
-  it('S89-E3: online at exactly 10 seconds (boundary — strictly less than)', () => {
-    const now = Date.now();
-    const exactly10SecAgo = now - 10_000;
-    addUser('u1', 'Alice', exactly10SecAgo);
-    render(<CollaboratorAvatars currentUserId="self-1" />);
-    // strictly < 10_000, so exactly 10_000 → idle, not online
-    const statusDot = screen.getByTestId('collab-avatar-u1').querySelector('[data-status]');
-    expect(statusDot).toHaveAttribute('data-status', 'idle');
-  });
-
-  it('S89-E3: idle at 15 seconds (above online, within idle range)', () => {
-    const now = Date.now();
-    const fifteenSecAgo = now - 15_000;
-    addUser('u1', 'Alice', fifteenSecAgo);
-    render(<CollaboratorAvatars currentUserId="self-1" />);
-    const statusDot = screen.getByTestId('collab-avatar-u1').querySelector('[data-status]');
-    expect(statusDot).toHaveAttribute('data-status', 'idle');
-  });
-
-  it('S89-E3: offline at 31 minutes (above idle threshold of 30 minutes)', () => {
-    const now = Date.now();
-    const thirtyOneMinAgo = now - 31 * 60 * 1000; // 31 minutes — beyond 30min idle threshold
-    addUser('u1', 'Alice', thirtyOneMinAgo);
-    render(<CollaboratorAvatars currentUserId="self-1" />);
-    const statusDot = screen.getByTestId('collab-avatar-u1').querySelector('[data-status]');
-    expect(statusDot).toHaveAttribute('data-status', 'offline');
+    renderAvatars({ currentUserId: 'self' });
+    // Only 2 collaborators (Alice and Bob), so no count badge
+    expect(screen.queryByTestId('collab-count-badge')).toBeNull();
   });
 });

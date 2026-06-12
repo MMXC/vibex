@@ -1,0 +1,39 @@
+/**
+ * ConflictBadge.module.css — S91-E3-F2
+ *
+ * Red border + tooltip warning for nodes being edited by another user.
+ */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.5);
+  color: #fca5a5;
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+  pointer-events: none;
+  animation: conflictPulse 2s ease-in-out infinite;
+}
+
+.icon {
+  color: #f87171;
+  flex-shrink: 0;
+}
+
+.label {
+  color: #fca5a5;
+}
+
+@keyframes conflictPulse {
+  0%, 100% {
+    opacity: 0.85;
+  }
+  50% {
+    opacity: 1;
+  }
+}

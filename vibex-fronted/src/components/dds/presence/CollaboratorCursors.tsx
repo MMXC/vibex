@@ -64,6 +64,7 @@ interface SingleCursorProps {
   x: number;
   y: number;
   color: string;
+  intent?: string;
 }
 
 const SingleCursor = memo(function SingleCursor({
@@ -72,6 +73,7 @@ const SingleCursor = memo(function SingleCursor({
   x,
   y,
   color,
+  intent,
 }: SingleCursorProps) {
   return (
     <div
@@ -96,6 +98,13 @@ const SingleCursor = memo(function SingleCursor({
       >
         {userName}
       </div>
+
+      {/* S91-E3-F1: Intent label pill */}
+      {intent && (
+        <div className={styles.intentLabel}>
+          {intent}
+        </div>
+      )}
     </div>
   );
 });
@@ -129,6 +138,8 @@ export const CollaboratorCursors = memo(function CollaboratorCursors({
           y: cursorState.y - viewportOffsetY,
           lastSeen: cursorState.lastSeen,
           color,
+          // S91-E3-F1: Include intent from remoteUsers
+          intent: remoteUser?.intent,
         };
       })
       .filter((item) => {
@@ -157,6 +168,7 @@ export const CollaboratorCursors = memo(function CollaboratorCursors({
           x={item.x}
           y={item.y}
           color={item.color}
+          intent={item.intent}
         />
       ))}
     </div>

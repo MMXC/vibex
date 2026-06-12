@@ -38,6 +38,10 @@ export interface RemoteUser {
   cursorY?: number;
   /** Last heartbeat timestamp */
   lastSeen: number;
+  /** S91-E3-F1: Current user intent/activity description */
+  intent?: string;
+  /** S91-E3-F1: Timestamp of last intent update */
+  intentUpdatedAt?: number;
 }
 
 /** S62-E1: Info about who is editing which node */
@@ -98,6 +102,27 @@ export interface ConflictRecord {
   detectedAt: number;
   /** 'keep-local' | 'keep-remote' | 'pending' */
   resolution: 'keep-local' | 'keep-remote' | 'pending';
+}
+
+/** S91-E3-F2: Conflict record for node selection conflicts (another user editing same node) */
+export interface NodeConflictRecord {
+  targetId: string;
+  userId: string;
+  userName: string;
+  lockedAt: number;
+}
+
+/** S91-E3-F3: Operation types for real-time history sync */
+export type OperationType = 'add' | 'delete' | 'edit-property' | 'move';
+
+/** S91-E3-F3: Operation record for real-time history */
+export interface OperationRecord {
+  userId: string;
+  userName: string;
+  operationType: OperationType;
+  description: string;
+  targetId: string;
+  timestamp: number;
 }
 
 /** S89-E3: Heartbeat timeout in milliseconds (10s — optimized from 30s) */
@@ -345,6 +370,42 @@ interface PresenceState {
 
   /** S66-E2: Clear all locks (on disconnect) */
   clearAllLocks: () => void;
+
+  // S91-E3-F1: Intent broadcast actions
+  /** S91-E3-F1: Last intent broadcast timestamp per user (for throttling) */
+  lastIntentBroadcast: Record<string, number>;
+
+  /** S91-E3-F1: Broadcast own intent — throttled to 1 per second */
+  broadcastIntent: (userId: string, intent: string) => void;
+
+  /** S91-E3-F1: Update a remote user's intent from WebSocket message */
+  updateRemoteIntent: (userId: string, intent: string) => void;
+
+  /** S91-E3-F1: Get a remote user's current intent */
+  getRemoteIntent: (userId: string) => string | undefined;
+
+  // S91-E3-F2: Node selection conflict actions
+  /** S91-E3-F2: Node selection conflicts: nodeId → NodeConflictRecord */
+  nodeSelectionConflicts: Map<string, NodeConflictRecord>;
+
+  /** S91-E3-F2: Add a node selection conflict when another user locks the same node */
+  addNodeConflict: (targetId: string, userId: string, userName: string) => void;
+
+  /** S91-E3-F2: Clear a node selection conflict when node is unlocked */
+  clearNodeConflict: (targetId: string) => void;
+
+  /** S91-E3-F2: Get conflict info for a node */
+  getNodeConflict: (nodeId: string) => NodeConflictRecord | undefined;
+
+  // S91-E3-F3: Operation history actions
+  /** S91-E3-F3: Last 10 operations (FIFO) */
+  operationHistory: OperationRecord[];
+
+  /** S91-E3-F3: Add an operation to the history (max 10 entries, FIFO) */
+  addOperation: (op: Omit<OperationRecord, 'timestamp'>) => void;
+
+  /** S91-E3-F3: Clear operation history (on disconnect) */
+  clearOperationHistory: () => void;
 }
 
 export const usePresenceStore = create<PresenceState>((set, get) => {
@@ -430,6 +491,9 @@ export const usePresenceStore = create<PresenceState>((set, get) => {
             cursorX: existing?.cursorX,
             cursorY: existing?.cursorY,
             lastSeen: Date.now(),
+            // S91-E3-F1: preserve intent from test data
+            intent: (user as any).intent ?? existing?.intent,
+            intentUpdatedAt: existing?.intentUpdatedAt,
           });
         }
         return { remoteUsers: next };
@@ -867,6 +931,82 @@ export const usePresenceStore = create<PresenceState>((set, get) => {
 
     getUnresolvedCount: () => {
       return get().pendingConflicts.length;
+    },
+
+    // S91-E3-F1: Intent broadcast
+    lastIntentBroadcast: {},
+
+    broadcastIntent: (userId: string, intent: string) => {
+      const now = Date.now();
+      const last = get().lastIntentBroadcast[userId] ?? 0;
+      if (now - last < 1000) return; // Throttle to 1 per second
+      set((state) => ({
+        lastIntentBroadcast: { ...state.lastIntentBroadcast, [userId]: now },
+      }));
+      // Update own intent in remoteUsers (for broadcast to other users)
+      set((state) => {
+        const updated = new Map(state.remoteUsers);
+        const existing = updated.get(userId);
+        if (existing) {
+          updated.set(userId, { ...existing, intent, intentUpdatedAt: now });
+        }
+        return { remoteUsers: updated };
+      });
+    },
+
+    updateRemoteIntent: (userId: string, intent: string) => {
+      const now = Date.now();
+      set((state) => {
+        const updated = new Map(state.remoteUsers);
+        const existing = updated.get(userId);
+        if (existing) {
+          updated.set(userId, { ...existing, intent, intentUpdatedAt: now });
+        }
+        return { remoteUsers: updated };
+      });
+    },
+
+    getRemoteIntent: (userId: string) => {
+      return get().remoteUsers.get(userId)?.intent;
+    },
+
+    // S91-E3-F2: Node selection conflicts
+    nodeSelectionConflicts: new Map(),
+
+    addNodeConflict: (targetId: string, userId: string, userName: string) => {
+      set((state) => {
+        const newMap = new Map(state.nodeSelectionConflicts);
+        newMap.set(targetId, { targetId, userId, userName, lockedAt: Date.now() });
+        return { nodeSelectionConflicts: newMap };
+      });
+    },
+
+    clearNodeConflict: (targetId: string) => {
+      set((state) => {
+        const newMap = new Map(state.nodeSelectionConflicts);
+        newMap.delete(targetId);
+        return { nodeSelectionConflicts: newMap };
+      });
+    },
+
+    getNodeConflict: (nodeId: string) => {
+      return get().nodeSelectionConflicts.get(nodeId);
+    },
+
+    // S91-E3-F3: Operation history
+    operationHistory: [],
+
+    addOperation: (op) => {
+      set((state) => {
+        const newOp: OperationRecord = { ...op, timestamp: Date.now() };
+        const next = [newOp, ...state.operationHistory];
+        // Keep max 10 entries (FIFO — newest first)
+        return { operationHistory: next.slice(0, 10) };
+      });
+    },
+
+    clearOperationHistory: () => {
+      set({ operationHistory: [] });
     },
   };
 });

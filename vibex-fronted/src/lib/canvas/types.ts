@@ -656,6 +656,8 @@ export interface CanvasSnapshot {
   createdAt: string;
   /** Snapshot version number (auto-increment per project) — E1 */
   version: number;
+  /** S90-E2: Associated Epic ID for selective rollback grouping */
+  epicId?: string;
   /** Number of nodes in each tree at snapshot time */
   contextCount: number;
   flowCount: number;
@@ -670,6 +672,8 @@ export interface CreateSnapshotInput {
   projectId?: string | null;
   label: string;
   trigger: CanvasSnapshot['trigger'];
+  // S90-E2: Optional Epic ID to associate this snapshot with an Epic
+  epicId?: string;
   contextNodes: BoundedContextNode[];
   flowNodes: BusinessFlowNode[];
   componentNodes: ComponentNode[];

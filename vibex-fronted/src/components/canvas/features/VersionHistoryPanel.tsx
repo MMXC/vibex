@@ -3,13 +3,14 @@
 /**
  * VersionHistoryPanel — 画布版本历史侧边栏
  * E4-F11: 版本历史
+ * S90-E2: 选择性回滚 (Selective Rollback) — 支持按 Epic 回滚
  *
  * 显示快照列表，支持预览和恢复
  * 侧边抽屉式设计，从右侧滑入
  * 内部管理 creating/restoring 状态，不依赖外部 props
  */
 
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useMemo } from 'react';
 import type { CanvasSnapshot } from '@/lib/canvas/types';
 import { canvasLogger } from '@/lib/canvas/canvasLogger';
 import { computeSnapshotDiff } from '@/lib/canvas/snapshotDiff';
@@ -30,6 +31,97 @@ const TRIGGER_LABELS: Record<string, string> = {
   ai_complete: '🤖 AI 生成',
   auto: '⚡ 自动',
 };
+
+// S90-E2: Extracted snapshot card for reuse in both Epic sections and standalone list
+interface SnapshotCardProps {
+  snap: CanvasSnapshot;
+  isSelected: boolean;
+  isInCompare: boolean;
+  onSelect: () => void;
+  onToggleCompare: () => void;
+  onRestore: (snapshotId: string, snapshotLabel: string) => void;
+  restoring: boolean;
+  formatDate: (isoString: string) => string;
+}
+
+const SnapshotCard = memo(function SnapshotCard({
+  snap,
+  isSelected,
+  isInCompare,
+  onSelect,
+  onToggleCompare,
+  onRestore,
+  restoring,
+  formatDate,
+}: SnapshotCardProps) {
+  return (
+    <div
+      className={`${styles.snapshotCard} ${styles.snapshotCardRelative} ${
+        isSelected ? styles.snapshotCardSelected : ''
+      } ${isInCompare ? styles.snapshotCardCompareSelected : ''}`}
+      onClick={onSelect}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          onSelect();
+        }
+      }}
+      data-testid={`snapshot-item-${snap.snapshotId}`}
+    >
+      <div className={styles.snapshotHeader}>
+        <span className={styles.snapshotTrigger}>
+          {TRIGGER_LABELS[snap.trigger] ?? snap.trigger}
+        </span>
+        {/* S90-E2: Epic badge */}
+        {snap.epicId && (
+          <span className={styles.epicBadge}>
+            📌 {snap.epicId}
+          </span>
+        )}
+        <span className={styles.snapshotTime}>
+          {formatDate(snap.createdAt)}
+        </span>
+      </div>
+
+      <div className={styles.snapshotLabel}>{snap.label}</div>
+
+      <div className={styles.cardLeft}>
+        <input
+          type="checkbox"
+          className={styles.compareCheckbox}
+          checked={isInCompare}
+          onChange={onToggleCompare}
+          onClick={(e) => e.stopPropagation()}
+          aria-label={`选择 ${snap.label} 用于对比`}
+        />
+      </div>
+
+      <div className={styles.snapshotStats}>
+        <span title="限界上下文">◇ {snap.contextCount}</span>
+        <span title="业务流程">→ {snap.flowCount}</span>
+        <span title="组件">▣ {snap.componentCount}</span>
+      </div>
+
+      {/* Restore button — shown when card is selected */}
+      {isSelected && (
+        <button
+          type="button"
+          className={styles.restoreBtn}
+          onClick={(e) => {
+            e.stopPropagation();
+            onRestore(snap.snapshotId, snap.label);
+          }}
+          disabled={restoring}
+          data-testid={`restore-snapshot-${snap.snapshotId}`}
+          aria-label={`恢复到 ${snap.label}`}
+        >
+          {restoring ? '恢复中...' : '↩ 恢复'}
+        </button>
+      )}
+    </div>
+  );
+});
 
 export function VersionHistoryPanel({ open, onClose }: VersionHistoryPanelProps) {
   const {
@@ -55,6 +147,15 @@ export function VersionHistoryPanel({ open, onClose }: VersionHistoryPanelProps)
   // Compare mode state
   const [compareSnapshots, setCompareSnapshots] = useState<CanvasSnapshot[]>([]);
   const [diffResult, setDiffResult] = useState<ReturnType<typeof computeSnapshotDiff> | null>(null);
+
+  // S90-E2: Selective rollback state
+  const [rollbackPreview, setRollbackPreview] = useState<{
+    epicId: string;
+    epicSnapshots: CanvasSnapshot[];
+    rollbackTarget: CanvasSnapshot;
+    rollbackDiff: ReturnType<typeof computeSnapshotDiff>;
+  } | null>(null);
+  const [rollbackLoading, setRollbackLoading] = useState(false);
 
   // Check if a snapshot is in compare list
   const isInCompare = (snap: CanvasSnapshot) =>
@@ -145,10 +246,129 @@ export function VersionHistoryPanel({ open, onClose }: VersionHistoryPanelProps)
     });
   };
 
+  // S90-E2: Group snapshots by Epic ID (snapshots with epicId are grouped)
+  const epicGroups = useMemo(() => {
+    const groups = new Map<string, CanvasSnapshot[]>();
+    for (const snap of snapshots) {
+      if (snap.epicId) {
+        const existing = groups.get(snap.epicId) ?? [];
+        groups.set(snap.epicId, [...existing, snap]);
+      }
+    }
+    // Sort groups by newest Epic snapshot
+    return Array.from(groups.entries())
+      .map(([epicId, snaps]) => ({
+        epicId,
+        snapshots: [...snaps].sort(
+          (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        ),
+      }))
+      .sort((a, b) => new Date(b.snapshots[0]!.createdAt).getTime() - new Date(a.snapshots[0]!.createdAt).getTime());
+  }, [snapshots]);
+
+  // S90-E2: Non-Epic snapshots (standalone/manual)
+  const nonEpicSnapshots = useMemo(
+    () => snapshots.filter(s => !s.epicId),
+    [snapshots]
+  );
+
+  // S90-E2: Open selective rollback preview
+  const handleSelectiveRollback = useCallback(
+    (epicId: string) => {
+      const epicSnapshots = epicGroups.find(g => g.epicId === epicId)?.snapshots ?? [];
+
+      // Sort oldest first to find the earliest snapshot for this Epic
+      const sortedEpicSnapshots = [...epicSnapshots].sort(
+        (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+      );
+      const oldestEpicSnapshot = sortedEpicSnapshots[0];
+
+      if (!oldestEpicSnapshot) return;
+
+      // Find the snapshot just before the oldest Epic snapshot (rollback target)
+      const rollbackTarget = snapshots.find(
+        s => new Date(s.createdAt).getTime() < new Date(oldestEpicSnapshot.createdAt).getTime()
+      );
+
+      if (!rollbackTarget) return;
+
+      // Compute diff for preview
+      const rollbackDiff = computeSnapshotDiff(rollbackTarget, oldestEpicSnapshot);
+
+      setRollbackPreview({
+        epicId,
+        epicSnapshots: sortedEpicSnapshots,
+        rollbackTarget,
+        rollbackDiff,
+      });
+    },
+    [epicGroups, snapshots]
+  );
+
+  // S90-E2: Confirm selective rollback
+  const handleConfirmRollback = useCallback(async () => {
+    if (!rollbackPreview) return;
+    setRollbackLoading(true);
+    try {
+      await restoreSnapshot(rollbackPreview.rollbackTarget.snapshotId);
+      setRollbackPreview(null);
+      onClose();
+    } catch {
+      canvasLogger.VersionHistoryPanel.error(' selective rollback error');
+    } finally {
+      setRollbackLoading(false);
+    }
+  }, [rollbackPreview, restoreSnapshot, onClose]);
+
   if (!open) return null;
+
+  const hasEpicGroups = epicGroups.length > 0;
 
   return (
     <>
+      {/* S90-E2: Selective rollback preview dialog */}
+      {rollbackPreview && (
+        <div className={styles.rollbackPreviewOverlay} role="dialog" aria-modal="true" data-testid="rollback-preview-dialog">
+          <div className={styles.rollbackPreviewDialog}>
+            <h3 className={styles.rollbackPreviewTitle}>
+              ⚠️ 回滚确认 — Epic "{rollbackPreview.epicId}"
+            </h3>
+            <p className={styles.rollbackPreviewSubtitle}>
+              将恢复到「{rollbackPreview.rollbackTarget.label}」之前的版本，
+              回滚 {rollbackPreview.epicSnapshots.length} 个相关快照的变更。
+            </p>
+
+            {/* Diff preview */}
+            <SnapshotDiffView
+              diff={rollbackPreview.rollbackDiff}
+              labelA={rollbackPreview.rollbackTarget.label}
+              labelB={`Epic "${rollbackPreview.epicId}" 变更`}
+              onBack={() => setRollbackPreview(null)}
+            />
+
+            <div className={styles.rollbackPreviewActions}>
+              <button
+                type="button"
+                className={styles.rollbackCancelBtn}
+                onClick={() => setRollbackPreview(null)}
+                data-testid="rollback-cancel-btn"
+              >
+                取消
+              </button>
+              <button
+                type="button"
+                className={styles.rollbackConfirmBtn}
+                onClick={handleConfirmRollback}
+                disabled={rollbackLoading}
+                data-testid="rollback-confirm-btn"
+              >
+                {rollbackLoading ? '回滚中...' : '⚠️ 确认回滚'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Backdrop overlay */}
       <div className={styles.overlay} onClick={onClose} aria-hidden="true" />
 
@@ -248,84 +468,68 @@ export function VersionHistoryPanel({ open, onClose }: VersionHistoryPanelProps)
                   </div>
                 )
               ) : (
-                snapshots.map((snap) => (
-                  <div
-                    key={snap.snapshotId}
-                    className={`${styles.snapshotCard} ${
-                      styles.snapshotCardRelative
-                    } ${
-                      selectedSnapshot?.snapshotId === snap.snapshotId
-                        ? styles.snapshotCardSelected
-                        : ''
-                    } ${
-                      isInCompare(snap) ? styles.snapshotCardCompareSelected : ''
-                    }`}
-                    onClick={() =>
-                      selectSnapshot(
-                        selectedSnapshot?.snapshotId === snap.snapshotId
-                          ? null
-                          : snap
-                      )
-                    }
-                    role="button"
-                    tabIndex={0}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
+                <>
+                  {/* S90-E2: Epic sections with rollback buttons */}
+                  {hasEpicGroups && epicGroups.map(({ epicId, snapshots: epicSnaps }) => (
+                    <div key={epicId} className={styles.epicSection} data-testid={`epic-section-${epicId}`}>
+                      <div className={styles.epicSectionTitle}>
+                        <span>📌</span>
+                        <span>Epic: {epicId}</span>
+                        <span style={{ marginLeft: 'auto' }}>
+                          <button
+                            type="button"
+                            className={styles.epicRollbackBtn}
+                            onClick={() => handleSelectiveRollback(epicId)}
+                            data-testid={`epic-rollback-${epicId}`}
+                            title={`回滚 Epic "${epicId}" 的所有变更`}
+                          >
+                            ↩ 回滚此 Epic
+                          </button>
+                        </span>
+                      </div>
+                      {epicSnaps.map((snap) => (
+                        <SnapshotCard
+                          key={snap.snapshotId}
+                          snap={snap}
+                          isSelected={selectedSnapshot?.snapshotId === snap.snapshotId}
+                          isInCompare={isInCompare(snap)}
+                          onSelect={() =>
+                            selectSnapshot(
+                              selectedSnapshot?.snapshotId === snap.snapshotId
+                                ? null
+                                : snap
+                            )
+                          }
+                          onToggleCompare={() => toggleCompare(snap)}
+                          onRestore={handleRestore}
+                          restoring={restoring}
+                          formatDate={formatDate}
+                        />
+                      ))}
+                    </div>
+                  ))}
+
+                  {/* Non-Epic snapshots (standalone / manual) */}
+                  {nonEpicSnapshots.map((snap) => (
+                    <SnapshotCard
+                      key={snap.snapshotId}
+                      snap={snap}
+                      isSelected={selectedSnapshot?.snapshotId === snap.snapshotId}
+                      isInCompare={isInCompare(snap)}
+                      onSelect={() =>
                         selectSnapshot(
                           selectedSnapshot?.snapshotId === snap.snapshotId
                             ? null
                             : snap
-                        );
+                        )
                       }
-                    }}
-                    data-testid={`snapshot-item-${snap.snapshotId}`}
-                  >
-                    <div className={styles.snapshotHeader}>
-                      <span className={styles.snapshotTrigger}>
-                        {TRIGGER_LABELS[snap.trigger] ?? snap.trigger}
-                      </span>
-                      <span className={styles.snapshotTime}>
-                        {formatDate(snap.createdAt)}
-                      </span>
-                    </div>
-
-                    <div className={styles.snapshotLabel}>{snap.label}</div>
-
-                    <div className={styles.cardLeft}>
-                      <input
-                        type="checkbox"
-                        className={styles.compareCheckbox}
-                        checked={isInCompare(snap)}
-                        onChange={() => toggleCompare(snap)}
-                        onClick={(e) => e.stopPropagation()}
-                        aria-label={`选择 ${snap.label} 用于对比`}
-                      />
-                    </div>
-
-                    <div className={styles.snapshotStats}>
-                      <span title="限界上下文">◇ {snap.contextCount}</span>
-                      <span title="业务流程">→ {snap.flowCount}</span>
-                      <span title="组件">▣ {snap.componentCount}</span>
-                    </div>
-
-                    {/* Restore button — shown when card is selected */}
-                    {selectedSnapshot?.snapshotId === snap.snapshotId && (
-                      <button
-                        type="button"
-                        className={styles.restoreBtn}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleRestore(snap.snapshotId, snap.label);
-                        }}
-                        disabled={restoring}
-                        data-testid={`restore-snapshot-${snap.snapshotId}`}
-                        aria-label={`恢复到 ${snap.label}`}
-                      >
-                        {restoring ? '恢复中...' : '↩ 恢复'}
-                      </button>
-                    )}
-                  </div>
-                ))
+                      onToggleCompare={() => toggleCompare(snap)}
+                      onRestore={handleRestore}
+                      restoring={restoring}
+                      formatDate={formatDate}
+                    />
+                  ))}
+                </>
               )}
             </div>
 

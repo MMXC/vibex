@@ -7533,3 +7533,32 @@ See git history for complete changelog.
 - AC4: Merge preview shows conflict warnings ✅
 
 **Tests**: 33 vitest passing
+## S91-E1 (2026-06-12)
+
+### AI Template Generation — LLM Backend + Gallery Tab
+**Type**: Feature
+
+**Files Changed**:
+- `vibex-backend/migrations/0024_ai_generation_jobs.sql` — D1 migration: `ai_generation_jobs` table
+- `vibex-backend/src/lib/llm/templateGenerator.ts` — MiniMax LLM wrapper (structured JSON output via JSON schema)
+- `vibex-backend/src/app/api/templates/ai-generate/route.ts` — POST /api/templates/ai-generate (create job) + GET (list user jobs)
+- `vibex-backend/src/app/api/templates/ai-generate/[jobId]/route.ts` — GET /api/templates/ai-generate/[jobId] (poll status)
+- `vibex-backend/src/app/api/templates/ai-generate/route.test.ts` — 6 Jest tests (route.test.ts)
+- `vibex-fronted/src/stores/aiGenerateStore.ts` — Zustand store with getState() static, job polling
+- `vibex-fronted/src/components/template-gallery/AIGenerateDialog.tsx` — Modal dialog with prompt input + polling
+- `vibex-fronted/src/components/template-gallery/AIGenerateDialog.module.css` — Dialog styles
+- `vibex-fronted/src/components/template-gallery/AIGeneratedPreview.tsx` — Tree view for generated canvas JSON
+- `vibex-fronted/src/components/template-gallery/AIGeneratedPreview.module.css` — Preview styles
+- `vibex-fronted/src/components/template-gallery/AIGenerateTab.tsx` — Gallery tab content with examples
+- `vibex-fronted/src/components/template-gallery/AIGenerateTab.module.css` — Tab styles
+- `vibex-fronted/src/components/template-gallery/AIGenerateDialog.test.tsx` — 5 Vitest tests (dialog)
+- `vibex-fronted/src/components/templates/TemplateGallery.tsx` — Integrated AI 生成 Tab in category nav
+
+**Acceptance Criteria**:
+- AC1: MiniMax LLM generates valid canvas JSON from natural language prompt ✅
+- AC2: Gallery includes AI 生成 Tab accessible from category nav ✅
+- AC3: Preview shows generated canvas structure before saving ✅
+- AC4: Job polling + status indicator (pending/generating/completed/failed) ✅
+
+**Tests**: 11 tests passing (5 vitest + 6 jest)
+

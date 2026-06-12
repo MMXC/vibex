@@ -175,3 +175,18 @@
   - 类型: feat
   - 影响: vibex-backend
 
+## S91-E1 · AI Template Generation · 2026-06-12
+
+### Backend Core
+
+#### 2026-06-12
+
+- **S91-E1 AI Template Generation** (epic/s91-e1-ai-template-generation)
+  - `src/app/api/templates/ai-generate/route.ts`: POST /api/templates/ai-generate (创建生成任务) + GET (列出用户任务)；`runtime = 'edge'`
+  - `src/app/api/templates/ai-generate/[jobId]/route.ts`: GET /api/templates/ai-generate/[jobId] (查询任务状态)
+  - `src/lib/llm/templateGenerator.ts`: MiniMax API wrapper，`MINIMAX_API_KEY` 环境变量，JSON schema 输出验证
+  - `migrations/0024_ai_generation_jobs.sql`: D1 迁移 `ai_generation_jobs` 表，含 job_id / prompt / status / result / error
+  - `src/app/api/templates/ai-generate/route.test.ts`: 6 Jest 测试（参数校验/状态机/错误处理）
+  - 类型: feat
+  - 影响: vibex-backend
+

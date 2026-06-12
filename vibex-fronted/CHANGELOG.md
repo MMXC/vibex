@@ -7446,3 +7446,7 @@ See git history for complete changelog.
 
 类型: feat
 影响: vibex-fronted
+## S93-E2 (2026-06-13)
+- **Template Versioning & Fork** — 模板版本化存储、fork 为个人副本
+- **TemplateVersionHistory.tsx**: 模板版本历史面板，显示版本列表、创建版本按钮、固定标记
+- **TemplateForkButton.tsx**: Fork 按钮组件，含对话框，支持自定义名称

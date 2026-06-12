@@ -7714,3 +7714,10 @@ See git history for complete changelog.
 
 类型: feat
 影响: vibex-fronted
+## S93-E2 (2026-06-13)
+- **Template Versioning & Fork** — 模板版本化存储、fork 为个人副本
+- **D1 Migration**: `0025_template_versions.sql` — `template_versions` 表，存储 id/template_id/version_number/description/snapshot_json/pinned/created_by/created_at
+- **POST /api/templates/{id}/versions**: 创建模板新版本快照
+- **PATCH /api/templates/{id}/versions/{versionId}**: 固定/取消固定模板版本
+- **POST /api/templates/{id}/fork**: Fork 模板为个人副本，复制内容 + 记录 forked_from_id
+

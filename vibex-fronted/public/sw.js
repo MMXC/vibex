@@ -1,11 +1,13 @@
 /**
- * Service Worker — E05 Canvas 离线模式 + F1.3-U1 离线写入队列 + S62-E5 画布数据缓存
+ * Service Worker — E05 Canvas 离线模式 + F1.3-U1 离线写入队列 + S62-E5 画布数据缓存 + S92-E4 PWA 离线缓存 + S93-E3 Offline-First PWA
  * Workbox 缓存策略:
  * - cacheFirst: 静态资源（JS/CSS/图片）
  * - networkFirst: API 数据
  * - Offline Queue: 非 GET 请求离线缓存，重放
  * - App Shell 预缓存
  * - E5 Canvas Cache: GET /api/canvas/* responses cached (last 5, 7-day TTL)
+ * - S92-E4: PWA 离线画布缓存 (last 5 canvases, 7-day TTL via IndexedDB)
+ * - S93-E3: Background Sync API + Cache Hit Rate Tracking (>80% goal)
  */
 
 const CACHE_NAME = 'vibex-v1';
@@ -311,7 +313,7 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // 静态资源（JS/CSS/图片）→ cacheFirst
+  // 静态资源（JS/CSS/图片）→ cacheFirst with hit tracking
   if (
     request.destination === 'script' ||
     request.destination === 'style' ||
@@ -320,10 +322,14 @@ self.addEventListener('fetch', (event) => {
   ) {
     event.respondWith(
       caches.match(request).then((cached) => {
-        if (cached) return cached;
+        if (cached) {
+          recordCacheHit();
+          return cached;
+        }
         return fetch(request).then((response) => {
           const clone = response.clone();
           caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
+          recordCacheMiss();
           return response;
         });
       })
@@ -346,7 +352,7 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // 其他资源 → stale-while-revalidate
+  // 其他资源 → stale-while-revalidate with hit tracking
   event.respondWith(
     caches.match(request).then((cached) => {
       const fetchPromise = fetch(request).then((response) => {
@@ -354,14 +360,140 @@ self.addEventListener('fetch', (event) => {
         caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
         return response;
       });
+      if (cached) recordCacheHit();
+      else recordCacheMiss();
       return cached || fetchPromise;
     })
   );
 });
 
+// ==================== S93-E3: Background Sync API ====================
+
+// S93-E3: Listen for Background Sync events registered by the client
+self.addEventListener('sync', async (event) => {
+  if (event.tag !== 'vibex-sync') return;
+
+  event.waitUntil(
+    (async () => {
+      const broadcast = new BroadcastChannel('vibex-offline-status');
+      broadcast.postMessage({ type: 'ONLINE' });
+      broadcast.close();
+
+      // Replay queued requests via the same logic as the online handler
+      const requests = await getQueuedRequests();
+      if (!requests || requests.length === 0) return;
+
+      let completed = 0;
+      let failed = 0;
+
+      for (const req of requests) {
+        try {
+          const response = await fetch(req.url, {
+            method: req.method,
+            headers: req.headers,
+            body: req.body,
+            cache: 'no-cache',
+            credentials: 'include',
+          });
+
+          if (response.ok || response.status === 409) {
+            await dequeueRequest(req.id);
+            completed++;
+          } else {
+            if (req.retryCount < MAX_RETRIES) {
+              await incrementRetryCount(req.id);
+              failed++;
+            } else {
+              await dequeueRequest(req.id);
+              failed++;
+            }
+          }
+        } catch {
+          if (req.retryCount < MAX_RETRIES) {
+            await incrementRetryCount(req.id);
+            failed++;
+          } else {
+            await dequeueRequest(req.id);
+            failed++;
+          }
+        }
+      }
+
+      // Notify clients of replay completion
+      const clients = await self.clients.matchAll();
+      clients.forEach((client) => {
+        client.postMessage({
+          type: 'REPLAY_COMPLETE',
+          syncResult: { completed, failed },
+        });
+      });
+    })()
+  );
+});
+
+// ==================== S93-E3: Cache Hit Rate Tracking ====================
+
+// Track cache hits/misses for monitoring service worker cache efficiency
+const CACHE_STATS_NAME = 'vibex-cache-stats';
+let _stats = { hits: 0, misses: 0 };
+
+async function loadCacheStats() {
+  try {
+    const db = await openDB();
+    const tx = db.transaction('meta', 'readonly');
+    const store = tx.objectStore('meta');
+    const req = store.get(CACHE_STATS_NAME);
+    return new Promise((resolve) => {
+      req.onsuccess = () => resolve(req.result ?? { hits: 0, misses: 0 });
+      req.onerror = () => resolve({ hits: 0, misses: 0 });
+    });
+  } catch {
+    return { hits: 0, misses: 0 };
+  }
+}
+
+async function saveCacheStats() {
+  try {
+    const db = await openDB();
+    if (!db.objectStoreNames.contains('meta')) {
+      db.createObjectStore('meta', { keyPath: 'key' });
+    }
+    const tx = db.transaction('meta', 'readwrite');
+    const store = tx.objectStore('meta');
+    store.put({ key: CACHE_STATS_NAME, ..._stats });
+  } catch {
+    // Non-critical
+  }
+}
+
+async function recordCacheHit() {
+  _stats.hits++;
+  await saveCacheStats();
+}
+
+async function recordCacheMiss() {
+  _stats.misses++;
+  await saveCacheStats();
+}
+
+// Expose cache stats via message handler
+self.addEventListener('message', (event) => {
+  if (event.data?.type === 'GET_CACHE_STATS') {
+    event.ports[0]?.postMessage({ hits: _stats.hits, misses: _stats.misses });
+  }
+});
+
+// Load persisted stats on startup
+loadCacheStats().then((s) => { _stats = s; });
+
 // ==================== Online Handler (Replay Queue) ====================
 
+// S92-E4: Broadcast offline/online status to clients
 self.addEventListener('online', async () => {
+  const broadcast = new BroadcastChannel('vibex-offline-status');
+  broadcast.postMessage({ type: 'ONLINE' });
+  broadcast.close();
+
   // Replay queued requests when coming back online
   const requests = await getQueuedRequests();
   if (!requests || requests.length === 0) return;

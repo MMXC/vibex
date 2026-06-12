@@ -1,0 +1,88 @@
+/**
+ * OfflineIndicator.module.css — S93-E3: Offline-First PWA Enhancement
+ *
+ * Design system tokens used:
+ *   --color-warning, --color-bg-secondary, --color-text-primary
+ *   --color-success, --color-primary, --radius-md
+ *   --duration-normal, --ease-out-expo, --font-sans, --text-sm
+ */
+
+.bar {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky, 200);
+  width: 100%;
+  padding: var(--space-2) var(--space-4);
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  line-height: 1;
+  transition:
+    background-color var(--duration-normal) var(--ease-out-expo),
+    color var(--duration-normal) var(--ease-out-expo);
+  animation: slideDown var(--duration-slow) var(--ease-out-expo) both;
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Offline (amber) variant */
+.offline {
+  background-color: var(--color-warning);
+  color: var(--color-text-inverse);
+}
+
+/* Online but has pending ops (info/primary) variant */
+.online {
+  background-color: var(--color-primary-muted);
+  color: var(--color-primary);
+  border-bottom: 1px solid var(--color-primary-glow);
+}
+
+.inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: var(--container-xl);
+  margin-inline: auto;
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.syncBadge {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--text-xs);
+  opacity: 0.9;
+}
+
+/* Spinning animation for sync icon */
+.spinning {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.idle {
+  opacity: 0.7;
+}

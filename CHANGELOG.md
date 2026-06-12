@@ -1,3 +1,19 @@
+## S93-E1 (2026-06-13)
+- **Canvas Version History** — 版本快照存储、时间轴面板、只读预览、一键恢复
+- **D1 Migration**: `0024_canvas_versions.sql` — `canvas_versions` 表，存储 id/canvas_id/version_number/snapshot_data/description/created_by/created_at
+- **GET /api/canvas/{id}/versions**: 列出画布所有版本（按 version_number DESC 排序）
+- **POST /api/canvas/{id}/versions**: 创建新版本快照，自动分配 version_number
+- **PATCH /api/canvas/{id}/versions/{versionId}/restore**: 恢复指定版本
+- **versionStore.ts**: Zustand store，含 fetchVersions / createVersion / restoreVersion / setPreviewVersion / setPanelOpen
+- **VersionHistoryPanel.tsx**: 时间轴面板，显示版本列表、最新标记、操作按钮
+- **VersionPreview.tsx**: 只读预览弹窗，显示节点/连线数量、恢复功能
+- **CSS**: `VersionHistoryPanel.module.css` + `VersionPreview.module.css`
+- **Backend 测试**: `route.test.ts` — 7 Jest 测试（auth/GET/POST/version_number 递增）
+- **Frontend 测试**: `versionStore.test.ts` (8 Vitest) + `VersionHistoryPanel.test.tsx` (8 Vitest) + `VersionPreview.test.tsx` (10 Vitest)
+
+类型: feat
+影响: vibex-backend, vibex-fronted
+
 ## S91-E4 (2026-06-13)
 - **Template Analytics Dashboard** — `/api/templates/analytics` API + `TemplateAnalyticsSection` component + `RatingDistributionChart` + CSV export (feat/S91-E4)
 

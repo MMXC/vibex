@@ -7387,3 +7387,15 @@ See git history for complete changelog.
 类型: feat
 影响: vibex-fronted
 
+
+
+## [Sprint92 E2] Template Marketplace 2.0 (2026-06-13)
+
+- `hooks/useTemplateSearch.ts`: 新增搜索历史 + 关键词高亮工具函数
+- `components/dds/gallery/TemplateGallery.tsx`: 横向标签筛选栏 + 搜索历史下拉 + 评分可信度（人数显示 + 样本少警告）
+- `components/dds/gallery/TemplateGallery.module.css`: 标签筛选栏样式 + 搜索历史下拉样式
+- `components/dds/gallery/TemplatePreviewDialog.tsx`: 只读画布预览模式 + "使用此模板"创建画布按钮
+- `services/api/modules/template.ts`: 扩展 PublicTemplate 接口
+
+类型: feat
+影响: vibex-fronted

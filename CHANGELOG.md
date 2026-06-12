@@ -7648,3 +7648,16 @@ See git history for complete changelog.
 类型: feat
 影响: vibex-backend, vibex-fronted
 
+
+
+## [Sprint92 E2] Template Marketplace 2.0 (2026-06-13)
+
+- `api/templates/route.ts`: 扩展 GET 支持同义词搜索（电商↔购物, 教育↔课程等）+ 标签 AND 组合筛选
+- `hooks/useTemplateSearch.ts`: 新增搜索历史（localStorage 最近5条）+ 关键词高亮工具函数
+- `components/dds/gallery/TemplateGallery.tsx`: 新增横向标签筛选栏 + 搜索历史下拉 + 评分可信度显示
+- `components/dds/gallery/TemplatePreviewDialog.tsx`: 扩展为只读画布预览 + "使用此模板"按钮
+- `services/api/modules/template.ts`: 扩展 PublicTemplate 接口 + 搜索/筛选调用
+- `api/templates/public/route.ts`: 扩展公开模板 API 支持同义词搜索
+
+类型: feat
+影响: vibex-backend, vibex-fronted

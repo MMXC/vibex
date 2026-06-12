@@ -7405,3 +7405,4 @@ See git history for complete changelog.
   Tests: 4 new S89-E3 boundary tests in `presenceStore.test.ts` + 3 new in `CollaboratorAvatars.test.tsx`  
   Fixes: existing `removeStaleUsers keeps users with recent heartbeat` (10s boundary) + 2 `CollaboratorAvatars` status tests  
   `HEARTBEAT_TIMEOUT_MS` 10_000, `getStatusDot` online threshold 10s  
+  `863febe04`

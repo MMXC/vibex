@@ -23,6 +23,7 @@ import {
   type GenerateShareLinkResult,
 } from '@/services/shareService';
 import type { ShareRole } from '@/lib/api/canvas-share';
+import { QRShareDialog } from './QRShareDialog';
 import styles from './ShareDialog.module.css';
 
 interface ShareLinkDisplay {
@@ -89,6 +90,9 @@ export function ShareDialog({
 
   // --- E4-F3: GitHub PR URL for embed (so embedded canvas can show PR badge) ---
   const [githubPrUrl, setGithubPrUrl] = useState<string | null>(null);
+
+  // S92-E4: QR share dialog state
+  const [showQRDialog, setShowQRDialog] = useState(false);
 
   // Fetch stored GitHub PR URL when dialog opens
   useEffect(() => {
@@ -357,6 +361,16 @@ export function ShareDialog({
                 >
                   {copied ? (t('copied') || '已复制') : (t('copyLink') || '复制链接')}
                 </button>
+                {/* S92-E4: QR code share button */}
+                <button
+                  type="button"
+                  className={styles.qrBtn}
+                  onClick={() => setShowQRDialog(true)}
+                  aria-label="扫码分享"
+                  data-testid="share-dialog-qr-btn"
+                >
+                  📱
+                </button>
                 <button
                   type="button"
                   className={styles.revokeBtn}
@@ -551,6 +565,14 @@ export function ShareDialog({
           )}
         </div>
       </div>
+
+      {/* S92-E4: QR Code Share Dialog */}
+      <QRShareDialog
+        isOpen={showQRDialog}
+        canvasId={canvasId}
+        canvasName={canvasName}
+        onClose={() => setShowQRDialog(false)}
+      />
     </div>
   );
 }

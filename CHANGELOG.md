@@ -14,6 +14,16 @@
 类型: feat
 影响: vibex-backend, vibex-fronted
 
+## S93-E4 (2026-06-13)
+- **Performance Optimization — Core Web Vitals** — PerformanceMonitor 扩展显示 FP/FCP/LCP 指标
+- **PerformanceObserver for LCP**: `new PerformanceObserver` 监听 largest-contentful-paint，`buffered: true` 读取历史记录
+- **performance.getEntriesByType('paint')**: 读取 first-paint 和 first-contentful-paint 历史记录
+- **useWebSocketPresence throttle**: `throttleMs` 从 50ms 调整至 80ms，减少性能抖动
+- **PerformanceMonitor.test.tsx**: 20 vitest (10 S81-E3 collapse/fps/node/edge + 10 S93-E4 CWV)
+
+类型: feat
+影响: vibex-fronted
+
 ## S91-E4 (2026-06-13)
 - **Template Analytics Dashboard** — `/api/templates/analytics` API + `TemplateAnalyticsSection` component + `RatingDistributionChart` + CSV export (feat/S91-E4)
 

@@ -1,3 +1,14 @@
+## S93-E1 (2026-06-13)
+- **Canvas Version History** — 版本快照存储、时间轴面板、只读预览、一键恢复
+- **versionStore.ts**: Zustand store，含 fetchVersions / createVersion / restoreVersion / setPreviewVersion / setPanelOpen，persist 中间件（仅持久化 isPanelOpen）
+- **VersionHistoryPanel.tsx**: 时间轴面板，显示版本列表、创建快照按钮、最新标记、操作按钮
+- **VersionPreview.tsx**: 只读预览弹窗，解析 snapshot_data JSON 显示节点/连线数量，支持恢复操作
+- **CSS**: `VersionHistoryPanel.module.css` + `VersionPreview.module.css`
+- **测试**: `versionStore.test.ts` (8 Vitest) + `VersionHistoryPanel.test.tsx` (8 Vitest) + `VersionPreview.test.tsx` (10 Vitest)
+
+类型: feat
+影响: vibex-fronted
+
 ## S91-E4 (2026-06-13)
 - **Template Analytics Dashboard** — `/api/templates/analytics` API + `TemplateAnalyticsSection` component + `RatingDistributionChart` + CSV export (feat/S91-E4)
 

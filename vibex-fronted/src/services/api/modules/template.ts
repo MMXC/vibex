@@ -81,7 +81,15 @@ export interface TemplateApi {
   importTemplate(file: File): Promise<IndustryTemplate>;
   getMarketplaceTemplates(industry?: string): Promise<IndustryTemplate[]>;
   // S90-E3: Template Sharing
-  getPublicTemplates(params?: { category?: string; sort?: string; page?: number; limit?: number }): Promise<PublicTemplatesResponse>;
+  // S92-E2: Added search (synonym) + filterTags (AND) params
+  getPublicTemplates(params?: {
+    category?: string;
+    sort?: string;
+    page?: number;
+    limit?: number;
+    search?: string;        // S92-E2: synonym search
+    filterTags?: string[];  // S92-E2: multi-tag AND filter
+  }): Promise<PublicTemplatesResponse>;
   getPublicTemplate(id: string, token: string): Promise<PublicTemplateDetail>;
   publishTemplate(id: string, isPublic: boolean): Promise<PublishResponse>;
 }
@@ -166,8 +174,15 @@ class TemplateApiImpl implements TemplateApi {
     return unwrapList<IndustryTemplate>(result, 'templates');
   }
 
-  // S90-E3: Template Sharing
-  async getPublicTemplates(params?: { category?: string; sort?: string; page?: number; limit?: number }): Promise<PublicTemplatesResponse> {
+  // S90-E3: Template Sharing, S92-E2: synonym search + filterTags
+  async getPublicTemplates(params?: {
+    category?: string;
+    sort?: string;
+    page?: number;
+    limit?: number;
+    search?: string;
+    filterTags?: string[];
+  }): Promise<PublicTemplatesResponse> {
     const result = await retry.execute(async () => {
       return await httpClient.get<PublicTemplatesResponse>('/templates/public', {
         params: {
@@ -175,6 +190,8 @@ class TemplateApiImpl implements TemplateApi {
           sort: params?.sort,
           page: params?.page,
           limit: params?.limit,
+          search: params?.search || undefined,           // S92-E2
+          filterTags: params?.filterTags?.join(',') || undefined, // S92-E2: comma-separated AND
         },
       });
     });

@@ -20,6 +20,7 @@ import React, {
   useState,
 } from 'react';
 import { DDSToolbar } from '@/components/dds/toolbar';
+import { CanvasTabBar } from '@/components/dds/canvas-tabs/CanvasTabBar';
 import { PresenceIndicator } from '@/components/dds/presence/PresenceIndicator';
 import { usePresence } from '@/hooks/canvas/usePresence';
 import { DDSScrollContainer } from '@/components/dds/canvas';
@@ -109,6 +110,8 @@ import { CommandPalette } from '@/components/dds/command-palette/CommandPalette'
 import { registerShortcutAction, unregisterShortcutAction } from '@/hooks/useKeyboardShortcuts';
 import { useCommandPaletteStore } from '@/stores/commandPaletteStore';
 import { useCanvasListStore } from '@/stores/canvasListStore';
+import { useCanvasTabStore } from '@/stores/dds/canvasTabStore';
+import { useCanvasViewportStore } from '@/lib/canvas/stores/canvasViewportStore';
 
 // E1 (Sprint70): reloadFromSnapshot — reads a snapshot from IndexedDB and replaces canvas nodes
 async function reloadFromSnapshot(canvasId: string, snapshotId: string): Promise<void> {
@@ -610,6 +613,61 @@ const { onCursorMove, broadcastCursor } = useWebSocketPresence({
     };
   }, [projectId, loadChapters]);
 
+  // ---- S90-E1: Initialize canvas tab for this projectId on mount ----
+  const canvasTabStore = useCanvasTabStore();
+  useEffect(() => {
+    if (!projectId) return;
+    // Open the projectId as a tab (or focus existing)
+    const tabName = `Canvas ${projectId.slice(0, 8)}`;
+    canvasTabStore.openTab(projectId, tabName);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Run once on mount; rely on URL changes for subsequent tab switches
+
+  // ---- S90-E1: Sync active tab with URL — update URL when active tab changes ----
+  useEffect(() => {
+    if (!canvasTabStore.activeTabId) return;
+    const activeTab = canvasTabStore.tabs.find((t) => t.id === canvasTabStore.activeTabId);
+    if (!activeTab) return;
+    // Only update URL if it differs from current (avoid infinite loops)
+    if (typeof window !== 'undefined') {
+      const url = new URL(window.location.href);
+      if (url.searchParams.get('projectId') !== activeTab.canvasId) {
+        url.searchParams.set('projectId', activeTab.canvasId);
+        window.history.replaceState({}, '', url.toString());
+      }
+    }
+  }, [canvasTabStore.activeTabId, canvasTabStore.tabs]);
+
+  // ---- S90-E1: Sync viewport when tab switches ----
+  const canvasViewportStore = useCanvasViewportStore();
+  useEffect(() => {
+    if (!canvasTabStore.activeTabId) return;
+    const activeTab = canvasTabStore.tabs.find(
+      (t) => t.id === canvasTabStore.activeTabId
+    );
+    if (!activeTab) return;
+    // Restore viewport from tab
+    canvasViewportStore.setViewport(activeTab.viewport);
+  }, [canvasTabStore.activeTabId]);
+
+  // ---- S90-E1: Save viewport on tab switch (before switching away) ----
+  // We capture the viewport from canvasViewportStore and persist to the tab being switched from
+  // This is handled by updating the viewport when the tab store is updated
+  const activeTabRef = canvasTabStore.activeTabId;
+  useEffect(() => {
+    if (!activeTabRef) return;
+    // Debounced: save viewport to tab every time it changes
+    const unsubscribe = useCanvasViewportStore.subscribe(
+      (state) => state.viewport,
+      (viewport) => {
+        if (canvasTabStore.activeTabId) {
+          canvasTabStore.updateViewport(canvasTabStore.activeTabId, viewport);
+        }
+      }
+    );
+    return unsubscribe;
+  }, [activeTabRef]);
+
   // ---- S41-E4: Load canvas from IndexedDB on mount ----
   useEffect(() => {
     if (!projectId) return;
@@ -1025,6 +1083,14 @@ const { onCursorMove, broadcastCursor } = useWebSocketPresence({
     >
       {/* Toolbar */}
       <DDSToolbar onAIGenerate={handleAIGenerate} agentSession={agentSession} projectId={projectId ?? ''} />
+
+      {/* S90-E1: Canvas Tab Bar — multi-canvas parallel editing */}
+      <CanvasTabBar
+        onNewTab={() => {
+          // Navigate to canvas list to open a new canvas in a new tab
+          window.open('/canvas-list', '_blank');
+        }}
+      />
 
       {/* S85-E1: 画布级权限体系 — viewer mode banner (reads from canvasPermissionsStore) */}
       <ViewerModeBanner projectId={projectId ?? ''} />

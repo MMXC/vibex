@@ -7721,3 +7721,11 @@ See git history for complete changelog.
 - **PATCH /api/templates/{id}/versions/{versionId}**: 固定/取消固定模板版本
 - **POST /api/templates/{id}/fork**: Fork 模板为个人副本，复制内容 + 记录 forked_from_id
 
+## S93-E3 (2026-06-13)
+- **Offline-First PWA Enhancement** — 离线画布编辑、同步队列、背景同步、PWA manifest 完善
+- **syncQueue.ts**: IndexedDB-backed sync queue (idb library)，queueOperation/dequeue/replay/pendingCount/clearAll APIs，31 Vitest 单元测试
+- **useOfflineSync.ts**: React hook，监听 online/offline，自动 replay 队列，BroadcastChannel 同步
+- **OfflineIndicator.tsx**: 非侵入式状态条，离线模式 + 待同步数量，动画图标
+- **manifest.json**: PWA manifest 完善（maskable icons、display:standalone）
+- **sw.js**: S93-E3 扩展：Background Sync API 事件处理器、缓存命中率追踪、Cache-First + Stale-While-Revalidate 策略
+

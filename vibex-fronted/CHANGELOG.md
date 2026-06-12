@@ -7450,3 +7450,9 @@ See git history for complete changelog.
 - **Template Versioning & Fork** — 模板版本化存储、fork 为个人副本
 - **TemplateVersionHistory.tsx**: 模板版本历史面板，显示版本列表、创建版本按钮、固定标记
 - **TemplateForkButton.tsx**: Fork 按钮组件，含对话框，支持自定义名称
+## S93-E3 (2026-06-13)
+- **Offline-First PWA Enhancement** — 离线画布编辑、同步队列、背景同步、PWA manifest 完善
+- **syncQueue.ts**: IndexedDB-backed sync queue，31 Vitest tests
+- **useOfflineSync.ts**: React hook，online/offline 监听 + auto replay
+- **OfflineIndicator.tsx**: 离线状态指示器，pending sync 计数显示
+- **manifest.json**: PWA manifest 完善

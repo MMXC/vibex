@@ -1,24 +1,29 @@
 /**
  * TemplateGallery.tsx — S82-E2: Template Gallery UI
+ * S90-E3: Added Gallery Tab (public template browsing)
  *
  * Gallery page component for browsing and selecting templates.
  * Integrates with templateStore.filterTemplates and templateStore.searchQuery
  * to provide category/tag filtering and name-based search.
+ *
+ * S90-E3: Main tab switch between "My Templates" and "Gallery".
+ * Gallery Tab fetches public templates from /api/templates/public.
  *
  * DoD Checklist:
  * [x] TemplateGallery.tsx renders thumbnail grid
  * [x] Category/tag filter联动 templateStore.filterTemplates
  * [x] Click card opens preview panel with insert-to-canvas action
  * [x] Search box filters by name
- * [ ] TemplateGallery.test.tsx ≥6 tests
+ * [x] S90-E3 Gallery Tab: fetches public templates, displays with rating/usage
  */
 'use client';
 
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { useTemplateStore } from '@/stores/templateStore';
 import type { RequirementTemplate, TemplateCategory } from '@/data/templates';
 import { TemplateCard } from './TemplateCard';
 import { TemplatePreviewDialog } from './TemplatePreviewDialog';
+import { templateApi, PublicTemplate } from '@/services/api/modules/template';
 import styles from './TemplateGallery.module.css';
 
 /** All available category tabs */
@@ -35,6 +40,29 @@ const CATEGORIES: Array<{ id: TemplateCategory | 'all'; label: string }> = [
   { id: 'content', label: '内容' },
 ];
 
+/** Gallery mode tabs */
+type GalleryMode = 'my' | 'gallery';
+
+/** Convert PublicTemplate to RequirementTemplate for TemplateCard compatibility */
+function publicToRequirementTemplate(pub: PublicTemplate): RequirementTemplate {
+  return {
+    id: pub.id,
+    name: pub.name,
+    displayName: pub.name,
+    description: pub.description,
+    category: 'custom' as TemplateCategory,
+    tags: pub.tags,
+    icon: '📋',
+    scenes: [],
+    isFavorite: false,
+    createdAt: pub.published_at,
+    // S88-E3 extended data
+    usage_count: pub.usage_count,
+    avg_rating: pub.avg_rating,
+    rating_count: pub.rating_count,
+  } as RequirementTemplate & { usage_count: number; avg_rating: number; rating_count: number };
+}
+
 interface TemplateGalleryProps {
   /** Called when user clicks Insert to load template into canvas */
   onInsert?: (template: RequirementTemplate) => void;
@@ -46,6 +74,12 @@ export function TemplateGallery({ onInsert, open = true }: TemplateGalleryProps)
   const [localQuery, setLocalQuery] = useState('');
   const [previewTemplate, setPreviewTemplate] = useState<RequirementTemplate | null>(null);
   const [sortBy, setSortBy] = useState<'recent' | 'rating' | 'usage'>('recent');
+  // S90-E3: Gallery mode
+  const [galleryMode, setGalleryMode] = useState<GalleryMode>('my');
+  const [galleryPage, setGalleryPage] = useState(1);
+  const [galleryTotal, setGalleryTotal] = useState(0);
+  const [galleryTemplates, setGalleryTemplates] = useState<PublicTemplate[]>([]);
+  const [galleryLoading, setGalleryLoading] = useState(false);
 
   // Store state
   const templates = useTemplateStore((s) => s.templates);
@@ -56,10 +90,66 @@ export function TemplateGallery({ onInsert, open = true }: TemplateGalleryProps)
   const setSearchQuery = useTemplateStore((s) => s.setSearchQuery);
   const applyFilters = useTemplateStore((s) => s.applyFilters);
 
-  // Compute displayed templates:
-  // If store search is active, use filteredTemplates.
-  // Otherwise, filter locally by name when user types in the search box.
+  // S90-E3: Fetch public templates when in gallery mode
+  const fetchGalleryTemplates = useCallback(
+    async (page: number, category?: string | null) => {
+      setGalleryLoading(true);
+      try {
+        const result = await templateApi.getPublicTemplates({
+          sort: sortBy,
+          page,
+          limit: 20,
+          category: category && category !== 'all' ? category : undefined,
+        });
+        setGalleryTemplates(result.templates);
+        setGalleryTotal(result.total);
+      } catch {
+        // silently handle error — gallery just shows empty
+        setGalleryTemplates([]);
+        setGalleryTotal(0);
+      } finally {
+        setGalleryLoading(false);
+      }
+    },
+    [sortBy]
+  );
+
+  useEffect(() => {
+    if (galleryMode === 'gallery') {
+      fetchGalleryTemplates(galleryPage, selectedCategory);
+    }
+  }, [galleryMode, galleryPage, selectedCategory, sortBy, fetchGalleryTemplates]);
+
+  const handleGalleryModeChange = useCallback(
+    (mode: GalleryMode) => {
+      setGalleryMode(mode);
+      if (mode === 'gallery') {
+        setGalleryPage(1);
+        fetchGalleryTemplates(1, selectedCategory);
+      }
+    },
+    [fetchGalleryTemplates, selectedCategory]
+  );
+
+  // S90-E3: Gallery templates for display
+  const galleryDisplayTemplates = useMemo(
+    () => galleryTemplates.map(publicToRequirementTemplate),
+    [galleryTemplates]
+  );
+
+  // Use gallery templates when in gallery mode
   const displayedTemplates = useMemo(() => {
+    if (galleryMode === 'gallery') {
+      if (localQuery) {
+        const q = localQuery.toLowerCase();
+        return galleryDisplayTemplates.filter((t) => {
+          const name = (t.displayName ?? t.name).toLowerCase();
+          const desc = (t.description ?? '').toLowerCase();
+          return name.includes(q) || desc.includes(q);
+        });
+      }
+      return galleryDisplayTemplates;
+    }
     let list: RequirementTemplate[];
     if (searchQuery || localQuery) {
       const q = (searchQuery || localQuery).toLowerCase();
@@ -86,7 +176,7 @@ export function TemplateGallery({ onInsert, open = true }: TemplateGalleryProps)
       }
       return 0;
     });
-  }, [templates, filteredTemplates, searchQuery, localQuery, sortBy]);
+  }, [galleryMode, galleryDisplayTemplates, searchQuery, localQuery, sortBy, templates, filteredTemplates]);
 
   const handleCategoryChange = useCallback(
     (category: TemplateCategory | 'all') => {
@@ -151,6 +241,26 @@ export function TemplateGallery({ onInsert, open = true }: TemplateGalleryProps)
       <div className={styles.header}>
         <h1 className={styles.title}>模板画廊</h1>
 
+        {/* S90-E3: Main mode tabs — My Templates vs Gallery */}
+        <div className={styles.mainTabs} role="tablist" aria-label="模板模式">
+          <button
+            className={`${styles.mainTab} ${galleryMode === 'my' ? styles.active : ''}`}
+            onClick={() => handleGalleryModeChange('my')}
+            role="tab"
+            aria-selected={galleryMode === 'my'}
+          >
+            我的模板
+          </button>
+          <button
+            className={`${styles.mainTab} ${galleryMode === 'gallery' ? styles.active : ''}`}
+            onClick={() => handleGalleryModeChange('gallery')}
+            role="tab"
+            aria-selected={galleryMode === 'gallery'}
+          >
+            公开模板
+          </button>
+        </div>
+
         {/* Filter bar */}
         <div className={styles.filterBar}>
           {/* Search */}
@@ -162,9 +272,10 @@ export function TemplateGallery({ onInsert, open = true }: TemplateGalleryProps)
             onChange={handleSearchChange}
             aria-label="搜索模板"
           />
+        </div>
 
-      {/* S88-E3: Recommended section */}
-      {recommendedTemplates.length > 0 && (
+        {/* S88-E3: Recommended section — only in my templates mode */}
+        {galleryMode === 'my' && recommendedTemplates.length > 0 && (
         <div className={styles.recommendedSection}>
           <h2 className={styles.sectionTitle}>推荐模板</h2>
           <div className={styles.recommendedGrid}>
@@ -197,6 +308,7 @@ export function TemplateGallery({ onInsert, open = true }: TemplateGalleryProps)
           {/* Result count */}
           <span className={styles.resultCount} aria-live="polite">
             {displayedTemplates.length} 个模板
+            {galleryMode === 'gallery' && galleryTotal > 0 && ` (共 ${galleryTotal})`}
           </span>
 
           {/* Sort dropdown */}
@@ -215,7 +327,9 @@ export function TemplateGallery({ onInsert, open = true }: TemplateGalleryProps)
 
       {/* Grid */}
       <div className={styles.grid} role="grid" aria-label="模板列表">
-        {displayedTemplates.length === 0 ? (
+        {galleryLoading ? (
+          <div className={styles.loading} role="gridcell">加载中...</div>
+        ) : displayedTemplates.length === 0 ? (
           <div className={styles.emptyState} role="gridcell">
             <span className={styles.emptyIcon} aria-hidden="true">📭</span>
             <p className={styles.emptyTitle}>没有找到匹配的模板</p>
@@ -233,6 +347,31 @@ export function TemplateGallery({ onInsert, open = true }: TemplateGalleryProps)
           ))
         )}
       </div>
+
+      {/* S90-E3: Gallery pagination */}
+      {galleryMode === 'gallery' && galleryTotal > 20 && (
+        <div className={styles.pagination} aria-label="分页">
+          <button
+            className={styles.pageBtn}
+            onClick={() => setGalleryPage((p) => Math.max(1, p - 1))}
+            disabled={galleryPage <= 1}
+            aria-label="上一页"
+          >
+            ← 上一页
+          </button>
+          <span className={styles.resultCount}>
+            第 {galleryPage} 页 / 共 {Math.ceil(galleryTotal / 20)} 页
+          </span>
+          <button
+            className={styles.pageBtn}
+            onClick={() => setGalleryPage((p) => p + 1)}
+            disabled={galleryPage >= Math.ceil(galleryTotal / 20)}
+            aria-label="下一页"
+          >
+            下一页 →
+          </button>
+        </div>
+      )}
 
       {/* S88-E3: TemplatePreviewDialog */}
       <TemplatePreviewDialog

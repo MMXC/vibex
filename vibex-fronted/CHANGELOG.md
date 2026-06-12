@@ -7239,3 +7239,19 @@ See git history for complete changelog.
 - `PRStatusBadge.test.tsx`: 6 vitest
 - `GitHubLinkSection.test.tsx`: 8 vitest
 - `useGitHubPR.test.ts`: 10 vitest（parseGitHubUrl + hook API）
+
+## S89-E5 · Advanced Export Formats · 2026-06-12
+
+### Features
+- **ExportDialog**: `src/components/dds/export/ExportDialog.tsx` — 导出对话框，支持 PNG/SVG/PDF/PPTX/JSON/Markdown 6种格式 + PNG缩放选项 + 导出历史面板
+- **ExportHistoryPanel**: 导出历史面板，显示历史导出记录（格式/缩放/时间戳）
+- **PPTX Export**: `pptxgenjs` 生成 PowerPoint 文件
+- **JSON Export**: 结构化导出 canvas JSON 配置
+- **Markdown Export**: Markdown 格式导出 canvas 内容
+
+### Tests
+- `ExportDialog.test.tsx`: 6 vitest（格式选项/缩放选择/历史面板）
+- Pre-existing failures in `BatchExportPanel.test.tsx` (S71-E5, unrelated)
+
+类型: feat
+影响: vibex-fronted

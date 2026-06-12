@@ -87,6 +87,24 @@ export function ShareDialog({
   const [embedShowToolbar, setEmbedShowToolbar] = useState(true);
   const [embedCodeCopied, setEmbedCodeCopied] = useState(false);
 
+  // --- E4-F3: GitHub PR URL for embed (so embedded canvas can show PR badge) ---
+  const [githubPrUrl, setGithubPrUrl] = useState<string | null>(null);
+
+  // Fetch stored GitHub PR URL when dialog opens
+  useEffect(() => {
+    if (!isOpen || !canvasId) return;
+    let cancelled = false;
+    fetch(`/api/canvas/${canvasId}/github`)
+      .then(r => r.json())
+      .then(data => {
+        if (!cancelled && data.ok && data.githubPrUrl) {
+          setGithubPrUrl(data.githubPrUrl);
+        }
+      })
+      .catch(() => { /* silently ignore — github link not set */ });
+    return () => { cancelled = true; };
+  }, [isOpen, canvasId]);
+
   // Build display object from service result
   const toDisplay = useCallback(
     (result: GenerateShareLinkResult, role: ShareRole): ShareLinkDisplay => ({
@@ -220,7 +238,7 @@ export function ShareDialog({
     setError(null);
   }, []);
 
-  // --- E4-F2: Build iframe src URL ---
+  // --- E4-F2/F3: Build iframe src URL ---
   const iframeSrc = useMemo(() => {
     if (!currentLink) return '';
     const params = new URLSearchParams({
@@ -233,8 +251,11 @@ export function ShareDialog({
       width: String(embedWidth),
       height: String(embedHeight),
     });
+    if (githubPrUrl) {
+      params.set('github_pr', githubPrUrl);
+    }
     return `/snapshot?${params.toString()}`;
-  }, [currentLink, canvasId, permission, embedTheme, embedShowToolbar, embedWidth, embedHeight]);
+  }, [currentLink, canvasId, permission, embedTheme, embedShowToolbar, embedWidth, embedHeight, githubPrUrl]);
 
   // --- E4-F2: Build generated iframe code ---
   const embedCode = useMemo(() => {

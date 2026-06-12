@@ -7453,3 +7453,24 @@ See git history for complete changelog.
 - `vibex-fronted/src/components/dds/export/ExportDialog.module.css`
 - `vibex-backend/src/app/api/canvas/export/markdown/route.ts`
 - `vibex-backend/src/app/api/canvas/export/markdown/route.test.ts`
+
+## S90-E1 (2026-06-12)
+
+### Canvas Tabs — Multi-Canvas Parallel Editing
+**Type**: Feature
+
+**Files Changed**:
+- `vibex-fronted/src/stores/dds/canvasTabStore.ts` — Zustand store, up to 8 canvas tabs with per-tab viewport/selection isolation
+- `vibex-fronted/src/components/dds/canvas-tabs/CanvasTabBar.tsx` — Tab bar component with dirty marker, close, beforeunload
+- `vibex-fronted/src/components/dds/canvas-tabs/CanvasTabBar.module.css` — Tab bar styles
+- `vibex-fronted/src/components/dds/canvas-tabs/__tests__/CanvasTabBar.test.tsx` — Tab bar vitest (20 tests)
+- `vibex-fronted/src/stores/dds/__tests__/canvasTabStore.test.ts` — Store vitest (22 tests)
+- `vibex-fronted/src/components/dds/DDSCanvasPage.tsx` — DDSCanvasPage integration
+
+**Acceptance Criteria**:
+- AC1: Up to 3 canvas tabs displayed simultaneously ✅
+- AC2: Tab switch preserves viewport state ✅
+- AC3: beforeunload + confirm dialog for dirty tabs ✅
+- AC4: 9th tab marks earliest active as dormant (max 8 active) ✅
+
+**Tests**: 42 vitest passing

@@ -7224,3 +7224,18 @@ See git history for complete changelog.
   Fixes: existing `removeStaleUsers keeps users with recent heartbeat` (10s boundary) + 2 `CollaboratorAvatars` status tests  
   `HEARTBEAT_TIMEOUT_MS` 10_000, `getStatusDot` online threshold 10s  
   `863febe04`
+
+
+## S89-E4 · GitHub Integration Deep Link · 2026-06-12
+
+### Features
+- **PRStatusBadge**: `src/components/dds/github/PRStatusBadge.tsx` — GitHub PR 状态徽章，支持 open/merged/closed 状态 + 点击跳转
+- **GitHubLinkSection**: `src/components/dds/settings/GitHubLinkSection.tsx` — 设置抽屉 GitHub Tab，支持 PR URL 输入/保存/清除
+- **useGitHubPR hook**: `src/hooks/useGitHubPR.ts` — GitHub PR URL 解析、获取、保存 Hook，支持 `parseGitHubUrl()` 工具函数
+- **ShareDialog embed**: `ShareDialog.tsx` — 嵌入 URL 支持 `?github_pr=<url>` 参数
+- **DDSCanvasPage integration**: `DDSCanvasPage.tsx` — 右上角 `PRStatusBadge` 组件，`githubPr` prop 支持嵌入模式
+
+### Tests
+- `PRStatusBadge.test.tsx`: 6 vitest
+- `GitHubLinkSection.test.tsx`: 8 vitest
+- `useGitHubPR.test.ts`: 10 vitest（parseGitHubUrl + hook API）

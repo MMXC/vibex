@@ -1,0 +1,171 @@
+/**
+ * AnnotationLayer.module.css — S90-E4
+ *
+ * Annotation layer overlay on top of DDS canvas.
+ * Position is CSS-transformed to match canvas viewport.
+ */
+
+.layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 100;
+  overflow: visible;
+}
+
+.editMode {
+  cursor: crosshair;
+  pointer-events: all;
+}
+
+/* Individual annotation bubble */
+.bubble {
+  position: absolute;
+  pointer-events: all;
+  transform: translate(0, 0); /* position is already in canvas coords */
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-width: 240px;
+  z-index: 101;
+}
+
+.bubbleDot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid white;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  cursor: pointer;
+  position: absolute;
+  top: -6px;
+  left: -6px;
+}
+
+.bubbleContent {
+  background: rgba(255, 255, 255, 0.95);
+  border: 1.5px solid var(--annotation-color, #6366F1);
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 13px;
+  color: #1f2937;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  word-break: break-word;
+  pointer-events: all;
+  margin-left: 8px;
+  margin-top: 6px;
+}
+
+.bubbleAuthor {
+  font-size: 11px;
+  color: #6b7280;
+  margin-top: 2px;
+}
+
+.bubbleActions {
+  display: flex;
+  gap: 2px;
+  margin-left: 8px;
+  margin-top: 2px;
+  opacity: 0;
+  transition: opacity 0.15s;
+  pointer-events: none;
+}
+
+.bubble:hover .bubbleActions {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.actionBtn {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  padding: 2px 5px;
+  font-size: 11px;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.actionBtn:hover {
+  background: #f9fafb;
+}
+
+/* Resolved annotation */
+.resolved .bubbleContent {
+  text-decoration: line-through;
+  opacity: 0.5;
+}
+
+/* Arrow annotation */
+.arrowSvg {
+  position: absolute;
+  top: -6px;
+  left: -6px;
+  width: calc(100% + 12px);
+  height: calc(100% + 12px);
+  pointer-events: none;
+}
+
+/* Edit form */
+.editForm {
+  background: white;
+  border: 2px solid #6366F1;
+  border-radius: 10px;
+  padding: 8px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  margin-left: 8px;
+  margin-top: 6px;
+}
+
+.editInput {
+  width: 100%;
+  min-width: 180px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 6px 8px;
+  font-size: 13px;
+  font-family: inherit;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+.editInput:focus {
+  outline: none;
+  border-color: #6366F1;
+  box-shadow: 0 0 0 2px rgba(99,102,241,0.15);
+}
+
+.editActions {
+  display: flex;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.saveBtn {
+  background: #6366F1;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 4px 10px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.saveBtn:hover {
+  background: #4f46e5;
+}
+
+.cancelBtn {
+  background: white;
+  color: #6b7280;
+  border: 1px solid #e5e7eb;
+  border-radius: 5px;
+  padding: 4px 10px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.cancelBtn:hover {
+  background: #f9fafb;
+}

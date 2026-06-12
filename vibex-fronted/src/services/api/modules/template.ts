@@ -38,6 +38,39 @@ export interface IndustryTemplate {
   updatedAt: string;
 }
 
+export interface PublicTemplate {
+  id: string;
+  name: string;
+  description: string;
+  author_name: string;
+  tags: string[];
+  thumbnail: string | null;
+  usage_count: number;
+  avg_rating: number;
+  rating_count: number;
+  share_token: string | null;
+  published_at: string;
+}
+
+export interface PublicTemplateDetail extends PublicTemplate {
+  content_json: string | null;
+}
+
+export interface PublicTemplatesResponse {
+  ok: boolean;
+  templates: PublicTemplate[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+export interface PublishResponse {
+  ok: boolean;
+  isPublic: boolean;
+  shareToken?: string;
+  error?: string;
+}
+
 export interface TemplateApi {
   getTemplates(industry?: string): Promise<IndustryTemplate[]>;
   getTemplate(id: string): Promise<IndustryTemplate>;
@@ -47,6 +80,10 @@ export interface TemplateApi {
   exportTemplates(): Promise<void>;
   importTemplate(file: File): Promise<IndustryTemplate>;
   getMarketplaceTemplates(industry?: string): Promise<IndustryTemplate[]>;
+  // S90-E3: Template Sharing
+  getPublicTemplates(params?: { category?: string; sort?: string; page?: number; limit?: number }): Promise<PublicTemplatesResponse>;
+  getPublicTemplate(id: string, token: string): Promise<PublicTemplateDetail>;
+  publishTemplate(id: string, isPublic: boolean): Promise<PublishResponse>;
 }
 
 // ==================== 实现 ====================
@@ -127,6 +164,37 @@ class TemplateApiImpl implements TemplateApi {
       });
     });
     return unwrapList<IndustryTemplate>(result, 'templates');
+  }
+
+  // S90-E3: Template Sharing
+  async getPublicTemplates(params?: { category?: string; sort?: string; page?: number; limit?: number }): Promise<PublicTemplatesResponse> {
+    const result = await retry.execute(async () => {
+      return await httpClient.get<PublicTemplatesResponse>('/templates/public', {
+        params: {
+          category: params?.category,
+          sort: params?.sort,
+          page: params?.page,
+          limit: params?.limit,
+        },
+      });
+    });
+    return result as PublicTemplatesResponse;
+  }
+
+  async getPublicTemplate(id: string, token: string): Promise<PublicTemplateDetail> {
+    const result = await retry.execute(async () => {
+      return await httpClient.get<{ ok: boolean; template: PublicTemplateDetail }>(`/templates/public/${id}`, {
+        params: { token },
+      });
+    });
+    return (result as { ok: boolean; template: PublicTemplateDetail }).template;
+  }
+
+  async publishTemplate(id: string, isPublic: boolean): Promise<PublishResponse> {
+    const result = await retry.execute(async () => {
+      return await httpClient.post<PublishResponse>(`/templates/${id}/publish`, { isPublic });
+    });
+    return result as PublishResponse;
   }
 }
 

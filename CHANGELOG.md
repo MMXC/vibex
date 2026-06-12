@@ -7435,3 +7435,39 @@ See git history for complete changelog.
 ### Variant W' self-impl
 - dev-e4 phantom（workspace 文件存在但未提交）；预探索确认现有代码 → Variant W' workspace-complete → 13 文件 commit + cherry-pick
 
+
+## S89-E5 · Advanced Export Formats · 2026-06-12
+
+### Features
+- **ExportDialog 新格式**: 新增 PPTX、JSON、Markdown 三个导出选项，与现有的 PNG/SVG/PDF 并列
+- **canvasExportStore**: 新建 Zustand store，管理 exportScale（1x/2x/3x）和 exportHistory（最近10条记录，含 format/scale/timestamp/canvasName）
+- **Export History 面板**: ExportDialog 内置历史面板，支持一键重新导出、清除历史；历史记录持久化在 Zustand store
+- **PNG 缩放选择器**: ExportDialog 新增 1x/2x/3x 分辨率选择器，影响 PNG/PDF 导出清晰度
+- **useBatchExport hook**: 扩展支持 json/ppt/markdown 格式；pptxgenjs 前端实时生成 PPTX 文件
+- **后端 Markdown 路由**: `POST /api/canvas/export/markdown` — 将 DDSCard[] 转换为 Markdown 文档并返回文件下载响应
+
+### Files
+- `vibex-fronted/src/stores/canvasExportStore.ts`
+- `vibex-fronted/src/hooks/useBatchExport.ts`
+- `vibex-fronted/src/components/dds/export/ExportDialog.tsx`
+- `vibex-fronted/src/components/dds/export/ExportDialog.module.css`
+- `vibex-backend/src/app/api/canvas/export/markdown/route.ts`
+- `vibex-backend/src/app/api/canvas/export/markdown/route.test.ts`
+
+## S89-E5 · Advanced Export Formats · 2026-06-12
+
+### Features
+- **ExportDialog 新格式**: 新增 PPTX、JSON、Markdown 三个导出选项，与现有的 PNG/SVG/PDF 并列
+- **canvasExportStore**: 新建 Zustand store，管理 exportScale（1x/2x/3x）和 exportHistory（最近10条记录，含 format/scale/timestamp/canvasName）
+- **Export History 面板**: ExportDialog 内置历史面板，支持一键重新导出、清除历史；历史记录持久化在 Zustand store
+- **PNG 缩放选择器**: ExportDialog 新增 1x/2x/3x 分辨率选择器，影响 PNG/PDF 导出清晰度
+- **useBatchExport hook**: 扩展支持 json/ppt/markdown 格式；pptxgenjs 前端实时生成 PPTX 文件
+- **后端 Markdown 路由**: `POST /api/canvas/export/markdown` — 将 DDSCard[] 转换为 Markdown 文档并返回文件下载响应
+
+### Files
+- `vibex-fronted/src/stores/canvasExportStore.ts`
+- `vibex-fronted/src/hooks/useBatchExport.ts`
+- `vibex-fronted/src/components/dds/export/ExportDialog.tsx`
+- `vibex-fronted/src/components/dds/export/ExportDialog.module.css`
+- `vibex-backend/src/app/api/canvas/export/markdown/route.ts`
+- `vibex-backend/src/app/api/canvas/export/markdown/route.test.ts`

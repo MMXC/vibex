@@ -1,4 +1,19 @@
 
+## S90-E4 · Canvas Annotation Layer · 2026-06-12
+
+### Features
+- **annotationStore**: Zustand + IndexedDB 持久化，CRUD + optimistic updates，离线优先
+- **AnnotationLayer**: 绝对定位覆盖层，继承画布 CSS transform（缩放/平移自动同步）
+- **AC1-AC4**: 点击放置 → 输入框 → 提交显示；作者颜色自动哈希；resolve→删除线；delete→移除
+- **DDSCanvasPage 集成**: AnnotationLayer 挂载，含 placementMode 状态控制
+
+### 测试
+- `annotation/__tests__/AnnotationLayer.test.tsx`: Vitest 覆盖 AC1-AC4
+- `annotation/__tests__/annotationStore.test.ts`: Vitest 覆盖 store CRUD + IndexedDB
+
+类型: feat
+
+
 
 ## S87-E4 · Canvas 批量导出增强 · 2026-06-11
 

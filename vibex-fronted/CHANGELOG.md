@@ -7418,3 +7418,20 @@ See git history for complete changelog.
 
 类型: feat
 影响: vibex-fronted
+
+## S92-E4 (2026-06-13)
+- **Mobile-First Preview** — `useIsMobileUA` hook + `MobilePreviewCanvas` + `MobileToolbar` + `QRShareDialog`
+- `useIsMobileUA`: UA-based mobile detection (iOS/Android/Tablet)
+- `MobilePreviewCanvas`: Read-only canvas with pinch-to-zoom, viewport pan
+- `MobileToolbar`: Zoom controls (+/-/fit), current zoom display
+- `QRShareDialog`: QR code generation for canvas sharing via `/api/share/[id]/qr`
+- `CanvasPageClient`: Auto-routes to MobilePreviewCanvas for mobile UA
+
+### 测试
+- `MobilePreviewCanvas.test.tsx`: 7 Vitest (header/nodes/zoom/empty-state)
+- `useIsMobileUA.test.ts`: 7 Vitest (iOS/Android/iPad/desktop UA detection)
+- `useTouchGestures.test.ts`: 5 Vitest (long-press/drag/swipe/reset)
+- `QRShareDialog.test.tsx`: 6 Vitest (open/close/loading/callback)
+
+类型: feat
+影响: vibex-fronted

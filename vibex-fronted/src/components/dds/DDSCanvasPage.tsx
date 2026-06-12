@@ -25,6 +25,8 @@ import { usePresence } from '@/hooks/canvas/usePresence';
 import { DDSScrollContainer } from '@/components/dds/canvas';
 import { CrossChapterEdgesOverlay } from '@/components/dds/canvas/CrossChapterEdgesOverlay';
 import { AIDraftDrawer } from '@/components/dds/ai-draft';
+import { AISuggestionsPanel } from '@/components/dds/ai-suggestions/AISuggestionsPanel';
+import { useAIDesignSuggestionsStore } from '@/stores/dds/aiDesignSuggestionsStore';
 import { DDSFlow } from '@/components/dds/DDSFlow';
 import { useDDSCanvasStore, ddsChapterActions } from '@/stores/dds/DDSCanvasStore';
 // S85-E1: 画布级权限体系 — viewer mode
@@ -1126,6 +1128,38 @@ const { onCursorMove, broadcastCursor } = useWebSocketPresence({
 
       {/* AI Draft Drawer */}
       <AIDraftDrawer />
+
+      {/* S89-E2: AI Design Suggestions Panel */}
+      <AISuggestionsPanel />
+
+      {/* S89-E2: Floating toggle button for AI Suggestions */}
+      <button
+        type="button"
+        onClick={() => useAIDesignSuggestionsStore.getState().togglePanel()}
+        style={{
+          position: 'fixed',
+          bottom: '24px',
+          right: '24px',
+          zIndex: 30,
+          width: '48px',
+          height: '48px',
+          borderRadius: '50%',
+          border: '1px solid var(--color-border, #374151)',
+          background: 'var(--color-surface, #1f2937)',
+          color: 'var(--color-text-primary, #f9fafb)',
+          fontSize: '1.25rem',
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.4)',
+          transition: 'background 0.15s ease',
+        }}
+        aria-label="Toggle AI Suggestions"
+        title="AI Suggestions"
+      >
+        💡
+      </button>
 
       {/* E1: CodeGenContext Panel — shown when agentSession=new */}
       {showCodeGenPanel && codeGenContext && (

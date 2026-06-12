@@ -7316,3 +7316,27 @@ See git history for complete changelog.
 
 **Tests**: 5 vitest passing
 
+## S91-E2 · GitHub Design Review Loop · 2026-06-13
+
+### Frontend Core
+
+#### 2026-06-13
+
+- **S91-E2 GitHub Design Review Loop** (epic/s91-e2-github-design-review-loop)
+  - `src/components/dds/annotation/annotationStore.ts`: Add `githubIssueUrl`, `githubIssueNumber`, `githubCommitSha` fields
+  - `src/components/dds/annotation/AnnotationDetailPanel.tsx`: Create/link GitHub issue button, commit SHA input, issue status display
+  - `src/components/dds/annotation/AnnotationDetailPanel.module.css`: Detail panel styles
+  - `src/components/dds/annotation/DesignReviewDashboard.tsx`: Design Review Tab — list open GitHub issues grouped by canvas with filter
+  - `src/components/dds/annotation/DesignReviewDashboard.module.css`: Dashboard styles
+  - `src/components/dds/annotation/__tests__/AnnotationDetailPanel.test.tsx`: 6 vitest (create issue, link commit, issue status)
+  - `src/components/dds/annotation/__tests__/DesignReviewDashboard.test.tsx`: 5 vitest (dashboard load, filter, issue list)
+
+**Acceptance Criteria**:
+- AC1: Annotation 可创建 GitHub Issue — 创建后 Annotation 显示 Issue 链接 ✅
+- AC2: Issue body 包含截图和 Canvas URL — GitHub Issue body 包含 base64 图片 ✅
+- AC3: 版本节点可关联 Git commit — 节点显示 commit SHA 前7位 ✅
+- AC4: Design Review Tab 显示未解决 Issue — 页面加载 Issue 列表 ≤ 2s ✅
+- AC5: Issue 关闭后 Design Review 自动更新 — Webhook 触发刷新 ✅
+
+**Tests**: 11 vitest passing
+

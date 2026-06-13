@@ -73,6 +73,8 @@ import { CanvasImportPanel } from '@/components/dds/canvas-dashboard/CanvasImpor
 import { ImportShareDialog } from '@/components/dds/share/ImportShareDialog';
 // S94-E2: Advanced Canvas Sharing — SharePanel with role selection, expiration, password, embed code, webhooks
 import { SharePanel } from '@/components/dds/share/SharePanel';
+// S94-E3: Canvas Audit Log
+import { AuditLogPanel } from '@/components/dds/audit/AuditLogPanel';
 // S89-E4: GitHub Integration Deep Link
 import { PRStatusBadge } from '@/components/dds/github/PRStatusBadge';
 import { useGitHubPR, parseGitHubUrl } from '@/hooks/useGitHubPR';
@@ -328,6 +330,16 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
 
   const handleSharePanelClose = useCallback(() => {
     setSharePanelOpen(false);
+  }, []);
+
+  // ---- S94-E3: AuditLogPanel state — opened via 'open-audit-log-panel' custom event ----
+  const [auditPanelOpen, setAuditPanelOpen] = useState(false);
+
+  // Listen for 'open-audit-log-panel' event dispatched from toolbar or canvas settings
+  useEffect(() => {
+    const handler = () => setAuditPanelOpen(true);
+    window.addEventListener('open-audit-log-panel', handler);
+    return () => window.removeEventListener('open-audit-log-panel', handler);
   }, []);
 
   // ---- S89-E4: GitHub PR Badge from ?github_pr= embed param ----
@@ -1577,6 +1589,12 @@ const { onCursorMove, broadcastCursor } = useWebSocketPresence({
     <SharePanel
       canvasId={projectId}
       onClose={handleSharePanelClose}
+    />
+
+    {/* S94-E3: AuditLogPanel — canvas audit log timeline with filters and CSV export */}
+    <AuditLogPanel
+      canvasId={projectId}
+      onClose={() => setAuditPanelOpen(false)}
     />
 
     {/* S83-E3: Conflict confirm toast — shown after auto-resolve strategy is chosen */}

@@ -27,6 +27,9 @@ import { StateMachineCard } from './StateMachineCard';
 import { NodeEditorLock } from '@/components/canvas/NodeEditorLock';
 import { NodeFocusOverlay } from '@/components/canvas/NodeFocusOverlay';
 import { NodeCommentBadge } from '@/components/dds/comments/NodeCommentBadge';
+// S95-E3: Node Edit Locking — remote lock badge + current-user lock indicator
+import { CollaboratorEditorBadge } from '@/components/dds/canvas/CollaboratorEditorBadge';
+import { LockIndicator } from '@/components/dds/canvas/LockIndicator';
 import { usePresenceStore } from '@/lib/collaboration/presenceStore';
 import type { APIEndpointCard as APIEndpointCardType, StateMachineCard as SMCardType } from '@/types/dds';
 
@@ -131,6 +134,10 @@ export const CardRenderer = memo(function CardRenderer({
       {locked && <LockOverlay userName={lockedBy} />}
       {/* S62-E1: Show remote editor badge when another user is editing this node */}
       <NodeEditorLock nodeId={card.id} />
+      {/* S95-E3: Show who holds a remote lock on this node */}
+      <CollaboratorEditorBadge nodeId={card.id} />
+      {/* S95-E3: Show 🔓 when current user holds the lock */}
+      <LockIndicator nodeId={card.id} />
       {/* S65-E2: Show remote focus indicator (reads directly from presenceStore) */}
       <NodeFocusOverlay nodeId={card.id} />
       {/* S69-E4: Show unread comment count badge on nodes */}

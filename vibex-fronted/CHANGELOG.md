@@ -7480,3 +7480,22 @@ See git history for complete changelog.
 - `AIInsightsPanel.tsx`: 健康度环形进度条 + 建议列表 + 布局选择器
 - `DDSCanvasPage.tsx`: 工具栏入口 🔬 按钮
 - Vitest: 9 tests covering all states
+
+## S94-E2 (2026-06-13): Advanced Canvas Sharing
+
+- **Feature**: Fine-grained sharing permissions (owner/editor/viewer/commenter)
+- **Feature**: Share links with expiration time and password protection
+- **Feature**: Canvas embed (iframe src) with copy-to-clipboard
+- **Feature**: Webhook configuration API (URL + event selection)
+- **API**: `POST /api/canvas/{id}/share` — create share link with role/expiry/password
+- **API**: `GET /api/canvas/{id}/share` — get share info or list shares by canvas
+- **API**: `DELETE /api/canvas/{id}/share` — revoke share link
+- **API**: `GET/POST /api/canvas/{id}/webhooks` — webhook list + create
+- **D1**: `canvas_share_links` table extended with password_hash, allow_comments, allow_download
+- **D1**: `canvas_webhooks` table — URL, events[], is_active, secret
+- **Frontend**: `SharePanel` with 4 tabs (Roles, Links, Embed, Webhooks)
+- **Frontend**: `shareStore` (Zustand) — createShare, listShares, createWebhook, toggleWebhook
+- **Tests**: 16 vitest (SharePanel) + 15 backend Jest
+
+类型: feat
+影响: vibex-backend/src/app/api/canvas/[id]/share/, vibex-backend/src/app/api/canvas/[id]/webhooks/, vibex-fronted/src/components/dds/share/

@@ -7771,3 +7771,19 @@ See git history for complete changelog.
 
 类型: feat
 影响: vibex-backend/src/app/api/canvas/[id]/share/, vibex-backend/src/app/api/canvas/[id]/webhooks/, vibex-fronted/src/components/dds/share/
+
+## S94-E3 (2026-06-13): Canvas Audit Log
+
+- **Feature**: Canvas operation audit log — filterable event history (create/update/delete/chat/events)
+- **Feature**: AuditLogSettingsTab in CanvasSettingsDrawer — toggle log retention
+- **API**: `GET /api/canvas/{id}/audit-log` — retrieve paginated audit events
+- **API**: `GET /api/admin/export-audit` — export audit log as CSV
+- **D1**: `canvas_audit_log` table — canvas_id, user_id, event_type, event_data, created_at
+- **Migration**: `0030_audit_log.sql` — create canvas_audit_log table + index
+- **Frontend**: `AuditLogPanel` — event type filter, user filter, time range, paginated list
+- **Frontend**: `auditStore` (Zustand) — fetchAuditLog, exportAudit
+- **Frontend**: `useAuditLog` hook — data fetching with TanStack Query
+- **Tests**: 8 vitest (AuditLogPanel) + 2 backend Jest (audit-log route)
+
+类型: feat
+影响: vibex-backend/src/app/api/canvas/[id]/audit-log/, vibex-backend/src/app/api/admin/export-audit/, vibex-fronted/src/components/dds/audit/, vibex-fronted/src/stores/auditStore.ts

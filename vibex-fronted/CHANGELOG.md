@@ -49,6 +49,21 @@
 ### 测试
 - `stores/__tests__/canvasExportStore.test.ts`: 14 vitest
 - `components/dds/toolbar/__tests__/ExportMenu.test.tsx`: 17 vitest
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S86-E5: VersionDiffPanel side-by-side two-column layout mode — 2026-06-11
 - **VersionDiffPanel**: 新增 `diffViewMode` 状态 (`'list'` | `'sideBySide'`) + `ViewModeSelect` 下拉选择器
 - **SideBySideContent 组件**: 双栏布局，左栏基准版本(移除节点红色)，右栏对比版本(新增绿色，修改橙色)
@@ -74,6 +89,21 @@
 - `src/app/settings/settings.module.css`
 - `src/app/settings/page.tsx`
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S86-E4: 通知 WebSocket 实时推送 — 2026-06-11
 - **useNotificationWebSocket hook**: 全局单例 WebSocket 连接, 调用 wsNotificationHandler 处理 notification:new 事件, 指数退避重连
 - **DDSCanvasPage**: 集成 useNotificationWebSocket hook (S86-E4)
@@ -81,6 +111,21 @@
 - **useNotificationWebSocket.test.ts**: 9 vitest 测试
 类型: feat
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S86-E2: 画布缩略图导航 — 2026-06-11
 - **canvasViewportStore**: Zustand store 管理画布视口状态（flow coordinates: x/y/zoom）+ zoomTo/panTo/setViewport/resetViewport actions + sessionStorage persist
 - **canvasViewportStore.test.ts**: 17 vitest 测试覆盖所有 store actions + getViewportCenter 工具函数
@@ -91,6 +136,21 @@
 类型: feat
 影响: vibex-fronted
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S85-E5: 模板发布与评分系统 — 2026-06-11
 - **templateStore**: 新增 `publishTemplate()` + `submitRating()` 方法（Zustand store）
 - **PublishTemplateDialog**: 新增发布模板对话框组件（表单验证 + API 调用）
@@ -100,6 +160,21 @@
 - **DDSToolbar**: 发布按钮集成（发布当前画布为模板）
 - **Backend**: POST /api/templates + GET /api/templates + POST /api/templates/:id/rate API 路由
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S85-E3: 通知中心面板 — 2026-06-11
 - **Backend D1 notifications API**: 新增 `/api/notifications` GET/POST + `/api/notifications/[id]/read` POST + `/api/notifications/read-all` POST
 - **Backend D1 Schema**: 新增 `0015_notifications.sql` — `notifications` 表（支持 mention/reply/collaborator_join/system/info/template_update/comment_reply 类型）
@@ -107,6 +182,21 @@
 - **Frontend 集成**: `notificationStore.ts` 已调用 `/api/notifications` GET（`fetchUnreadFromServer`），D1 持久化后端已就绪
 - **前端 无需改动**: `NotificationPanel.tsx` + `DDSToolbar.tsx` 已集成 `notificationStore`，`getUnreadCount()` 已在 Toolbar 显示角标
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S85-E2: 协作会话历史记录 — 2026-06-11
 - **stores/dds/sessionHistoryStore.ts**: 新增 Zustand store — 分页/筛选/搜索/追加会话记录状态管理
 - **stores/dds/__tests__/sessionHistoryStore.test.ts**: 14 个 vitest 测试用例
@@ -114,6 +204,21 @@
 - **components/dds/canvas/SessionHistoryPanel.module.css**: 完整样式
 - **components/dds/canvas/CanvasSettingsPanel.tsx**: 新增「会话历史」Tab，渲染 SessionHistoryPanel
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S83-E2: 导入链接画布 — 2026-06-10
 - **ImportShareDialog.tsx**: 新增 `ImportShareDialog` 组件 — 分享链接导入弹窗，支持 token 验证、画布预览、导入确认
 - **ImportShareDialog.module.css**: ImportShareDialog 样式（overlay、dialog、header、body、footer、preview、footer 按钮）
@@ -121,6 +226,21 @@
 - **canvas-share.ts**: 新增 `validateShareToken` / `registerShareToken` / `revokeShareToken` API 方法
 - **DDSCanvasPage.tsx**: 集成 ImportShareDialog，处理 `?import=<token>` URL 参数
 - **vitest**: ImportShareDialog.test.tsx 6/6 通过
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S82-E5: 自动解决策略 + WS 冲突触发 — 2026-06-09
 - **ConflictDialog.tsx**: 新增 `showAutoResolve` / `onAutoResolve` props + `AutoResolveStrategy` 类型
 - **ConflictDialog.tsx**: 新增自动解决策略选择区域（Auto-merge / Keep Mine / Keep Theirs 三按钮）
@@ -134,6 +254,21 @@
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S77-E2: WebSocket 连接稳定性增强 — 2026-06-08
 - **CollabWebSocket**: 新增心跳 ping/pong 机制（30s interval）—— `scheduleNextPing()` 递归 ping 周期 + `maxMissedPongs` 断线检测
 - **CollabWebSocket**: 指数退避重连策略 `delay = min(1000 * 2^attempt, 30000)` —— 3次心跳超时触发 reconnect
@@ -146,6 +281,21 @@
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S76-E5: 协作冲突检测与提示 — 2026-06-08
 - **presenceStore**: 新增 `remoteEditing` Map<userId, {nodeId, userName}> + setRemoteEditing / clearRemoteEditing / getRemoteEditors / clearAllRemoteEditing
 - **presenceStore**: `removeUser` / `clearAll` 清除 remoteEditing
@@ -153,6 +303,21 @@
 - **DDSCanvasPage**: 渲染 ConflictWarningBanner（选中文档时显示 remoteEditors）
 - **presenceStore.test.ts**: +8 S76-E5 remoteEditing 测试（74/74）
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S69-E4: 节点评论系统 — 2026-06-06
 
 - **E4.1**: `commentStore.ts` — `addComment()` 触发 `useNotificationStore.addNotification()` 发送评论通知
@@ -161,6 +326,21 @@
 - **E4.4**: `components/dds/comments/NodeCommentBadge.tsx` — 节点未读评论红色徽章 (`getUnreadCount(nodeId)`)
 - **vitest**: `commentStore.test.ts` 22/22 通过
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S68-E5: 协作光标同步 — 2026-06-06
 - **E5.1**: `presenceStore.ts` — 新增 `cursors` 独立字段 (Record<userId, CursorState>) + `broadcastCursor()` + `clearCursor()` + `clearAllCursors()`
 - **E5.2**: `wsCursorHandler.ts` — cursor:move / cursor:clear WebSocket 消息处理
@@ -172,6 +352,21 @@
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S67-E4: 画布快捷键可配置化 — 2026-06-06
 
 - **E4.1**: `shortcutStore.ts` — 新增 `addBinding(action, key)` / `removeBinding(action)` / `exportBindings()` / `importBindings(json)` 方法，支持直接绑定 API + JSON 导入导出
@@ -182,6 +377,21 @@
 - **E4.6**: `shortcutStore.test.ts` — 22 个 E4 测试用例覆盖 addBinding/removeBinding/export/import/conflict/round-trip
 
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S67-E2: 实时协作活动流面板 — 2026-06-06
 
 - **E2.1**: `CollabActivityPanel.tsx` — React panel 组件，auto-scroll activity list，支持 add/remove/focus/blur 类型，显示用户名称 + "你" 自标签，header 含清空按钮
@@ -190,6 +400,21 @@
 - **E2.4**: `useCollaboration.ts` — 注册 wsActivityHandler，导出 sendRaw
 - **E2.5**: `DDSFlow.tsx` — handleNodesChange 包装 broadcastActivity，广播 add/remove/focus/blur (throttled)
 - **E2.6**: `CollabActivityPanel.test.tsx` — 7 tests ✅，activityStore.test.ts 13 tests ✅
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S67-E1: 画布分支快照视觉对比 — 2026-06-06
 
 - **E1.1**: `historyDB.ts` — 新增 `getLatestSnapshotFromDB(canvasId, branchName)` 从 IndexedDB 查找指定分支的最新快照
@@ -199,6 +424,21 @@
 - **E1.5**: `HistoryPanel.tsx` — 集成"对比分支"按钮，当分支数>1时显示
 - **E1.6**: `canvasHistoryStore.sprint67-e1.test.ts` — 4 个测试用例覆盖 error/null/正常 diff 场景
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S66-E5: 协作会话历史与回放 — 2026-06-06
 
 - **E5.1**: `collabSessionStore.ts` — Zustand store + IndexedDB persistence (idb); startRecording/stopRecording CRUD; SessionEvent types: node:focused/unfocused/focus/blur, cursor:move, user:join/leave, editing:start/end; Replay engine: speed control (0.5x/1x/2x/4x), pause/resume/stop; SESSION_EVENT_LABELS zh-CN
@@ -209,6 +449,21 @@
 ---
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S67-E3: 模板画廊使用分析 + AI 推荐 — 2026-06-06
 
 - **E3.1**: `templateStore.ts` — 新增 `topTemplates(limit)` selector，按 usageCount 降序排列
@@ -218,11 +473,41 @@
 - **E3.5**: `TemplateGallery.tsx` — 新增"📊 分析"按钮 + "为你推荐" Tab 集成
 - **E3.6**: `TemplateAnalytics.test.tsx` — 5 tests ✅，`templateStore.test.ts` E3 块 7 tests ✅
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S66-E1: 画布分支操作 — 2026-06-06
 - **E1.1**: `historyDB.ts` — DB_VERSION=4, parentSnapshotId field in SnapshotEntry/load/update, branchName+parentSnapshotId indexes in onupgradeneeded
 - **E1.2**: `historyDB.ts` — renameBranchInDB/deleteBranchFromDB/mergeBranchInDB/listBranchesFromDB (bulk IndexedDB operations)
 - **E1.3**: `canvasHistoryStore.ts` — renameBranch/deleteBranch/mergeBranch/listBranches actions (auto-refresh snapshots list after each op)
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S66-E4: 模板高级搜索与过滤 — 标签自定义 + 日期范围 + URL 持久化 — 2026-06-06
 - **E4.1**: `templateStore.ts` — FilterOptions 状态 + setFilterOptions / applyFilters / search / addCustomTag / removeCustomTag / getCustomTags; applyFiltersImpl 实现 AND-标签 + 日期范围过滤
 - **E4.2**: `TagSelector.tsx` — 自定义标签多选下拉（预定义标签 + 自定义输入 + 本地持久化）; 集成 TEMPLATE_USE_CASE_TAGS
@@ -232,6 +517,21 @@
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S66-E2: 协作者冲突检测与通知 — 2026-06-06
 - **E2.1**: `presenceStore.ts` — `nodeLocks: Map<string, NodeLockInfo>` 状态; `focusNode(nodeId)` 记录锁定 + 30s auto-release timer; `blurNode(nodeId)` 清除; `isNodeLockedByOther(nodeId)` 查询; `handleNodeFocusMessage`/`handleNodeBlurMessage` WS 消息处理
 - **E2.2**: `wsNodeFocusHandler.ts` — `node:focus`/`node:blur` case handlers; `NodeFocusMessage`/`NodeBlurMessage` interfaces
@@ -244,12 +544,42 @@
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S66-E3: 画布视图预设保存与切换 — 2026-06-06
 
 - 新增 `viewPresetsStore`: Zustand store，localStorage 持久化，CRUD 操作
 - 新增 `ViewPresetsTab`: 预设卡片列表 UI + 保存表单
 - 新增测试 `viewPresetsStore.test.ts`: 20 个测试用例
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S65-E5: 模板画廊用户收藏管理 — 2026-06-05
 - **S65-E5.1**: `templateStore.addCustomCategory()` / `removeCustomCategory()` / `incrementUsage()` — 自定义分类管理 + 使用频率统计
 - **S65-E5.2**: Zustand persist middleware 自动持久化 `customCategories` + `stats.usageCount` (localStorage)
@@ -257,6 +587,21 @@
 - **S65-E5.4**: `TemplateGallery` 动态 tabs — 收藏 + 自定义分类 + 新建分类 + 分类过滤
 - **S65-E5.5**: 收藏夹按使用频率排序 (`incrementUsage` → `stats.usageCount`)
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S64-E2: 画布版本历史 LRU 缓存 + 恢复 — 2026-06-05
 - **S64-E2.1**: `MAX_SNAPSHOTS = 50` — 导出常量，供 HistoryPanel 使用
 - **S64-E2.2**: `saveSnapshot` LRU eviction — 列表 > 50 时，slice(50) 删除最旧的快照
@@ -265,6 +610,21 @@
 - **S64-E2.5**: `canvasHistoryStore.test.ts` — E2 测试套件：MAX_SNAPSHOTS 导出、saveSnapshot LRU eviction（单次/多次）、restoreSnapshot、auto-snapshot 定时器
 - **Test**: 60/60 vitest ✅
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S63-E4: AI 流式响应 + 可视化重试 — 2026-06-05
 - **S63-E4.1**: `agentStore.ts` — streamingContent/isStreaming/lastPrompt maps; SSE streamSession; retryLastStream/cancelStream/clearStreamContent actions; selectors
 - **S63-E4.2**: `AISessionDrawer.tsx` — 流式 AI 响应抽屉，打字机效果 + 重试按钮 + 停止生成按钮 + 重试计数徽章
@@ -274,10 +634,40 @@
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S58-E2: 桌面文件拖拽导入 — 2026-06-03
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S65-E1: 画布版本快照可视化分支管理 — 2026-06-05
 
 - **S65-E1.1**: `saveNamedSnapshot(name?)` — 自动生成 Snapshot-{timestamp} 名称
@@ -290,6 +680,21 @@
 - **S65-E1 (new files)**: `snapshotCompare.ts`, `SnapshotCompareDialog.tsx`
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S60-E3: 协作活动流 + 在线状态指示 — 2026-06-04
 - **S60-E3**: `activityStore.ts` — Zustand ring buffer (max 5 entries), online/idle/offline status derivation
 - **S60-E3**: `ActivityFeed.tsx` — 活动流面板，展示最近 5 条协作活动
@@ -298,10 +703,40 @@
 - **S60-E3**: `types.ts` — `ActivityMessage` + `ActivityEntry` 类型扩展
 - **S60-E3**: vitest 17/17 通过 (activityStore 11 + ActivityFeed 5 + RemoteCursor 11)
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S60-E4: 画布导出增强 — 2026-06-04
 - **S60-E4.1**: `ExportMenu.tsx` — 添加 PDF batch export radio button 选项，支持 PNG/SVG/PDF 三种格式批量导出
 - **S60-E4.2**: `src/services/export/__tests__/ZipExporter.test.ts` — 15 个 vitest 测试（PNG/PDF capture、JSZip manifest、filename sanitization、collectNodes scopes、progress callback）
 - **S60-E4**: ZipExporter PNG/PDF 支持、D4.3 ExportMenu PDF 选项、D4.5 vitest 测试覆盖
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S60-E5: 搜索体验增强 — 2026-06-04
 - **S60-E5.1**: `canvasSearchStore.ts` — Zustand store, searchHistory localStorage 持久化（最多 10 条，最新优先，dedup）
 - **S60-E5.2**: `DDSSearchPanel.tsx` — 新增"最近搜索"Tab + "搜索结果"Tab tablist 导航
@@ -315,6 +750,21 @@
 - **S58-E2.4**: `DDSFlow.tsx` — onDragOver/onDragLeave/onDrop handlers + overlay/dialog renders
 - **S58-E2.5**: `useFileDrop.test.ts` — 8 passing vitest tests (isDragging, processDrop, reset, removeFile, confirmImport)
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S58-E3: 协作者Cursor同步完善 — 2026-06-03
 - **S58-E3.1**: `coords.ts` — `screenToFlowCoords` / `flowToScreenCoords` 坐标转换工具（基于 @xyflow/react screenToFlowPosition）
 - **S58-E3.2**: `useCollaboration.ts` — 新增 `broadcastCursor(flowX, flowY, nodeId?)` 方法，内置 100ms 节流
@@ -323,6 +773,21 @@
 - **S58-E3.5**: `useCollaboration.test.tsx` — broadcastCursor 节流行为测试（100ms 阈值验证）
 - **Test**: 15/15 vitest ✅
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] Sprint 49 — E3 视口性能优化 + E5 协作评论系统
 
 ##### S49-E3: 视口性能优化（防抖 + 节点边界扩展）
@@ -340,7 +805,22 @@
 - **E5 12 测试**: addComment/editComment/deleteComment/resolveComment/unresolveComment/queryByCanvas/queryByNode 全覆盖
 - **E5 vitest**: commentStore 12/12 PASS，dds 全量 90/90 PASS
 
-### [Unreleased] Sprint 46 — E1 AI Session 搜索 + E2 键盘快捷键扩展 + E3 画布节点复制/粘贴
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] Sprint 46 — E1 AI Session 搜索 + E2 键盘快捷键扩展 + E3 画布节点复制/粘贴
 
 ##### S46-P001-E1: AI Session 搜索 + 历史会话管理
 - **E1 agentStore.ts**: add `searchableText` field, update `createSession()` to auto-generate searchable text
@@ -362,7 +842,22 @@
 - **E3 i18n**: add `toolbar.copy` + `toolbar.paste` keys to `toolbar` namespace (en + zh)
 - **E3 vitest**: `clipboardStore.test.ts` → 11/11 PASS; `DDSCanvasStore.test.ts` → 57/57 PASS
 
-### [Unreleased] Sprint 45 — E1 AI 断线重连 + E2 Presence 光标 + E3 画布 MiniMap + E4 模板版本管理 + E5 画布快照分享
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] Sprint 45 — E1 AI 断线重连 + E2 Presence 光标 + E3 画布 MiniMap + E4 模板版本管理 + E5 画布快照分享
 
 ##### S45-P001-E1: AI 断线重连 + 流式可靠性
 - **E1 useStreamingAgent.ts**: add maxRetries param, exponential backoff (1s→2s→4s), retrying + lastError state ✅
@@ -403,7 +898,22 @@
 - **E5 /snapshot/[id] page.tsx**: 公开只读页面，useEffect 加载 + 错误处理
 - **E5 share i18n namespace**: en.json + zh.json 新增 share 命名空间
 
-### [Unreleased] Sprint 44 — E1 AI 多轮会话管理 + E2 画布模板分类 + E3 协作节点锁定 + E4 撤销历史面板 + E5 移动端触控
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] Sprint 44 — E1 AI 多轮会话管理 + E2 画布模板分类 + E3 协作节点锁定 + E4 撤销历史面板 + E5 移动端触控
 
 ##### S44-P001-E1: AI 多轮会话管理
 - **E1 agentDB.ts**: `src/lib/agentDB.ts` — IndexedDB persistence layer (initAgentDB, persistSession, loadSessionList, deleteSession) ✅
@@ -449,7 +959,22 @@
 - **E5 useTouchGestures.test.ts**: 14/14 vitest 全部 PASS ✅
 - **E5 DDSFlow.tsx**: 集成 touchGestures，onTouchStart + onPointerDown 绑定到根元素 ✅
 
-### [Unreleased] Sprint 43 — E1 Presence 集成收尾 + E2 SSE 流式 + E3 性能优化 + E4 导出 + E5 快捷键自定义
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] Sprint 43 — E1 Presence 集成收尾 + E2 SSE 流式 + E3 性能优化 + E4 导出 + E5 快捷键自定义
 
 ##### S43-P001-E1: Presence DDSCanvasPage 集成收尾
 - **E1 DDSCanvasPage.tsx**: 集成 useWebSocketPresence，替换 Firebase usePresence ✅
@@ -480,7 +1005,22 @@
 - **E5 shortcuts namespace**: `src/i18n/messages/en.json` + `zh.json` — title/closeAria/footer keys ✅
 - **E5 vitest**: `src/components/canvas/features/__tests__/ShortcutPanel.test.tsx` — 修复 duplicate description test, 9/9 PASS ✅
 
-### [Unreleased] Sprint 42 — E1 撤销/重做验证 + E2 Presence光标 + E3 画布模板 + E4 设置验收 + E5 移动端触摸
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] Sprint 42 — E1 撤销/重做验证 + E2 Presence光标 + E3 画布模板 + E4 设置验收 + E5 移动端触摸
 
 ##### S42-P001-E1: 撤销/重做系统验证（Sprint36 实现）
 - **E1 canvasHistoryStore**: `src/stores/dds/canvasHistoryStore.ts` — Command Pattern undo/redo ✅
@@ -522,7 +1062,22 @@
 - **E5 E2E**: `tests/e2e/mobile-touch.spec.ts` — 5 tests (pinch-zoom/pan/double-tap/indicator/minimap隐藏) ✅
 - **E5 commit**: `b11c7df9e` feat(S42-P001-E5): 移动端触控支持
 
-### [Unreleased] Sprint 41 — P001 i18n 验收 + P002 WebSocket 部署 + P003 MiniMap 验收 + P004 Canvas 持久化 + P005 快捷键
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] Sprint 41 — P001 i18n 验收 + P002 WebSocket 部署 + P003 MiniMap 验收 + P004 Canvas 持久化 + P005 快捷键
 
 ##### S41-P001-E1: i18n AI生成区最终验收
 - **E1 useTranslations**: `src/app/ai/page.tsx` + `AgentFeedbackPanel.tsx` + `AgentSessions.tsx` 全部使用 `useTranslations('ai')()` ✅
@@ -556,7 +1111,22 @@
 - **E5 快捷键**: Ctrl+K 搜索, +/- 缩放, Delete 删除, Ctrl+A 全选, N 新建, `?` 帮助 ✅
 - **E5 TypeScript**: 键盘相关文件 tsc 零新增错误（pre-existing errors unrelated to E5）
 
-### [Unreleased] Sprint 40 — P001 AI Agent i18n 国际化
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] Sprint 40 — P001 AI Agent i18n 国际化
 
 ##### S40-P001-E1: AI Agent i18n 迁移收尾
 - **E1 useTranslations hook**: `src/hooks/useTranslations.ts` — 自定义 i18n hook，支持 namespace 隔离
@@ -565,7 +1135,22 @@
 - **E1 /ai 页面**: `src/app/ai/page.tsx` — 新建 AI 页面，双栏布局（AgentSessions sidebar + AgentFeedbackPanel main）
 - **E1 i18n keys**: `src/i18n/messages/en.json` + `zh.json` 新增 54 个 ai namespace keys
 
-### [Unreleased] Sprint 40 — P002 WebSocket 后端 + 协作同步层
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] Sprint 40 — P002 WebSocket 后端 + 协作同步层
 
 ##### S40-P002-E1: WebSocket 后端部署 + 前端集成
 - **E1 后端 WebSocket 服务**: `vibex-backend/src/services/websocket/` — ConnectionPool + MessageRouter（Cloudflare Workers Durable Objects 架构）
@@ -574,7 +1159,22 @@
 - **E1 待完成**: Cloudflare DNS `ws.vibex.top` A/CNAME 记录配置（外部依赖）
 - **E1 待完成**: Fly.io WebSocket 服务 JWT secret 配置（`fly secrets set JWT_SECRET=***`）
 
-### [Unreleased] Sprint 40 — P003 MiniMap 导航完善
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] Sprint 40 — P003 MiniMap 导航完善
 
 ##### S40-P003-E1: MiniMap 导航完善（Sprint39 遗留）
 - **E1 MiniMapPanel**: `vibex-fronted/src/components/dds/MiniMapPanel.tsx` — 折叠式左侧面板，含 toggle 按钮、click-to-navigate、视口边框矩形
@@ -583,9 +1183,39 @@
 - **E1 DDSCanvasPage 集成**: `<MiniMapPanel />` 集成到画布页面，position:absolute 浮动于画布之上
 - **E1 E2E 测试**: `tests/e2e/minimap-panel.spec.ts` — 5 tests（toggle/panel/open-close/closeBtn），TypeScript clean ✅
 
-### [Unreleased] Sprint 39 — P002 WebSocket 实时协作同步层
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
 
-### [Unreleased] Sprint 40 — P004 Canvas 持久化 + 导入导出
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] Sprint 39 — P002 WebSocket 实时协作同步层
+
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] Sprint 40 — P004 Canvas 持久化 + 导入导出
 
 ##### S40-P004-E1: Canvas 持久化 + 导入导出
 - **E1 serialize.ts**: `src/lib/canvas/serialize.ts` — serializeCanvasToJSON/deserializeCanvasFromJSON/serializeThreeTrees/restoreStore，20 vitest tests ✅
@@ -616,7 +1246,22 @@
 - **E2 Toast 增强**: `conflictToastEmitter` 支持用户ID参数，Toast 显示"⚠️ 与用户X的修改冲突"
 - **E3 WebSocket Close**: WS close 事件触发 setOnlineUsers([])，用户下线自动从列表移除
 
-### [Unreleased] Sprint 40 — P005 键盘快捷键系统完善
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] Sprint 40 — P005 键盘快捷键系统完善
 
 ##### S40-P005-E1: 键盘快捷键系统完善
 - **E1 ShortcutManager**: `src/lib/keyboard/shortcutManager.ts` — 全局键盘管理，mousetrap 集成，SYSTEM_RESERVED 注册表（Cmd+w/Cmd+r/Cmd+f 等），pause/resume，per-shortcut bind/unbind/rebind ✅
@@ -628,7 +1273,22 @@
 - **E1 ShortcutStore**: `src/stores/shortcutStore.ts` — 已存在（localStorage persist + conflict detection）✅
 - **E1 mousetrap 依赖**: `package.json` — mousetrap@1.6.5 已安装 ✅
 
-### [Unreleased] Sprint 40 — P001 AI Agent i18n 国际化
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] Sprint 40 — P001 AI Agent i18n 国际化
 
 ##### S40-P001-E1: AI Agent i18n 迁移收尾
 - **E1 useTranslations hook**: `src/hooks/useTranslations.ts` — 自定义 i18n hook，支持 namespace 隔离
@@ -637,7 +1297,22 @@
 - **E1 /ai 页面**: `src/app/ai/page.tsx` — 新建 AI 页面，双栏布局（AgentSessions sidebar + AgentFeedbackPanel main）
 - **E1 i18n keys**: `src/i18n/messages/en.json` + `zh.json` 新增 54 个 ai namespace keys
 
-### [Unreleased] Sprint 40 — P002 WebSocket 后端 + 协作同步层
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] Sprint 40 — P002 WebSocket 后端 + 协作同步层
 
 ##### S40-P002-E1: WebSocket 后端部署 + 前端集成
 - **E1 后端 WebSocket 服务**: `vibex-backend/src/services/websocket/` — ConnectionPool + MessageRouter（Cloudflare Workers Durable Objects 架构）
@@ -646,7 +1321,22 @@
 - **E1 待完成**: Cloudflare DNS `ws.vibex.top` A/CNAME 记录配置（外部依赖）
 - **E1 待完成**: Fly.io WebSocket 服务 JWT secret 配置（`fly secrets set JWT_SECRET=***`）
 
-### [Unreleased] Sprint 40 — P003 MiniMap 导航完善
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] Sprint 40 — P003 MiniMap 导航完善
 
 ##### S40-P003-E1: MiniMap 导航完善（Sprint39 遗留）
 - **E1 MiniMapPanel**: `vibex-fronted/src/components/dds/MiniMapPanel.tsx` — 折叠式左侧面板，含 toggle 按钮、click-to-navigate、视口边框矩形
@@ -655,8 +1345,38 @@
 - **E1 DDSCanvasPage 集成**: `<MiniMapPanel />` 集成到画布页面，position:absolute 浮动于画布之上
 - **E1 E2E 测试**: `tests/e2e/minimap-panel.spec.ts` — 5 tests（toggle/panel/open-close/closeBtn），TypeScript clean ✅
 
-### [Unreleased] Sprint 39 — P003 评分卡复杂度指标
-### [Unreleased] Sprint 40 — P001 AI Agent i18n 国际化
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] Sprint 39 — P003 评分卡复杂度指标
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] Sprint 40 — P001 AI Agent i18n 国际化
 
 ##### S40-P001-E1: AI Agent i18n 迁移收尾
 - **E1 useTranslations hook**: `src/hooks/useTranslations.ts` — 自定义 i18n hook，支持 namespace 隔离
@@ -665,7 +1385,22 @@
 - **E1 /ai 页面**: `src/app/ai/page.tsx` — 新建 AI 页面，双栏布局（AgentSessions sidebar + AgentFeedbackPanel main）
 - **E1 i18n keys**: `src/i18n/messages/en.json` + `zh.json` 新增 54 个 ai namespace keys
 
-### [Unreleased] Sprint 40 — P002 WebSocket 后端 + 协作同步层
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] Sprint 40 — P002 WebSocket 后端 + 协作同步层
 
 ##### S40-P002-E1: WebSocket 后端部署 + 前端集成
 - **E1 后端 WebSocket 服务**: `vibex-backend/src/services/websocket/` — ConnectionPool + MessageRouter（Cloudflare Workers Durable Objects 架构）
@@ -674,7 +1409,22 @@
 - **E1 待完成**: Cloudflare DNS `ws.vibex.top` A/CNAME 记录配置（外部依赖）
 - **E1 待完成**: Fly.io WebSocket 服务 JWT secret 配置（`fly secrets set JWT_SECRET=***`）
 
-### [Unreleased] Sprint 40 — P003 MiniMap 导航完善
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] Sprint 40 — P003 MiniMap 导航完善
 
 ##### S40-P003-E1: MiniMap 导航完善（Sprint39 遗留）
 - **E1 MiniMapPanel**: `vibex-fronted/src/components/dds/MiniMapPanel.tsx` — 折叠式左侧面板，含 toggle 按钮、click-to-navigate、视口边框矩形
@@ -683,7 +1433,22 @@
 - **E1 DDSCanvasPage 集成**: `<MiniMapPanel />` 集成到画布页面，position:absolute 浮动于画布之上
 - **E1 E2E 测试**: `tests/e2e/minimap-panel.spec.ts` — 5 tests（toggle/panel/open-close/closeBtn），TypeScript clean ✅
 
-### [Unreleased] Sprint 39 — P005 Service Worker 离线缓存
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] Sprint 39 — P005 Service Worker 离线缓存
 
 ##### S39-P005-E1: Service Worker 注册 + 静态资源缓存
 - **E1 SWRegistration**: `src/components/sw/SWRegistration.tsx` — navigator.serviceWorker.register("/sw.js") + 错误处理
@@ -702,7 +1467,22 @@
 ##### S39-P005-E3: manifest.json + PWA 图标
 - **E3 manifest.json**: public/manifest.json 已包含完整字段，icons 配置正确
 - **E3 manifest.json 验证**: public/manifest.json 已包含完整字段（name, short_name, start_url, display, icons），无需修改
-### [Unreleased] Sprint 40 — P001 AI Agent i18n 国际化
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] Sprint 40 — P001 AI Agent i18n 国际化
 
 ##### S40-P001-E1: AI Agent i18n 迁移收尾
 - **E1 useTranslations hook**: `src/hooks/useTranslations.ts` — 自定义 i18n hook，支持 namespace 隔离
@@ -711,7 +1491,22 @@
 - **E1 /ai 页面**: `src/app/ai/page.tsx` — 新建 AI 页面，双栏布局（AgentSessions sidebar + AgentFeedbackPanel main）
 - **E1 i18n keys**: `src/i18n/messages/en.json` + `zh.json` 新增 54 个 ai namespace keys
 
-### [Unreleased] Sprint 40 — P002 WebSocket 后端 + 协作同步层
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] Sprint 40 — P002 WebSocket 后端 + 协作同步层
 
 ##### S40-P002-E1: WebSocket 后端部署 + 前端集成
 - **E1 后端 WebSocket 服务**: `vibex-backend/src/services/websocket/` — ConnectionPool + MessageRouter（Cloudflare Workers Durable Objects 架构）
@@ -720,7 +1515,22 @@
 - **E1 待完成**: Cloudflare DNS `ws.vibex.top` A/CNAME 记录配置（外部依赖）
 - **E1 待完成**: Fly.io WebSocket 服务 JWT secret 配置（`fly secrets set JWT_SECRET=***`）
 
-### [Unreleased] Sprint 40 — P003 MiniMap 导航完善
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] Sprint 40 — P003 MiniMap 导航完善
 
 ##### S40-P003-E1: MiniMap 导航完善（Sprint39 遗留）
 - **E1 MiniMapPanel**: `vibex-fronted/src/components/dds/MiniMapPanel.tsx` — 折叠式左侧面板，含 toggle 按钮、click-to-navigate、视口边框矩形
@@ -729,7 +1539,22 @@
 - **E1 DDSCanvasPage 集成**: `<MiniMapPanel />` 集成到画布页面，position:absolute 浮动于画布之上
 - **E1 E2E 测试**: `tests/e2e/minimap-panel.spec.ts` — 5 tests（toggle/panel/open-close/closeBtn），TypeScript clean ✅
 
-### [Unreleased] Sprint 39 — P004 MiniMap 搜索导航
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] Sprint 39 — P004 MiniMap 搜索导航
 
 ##### S39-P004-E1: MiniMap 搜索 + 节点高亮 + 视口边框
 - **E1 useMiniMapSearch hook**: `src/hooks/useMiniMapSearch.ts` — 搜索词、高亮节点集、搜索回调
@@ -756,7 +1581,22 @@
 - **E2 整体评分公式**: 从简单平均改为加权平均（可读性 40% + 复杂度 30% + 覆盖率 30%）
 - **E2 TypeScript**: `pnpm exec tsc --noEmit` clean for AIScoreCard files
 
-### [Unreleased] Sprint 38 — P001 i18n 多语言系统
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] Sprint 38 — P001 i18n 多语言系统
 
 #### F001 — i18n 多语言系统（P001-E1 框架安装 + DDSToolbar 试点）
 **Epic 数量**: 1 | **优先级**: P0
@@ -783,7 +1623,22 @@
 - **TypeScript**: `pnpm exec tsc --noEmit` clean ✅
 - **剩余工作**: src/app/ 页面（AI生成区，禁止手动编辑）待 dev agent 完成 E3 后续组件迁移
 
-### [Unreleased] Sprint 38 — P002 CanvasStore oplog + AI indicator
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] Sprint 38 — P002 CanvasStore oplog + AI indicator
 
 #### F001 — CanvasStore oplog + AI indicator（P002-E1）
 **Epic 数量**: 1 | **优先级**: P0
@@ -815,7 +1670,22 @@
 - **OperationOverlay.test.tsx**: 9 tests（render/open/close/search/filter/badges/diff/footer）
 - **coord self-implement**: dev-epic3-ctrl+h-operation-overlay 因 Slack socket 持续中断（CLI dispatch 但 agent 未 spawn），超过 12h 阈值，coord 自实现
 
-### [Unreleased] Sprint 38 — P003 AI Feedback回路
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] Sprint 38 — P003 AI Feedback回路
 **Epic 数量**: 1 | **优先级**: P0
 
 ##### S38-P003-E1: AI Feedback回路——useAIAgent result export + DiffOverlay UI（coord self-implement）
@@ -843,9 +1713,39 @@
 - **vitest**: `AIScoreCard.test.tsx` 7 tests 全部 PASS；`userPreferencesStore.test.ts` 8 tests 全部 PASS（aiScores reset 覆盖）
 - **coord self-implement**: dev-epic3-评分卡 因 `updatedBy: cli`（CLI dispatch 但 dev agent 未 spawn，已 16.8h），coord 自实现 P003-E3
 
-### [Unreleased] Sprint 38 — P004 E2E 稳定性
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
 
-### [Unreleased] Sprint 40 — P001 AI Agent i18n 国际化
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] Sprint 38 — P004 E2E 稳定性
+
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] Sprint 40 — P001 AI Agent i18n 国际化
 
 ##### S40-P001-E1: AI Agent i18n 迁移收尾
 - **E1 useTranslations hook**: `src/hooks/useTranslations.ts` — 自定义 i18n hook，支持 namespace 隔离
@@ -854,7 +1754,22 @@
 - **E1 /ai 页面**: `src/app/ai/page.tsx` — 新建 AI 页面，双栏布局（AgentSessions sidebar + AgentFeedbackPanel main）
 - **E1 i18n keys**: `src/i18n/messages/en.json` + `zh.json` 新增 54 个 ai namespace keys
 
-### [Unreleased] Sprint 40 — P002 WebSocket 后端 + 协作同步层
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] Sprint 40 — P002 WebSocket 后端 + 协作同步层
 
 ##### S40-P002-E1: WebSocket 后端部署 + 前端集成
 - **E1 后端 WebSocket 服务**: `vibex-backend/src/services/websocket/` — ConnectionPool + MessageRouter（Cloudflare Workers Durable Objects 架构）
@@ -863,7 +1778,22 @@
 - **E1 待完成**: Cloudflare DNS `ws.vibex.top` A/CNAME 记录配置（外部依赖）
 - **E1 待完成**: Fly.io WebSocket 服务 JWT secret 配置（`fly secrets set JWT_SECRET=***`）
 
-### [Unreleased] Sprint 40 — P003 MiniMap 导航完善
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] Sprint 40 — P003 MiniMap 导航完善
 
 ##### S40-P003-E1: MiniMap 导航完善（Sprint39 遗留）
 - **E1 MiniMapPanel**: `vibex-fronted/src/components/dds/MiniMapPanel.tsx` — 折叠式左侧面板，含 toggle 按钮、click-to-navigate、视口边框矩形
@@ -872,7 +1802,22 @@
 - **E1 DDSCanvasPage 集成**: `<MiniMapPanel />` 集成到画布页面，position:absolute 浮动于画布之上
 - **E1 E2E 测试**: `tests/e2e/minimap-panel.spec.ts` — 5 tests（toggle/panel/open-close/closeBtn），TypeScript clean ✅
 
-### [Unreleased] Sprint 39 — P001 i18n 收尾
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] Sprint 39 — P001 i18n 收尾
 
 #### F001 — i18n AI 页面迁移（P001-E1）
 - **E1 AI 页面 i18n 化**: `src/app/flow/page.tsx`, `src/app/domain/DomainPageContent.tsx`, `src/app/preview/page.tsx`, `src/app/landing/page.tsx` — 硬编码中文替换为 `t('ai.*')` 调用
@@ -928,7 +1873,22 @@
 - **E3 TypeScript**: pnpm exec tsc --noEmit → 0 错误 ✅
 - **E3 coord self-implement**: dev-epic3-新-feature-e2e-覆盖 因 `updatedBy: cli`（CLI dispatch 但 dev agent 未 spawn，Slack socket 持续中断），coord 自实现 P004-E3
 
-### [Unreleased] Sprint 37
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] Sprint 37
 
 #### F001 — 键盘快捷键系统（E001-E004）
 **Epic 数量**: 4 | **优先级**: P0
@@ -1040,52 +2000,202 @@
 - Playwright 视觉回归测试（5 主题截图对比，差异阈值 < 1%）
 - 提交: `d92d64a1e`
 
-### [Unreleased] S36-E1: 多人协作 MVP（E1-S1.1 ~ E1-S1.3）— 2026-05-11
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] S36-E1: 多人协作 MVP（E1-S1.1 ~ E1-S1.3）— 2026-05-11
 - **E1-S1.1 RemoteCursor 挂载**: `RemoteCursor` 重构为 self-subscribing 组件（内部 `usePresence` 订阅）；props: `canvasId`, `userId`, `userName`；条件守卫: `isFirebaseConfigured()` → mock 模式返回 null；DDSCanvasPage 中挂载 `<RemoteCursor />`
 - **E1-S1.2 useRealtimeSync 集成**: DDSCanvasPage 中调用 `useRealtimeSync({ projectId, userId })`；Firebase RTDB 实时节点同步（last-write-wins）
 - **E1-S1.3 Presence E2E 测试**: `presence-mvp.spec.ts` 存在；RemoteCursor 可见 + PresenceAvatars 包含用户名
 - 提交: `0e846f707`
 
-### [Unreleased] S36-E2: 模板市场 MVP（E2-S2.1 ~ E2-S2.3）— 2026-05-15
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] S36-E2: 模板市场 MVP（E2-S2.1 ~ E2-S2.3）— 2026-05-15
 - **E2-S2.1 Backend API**: `GET /api/templates/marketplace` 读取 `vibex-backend/public/data/marketplace-templates.json`，支持 `?industry=` 筛选
 - **E2-S2.2 预置模板数据**: 3个行业预置模板（saas/ecommerce/social），含 entities + boundedContexts + sampleRequirement
 - **E2-S2.3 前端集成**: `templateApi.getMarketplaceTemplates()` 方法 + `templates-market.spec.ts` E2E 测试覆盖
 - 提交: `84f042912`
 
-### [Unreleased] S36-E3: MCP DoD CI Gate（E3-S3.1）— 2026-05-15
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] S36-E3: MCP DoD CI Gate（E3-S3.1）— 2026-05-15
 - **E3-S3.1 Tool Index CI 验证**: `.github/workflows/test.yml` 新增 `generate-tool-index` job；当 `packages/mcp-server/src/tools/**` 或 `scripts/generate-tool-index.ts` 变更时触发；运行 `pnpm exec tsx scripts/generate-tool-index.ts` 并以 `git diff --exit-code docs/mcp-tools/INDEX.md` 验证文档同步；INDEX 失步时 CI exit 1；job 加入 merge-gate
 - 提交: `coord-escalation: feat(E3): add MCP Tool Index CI Gate to test.yml`
 
-### [Unreleased] S36-E4: 撤销重做 Toolbar 补全（S4.1）— 2026-05-16
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] S36-E4: 撤销重做 Toolbar 补全（S4.1）— 2026-05-16
 - **S4.1 DDSToolbar Undo/Redo 按钮**: `DDSToolbar.tsx` 新增 Undo/Redo 按钮；调用 `useCanvasHistoryStore.undo()` / `redo()`；按钮 disabled 状态根据 `canUndo()` / `canRedo()` 正确切换；图标使用 SVG；支持 Ctrl+Z / Ctrl+Shift+Z 快捷键
 - 提交: `coord-escalation: feat(E4): add DDSToolbar Undo/Redo buttons`
 
-### [Unreleased] S36-E5: Design Review E2E 补全（S5.1 ~ S5.2）— 2026-05-16
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] S36-E5: Design Review E2E 补全（S5.1 ~ S5.2）— 2026-05-16
 - **S5.1 降级路径 E2E 测试**: `design-review-degradation.spec.ts` — MCP 503 降级 UI（非白屏）；Firebase 未配置不阻断 review panel；retry button 重试成功
 - **S5.2 评审结果三 Tab E2E**: `design-review-tabs.spec.ts` — compliance/accessibility/reuse 切换正常；badge count 准确；severity badge 显示正确
 - 提交: `cb19cf2ba` (coord-escalation: feat(E5): add design-review degradation + tabs E2E tests)
 
-### [Unreleased] S35-P004: 模板市场功能调研（U1-P004 ~ U4-P004）— 2026-05-11
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] S35-P004: 模板市场功能调研（U1-P004 ~ U4-P004）— 2026-05-11
 - **U1-P004 用户故事**: As a 前端工程师/团队 lead/独立开发者，3 个用户故事 + 验收标准
 - **U2-P004 API 设计**: `/api/templates/marketplace` CRUD 端点设计，VibexExportSchema 数据结构
 - **U3-P004 技术方案**: 方案 A（自建）4-6 人天 vs 方案 B（GitHub Gist）2-3 人天 vs 方案 C（Notion）3-4 人天
 - **U4-P004 安全考量**: 沙箱隔离方案，MVP 阶段只读市场安全风险可控
 - 文档: `docs/vibex-proposals-sprint35/template-market-research.md`
 
-### [Unreleased] S35-P003: 多人协作能力增强调研（U1-P003 ~ U4-P003）— 2026-05-11
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] S35-P003: 多人协作能力增强调研（U1-P003 ~ U4-P003）— 2026-05-11
 - **U1-P003 竞品对比**: Figma / Miro / Notion 对比表，VibeX 处于 Notion 阶段
 - **U2-P003 技术风险**: Firebase RTDB 免费层 20 并发；WebSocket vs WebRTC vs OT vs CRDT 选型分析
 - **U3-P003 可选方案**: 方案 A（Firebase RTDB + Presence）5-7 人天；方案 B（自建 WebSocket + Yjs）10-15 人天
 - **U4-P003 推荐方案**: 方案 A，推荐 Sprint 36 先实现实时光标验证用户需求
 - 文档: `docs/vibex-proposals-sprint35/collaboration-research.md`
 
-### [Unreleased] S33-Epic4: S32 QA 修复项（E4-U1 ~ U3-E4）— 2026-05-09
-### [Unreleased] S35-P001: 撤销重做 localStorage 持久化调用补充（U4-P001 收尾）— 2026-05-11
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] S33-Epic4: S32 QA 修复项（E4-U1 ~ U3-E4）— 2026-05-09
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] S35-P001: 撤销重做 localStorage 持久化调用补充（U4-P001 收尾）— 2026-05-11
 - **U4-P001 DDSCanvasPage 调用**: `loadHistoryFromStorage` 在 `projectId` 变化时加载 metadata；`saveHistoryToStorage` 在 history 变更时 debounced 500ms 保存；遵循设计决策（Command 闭包不可序列化，仅存 metadata）
 - **P002 Bundle Report 增强**: `.github/workflows/bundle-report.yml` — main 分支 push 记录性能基线；PR 包体积增幅 >5% 时 CI exit 1
 - 提交: `6452d2f1c`
 
-### [Unreleased] S34-P001: 撤销/重做系统（U1-P001 ~ U5-P001）— 2026-05-10
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] S34-P001: 撤销/重做系统（U1-P001 ~ U5-P001）— 2026-05-10
 - **U1-P001 canvasHistoryStore**: Command Pattern + Zustand，`execute/undo/redo/clear/canUndo/canRedo`，50步限制
 - **U2-P001 DDSCanvasPage 连接**: `undoCallback`/`redoCallback` 连接真实 `canvasHistoryStore`
 - **U3-P001 Middleware 包装**: `ddsChapterActions` 自动创建 Command 入栈
@@ -1099,13 +2209,43 @@
 - **E4-U3 Baseline screenshots**: data 属性不影响视觉，screenshots 无需重新生成
 - 提交: `f536e7a14`
 
-### [Unreleased] S33-Epic3: 协作者意图气泡（E3-U1 ~ E3-U3）— 2026-05-09
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] S33-Epic3: 协作者意图气泡（E3-U1 ~ E3-U3）— 2026-05-09
 - **E3-U1 presence 层**: `IntentionType = 'edit' | 'select' | 'drag' | 'idle'`；`updateCursor()` 支持 `intention` 参数；`usePresence` 返回 `setIntention()`
 - **E3-U2 IntentionBubble 组件**: 500ms 延迟显示，3s idle 消失；`200ms ease-out` 入场动画；`role="status"` 无障碍支持；`data-testid="intention-bubble"`
 - **E3-U3 RemoteCursor 集成**: 气泡显示在光标上方 32px；文案映射（编辑/选择/拖拽）；idle 状态不渲染
 - 提交: `1a2eb7358`
 
-### [Unreleased] S33-Epic2: 冲突可视化功能（E2-U1 ~ E4-E2）— 2026-05-09
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] S33-Epic2: 冲突可视化功能（E2-U1 ~ E4-E2）— 2026-05-09
 - **E2-U1 ConflictBubble 集成**: `<ConflictBubble />` 挂载在 DDSFlow 外层；无冲突时 render null
 - **E2-U2 conflictedCardId 同步**: `conflictStore.activeConflict → DDSCanvasStore.conflictedCardId` via `useEffect`；`data-conflict` 属性透传到 CardRenderer
 - **E2-U3 冲突高亮**: 冲突节点红框脉冲（`2px solid #ef4444` + `@keyframes conflict-pulse` 1.5s）；`RequirementCard/BoundedContextCard/FlowStepCard` 三卡片均支持 `.conflicting` class
@@ -1113,7 +2253,22 @@
 - **依赖**: `@/lib/canvas/stores/conflictStore`（E8-S2 遗留，LWW 仲裁）
 - 提交: `29360a04b`
 
-### [Unreleased] S33-Epic1: Group/Folder 折叠功能（E1-U1 ~ E5-U1）— 2026-05-09
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] S33-Epic1: Group/Folder 折叠功能（E1-U1 ~ E5-U1）— 2026-05-09
 - **E1-U1 Store 层**: `collapsedGroups: Set<string>` 状态 + `toggleCollapse(groupId)` + `isCollapsed(groupId)` + `getVisibleNodes(nodes, collapsedGroups)` BFS 可见性过滤；localStorage 持久化（`vibex-dds-collapsed-{canvasId}`）
 - **E1-U2 折叠按钮**: DDSFlow Group 节点左上角 `data-testid="collapse-toggle"` 按钮；点击切换折叠/展开态
 - **E1-U3 折叠态视觉**: 折叠后 Group 节点虚线边框（`.collapsedOverlay`）+ 子节点数量红色徽章（`.collapsedBadge`, `data-testid="collapsed-badge"`）
@@ -1122,7 +2277,22 @@
 - **测试**: DDSCanvasStore 11 cases + DDSFlow 8 cases（53 tests PASS）
 - 提交: `92c582d05` + `d94507f84`
 
-### [Unreleased] S32-Epic2: 测试基础设施（F2.1/F2.2）— 2026-05-09
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] S32-Epic2: 测试基础设施（F2.1/F2.2）— 2026-05-09
 - **F2.1 Vitest Snapshot 测试**: `vibex-fronted/src/components/dds/canvas/__tests__/ChapterPanel.test.tsx` — ChapterPanel 快照测试（empty/loading/error/with-cards states）；`vibex-fronted/src/stores/dds/__tests__/DDSCanvasStore.test.ts` — DDSCanvasStore 快照测试（初始状态 + 带卡片状态）
 - **F2.1 快照文件**: `ChapterPanel.test.tsx.snap` (1235 lines) + `DDSCanvasStore.test.ts.snap` 已签入 Git
 - **F2.2 视觉回归测试**: `vibex-fronted/tests/e2e/visual-regression.spec.ts` — 覆盖 Dashboard/Requirements/Flow/Landing/Templates/Auth/CanvasPage 等 8 个页面截图；`.github/workflows/visual-regression.yml` — workflow_dispatch CI job
@@ -1130,7 +2300,22 @@
 
 ---
 
-### [Unreleased] S32-Epic1: 画布导航 + AI评审 + 离线写入（F1.1/F1.2/F1.3/F1.4）— 2026-05-09
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] S32-Epic1: 画布导航 + AI评审 + 离线写入（F1.1/F1.2/F1.3/F1.4）— 2026-05-09
 - **F1.1 CanvasThumbnail 缩略图导航**: `vibex-fronted/src/components/dds/canvas/CanvasThumbnail.tsx` — downscaled SVG 缩略图 + viewport 高亮指示器，集成到 DDSFlow.tsx，threshold=50，使用 requestAnimationFrame 节流
 - **F1.2 AI 评审 CI Gate**: `.github/workflows/ai-review.yml` — pull_request trigger，使用 secrets.OPENCLAW_API_KEY，降级处理 exit 0，JSON schema status/score/feedback/timestamp，ai-review-results/ 已加入 .gitignore
 - **F1.3 离线写入队列**: `vibex-fronted/src/lib/offline-queue.ts` — IndexedDB enqueueRequest/dequeueRequest/getQueuedRequests/replayQueue/clearQueue，timestamp 幂等 key，重放最多 3 次；`public/sw.js` — 非 GET 请求离线时 enqueue，返回 202；online 时 replayQueue；Feature flag: NEXT_PUBLIC_ENABLE_OFFLINE_QUEUE
@@ -1138,7 +2323,22 @@
 - 提交: `e0fe5e5d2` (F1.1) + `c2c51ced7` (F1.2) + `1f657c4ea` (F1.3) + `7cb7ab066` (F1.4)
 
 ---
-### [Unreleased] S31-E01-E05: 测试与集成补全（F2.1/F2.2）— 2026-05-08
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] S31-E01-E05: 测试与集成补全（F2.1/F2.2）— 2026-05-08
 - **F2.1 ProtoPreview E2E**: `vibex-fronted/tests/e2e/protopreview-realtime.spec.ts` — 3 场景 E2E（无选中→placeholder、选中→preview、取消→placeholder）
 - **F2.2 PresenceAvatars 集成**: `vibex-fronted/src/components/prototype/ProtoFlowCanvas.tsx` — 集成 PresenceAvatars，`data-testid="presence-avatars"`；Firebase 未配置时静默降级
 - **ProtoFlowCanvas unit tests**: `vibex-fronted/src/components/prototype/__tests__/ProtoFlowCanvas.test.tsx` — +2 tests (Firebase 降级 + presence container)
@@ -1146,7 +2346,22 @@
 
 ---
 
-### [Unreleased] S31-E02: 项目导入导出补全（F1.1/F1.2/F1.3）— 2026-05-08
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] S31-E02: 项目导入导出补全（F1.1/F1.2/F1.3）— 2026-05-08
 - **F1.1 Schema 对齐**: `vibex-backend/src/lib/services/projectExporter.ts` — 输出从 `{projectId,projectName}` 改为 `{project:{name,description}}`，与 VibexExportSchema 对齐
 - **F1.1 VibexExportSchema**: `vibex-backend/src/lib/schemas/vibex.ts` — `exportedAt` 改为 optional；roundtrip 测试通过
 - **F1.2 导出重构**: `vibex-fronted/src/app/dashboard/page.tsx` — `handleSingleExport` 调用 `GET /api/projects/:id/export`，下载 `.vibex` 文件；批量导出分别调用各项目 API
@@ -1156,27 +2371,87 @@
 
 ---
 
-### [Unreleased] vibex-proposals-sprint30 E05: Presence 层增强 — 2026-05-08
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-sprint30 E05: Presence 层增强 — 2026-05-08
 - **useRealtimeSync**: `vibex-fronted/src/hooks/useRealtimeSync.ts` — Firebase RTDB 实时同步 hook，isFirebaseConfigured 检测 + mockSubscribers fallback
 - **usePresence hook**: Zustand mock fallback，Firebase 未配置时静默降级不阻断 Canvas
 - 提交: `fd4f5476a`
 
 ---
 
-### [Unreleased] vibex-proposals-sprint30 E04: Spec 补全 — 2026-05-08
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-sprint30 E04: Spec 补全 — 2026-05-08
 - **E04-template-crud.md**: `docs/vibex-proposals-sprint28/specs/E04-template-crud.md` — Template CRUD API fields + error codes（111 行）
 - **E01-notification.md**: `docs/vibex-proposals-sprint29/specs/E01-notification.md` — Slack DM + 站内降级 + ShareBadge（167 行）
 - 提交: `766e984f8`
 
 ---
 
-### [Unreleased] vibex-proposals-sprint30 E03: E2E 测试补全 — 2026-05-08
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-sprint30 E03: E2E 测试补全 — 2026-05-08
 - **share-notification.spec.ts**: `vibex-fronted/tests/e2e/share-notification.spec.ts` — TC-S06/S07 ShareBadge E2E 测试（229 行）
 - 提交: `fc15517a7`
 
 ---
 
-### [Unreleased] vibex-proposals-sprint30 E02: 项目导入/导出 — 2026-05-08
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-sprint30 E02: 项目导入/导出 — 2026-05-08
 - **GET /api/projects/:id/export**: `vibex-backend/src/app/api/projects/[id]/export/route.ts` — 导出 v1.0 JSON
 - **POST /api/projects/import**: `vibex-backend/src/app/api/projects/import/route.ts` — Zod 校验 + Prisma 写入
 - **VibexExportSchema**: `vibex-backend/src/lib/schemas/vibex.ts` — Zod schema + 7 个 error codes
@@ -1184,7 +2459,22 @@
 
 ---
 
-### [Unreleased] vibex-proposals-sprint30 E01: ProtoPreview 实时联动 — 2026-05-08
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-sprint30 E01: ProtoPreview 实时联动 — 2026-05-08
 - **ProtoPreviewPanel**: `vibex-fronted/src/components/prototype/ProtoPreviewPanel.tsx` — `useShallow` 订阅 `selectedNodeId`，200ms 防抖
 - **ProtoPreviewContent**: `vibex-fronted/src/components/prototype/ProtoPreviewContent.tsx` — `data-rebuild="false"` 热更新
 - **debounce.ts**: `vibex-fronted/src/utils/debounce.ts` — 通用防抖工具函数
@@ -1193,7 +2483,22 @@
 
 ---
 
-### [Unreleased] vibex-proposals-sprint27 P001: 实时协作 — Firebase RTDB 节点同步 — 2026-05-07
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-sprint27 P001: 实时协作 — Firebase RTDB 节点同步 — 2026-05-07
 - **S-P1.3 useRealtimeSync 集成**: `CanvasPage.tsx` — 集成 useRealtimeSync hook，Firebase RTDB 未配置时自动降级
 - **S-P1.4 Last-Write-Wins**: `useRealtimeSync.ts` — subscribeToNodes SSE 订阅 + writeNodes 节流写入（500ms debounce），updatedAt 时间戳比较
 - **S-P1.5 E2E 测试**: `presence-mvp.spec.ts` — P001 测试套件（Firebase 未配置无崩溃/画布正常加载/LWW mock 不阻断交互）
@@ -1202,7 +2507,22 @@
 - 验证: `pnpm tsc --noEmit` ✅ TS 0 errors
 - 提交: 3ec5ec8db
 
-### [Unreleased] vibex-proposals-sprint27 P002: 属性面板性能优化 — 2026-05-07
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-sprint27 P002: 属性面板性能优化 — 2026-05-07
 - **S-P2.1 虚拟化**: `ProtoAttrPanel.tsx` — @tanstack/react-virtual 虚拟化属性列表（estimateSize:48, overscan:3），DOM 节点数大幅减少
 - **S-P2.2 Memo 优化**: `ProtoAttrPanel.tsx` — useMemo + memo 优化重渲染性能
 - **S-P2.3 加载指示器**: `ProtoEditor.tsx` — >200 节点显示加载状态 badge
@@ -1210,7 +2530,22 @@
 - 验证: `tsc --noEmit` 退出 0
 - 提交: baa57fa03
 
-### [Unreleased] vibex-proposals-sprint27 P003: AI 辅助需求解析 — 2026-05-07
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-sprint27 P003: AI 辅助需求解析 — 2026-05-07
 - **POST /api/ai/clarify**: `vibex-backend/src/app/api/ai/clarify/route.ts` — OpenAI 解析需求（role/goal/constraints），30s 超时降级
 - **ClarifyStep**: `vibex-fronted/src/components/onboarding/steps/ClarifyStep.tsx` — AI 分析 + 加载状态 + 结果预览（205 行）
 - **InputStep**: `vibex-fronted/src/components/onboarding/steps/InputStep.tsx` — 支持输入需求文本
@@ -1218,7 +2553,22 @@
 - 方案: `docs/vibex-proposals-sprint27/IMPLEMENTATION_PLAN.md`
 - 提交: c12a74e74
 
-### [Unreleased] vibex-proposals-sprint27 P004: 模板 API 完整 CRUD + Dashboard UI — 2026-05-07
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-sprint27 P004: 模板 API 完整 CRUD + Dashboard UI — 2026-05-07
 - **GET /api/v1/templates**: `vibex-backend/src/app/api/v1/templates/route.ts` — 返回 ≥3 mock 模板（支持 industry 过滤）
 - **POST/PUT/DELETE /api/v1/templates**: 完整 CRUD，DELETE 后 GET → 404
 - **Dashboard UI**: `vibex-fronted/src/app/dashboard/templates/page.tsx` — 模板列表/创建/编辑/删除页面（706 行）
@@ -1226,7 +2576,22 @@
 - 方案: `docs/vibex-proposals-sprint27/IMPLEMENTATION_PLAN.md`
 - 提交: 82c43b0e3
 
-### [Unreleased] vibex-proposals-sprint28 E01: 实时协作整合 — 2026-05-07
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-sprint28 E01: 实时协作整合 — 2026-05-07
 - **S01.2 useRealtimeSync**: `hooks/useRealtimeSync.ts` — Firebase RTDB 实时节点同步 hook，last-write-wins 冲突解决
 - **S01.2 RTDB helpers**: `lib/firebase/firebaseRTDB.ts` — Firebase RTDB SSE 订阅 + 节点写入 helpers
 - **S01.1 PresenceLayer**: CanvasPage 已集成 `usePresence`，S01.2 补充节点实时同步
@@ -1234,7 +2599,22 @@
 - 验证: `tsc --noEmit` 退出 0
 - 提交: 7a54204f2
 
-### [Unreleased] vibex-proposals-sprint28 E02: Design Output 性能优化 — 2026-05-07
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-sprint28 E02: Design Output 性能优化 — 2026-05-07
 - **S02.1 react-window 迁移**: `ChapterPanel.tsx` — @tanstack/react-virtual → react-window List 虚拟化，rowHeight=120 固定常量，CardItemRow rowComponent
 - **S02.1 ResizeObserver**: `ChapterPanel.tsx` — 容器高度动态测量，List 自适应
 - **S02.1 scrollToRow**: `ChapterPanel.tsx` — listRef.scrollToRow(selectedIndex) 滚动定位
@@ -1244,7 +2624,22 @@
 - 验证: `pnpm tsc --noEmit` ✅ TS 0 errors
 - 提交: 112ccf3a7
 
-### [Unreleased] vibex-proposals-sprint28 E03: AI 辅助需求解析 — 2026-05-07
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-sprint28 E03: AI 辅助需求解析 — 2026-05-07
 - **POST /api/ai/clarify**: `vibex-fronted/src/app/api/ai/clarify/route.ts` — OpenAI 解析需求（role/goal/constraints），30s 超时降级
 - **useClarifyAI hook**: `vibex-fronted/src/hooks/useClarifyAI.ts` — 封装 analyze/result/isLoading/error/reset
 - **ruleEngine 降级**: `vibex-fronted/src/lib/ai/ruleEngine.ts` — 无 API Key 或超时 → 正则+关键词降级
@@ -1254,7 +2649,22 @@
 - 验证: `pnpm tsc --noEmit` ✅ TS 0 errors
 - 提交: a53e8cf3a
 
-### [Unreleased] vibex-proposals-sprint28 E04: 模板 API 完整 CRUD — 2026-05-07
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-sprint28 E04: 模板 API 完整 CRUD — 2026-05-07
 - **templateStore 共享存储**: `vibex-backend/src/lib/templateStore.ts` — 解决 Next.js route 文件独立 module scope 问题
 - **S04.1 CRUD API**: `route.ts` + `[id]/route.ts` — POST → 201, PUT → 200, DELETE → 200/内置模板 403
 - **S04.2 Dashboard UI**: `/dashboard/templates` 已存在（之前 sprint 已交付）
@@ -1265,7 +2675,22 @@
 - 验证: `tsc --noEmit` ✅ backend 0 errors, frontend 0 errors
 - 提交: ff866e9af
 
-### [Unreleased] vibex-proposals-sprint29 E02: 项目分享通知系统 — 2026-05-07
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-sprint29 E02: 项目分享通知系统 — 2026-05-07
 - **NotificationService**: `vibex-backend/src/lib/notification/NotificationService.ts` — Slack DM + 站内通知降级，支持 in-app fallback
 - **POST /api/projects/:id/share/notify**: `vibex-backend/src/app/api/projects/[id]/share/notify/route.ts` — 分享项目触发通知端点
 - **ShareBadge**: `vibex-fronted/src/components/dashboard/ShareBadge.tsx` — 站内通知未读计数 badge
@@ -1273,7 +2698,22 @@
 - 方案: `docs/vibex-proposals-sprint29/IMPLEMENTATION_PLAN.md`
 - 提交: ffa2df6a4
 
-### [Unreleased] vibex-proposals-sprint29 E01: Onboarding → Canvas 无断点 — 2026-05-07
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-sprint29 E01: Onboarding → Canvas 无断点 — 2026-05-07
 - **useCanvasPrefill hook**: `vibex-fronted/src/hooks/useCanvasPrefill.ts` — 读取 localStorage 预填充数据，支持 `{ raw, parsed: null }` AI 降级格式，读取后自动清理
 - **动态画布路由**: `vibex-fronted/src/app/canvas/[id]/page.tsx` — Onboarding 跳转目标，100ms 内显示 CanvasPageSkeleton
 - **AI 降级格式**: `vibex-fronted/src/components/onboarding/steps/PreviewStep.tsx` — `storePendingTemplateRequirement` 存储格式改为 `{ raw, parsed: null }`
@@ -1282,14 +2722,44 @@
 - 验证: `tsc --noEmit` 退出 0
 - 提交: 3b78219c6
 
-### [Unreleased] vibex-proposals-sprint29 E03: Dashboard 全局搜索增强 — 2026-05-07
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-sprint29 E03: Dashboard 全局搜索增强 — 2026-05-07
 - **Dashboard 搜索**: `vibex-fronted/src/app/dashboard/page.tsx` — 搜索过滤增强
 - **SearchFilter**: `vibex-fronted/src/components/chat/SearchFilter.tsx` — 搜索过滤组件增强
 - **E2E 测试**: `vibex-fronted/tests/e2e/search.spec.ts` — 搜索功能 E2E 测试（86 行）
 - 方案: `docs/vibex-proposals-sprint29/IMPLEMENTATION_PLAN.md`
 - 提交: 1f3b82300
 
-### [Unreleased] vibex-proposals-sprint29 E04: RBAC 细粒度权限矩阵 — 2026-05-07
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-sprint29 E04: RBAC 细粒度权限矩阵 — 2026-05-07
 - **types.ts**: `vibex-fronted/src/lib/rbac/types.ts` — `ProjectPermission: view|edit|delete|manageMembers`，`TeamRole: owner|admin|member|viewer`
 - **RBACService**: `vibex-fronted/src/lib/rbac/RBACService.ts` — `canPerform(role, action)` 权限检查函数
 - **PUT /api/projects/:id/role**: `vibex-backend/src/app/api/projects/[id]/role/route.ts` — 更新成员角色端点
@@ -1297,7 +2767,22 @@
 - 方案: `docs/vibex-proposals-sprint29/IMPLEMENTATION_PLAN.md`
 - 提交: 6517f9c04
 
-### [Unreleased] vibex-proposals-sprint29 E05: Canvas 离线模式 — 2026-05-07
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-sprint29 E05: Canvas 离线模式 — 2026-05-07
 - **sw.js**: `vibex-fronted/public/sw.js` — Service Worker（cacheFirst 静态 / networkFirst API / offline fallback）
 - **manifest.json**: `vibex-fronted/public/manifest.json` — PWA manifest（standalone display）
 - **offline.html**: `vibex-fronted/public/offline.html` — 离线 fallback 页面（中文字符）
@@ -1306,7 +2791,22 @@
 - 方案: `docs/vibex-proposals-sprint29/IMPLEMENTATION_PLAN.md`
 - 提交: 7a9869850
 
-### [Unreleased] vibex-proposals-sprint29 E06: Analytics 趋势分析 — 2026-05-07
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-sprint29 E06: Analytics 趋势分析 — 2026-05-07
 - **TrendChart.tsx**: `vibex-fronted/src/components/analytics/TrendChart.tsx` — 纯 SVG 实现，无 Recharts/Chart.js
 - **GET /api/analytics/funnel**: `vibex-backend/src/app/api/analytics/funnel/route.ts` — 30 天聚合数据
 - **CSV 导出**: UTF-8 with BOM 编码，Excel 兼容
@@ -1314,7 +2814,22 @@
 - 方案: `docs/vibex-proposals-sprint29/IMPLEMENTATION_PLAN.md`
 - 提交: 424edc52d
 
-### [Unreleased] vibex-proposals-sprint29 E07: Sprint 28 Specs 补全 — 2026-05-07
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-sprint29 E07: Sprint 28 Specs 补全 — 2026-05-07
 - **E03-ai-clarify.md**: `docs/vibex-proposals-sprint29/specs/E03-ai-clarify.md` — AI 辅助解析 API schema + 降级路径逻辑表（89 行）
 - **E04-template-crud.md**: `docs/vibex-proposals-sprint29/specs/E04-template-crud.md` — 模板 API 完整 CRUD schema + Dashboard UI + JSON 导入导出（135 行）
 - **E06-error-boundary.md**: `docs/vibex-proposals-sprint29/specs/E06-error-boundary.md` — ErrorBoundary 设计 + Fallback UI + 边界条件表（76 行）
@@ -1322,7 +2837,22 @@
 - 方案: `docs/vibex-proposals-sprint29/IMPLEMENTATION_PLAN.md`
 - 提交: 52fe0e39b
 
-### [Unreleased] vibex-proposals-sprint26 E4: 移动端渐进适配 — 2026-05-06
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-sprint26 E4: 移动端渐进适配 — 2026-05-06
 - **S4.5 viewport meta**: `vibex-fronted/src/app/layout.tsx` — `viewport: { width: device-width, initialScale: 1, maximumScale: 1, userScalable: false }`
 - **S4.1 响应式 CSS**: `canvas.module.css` — mobile (<768px) / tablet (768-1024px) 断点，隐藏侧边栏/统计栏
 - **S4.2 只读模式**: `CanvasPage.tsx` — `useMediaQuery` 检测移动端，非 admin 自动只读（`data-testid=mobile-read-only-banner`）
@@ -1330,7 +2860,22 @@
 - **Dashboard mobile**: `dashboard.module.css` — E4 mobile 样式（projectCard/bulkActionBar/sectionHeader）
 - 提交: d32eee41b
 
-### [Unreleased] vibex-proposals-sprint26 E3: Dashboard 项目批量操作 — 2026-05-06
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-sprint26 E3: Dashboard 项目批量操作 — 2026-05-06
 - **S3.1 checkbox 多选**: `vibex-fronted/src/app/dashboard/page.tsx` — 项目卡片增加 checkbox（`data-testid=project-checkbox-{id}`），`onClick` + `stopPropagation` 防止 Link 跳转
 - **S3.5 全选**: `select-all-projects` checkbox（indeterminate 状态），`toggleSelectAll`
 - **S3.2 批量操作栏**: 固定底部 `bulkActionBar`（`data-testid=bulk-action-bar`），显示选中数量，archive/delete/export 三个按钮
@@ -1338,7 +2883,22 @@
 - **S3.3 批量删除/归档二次确认**: 复用 `openConfirm` Dialog，destructive=true
 - 提交: 205bc8a19
 
-### [Unreleased] vibex-proposals-sprint26 E2: 跨项目 Canvas 版本历史 — 2026-05-06
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-sprint26 E2: 跨项目 Canvas 版本历史 — 2026-05-06
 - **S2.1 CanvasSnapshot 表**: `migrations/0006_canvas_snapshot.sql` 已存在，字段含 id/projectId/version/name/description/data/createdAt/createdBy/isAutoSave
 - **S2.2 50 版本限制 + 自动清理**: `vibex-backend/src/app/api/canvas/snapshots/route.ts` — POST 创建快照后检查数量，超过 50 个时自动删除最早的版本
 - **S2.5 PRD 规范 API**: 新建 `vibex-backend/src/app/api/v1/projects/[id]/versions/route.ts` — GET 列表 + DELETE 清空；`vibex-backend/src/app/api/v1/projects/[id]/versions/[versionId]/route.ts` — GET 单个 + POST 恢复
@@ -1349,7 +2909,22 @@
 - 验证: `pnpm tsc --noEmit` 通过, `pnpm -C vibex-backend tsc --noEmit` 通过
 - 提交: 360c1619c
 
-### [Unreleased] vibex-proposals-sprint26 E1: Onboarding → 画布预填充 — 2026-05-06
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-sprint26 E1: Onboarding → 画布预填充 — 2026-05-06
 - **S1.2 CanvasFirstHint**: 新增 `vibex-fronted/src/components/guidance/CanvasFirstHint.tsx` + `.module.css`；`[data-testid="canvas-first-hint"]`，3s 后自动消失；guidanceStore 新增 `canvasFirstHintDismissed` 字段 + localStorage 持久化
 - **S1.1 PreviewStep 项目创建跳转**: `vibex-fronted/src/components/onboarding/steps/PreviewStep.tsx` — `handleNext` 改为 async，调用 `projectApi.createProject()` 后 `router.push(/canvas/{projectId})`
 - **S1.1 扩展 ProjectCreate**: schema + types + backend API 接受 `templateRequirement` 参数
@@ -1359,12 +2934,42 @@
 - 验证: `pnpm tsc --noEmit` 通过, 9 files changed, 207 insertions(+)
 - 提交: 67a8166ad
 
-### [Unreleased] vibex-sprint25-rbac-fix: RBAC 安全漏洞修复 — 2026-05-05
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-sprint25-rbac-fix: RBAC 安全漏洞修复 — 2026-05-05
 - **Fix: Project Member 权限**: `hooks/useCanvasRBAC.ts` — 移除 `member` 角色的 canEdit/canShare 权限（仅 owner 可编辑/分享），修复安全漏洞
 - DoD: TS 0 errors ✅, E5 changelog ✅
 - 提交: ea2df8f23
 
-### [Unreleased] vibex-proposals-sprint25 E5: Teams × Canvas 共享权限 — 2026-05-05
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-sprint25 E5: Teams × Canvas 共享权限 — 2026-05-05
 - **F5.1 canvas-share API**: `routes/v1/canvas-share.ts` — POST/GET/DELETE endpoint；内存 Map 模拟 canvas_team_mapping；权限校验（team member）+ 错误处理（401/403/404/409）；集成到 gateway.ts
 - **F5.1 前端 API 层**: `lib/api/canvas-share.ts` — canvasShareApi.share/listTeams/listCanvases/revoke
 - **F5.2 Team Canvas 列表**: `dashboard/teams/page.tsx` — 标签页切换（成员/团队 Canvas）；`data-testid="team-canvas-list"` + `data-testid="team-project-item"`
@@ -1376,20 +2981,65 @@
 - DoD: canvas-share API 200 ✅, team-canvas-list ✅, useCanvasRBAC team 维度 ✅, share-to-team-btn ✅, team-project-badge ✅, TS 0 errors ✅
 - 提交: c5d6f5952 + 57da72128
 
-### [Unreleased] vibex-proposals-sprint25 E4: Dashboard 搜索过滤 — 2026-05-04
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-sprint25 E4: Dashboard 搜索过滤 — 2026-05-04
 - **S4.1 useProjectSearch hook**: `vibex-fronted/src/hooks/useProjectSearch.ts` — 统一管理 searchQuery/filter/sort 状态；导出 `filtered/searching/searchQuery/filter/sort/setSearch/setFilter/setSort`；支持 filter: all/7d/30d/mine，sort: name-asc/name-desc/updatedAt-asc/updatedAt-desc
 - **S4.1 单元测试**: `vibex-fronted/src/hooks/__tests__/useProjectSearch.test.ts` — 18 tests（search/filter/sort/combined）全部通过
 - DoD: hook 实现 ✅, 18/18 tests ✅, TS 0 errors ✅
 - 提交: 42325c4b8
 
-### [Unreleased] vibex-proposals-sprint25 E3: Sprint 24 遗留收尾 — 2026-05-04
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-sprint25 E3: Sprint 24 遗留收尾 — 2026-05-04
 - **S3.1 Slack E2E 报告验证**: `vibex-fronted/scripts/e2e-summary-to-slack.ts` Block Kit 格式验证 + CI workflow `.github/workflows/test.yml` e2e job 配置 `e2e:summary:slack`（if:always）+ `webhook:dryrun` 前置验证；确认 SLACK_WEBHOOK_URL 已配置
 - **S3.2 TypeScript 全面审计**: backend/frontend `tsc --noEmit` → 0 errors（S24 P002 已确认，S25 直接采纳）
 - **S3.3 API 测试用例补全**: `vibex-backend/src/app/api/v1/auth/` — auth.test.ts 补全至 30 tests（login: 12, register: 12, logout: 6）；修复 mock 返回值 + beforeEach mockReset；覆盖正常路径 + 错误路径 + edge cases（空白字符串/null字段/生产Secure标志）
 - **S3.4 CHANGELOG 更新**: S23/S24 条目移出 [Unreleased]，添加 Released 版本头
 - DoD: S3.1 ✅, S3.2 ✅, S3.3 auth≥20 ✅, S3.4 ✅
 
-### [Unreleased] vibex-proposals-sprint25 E2: 跨 Canvas 项目版本对比 — 2026-05-04
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-sprint25 E2: 跨 Canvas 项目版本对比 — 2026-05-04
 - **S2.1 /canvas-diff 路由**: `app/canvas-diff/page.tsx` — `/canvas-diff` 页面 + `data-testid="canvas-diff-page"`
 - **S2.1 引导文案**: `CanvasDiffView.tsx` — 首次进入"选择两个项目开始对比"；选 A 后"请选择要对比的第二个 Canvas 项目"
 - **S2.2 选择器 data-testid**: `CanvasDiffSelector` — `data-testid="canvas-a-selector"` + `data-testid="canvas-b-selector"`
@@ -1397,7 +3047,22 @@
 - DoD: `/canvas-diff` 路由 ✅, data-testid ✅, diff 三色展示 ✅, export ✅, TS 0 errors ✅
 - 提交: 2abe36e9f
 
-### [Unreleased] vibex-proposals-sprint25 E1: Onboarding + 需求模板库捆绑交付 — 2026-05-04
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-sprint25 E1: Onboarding + 需求模板库捆绑交付 — 2026-05-04
 - **S1.1 Onboarding Step5 模板推荐**: `PreviewStep.tsx` — Step 5 (prototype) 渲染模板卡片列表，调用 `useTemplates()` 获取模板数据，`data-testid="onboarding-template-card"`；模板选择后 `setSelectedTemplateId()` + `storePendingTemplateRequirement()` 存入 localStorage
 - **S1.2 模板 auto-fill**: `ChapterPanel.tsx` — `templateRequirement` prop → `useEffect` → `parseRequirementContent()` 解析 → 生成 `UserStoryCard` 填入 requirement chapter；`autoFilledRef` guard 防止 API 加载后重复填充；`cards.length > 0` 已有内容保护不覆盖；`data-testid="requirement-chapter"`
 - **S1.3 场景化推荐**: `ClarifyStep.tsx` → `setScenario()` → `SCENARIO_OPTIONS`（new-feature/refactor/bugfix/documentation/other）；`PreviewStep.tsx` → `filterByScenario()` 按场景标签过滤模板卡片
@@ -1408,6 +3073,21 @@
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S58-E1: 画布版本分支管理 — Snapshot 持久化
 - **E1 Snapshot 接口**: `SnapshotData` / `Snapshot` / `SnapshotMeta` 类型定义，`canvasHistoryStore` 新增 snapshot state + actions
 - **E1 IndexedDB 持久化**: `historyDB` DB_VERSION 升级至 2，`snapshots` objectStore (composite key: canvasId + snapshotId)，LIRS 淘汰策略
@@ -1488,7 +3168,22 @@
 - TS: 0 errors ✅；Security ✅；Changelog ✅
 - 提交: 276f1ba26
 
-### [Unreleased] vibex-proposals-20260502-sprint22 Epic5-Agent-E2E: Agent E2E 路径补全 — 2026-05-02
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-20260502-sprint22 Epic5-Agent-E2E: Agent E2E 路径补全 — 2026-05-02
 - **S1 Error Banner**: `WorkbenchUI.tsx` — `data-testid="agent-error-message"` + error banner when 503/500 (role=alert, aria-live=assertive)；`WorkbenchUI.module.css` — .errorBanner 样式
 - **S1 agent-timeout.spec.ts**: 503 mock + TC-E5-1 error message visible + 503 status verification；C-E5-1: page.route mock
 - **S2 AgentSessions data-testid**: `AgentSessions.tsx` — add `data-testid="agent-session-item"` to sessionCard
@@ -1496,13 +3191,43 @@
 - **S3 Session Delete**: TC-E5-3-1/2 — session deletion decreases count + DELETE /api/agent/sessions/:id returns 200
 - TS: 0 errors ✅；Unit tests: 12 passed ✅；Changelog ✅
 
-### [Unreleased] vibex-proposals-20260502-sprint22 Epic1-Design-Review-MCP: MCP 设计评审集成 — 2026-05-02
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-20260502-sprint22 Epic1-Design-Review-MCP: MCP 设计评审集成 — 2026-05-02
 
 - **E1-S1 MCP Bridge**: `vibex-fronted/src/lib/mcp-bridge.ts` — MCP server stdio JSON-RPC封装，5s超时，graceful degradation（降级到静态分析）
 - **E1-S2 review_design API route**: `api/mcp/review_design/route.ts` — 兼容 MCP bridge 与 fallback，200响应不回500
 - 提交: `d0b50ce74` (feat), `8d4b04dc1` (fix Turbopack), `17119793e` (fix build)
 
-### [Unreleased] vibex-proposals-20260502-sprint22 Epic4-Template-Library: 需求模板库 — 2026-05-02
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-20260502-sprint22 Epic4-Template-Library: 需求模板库 — 2026-05-02
 - **S1 Template Selection Modal**: `NewProjectModal.tsx` — 4 模板选项（SaaS/移动端/电商/空白），两步骤流程（选模板→填名称→创建），`data-testid="template-select-modal"` + `template-option` (×4)
 - **S1 industry-templates.json**: `public/data/industry-templates.json` — 4 个结构化模板（id/name/description/chapters.requirement/chapters.architecture），懒加载不阻塞首屏
 - **S2 useTemplates hook**: `useTemplates.ts` — 懒加载（`fetch /data/industry-templates.json`）+ 自定义模板管理（localStorage key: `vibex:customTemplates`）+ `QuotaExceededError` 优雅降级
@@ -1510,7 +3235,22 @@
 - **S3 Save-as-template**: `ChapterPanel.tsx` footer — 保存当前章节为自定义模板，`data-testid="save-as-template-btn"`，调用 `useTemplates.saveAsTemplate`
 - TS: 0 errors ✅；Changelog ✅
 
-### [Unreleased] vibex-proposals-20260502-sprint22 Epic3-Teams-Collab-UI: 团队协作 UI — 2026-05-02
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-20260502-sprint22 Epic3-Teams-Collab-UI: 团队协作 UI — 2026-05-02
 - **S1 PresenceAvatars team border**: `PresenceAvatars.tsx` — `showTeamBadge` + `teamMemberIds` props，新增 team/guest border 样式（`TEAM_COLORS` 常量，owner/member=#10b981, guest=#d1d5db）；四态覆盖完整（ideal/empty/loading/error）
 - **S2 useCanvasRBAC hook**: `useCanvasRBAC.ts` — RBAC 检查 hook（canDelete/canShare/canEdit/canView），5min LRU 缓存（`RBAC_CACHE` Map），`/v1/projects/:id/permissions` API 调用
 - **S3 DDSToolbar RBAC buttons**: `DDSToolbar.tsx` — 导出/导入按钮集成 RBAC disabled 逻辑（`canShare`/`canEdit`），导出模态框（JSON/Vibex/OpenAPI/StateMachine）
@@ -1525,25 +3265,100 @@
 - **C5 e2e:summary:slack**: `vibex-fronted/scripts/e2e-summary-to-slack.ts` — Playwright 结果生成 Slack 报告，支持 CI 模式
 - **.env.staging.example**: staging 环境变量模板（含 NEXT_PUBLIC_BASE_URL/BASE_URL/STAGING_DATABASE_URL）
 - 提交: 6e6dc7c0f
-### [Unreleased] vibex-proposals-20260430-sprint18 S18-E18-QUALITY-2: DX 改进（类型文档 & Migration Guide）— 2026-04-30
-### [Unreleased] vibex-sprint20-qa E2-QA: Workbench UI + AI Agent 验证 — 2026-05-01
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-20260430-sprint18 S18-E18-QUALITY-2: DX 改进（类型文档 & Migration Guide）— 2026-04-30
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-sprint20-qa E2-QA: Workbench UI + AI Agent 验证 — 2026-05-01
 - **E2-QA Workbench Feature Flag**: `/workbench` (NEXT_PUBLIC_WORKBENCH_ENABLED=false) → HTTP 404 ✅；dev+tester 独立验证一致 ✅
 - **E2-QA Canvas 虚拟化**: `/canvas` 页面加载正常（未登录 → /auth 重定向行为正确）✅；dev+tester 独立验证一致 ✅
 - **E2-QA P006 API 输入校验**: POST `/api/agent/sessions` + empty/whitespace → HTTP 400 `{"error":"task is required"}` ✅；dev+tester 独立验证一致 ✅
 - **E2-QA P006 Backend 不可达降级**: POST/GET timeout（backend 未运行时）✅；OpenClaw gateway `/health` → `{"ok":true,"status":"live"}` ✅
 - 提交: 0e08dbe1e, a244138d8 (changelog commits)
-### [Unreleased] vibex-proposals-20260501-sprint20 P006: AI Agent 真实接入 — 2026-05-01
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-20260501-sprint20 P006: AI Agent 真实接入 — 2026-05-01
 - **P006 核心基础设施**: `vibex-backend/src/services/OpenClawBridge.ts` — `spawnAgent()` 调用 OpenClaw gateway sessions_spawn API，30s AbortController 超时，`isRuntimeUnavailable()` 覆盖 ECONNREFUSED/AbortError；`vibex-backend/src/routes/agent/sessions.ts` 完整 CRUD（POST/GET/GET:id/GET:id/status/DELETE），in-memory store（50 上限）
 - **P006 Frontend 集成**: `vibex-fronted/src/app/api/agent/sessions/route.ts` — proxy 到 backend，503 当 backend 不可用；`CodingAgentService.ts` — 全部 MOCK/mockAgentCall 移除，改为真实 API 调用
 - **P006 测试覆盖**: `sessions.test.ts` 13 tests + `OpenClawBridge.test.ts` 15 tests + `agent-sessions.test.ts` 12 tests = 40 tests passed ✅
 - 提交: a0929d868, 652a267b9, 59d44ade1
-### [Unreleased] vibex-proposals-20260501-sprint20 P003: Workbench 生产化 — 2026-05-01
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-20260501-sprint20 P003: Workbench 生产化 — 2026-05-01
 - **P003-T1 /workbench 路由**: `vibex-fronted/src/app/workbench/page.tsx` — `NEXT_PUBLIC_WORKBENCH_ENABLED` flag 控制，`!isEnabled` → `notFound()` HTTP 404 优雅降级
 - **P003-T2 Feature Flag 文档**: `docs/feature-flags.md` — 记录 `NEXT_PUBLIC_WORKBENCH_ENABLED` 开关说明
 - **P003-T3 Agent Sessions UI**: `vibex-fronted/src/components/workbench/` — WorkbenchUI + SessionList + TaskInput；`agentSessionStore.ts` 服务端内存存储（Map，50 sessions 上限自动清理）；`api/agent/sessions/route.ts` GET/POST API（输入校验：task 必填非空 → 400）；JSX 内容自动转义无 XSS 风险 ✅
 - **P003-T4 E2E 测试**: `tests/e2e/workbench-journey.spec.ts` — 4 API tests (POST 201/400×2, GET 200) + 404 UI test；8 passed ✅
 - 提交: 3f2903613, abcd0b75e
-### [Unreleased] vibex-proposals-20260501-sprint20 P004: Canvas 虚拟化 — 2026-05-01
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-20260501-sprint20 P004: Canvas 虚拟化 — 2026-05-01
 - **P004-T3 selectedCardSnapshot**: `stores/DDSCanvasStore.ts` — 新增 `selectedCardSnapshot` 状态 + `updateCardVisibility()` 方法，追踪跨虚拟边界的选择状态（cardId/cardData/wasVisible）
 - **P004-T4 Canvas 虚拟化**: `vibex-fronted/src/components/dds/canvas/ChapterPanel.tsx` — `.map()` 渲染替换为 `@tanstack/react-virtual` `useVirtualizer`，`estimateSize:120`, `overscan:3`；`parentRef` 作为 scroll container；跨边界选中状态保持
 - **P004-T5 单元测试**: `stores/dds/__tests__/DDSCanvasStore.test.ts` +131 lines — `selectedCardSnapshot` + `updateCardVisibility` 覆盖测试
@@ -1551,7 +3366,22 @@
 - **P004-E3-QA E2E 测试**: `tests/e2e/canvas-virtualization-perf.spec.ts` — E3-S2 100节点 P50<100ms + E3-S3 150节点 dropped<2 + E3-S4 跨虚拟边界选中状态；数据注入改用 `addInitScript()` + API route interception（无 `require()`）
 - 提交: a5db58799, 9588265db, 9eac94c1d, 25cc0aaf0, bc08c8eca, <fix-commit>
 
-### [Unreleased] vibex-proposals-20260501-sprint20 P001: MCP DoD 收尾 — 2026-05-01
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-20260501-sprint20 P001: MCP DoD 收尾 — 2026-05-01
 - **P001-T1 /health 集成到 stdio 启动**: `packages/mcp-server/src/routes/health.ts` — 重构为 `setupHealthEndpoint(port)` 返回 `Promise<http.Server>`，移除独立 HTTP 进程；`packages/mcp-server/src/index.ts` main() 中 `await setupHealthEndpoint(3100)` 在 stdio transport 之前启动，/health 可访问性从「独立运行」升级为「主进程生命周期内」
 - **P001-T2 脚本验证**: `scripts/generate-tool-index.ts` exit 0 ✅
 - **P001-T3 文档验证**: `docs/mcp-tools/INDEX.md` 7 tools ✅
@@ -1560,30 +3390,120 @@
 - **S18-E18-QUALITY-2 DX 改进**: `docs/types/README.md` — VibeX 类型系统文档（@vibex/types API 参考、CardTree/BoundedContext/Dedup/TeamTasks 类型说明、Zod schema、Migration Guide）；E18-TSFIX-2 Breaking Changes 迁移指南
 - **提交**: 93b33afe3
 
-### [Unreleased] vibex-proposals-20260430-sprint18 S18-E18-QUALITY-1: 测试覆盖率提升 — 2026-04-30
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-20260430-sprint18 S18-E18-QUALITY-1: 测试覆盖率提升 — 2026-04-30
 - **S18-E18-QUALITY-1 测试覆盖率**: `@vibex/types` 类型守卫测试覆盖率 ≥ 80% — `src/guards.test.ts` (84 vitest cases) + `test-guards.mjs` (38 Node cases) 共 122 个测试用例覆盖全部 19 个 guards；`pnpm run build` → 0 errors ✅；`node test-guards.mjs` → 38 passed ✅
 - **提交**: 412827d85
 
-### [Unreleased] vibex-proposals-20260430-sprint18 S18-E18-CORE-3: 三树面板空状态优化 — 2026-04-30
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-20260430-sprint18 S18-E18-CORE-3: 三树面板空状态优化 — 2026-04-30
 - **S18-E18-CORE-3 三树空状态**: `BoundedContextTree.tsx` + `BusinessFlowTree.tsx` + `ComponentTree.tsx` — 三树组件空状态文案增强；BoundedContextTree/ BusinessFlowTree 添加手动新增按钮；ComponentTree 优化空状态引导；`tsc --noEmit` → 0 errors ✅
 - **提交**: 3f65313c6
 
-### [Unreleased] vibex-proposals-20260430-sprint18 S18-E18-CORE-2: Canvas 骨架屏加载状态 — 2026-04-30
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-20260430-sprint18 S18-E18-CORE-2: Canvas 骨架屏加载状态 — 2026-04-30
 - **S18-E18-CORE-2 Canvas 骨架屏**: `CanvasPage.tsx` + `CanvasPageSkeleton.tsx` — 画布加载时显示三列骨架屏占位符（对应 BoundedContextTree/ComponentTree/BusinessFlowTree 布局）；`Skeleton.tsx` 新增 `SkeletonLine`/`SkeletonBox` 辅助组件；`tsc --noEmit` → 0 errors ✅
 - **提交**: 8af38ce53
 
-### [Unreleased] vibex-proposals-20260430-sprint18 S18-E18-CORE-1: Sprint 1-17 Backlog 扫描与优先级排序 — 2026-04-30
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-20260430-sprint18 S18-E18-CORE-1: Sprint 1-17 Backlog 扫描与优先级排序 — 2026-04-30
 - **S18-E18-CORE-1 Backlog 扫描**: `docs/backlog-sprint17.md` — 6 个功能点 RICE 评分分析；Top 3: B5 CodeGenerator E2E(81)、B1 骨架屏(54)、B2 TS 严格模式(54)
 - **提交**: 9b4b0ea33
 
-### [Unreleased] vibex-proposals-20260430-sprint18 S18-E18-TSFIX-3: @vibex/types 类型基础设施 — 2026-04-30
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-20260430-sprint18 S18-E18-TSFIX-3: @vibex/types 类型基础设施 — 2026-04-30
 - **S18-E18-TSFIX-3 @vibex/types 类型守卫**: `packages/types/` 新增 19 个 type predicate guards — 覆盖 CardTree(BoundedContext/Dedup)、TeamTask、Events 等领域类型；`pnpm run build` → 0 errors ✅
   - `src/guards.ts`: 19 个 type predicate 函数 (`isCardTreeNode`/`isBoundedContext`/`isDedupResult` 等)
   - `src/index.ts`: 导出 guards 模块
   - 类型引用来自 `api.ts`/`store.ts`，build 一致性验证通过
 - **提交**: d6332dd3f, 126823bb1
 
-### [Unreleased] vibex-proposals-20260430-sprint18 S18-E18-TSFIX-2: vibex-fronted TypeScript 严格模式修复 — 2026-04-30
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-20260430-sprint18 S18-E18-TSFIX-2: vibex-fronted TypeScript 严格模式修复 — 2026-04-30
 - **S18-E18-TSFIX-2 vibex-fronted TS 修复**: `vibex-fronted/` 解决 351 个 TS 严格错误 — 批量 1(155 errors) + 批量 2(196 errors)；`tsc --noEmit` → 0 errors ✅；20 unwrappers tests passed ✅
   - API modules: `unwrapField`/`unwrapData` 返回值添加 `!` 非空断言(91 files)
   - `css-modules.d.ts`: 增强 named properties 类型定义解决 CSS module 导入类型安全
@@ -1592,31 +3512,106 @@
   - lib: `mermaid-parser.ts` 添加空值守卫(4 diagram parsers)、`format.ts`/`parser.ts` 添加 null guards
 - **提交**: 18bda9f69, c04dcccd2, a3e4aadfd
 
-### [Unreleased] vibex-proposals-20260430-sprint18 S18-E18-TSFIX-1: mcp-server TypeScript 修复 — 2026-04-30
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-20260430-sprint18 S18-E18-TSFIX-1: mcp-server TypeScript 修复 — 2026-04-30
 - **S18-E18-TSFIX-1 mcp-server TS 修复**: `packages/mcp-server/` 解决 7 个 TS 错误 — package.json 添加 `"type": "module"` 支持 ESM、移除未使用的 `buildResponse` 函数、相对导入添加 `.js` 扩展名(tsconfig paths cross-package imports)、jest.config.js 重命名为 .cjs；`tsc --noEmit` → 0 errors ✅；12 tests passed ✅
 - **提交**: e65d0537c, d713b85f2
 
-### [Unreleased] vibex-proposals-20260428-sprint17 S17-E3: Epic 3 Technical Deepening — 2026-04-29
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-20260428-sprint17 S17-E3: Epic 3 Technical Deepening — 2026-04-29
 - **S17-E3-U1 TypeScript noUncheckedIndexedAccess**: `tsconfig.json` added `"noUncheckedIndexedAccess": true` — array index access returns `T | undefined`; array-bounds guard required before use
 - **S17-E3-U3 confirmationStore null guards**: `confirmationStore.ts` add null guards for `history[]` access (goBack/goForward/jumpToSnapshot) — defensive fix for noUncheckedIndexedAccess compliance
 - **S17-E3-U4 Analytics Dashboard E2E**: `analytics-dashboard.spec.ts` (257L) — 7 E2E tests (AD-01~AD-05 + range toggle + CSV export) covering FunnelWidget idle/loading/success/error four states; S17-P2-2 DoD compliant
 - **S17-E3-U2/U3 defer**: TypeScript type fixes deferred to Sprint 18 (342 errors from noUncheckedIndexedAccess require ~2-3d full-scopes fix)
 - 提交: bd1fb2051, 70a070b42, 679031720, 7252d6d48
 
-### [Unreleased] vibex-proposals-20260428-sprint17 S17-E2: Epic 2 E2-U1~U3 Integration Deepening — 2026-04-29
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-20260428-sprint17 S17-E2: Epic 2 E2-U1~U3 Integration Deepening — 2026-04-29
 - **S17-E2-U1 Firebase Cold Start Benchmark**: `benchmark/firebase-benchmark.ts` — 5 iterations, threshold 500ms, exit 0 on pass; FirebaseMock cold start avg 0.02ms, isFirebaseConfigured() check avg 0.00ms
 - **S17-E2-U2 Firebase Presence E2E**: `tests/e2e/firebase-presence.spec.ts` +4 tests (S17-P1-2) — 5-user concurrent presence delay < 3s, subscribeToOthers sequential updates, avatar count check in browser context
 - **S17-E2-U3 Firebase Degradation**: `PresenceAvatars.tsx` returns null when `!isAvailable` — WiFi-off icon hidden in unconfigured/mock mode; four states (ideal/empty/loading/error) fully covered
 - 提交: e8ec84fe0, d419fd72e, 02f0efd7d
 
-### [Unreleased] vibex-proposals-20260428-sprint17 S17-E1: Epic 1 E1-U1~U4 Verification — 2026-04-29
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-20260428-sprint17 S17-E1: Epic 1 E1-U1~U4 Verification — 2026-04-29
 - **S17-E1-U1**: Create `code-generator-e2e.spec.ts` (6 Playwright E2E tests for CodeGenPanel — panel visibility, generate button, tab switching, node count, download, framework selector)
 - **S17-E1-U2**: Add +3 tests to `design-review.spec.ts` (CodeGenPanel production path — generate button, framework selector, code preview tabs)
 - **S17-E1-U3**: Add `packages/mcp-server/src/routes/health.ts` — standalone Node.js HTTP `/health` on port 3100; returns `{status, timestamp, tools: {registered, names}}`; 404 for other paths
 - **S17-E1-U4**: Add `scripts/generate-tool-index.ts` — parses `listTools()` from mcp-server source, generates `docs/mcp-tools/INDEX.md` with 7 tools table (name/description/input schema); exit 0
 - 提交: 8f817a5c0
 
-### [Unreleased] vibex-proposals-20260428-sprint16 S16-P2-2: MCP Tool Governance & Documentation — 2026-04-28
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-20260428-sprint16 S16-P2-2: MCP Tool Governance & Documentation — 2026-04-28
 - **S16-P2-2-review_design.md**: 222 lines — Overview/Input/Output/Error/Issue Severity/Examples/Design Checks/CLI/Testing sections; 3 compliance + 3 a11y + 3 reuse issue types
 - **S16-P2-2-figma_import.md**: 175 lines — Overview/Input/Output/Error/Examples/Token Extraction/CLI/Testing; fileKey/nodeIds params
 - **S16-P2-2-generate_code.md**: 176 lines — Overview/Input/Output/Error/Examples/Node Type Support/CLI/Testing; 3 modes (flowstep/apientrypoint/statemachine)
@@ -1625,14 +3620,44 @@
 - **S16-P2-2-⚠️ DoD gaps**: `INDEX.md` + `generate-tool-index.ts` script + `GET /health` endpoint in `index.ts` 未实现（2-2.4 / 2-2.5）
 - 提交: 9e09edfea
 
-### [Unreleased] vibex-proposals-20260428-sprint16 S16-P2-1: Canvas Version History Production — 2026-04-28
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-20260428-sprint16 S16-P2-1: Canvas Version History Production — 2026-04-28
 - **S16-P2-1-useVersionHistory**: 30s debounce auto-snapshot; `createSnapshot` (manual) / `notifyChange` (auto); `restoreSnapshot` with pre-restore backup; max 50 snapshots pruning; `projectId=null` rejection; `isSnapshotting`/`isRestoring` states
 - **S16-P2-1-VersionHistoryPanel**: Manual section (📌 icon) / Auto-save section (⏱️ icon); Restore confirmation dialog; `projectId=null` guide UI with CTA button; empty state with 30s hint; `data-testid`全覆盖
 - **S16-P2-1-Unit tests**: 8 tests (useVersionHistory) — empty start, manual snapshot, null guard, delete, restore re-add, notifyChange guard, clearAll, maxSnapshots limit ✅
 - **S16-P2-1-E2E tests**: 7 tests (version-history-e2e.spec.ts) — no-project guide, sections, create button, type badges, restore flow, delete
 - 提交: b9c63cc4a
 
-### [Unreleased] vibex-proposals-20260428-sprint16 S16-P1-2: Code Generator Real Component Generation — 2026-04-28
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-20260428-sprint16 S16-P1-2: Code Generator Real Component Generation — 2026-04-28
 - **S16-P1-2-FlowStepCard**: Real props (`stepName`/`actor`/`pre`/`post`/`stepId`); cyberpunk card styling; selected state; `data-step-id` attribute
 - **S16-P1-2-APIEndpointCard**: Real props (`method`/`path`/`summary`/`description`/`operationId`); METHOD_COLORS map (GET/POST/PUT/DELETE/PATCH); `data-method` attribute
 - **S16-P1-2-StateMachineCard**: Real props (`states`/`transitions`/`initialState`/`stateMachineId`); states rendered as tags; transitions with from/event/to; "+N more" truncation at 3; `data-state-id` attributes
@@ -1640,7 +3665,22 @@
 - **S16-P1-2-Unit tests**: 7 tests (codeGenerator.test.ts) — type validation for all 3 prop types, optional fields, transition conditions ✅
 - 提交: 5afccdc7f
 
-### [Unreleased] vibex-proposals-20260428-sprint16 S16-P1-1: Firebase Mock + Config Path — 2026-04-28
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-20260428-sprint16 S16-P1-1: Firebase Mock + Config Path — 2026-04-28
 - **S16-P1-1-FirebaseMock (client)**: Singleton mock with 4 states (CONNECTED/DEGRADED/DISCONNECTED/RECONNECTING); exponential backoff reconnect (1s base, 30s max, 3 attempts); degraded latency simulation (2s); `measureColdStart()` cold start measurement
 - **S16-P1-1-FirebaseMock (server)**: `packages/mcp-server/src/mocks/firebaseMock.ts` mirrors client with identical state machine
 - **S16-P1-1-useFirebase**: Cold start threshold (< 500ms → local-only fallback); `connect`/`disconnect`/`reconnect`/`setMockState`; autoConnect; `isLocalFallback` state
@@ -1650,7 +3690,22 @@
 - **S16-P1-1-Docs**: `docs/vibex-sprint16/firebase-config-path.md` with env vars and connection flow
 - 提交: 712d23854
 
-### [Unreleased] vibex-proposals-20260428-sprint16 S16-P0-2: Design-to-Code Bidirectional Sync — 2026-04-28
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-20260428-sprint16 S16-P0-2: Design-to-Code Bidirectional Sync — 2026-04-28
 - **S16-P0-2-ConflictResolutionDialog**: 3-panel diff UI (Design/Token/Code); Accept Design/Code/Token/Merge All buttons; cyberpunk glassmorphism styling; `isOpen` + `changes` + `designTokens` + `codeTokens` props
 - **S16-P0-2-driftDetector**: `detectDrift(designTokens, codeTokens, scenario?)` — detects added/removed/modified tokens; `isDriftAcceptable()` threshold check; 3-scenario (A: renamed / B: refactored / C: no drift); false positive rate calculation
 - **S16-P0-2-batchExporter**: `batchExport(tasks, concurrency, onProgress)` — Promise.allSettled with configurable concurrency; progress callback; `export50Components()` helper; memory leak prevention via result clearing
@@ -1660,7 +3715,22 @@
 - **S16-P0-2-Verification doc**: `docs/vibex-sprint16/design-to-code-verification.md` with 3-scenario test matrix and FP rate table
 - 提交: 8ea6fbee1
 
-### [Unreleased] vibex-proposals-20260428-sprint16 S16-P0-1: Design Review UI Integration — 2026-04-28
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-20260428-sprint16 S16-P0-1: Design Review UI Integration — 2026-04-28
 - **S16-P0-1-DDSToolbar button**: `data-testid="design-review-btn"` — Dispatches `design-review:open` CustomEvent
 - **S16-P0-1-useDesignReview hook**: Mock `review_design` MCP call with 1.5s simulated delay; returns 3 compliance / 3 accessibility issues + 3 reuse recommendations
 - **S16-P0-1-ReviewReportPanel**: Glassmorphism overlay with 3 tabs (Compliance/Accessibility/Reuse); severity badges (critical/warning/info); priority badges (high/medium/low); loading spinner; error state; empty state
@@ -1670,7 +3740,22 @@
 - **S16-P0-1-E2E tests**: 7 tests (toolbar button, keyboard shortcut, 3 tabs, close, aria-label) — design-review.spec.ts
 - 提交: 1e56cac17
 
-### [Unreleased] vibex-proposals-20260427-sprint14 E1: Design-to-Code Pipeline — 2026-04-27
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-20260427-sprint14 E1: Design-to-Code Pipeline — 2026-04-27
 - **E1-U1 Feature Flags**: `FEATURE_DESIGN_TO_CODE_PIPELINE` + `FEATURE_DESIGN_TO_CODE_BIDIRECTIONAL` added to featureFlags.ts
 - **E1-U1 Types**: `DesignNode` / `CodeGenContext` / `TokenSnapshot` defined in types/codegen.ts
 - **E1-U1 injectContext**: agentStore.injectContext() validates CodeGenContext shape; throws descriptive error on invalid input
@@ -1687,7 +3772,22 @@
 - **验证**: `pnpm exec tsc --noEmit` → 0 errors; E1 files lint clean
 - 提交: 782cf50d2
 
-### [Unreleased] vibex-proposals-20260426-sprint12 E10: 设计稿代码生成 — 2026-04-26
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-20260426-sprint12 E10: 设计稿代码生成 — 2026-04-26
 - **E10-S1 codeGenerator.ts**: `generateComponentCode(flow, framework)` 生成 TypeScript 类型定义 + TSX 骨架 + CSS Module + index；`sanitizeName()` 处理中文/特殊字符 PascalCase；`packageAsZip()` JSZip 打包 ZIP 下载
 - **E10-S1 类型定义**: CanvasNode/CanvasFlow/Chapter 接口；flow-specific types（ContextNode/FlowNode/ComponentNode）；`CanvasNodeType` 枚举
 - **E10-S2 CodeGenPanel UI**: framework selector (React/Vue/Solid)；generate button；code preview tabs (tsx/css/types/index)；download ZIP button；200节点限制警告
@@ -1697,7 +3797,22 @@
 - **修复**: CodeGenPanel TS null check (tabs type annotation)
 - 提交: ea8c6e79f
 
-### [Unreleased] vibex-proposals-20260426-sprint12 E9: AI 设计评审 — 2026-04-26
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-20260426-sprint12 E9: AI 设计评审 — 2026-04-26
 - **E9-S1 review_design MCP tool**: `packages/mcp-server/src/tools/reviewDesign.ts` 注册为 MCP tool；输入 canvasId/nodes/check flags；返回 DesignReviewReport（compliance/a11y/reuse 三段）
 - **E9-S1 工具注册**: `list.ts` 添加 review_design tool schema；`execute.ts` case 'review_design' 调用 reviewDesign()
 - **E9-S2 Design Compliance**: `designCompliance.ts` 检测硬编码 hex/rgba 颜色、硬编码字体、CSS变量合规；间距 4px grid 校验；`extractStrings()` 递归提取字段
@@ -1707,7 +3822,22 @@
 - **验证**: `pnpm exec jest --testPathPatterns=designCompliance|a11yChecker|componentReuse` → 40/40 passed
 - 提交: 9519d0602
 
-### [Unreleased] vibex-proposals-20260426-sprint12 E8: Canvas 协作冲突解决 — 2026-04-26
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-20260426-sprint12 E8: Canvas 协作冲突解决 — 2026-04-26
 - **E8-S1 conflictStore**: LWW 仲裁 — `startDraft/clearDraft` 追踪本地编辑；`checkConflict`: remote.version > local.version → auto-adopt；否则弹出 ConflictDialog；`resolveKeepLocal/resolveUseRemote` 双路径解决
 - **E8-S1 Firebase RTDB 锁**: `lockCard/unlockCard/syncLocks` 实现卡片级别锁；Lock timeout monitor (60s)；Firebase unconfigured graceful fallback
 - **E8-S2 ConflictDialog**: 三选项 UI（保留本地/使用服务端/合并）；WCAG 2.1 AA 合规（focus trap、aria-labels、keyboard nav）；data-testid 覆盖 E2E
@@ -1717,7 +3847,22 @@
 - **验证**: `pnpm exec tsc --noEmit` → 0 errors（frontend）
 - 提交: 5c44b0ba5 (E8-S1/S2/S3), 607cd5d06 (fix import paths), 0b9c43806 (E2E tests), ae5f566e1 (fix tests)
 
-### [Unreleased] vibex-proposals-20260426-sprint12 E7: MCP Server 可观测性 — 2026-04-26
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-20260426-sprint12 E7: MCP Server 可观测性 — 2026-04-26
 - **E7-S1 动态版本读取**: `index.ts` 使用 `readFileSync` + `import.meta.url` 读取 `package.json.version`；移除硬编码 '0.1.0'
 - **E7-S1 HealthCheckOptions**: `health.ts` 添加 `serverVersion` 参数注入；`performHealthCheck()` 返回 status/version/uptime/tools/checks/connectedClients
 - **E7-S2 Structured Logging**: `logger.logToolCall()` — tool/duration/success 字段；启动时记录 version + SDK version
@@ -1726,7 +3871,22 @@
 - **E7-S2 测试**: `logger.test.ts` 12 tests (JSON格式/tool call/脱敏/嵌套脱敏)；`health.test.ts` ✅
 - 提交: 4bf59939e (E7-S1 dynamic version), 3e8667dad (E7-S1/S2 foundation)
 
-### [Unreleased] vibex-proposals-20260426-sprint12 E6: Prompts 安全 AST 扫描 — 2026-04-26
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-20260426-sprint12 E6: Prompts 安全 AST 扫描 — 2026-04-26
 - **E6-S1 接口对齐 spec**: `SecurityReport` → `SecurityAnalysisResult`（per epic-06-ast-scan.md）；`UnsafePattern` 接口含 type/line/column；`unsafeEval/newFunction/dynamicCode` → `unsafePatterns: UnsafePattern[]`
 - **E6-S2 轻量级 AST Walker**: 移除 `@babel/traverse` Path 对象开销，手写 `walkNode()` 递归遍历；性能 ~18-24ms/5000行（spec: <50ms）
 - **E6-S3 innerHTML/outerHTML 检测**: `MemberExpression` visitor 检测 `property.name in ['innerHTML','outerHTML']`；`generateSecurityWarnings` 按类型分组输出警告
@@ -1735,7 +3895,22 @@
 - **验证**: `npx jest --testPathPatterns=codeAnalyzer --no-coverage` → 21/21 passed（+ perf test）
 - 提交: e3229f884
 
-### [Unreleased] vibex-proposals-20260426 E4: Firebase 实时协作 — 2026-04-26
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-20260426 E4: Firebase 实时协作 — 2026-04-26
 - **E4-S1 配置检查**: `isFirebaseConfigured()` 检查 NEXT_PUBLIC_FIREBASE_API_KEY 和 NEXT_PUBLIC_FIREBASE_DATABASE_URL；`updateCursor(canvasId, userId, x, y)` 通过 REST PATCH 写入 RTDB
 - **E4-S2 usePresence RTDB写入**: `usePresence(canvasId, userId, name)` 返回 `{ others, updateCursor, isAvailable, isConnected }`；DDSCanvasPage 通过 useEffect + setTimeout(100ms) 节流调用 updateCursor
 - **E4-S3 PresenceAvatars订阅**: PresenceAvatars 组件渲染于 fixed bottom-right (zIndex 9999, pointerEvents none)；所有 Firebase 调用均加 isFirebaseConfigured() guard
@@ -1744,7 +3919,22 @@
 - **Files**: vibex-fronted/src/components/dds/DDSCanvasPage.tsx, vibex-fronted/src/lib/firebase/presence.ts, vibex-fronted/src/components/canvas/Presence/PresenceAvatars.tsx
 - 提交: 597bd49bf, a06db153b
 
-### [Unreleased] vibex-proposals-20260426 E3: 画布搜索
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-20260426 E3: 画布搜索
 - **E3-S1 搜索面板UI**: DDSSearchPanel 深色主题，键盘导航（↑↓ Enter Esc），data-testid="dds-search-panel"
 - **E3-S2 全文搜索实现**: useDDSCanvasSearch hook，debounce 300ms，遍历 5 个 chapter
 - **E3-S3 点击跳转**: scrollToCard 实现，smooth scrollIntoView + yellow pulse highlight 动画
@@ -1754,7 +3944,22 @@
 - **Files**: vibex-fronted/src/hooks/dds/useDDSCanvasSearch.ts, vibex-fronted/src/components/dds/DDSSearchPanel.tsx, vibex-fronted/src/components/dds/DDSCanvasPage.tsx, vibex-fronted/tests/e2e/keyboard-shortcuts.spec.ts
 - 提交: 9bc9330c1, d48ad4f09
 
-### [Unreleased] vibex-proposals-20260426 E2: 画布快捷键系统
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-20260426 E2: 画布快捷键系统
 - **E2-S1 CanvasPage 键盘监听**: `useKeyboardShortcuts` 集成到 DDSCanvasPage；Delete 遍历 5 个 chapter 删除选中卡片；Esc 绑定 `deselectAll()`；`?` 键通过 `shortcutStore.startEditing('go-to-canvas')` 唤起 ShortcutEditModal
 - **E2-S2 ShortcutEditModal 集成**: 导入 `useShortcutStore`；`ShortcutEditModalPortal` 仅在 `editingAction !== null` 时渲染；通过 `shortcutStore.startEditing/cancelEditing` 控制可见性
 - **E2-S3 默认快捷键绑定**: Delete/Backspace → `ddsChapterActions.deleteCard`；Ctrl+Z/Ctrl+Y → placeholder stub；Esc → `deselectAll()`
@@ -1763,7 +3968,22 @@
 - **Files**: vibex-fronted/src/components/dds/DDSCanvasPage.tsx, vibex-fronted/tests/e2e/keyboard-shortcuts.spec.ts
 - 提交: 9a4403419, c9c02c450
 
-### [Unreleased] vibex-proposals-20260426 E1: 后端TS债务清理（Sprint 11）— 2026-04-26
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-20260426 E1: 后端TS债务清理（Sprint 11）— 2026-04-26
 - **E1-S1 wrangler types**: wrangler types生成与env.ts类型整合，零TS错误
 - **E1-S2 ZodSchema泛型**: `ZodType<unknown>`保持用于API参数泛型，合理且通过tsc
 - **E1-S3 DurableObject绑定**: 67处`as any`大部分在test/schema场景，env.ts提供完整类型兜底
@@ -1772,14 +3992,59 @@
 - **Files**: vibex-backend/src/lib/env.ts, vibex-backend/src/cloudflare-workers.d.ts, .github/workflows/test.yml
 - 提交: 48292f80d, 639c520f1, 010165584
 
-### [Unreleased] vibex-proposals-20260425-sprint10 E6: Canvas 本地持久化 — 2026-04-26
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-20260425-sprint10 E6: Canvas 本地持久化 — 2026-04-26
 - **E6-S1 Zustand Persist**: DDSCanvasStore 包裹 `persist` middleware，`partialize` 白名单：`projectId`, `chapters`, `crossChapterEdges`；排除 UI 状态（chatHistory/isGenerating/selectedCardIds/isFullscreen/isDrawerOpen）；Storage key: `vibex-dds-canvas-v2`
 - **E6-S2 useCanvasPersistence Hook**: 暴露 `canvas` 快照、`setCanvas` 批量更新、`clearCanvas` 重置；同步 `partialize` 白名单字段
 - **Files**: src/hooks/useCanvasPersistence.ts, src/stores/dds/DDSCanvasStore.ts
 - 提交: a41b1bdcd
 
-### [Unreleased] vibex-proposals-20260425 E0: Sprint 9 债务清理 — 2026-04-25
-### [Unreleased] vibex-proposals-20260425-sprint10 E3: Firebase 实时协作 — 2026-04-25
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-20260425 E0: Sprint 9 债务清理 — 2026-04-25
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-20260425-sprint10 E3: Firebase 实时协作 — 2026-04-25
 - **E3-S2 RemoteCursor**: 新建 RemoteCursor SVG 组件（鼠标光标图标 + 用户名标签），集成到 PresenceLayer，`usePresence` 提供实时位置
 - **E3-S3 ConflictBubble 增强**: 添加 .node-id / .conflict-hint class，"接受"按钮点击后气泡消失，新增 conflict-accept/reject/merge 按钮
 - **Files**: src/components/canvas/RemoteCursor.tsx, src/components/canvas/RemoteCursor.test.tsx, src/components/canvas/PresenceLayer.tsx, src/components/canvas/ConflictBubble.tsx, src/components/canvas/ConflictBubble.test.tsx
@@ -1790,24 +4055,99 @@
 - **Files**: vibex-fronted/src/app/version-history/page.tsx
 - 提交: d8502b150, abc28cafc
 
-### [Unreleased] vibex-proposals-20260425 E2: Teams Dashboard — 2026-04-25
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
 
-### [Unreleased] vibex-proposals-20260425 P002: Firebase 实时协作验证 — 2026-04-25
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-20260425 E2: Teams Dashboard — 2026-04-25
+
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-20260425 P002: Firebase 实时协作验证 — 2026-04-25
 - **P002-S2 Firebase Cold Start**: 单元测试验证 isFirebaseConfigured() < 5ms, setPresence/subscribeToOthers mock < 10ms
 - **P002-S3 Presence Latency**: 单元测试验证 setPresence/subscribeToOthers/removePresence mock < 10ms, 多用户并发 < 50ms
 - **P002-S5 SSE Bridge E2E**: E2E 测试覆盖 Canvas SSE 完整事件序列
 - **Files**: src/lib/firebase/__tests__/firebase-config.test.ts, src/lib/firebase/__tests__/firebase-presence-latency.test.ts, tests/e2e/presence-mvp.spec.ts, tests/e2e/sse-e2e.spec.ts
 - 提交: eb51c4f7
 
-### [Unreleased] vibex-proposals-20260425 E1: Analytics API 修复 + Dashboard Widget — 2026-04-25
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-20260425 E1: Analytics API 修复 + Dashboard Widget — 2026-04-25
 - **E1-S1 后端 API 修复**: GET /api/v1/analytics DB 错误时返回空数组而非 500，GET /api/v1/health 指标错误时返回 degraded 状态
 - **E1-S2 AnalyticsWidget**: 纯 SVG 折线图组件（无 recharts/chart.js 依赖），四态（idle/loading/success/error/empty），data-testid 规范
 - **E1-Contract 统一**: 新建 App Router /api/analytics 聚合层，将后端原始事件转换为 PRD 契约格式 { success, data: { page_view/canvas_open/component_create/delivery_export }, meta }
 - **Files**: vibex-backend/src/routes/v1/analytics.ts, vibex-fronted/src/components/dashboard/AnalyticsWidget.{tsx,module.css,test.tsx}, vibex-fronted/src/app/api/analytics/route.ts, vibex-fronted/src/app/dashboard/page.tsx
 - 提交: 83b2caac9, 21005374e, 450f1411f, 3ab68c7bd
 
-### [Unreleased] vibex-proposals-20260425 P001: TypeScript 债务清理 — 2026-04-25
-### [Unreleased] vibex-proposals-20260426 E2: 画布快捷键系统
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-20260425 P001: TypeScript 债务清理 — 2026-04-25
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-20260426 E2: 画布快捷键系统
 
 - **E2-S1 CanvasPage 键盘监听**: `useKeyboardShortcuts` 集成到 DDSCanvasPage；Delete 遍历 5 个 chapter 删除选中卡片；Esc 绑定 `deselectAll()`；`?` 键通过 `shortcutStore.startEditing('go-to-canvas')` 唤起 ShortcutEditModal
 - **E2-S2 ShortcutEditModal 集成**: 导入 `useShortcutStore`；`ShortcutEditModalPortal` 仅在 `editingAction !== null` 时渲染；通过 `shortcutStore.startEditing/cancelEditing` 控制可见性
@@ -1825,13 +4165,43 @@
 - **Files**: src/lib/api-validation.ts, src/lib/env.ts, src/lib/errorHandler.ts, src/routes/collaboration-ws.ts, src/routes/project-snapshot.ts, src/services/context/SessionManager.ts, src/services/websocket/index.ts, wrangler.toml
 - 提交: cb737d5a, ddeea90e
 
-### [Unreleased] vibex-sprint7-fix EpicE1: CI TypeScript Gate — 2026-04-24
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-sprint7-fix EpicE1: CI TypeScript Gate — 2026-04-24
 - **E1-U1 TypeScript Gate**: CI新增typecheck-backend+typecheck-frontend独立job, tsc --noEmit作为独立gate
 - **E1-U2 as any Baseline**: CI新增as-any-baseline job, 基线163 pre-existing存量
 - **Files**: .github/workflows/test.yml, AGENTS.md, AS_ANY_BASELINE.md
 - 提交: 6b4e432c
 
-### [Unreleased] vibex-sprint7-fix EpicE5: Batch Export Real DB + KV — 2026-04-24
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-sprint7-fix EpicE5: Batch Export Real DB + KV — 2026-04-24
 - **E5-U1 ZipArchiveService**: 真实D1查询, JSZip生成Uint8Array ZIP, manifest.json索引
 - **E5-U2 KV存储**: batch-export路由POST返回download URL, KV.put(base64) 5min TTL
 - **E5-U3 一次性下载**: download路由GET从KV读取→base64解码→delete key→返回application/zip
@@ -1839,7 +4209,22 @@
 - **Files**: services/ZipArchiveService.ts, api/v1/projects/batch-export/route.ts, download/route.ts, lib/env.ts
 - 提交: 76fc9719
 
-### [Unreleased] vibex-sprint7-fix EpicE2: Firebase Presence 真实接入 — 2026-04-24
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-sprint7-fix EpicE2: Firebase Presence 真实接入 — 2026-04-24
 - **E2-U1 Firebase REST API**: 零SDK依赖, fetch+EventSource实时同步, polling fallback
 - **E2-U2 PresenceAvatars四态**: 理想态(彩色头像堆叠)/空状态(NoCollaboratorsIcon)/加载态(骨架屏)/错误态(WifiOffIcon)
 - **E2-U3 visibilitychange兜底**: document.visibilityState=hidden时removePresence清除
@@ -1847,25 +4232,85 @@
 - **Files**: lib/firebase/presence.ts, hooks/usePresence.ts, components/canvas/Presence/PresenceAvatars.tsx, tests/e2e/presence-mvp.spec.ts
 - 提交: 3c092e14
 
-### [Unreleased] vibex-proposals-20260424 E6-U1-U2: 性能可观测性落地 — 2026-04-24
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-20260424 E6-U1-U2: 性能可观测性落地 — 2026-04-24
 - **E6-U1 /health端点P50/P95/P99**: /api/health GET返回延迟指标, POST记录响应时间, 滑动窗口算法
 - **E6-U2 Web Vitals阈值监控**: LCP>4000ms→degraded, CLS>0.1→unhealthy, Cache-Control no-store
 - **Files**: src/app/api/health/route.ts, tests/e2e/health-api.spec.ts
 - 提交: aaeb4e4c
 
-### [Unreleased] vibex-proposals-20260424 E5-U1-U2: 多文件组件批量导出 — 2026-04-24
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-20260424 E5-U1-U2: 多文件组件批量导出 — 2026-04-24
 - **E5-U1 多文件组件导出**: batch-export/route.ts JSZip生成ZIP, max 100组件, 5MB限制
 - **E5-U2 批量导出UI**: BatchExportCard.tsx 组件多选, Select All/None, 导出ZIP
 - **Files**: batch-export/route.ts, BatchExportCard.tsx, tests/e2e/batch-export.spec.ts
 - 提交: 5d1dce08
 
-### [Unreleased] vibex-proposals-20260424 E4-U1-U2: Import/Export 完整集成 — 2026-04-24
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-20260424 E4-U1-U2: Import/Export 完整集成 — 2026-04-24
 - **E4-U1 Import/Export完整集成**: lib/import-export/api.ts API客户端, 5MB文件校验, JSON/YAML导入导出
 - **E4-U2 Import/Export UI集成**: ImportExportCard.tsx 拖拽上传, 导出按钮, 错误/成功状态
 - **Files**: lib/import-export/api.ts, components/import-export/, tests/e2e/import-export-roundtrip.spec.ts
 - 提交: 4e8c4ce7
 
-### [Unreleased] vibex-proposals-20260424 E3-U1-U4: Teams API前端集成 — 2026-04-24
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-20260424 E3-U1-U4: Teams API前端集成 — 2026-04-24
 - **E3-U1 团队列表页面**: /dashboard/teams, TanStack Query, TeamList组件
 - **E3-U2 创建团队Dialog**: 表单验证(1-100/500), 乐观更新onMutate/onError/onSettled
 - **E3-U3 成员管理面板**: TeamMemberPanel, invite/updateRole/remove成员
@@ -1873,14 +4318,44 @@
 - **Files**: app/dashboard/teams/, components/teams/, lib/api/teams.ts, tests/e2e/teams-ui.spec.ts
 - 提交: 5a8df17a
 
-### [Unreleased] vibex-proposals-20260424 E2-U1-U3: Firebase Presence MVP — 2026-04-24
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-20260424 E2-U1-U3: Firebase Presence MVP — 2026-04-24
 - **E2-U1 Firebase SDK接入**: src/lib/firebase/presence.ts SDK初始化, 无404资源
 - **E2-U2 Presence UI层**: PresenceAvatars头像气泡, PresenceCursor光标, usePresence hook
 - **E2-U3 断线清除**: beforeunload监听器清除presence数据
 - **Files**: components/canvas/Presence/PresenceAvatars.tsx, hooks/usePresence.ts, tests/e2e/presence-mvp.spec.ts
 - 提交: 3bf5fad4
 
-### [Unreleased] vibex-proposals-20260424 E1-U1-U3: 后端TS债务清理 — 2026-04-24
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-20260424 E1-U1-U3: 后端TS债务清理 — 2026-04-24
 - **E1-U1 auth签名统一**: getAuthUserFromRequest重载，单参数→{success,user}，两参数→AuthUser|null
 - **E1-U2 lib/db.ts泛型约束**: PrismaClientType类型别名替代ReturnType<...>，修复Function约束
 - **E1-U3 CloudflareEnv类型**: index.ts双重cast修复
@@ -1888,21 +4363,66 @@
 - **Tests**: E1相关tsc错误归零
 - 提交: 01016558
 
-### [Unreleased] vibex-pm-proposals-20260414_143000 E8-U1: Import/Export API — 2026-04-22
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-pm-proposals-20260414_143000 E8-U1: Import/Export API — 2026-04-22
 - **E8-U1 Import/Export API**: JSON+YAML parsers, round-trip validation, SSRF protection
 - **Backend**: import.ts (POST /v1/projects/import, 5MB limit), export.ts (GET /v1/projects/export, JSON/YAML format)
 - **Parsers**: json-importer.ts, yaml-importer.ts (js-yaml), json-exporter.ts, yaml-exporter.ts
 - **Tests**: import-export.test.ts — 12 tests PASS (JSON/YAML round-trip, 5MB limit, SSRF)
 - 提交: 80d2801e
 
-### [Unreleased] vibex-pm-proposals-20260414_143000 E7-U1: 版本历史 projectId=null 边界处理 — 2026-04-22
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-pm-proposals-20260414_143000 E7-U1: 版本历史 projectId=null 边界处理 — 2026-04-22
 - **E7-U1 version history**: projectId=null 时显示引导 UI（"请先选择项目" + /projects/new 链接）
 - **page.tsx**: 使用 useSearchParams() 读取 projectId，null 边界路由
 - **CSS**: .emptyAction 按钮样式（蓝色渐变）
 - **Tests**: page.test.tsx — 2 tests 验证 null 边界逻辑 PASS
 - 提交: feb5dff1
 
-### [Unreleased] vibex-pm-proposals-20260414_143000 E6-U1: Teams API — 2026-04-22
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-pm-proposals-20260414_143000 E6-U1: Teams API — 2026-04-22
 - **E6-U1 Teams API**: D1 migration (Team + TeamMember + TeamInvite 表), TeamService (CRUD + 成员管理 + 权限分层)
 - **Backend routes**: GET/POST /v1/teams, GET/PUT/DELETE /v1/teams/:id, GET/POST /v1/teams/:id/members, PUT/DELETE /v1/teams/:id/members/:userId, GET /v1/teams/:id/permissions
 - **Role hierarchy**: owner(3) > admin(2) > member(1)，权限检查 + 4 个专用错误类
@@ -1910,63 +4430,228 @@
 - **Tests**: TeamService.test.ts — 9 unit tests (角色分层 + 错误类验证)
 - 提交: 276d56ad + 96422922
 
-### [Unreleased] vibex-pm-proposals-20260414_143000 E5-U1: 统一 API 错误格式 — 2026-04-22
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-pm-proposals-20260414_143000 E5-U1: 统一 API 错误格式 — 2026-04-22
 - **E5-U1 统一 API 错误格式**: 61 个后端路由全部迁移到 `apiError()`，统一 `{ error, code, status, details }` 格式
 - **修复漏网之鱼**: chat.ts 2处裸错误、component-manager.ts 3处裸错误、ai-ui-generation.ts 3处裸错误全部修正
 - **集成测试**: `api-error-integration.test.ts` — 26 tests 覆盖 4xx/5xx/domain-specific 错误码全映射
 - **后端测试**: 2 suites, 26 tests PASS
 - 提交: 13e4f079 + 0c06941a
 
-### [Unreleased] vibex-pm-proposals-20260414_143000 E4-U1: TabBar Phase 对齐 — 2026-04-22
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-pm-proposals-20260414_143000 E4-U1: TabBar Phase 对齐 — 2026-04-22
 - **E4-U1 TabBar Phase 对齐**: TabBar 按 phase 显示可见 tabs（input 仅 context，context/flow 仅 context+flow，component/prototype 显示全部）
 - **双向同步**: TabBar 点击 tab 同步 setPhase(phase)，与 PhaseNavigator 行为对称；phase 变化时 TabBar 高亮同步
 - **新增测试**: TabBarSymmetry.test.tsx — 13 个测试覆盖 phase-gated 可见性 + 双向同步验证（26 tests PASS）
 - 提交: 6c319f5e
 
-### [Unreleased] vibex-canvas-ux-fix — E1 API Error + E3 Project Button Fix — 2026-04-21
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-canvas-ux-fix — E1 API Error + E3 Project Button Fix — 2026-04-21
 - **E1-U1 handleResponseError**: async/await 修复，`res.json()` 加 `await`，后端错误消息正确透传到 toast
 - **E1-U2 res.json() 安全审计**: 全局扫描 `res.json()` + `res.blob()`，发现 `exportZip` 缺少 await 已修复（8 tests PASS）
 - **E3-U2 tooltip 与失败原因一致**: 组件树为空→"请先生成组件树"；context/flow/componentInactive→对应文案；9 tests PASS
 - 提交: [dev-e1-u1](vibex-canvas-ux-fix/dev-e1-u1)
 
-### [Unreleased] vibex-tech-debt-qa E4: ErrorBoundary 去重 — 2026-04-21
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-tech-debt-qa E4: ErrorBoundary 去重 — 2026-04-21
 - **E4-U1 VisualizationPlatform**: 内联 `class ErrorBoundary` → 复用 `ui/ErrorBoundary`，减少 37 行重复代码；统一日志格式和 fallback UI
 - 提交: 92b7418b
 
-### [Unreleased] vibex-tech-debt-qa E5: HEARTBEAT 话题追踪脚本 — 2026-04-21
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-tech-debt-qa E5: HEARTBEAT 话题追踪脚本 — 2026-04-21
 - **E5-U1 heartbeat_tracker.py**: 追踪 heartbeat 话题变化，支持 `--diff`/`--watch`/`--format json|md`；检测幽灵任务（连续 N 天无变化）；自动更新 IMPLEMENTATION_PLAN.md
 - 提交: 92b7418b
 
-### [Unreleased] vibex-tech-debt-qa E2: proposal-dedup 正则修复 + 去重逻辑 — 2026-04-20
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-tech-debt-qa E2: proposal-dedup 正则修复 + 去重逻辑 — 2026-04-20
 - **proposal_tracker.py**: 修复正则支持 TS-001/LINT-001/A-P1-2 等新 ID 格式；添加 `(id, date_dir)` 去重逻辑；新增 `linked_tasks` 字段到 JSON 输出
 - **test_proposal_tracker.py**: 新增 10 个测试用例，覆盖 parse/dedup/extract 路径 — 10/10 PASS ✅
 - **EXECUTION_TRACKER.json**: 提案数 12→17，新增 `dedup_count` 统计字段
 - 提交: d09ab6cb
 
-### [Unreleased] vibex-tech-debt-qa E3: P1-components 组件测试覆盖率提升 — 2026-04-21
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-tech-debt-qa E3: P1-components 组件测试覆盖率提升 — 2026-04-21
 - **E3-U1 CardTreeNode**: 35 tests (15→35)，覆盖率 69.38% → 89.79% Lines；导出 toggleChildChecked 供单元测试；新增 SSR branch istanbul pragma
 - **E3-U2 AuthError**: 8 tests，覆盖 AuthError 类 401/403 状态码 + isAuthError 标志；CardTreeNode 类型重构为 NodeProps<CardTreeNodeData>
 - 提交: 5741e408 (E3-U1), 625bd311 (E3-U2)
 
-### [Unreleased] vibex-sprint4-spec-canvas-extend E4: 导出功能 — 2026-04-18
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-sprint4-spec-canvas-extend E4: 导出功能 — 2026-04-18
 - **E4-U1 APICanvasExporter**: `services/dds/exporter.ts` — `exportDDSCanvasData()` converts `APIEndpointCard[]` → OpenAPI 3.0.3 JSON with tags/responses/requestBody
 - **E4-U2 SMExporter**: `exportToStateMachine()` converts `StateMachineCard[]` → StateMachine JSON with transitions mapped to `on` entries
 - **E4-U3/U4 Export Modal**: `components/dds/toolbar/DDSToolbar.tsx` + `.module.css` — modal with OpenAPI + StateMachine download buttons
 - **E4-U5 Tests**: `services/dds/__tests__/exporter.test.ts` — 16 passing tests (null guard, method mapping, transitions, responses, initial state, deduplication)
 - Commit: 9a3e239d
-### [Unreleased] vibex-sprint4-spec-canvas-extend P0: 硬编码颜色修复 — 2026-04-18
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-sprint4-spec-canvas-extend P0: 硬编码颜色修复 — 2026-04-18
 - **CSS tokens**: 修复硬编码颜色 → CSS 变量 (`--color-primary` 等)
 - **APIEndpointCard**: 移除硬编码 `indigo`/`blue` 颜色，使用 CSS tokens
 - **StateMachineCard**: 移除硬编码 `amber`/`pink`/`purple` 颜色，使用 CSS tokens
 - **exporter.ts**: 修复导出类型定义
 - 提交: 83d40fae (P0 defects fix)
-### [Unreleased] vibex-sprint4-spec-canvas-extend E3-E5 P1/P2 缺陷修复 — 2026-04-18
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-sprint4-spec-canvas-extend E3-E5 P1/P2 缺陷修复 — 2026-04-18
 - **exporter.ts 修复**: 修复 `toStateMachineSpec` 中缺少的大括号语法错误
 - **exporter.ts 重构**: 变量重命名 `allStates` → `states` 解决作用域冲突
 - **exporter.ts 测试**: 新增 `E4-U3: handles undefined allStates properly` 测试
 - 提交: 7debf56e (P1/P2 defects fix)
 
-### [Unreleased] vibex-sprint4-spec-canvas-extend E5: 章节四态规范 — 2026-04-18
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-sprint4-spec-canvas-extend E5: 章节四态规范 — 2026-04-18
 - **E5-U1/U2 AC3 CardErrorBoundary**: `canvas/CardErrorBoundary.tsx` — 捕获卡片渲染错误，显示 'API 端点渲染失败' / '状态节点渲染失败'
 - **E5-U1/U2 AC2 骨架屏**: DDSCanvasPage 加载态改用 ChapterSkeleton，var(--color-skeleton) token 替代进度条
 - **E5-U1 AC1 API 空状态**: ChapterEmptyState — '暂无 API 端点' 引导文案
@@ -1974,11 +4659,41 @@
 - **集成**: CardRenderer 包裹 APIEndpointCard + StateMachineCard with CardErrorBoundary
 - **测试**: DDSFourStates.test.tsx — 5 passing tests
 - 提交: 9d1bd809
-### [Unreleased] vibex-sprint4-spec-canvas-extend E5-QA: 章节存在性测试 — 2026-04-18
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-sprint4-spec-canvas-extend E5-QA: 章节存在性测试 — 2026-04-18
 - **chapter-existence.test.ts**: 3 个测试用例 — 验证 chapters API + context 存在性
 - 提交: 5ee0081e
 
-### [Unreleased] vibex-sprint4-spec-canvas-extend E1: API 规格章节 — 2026-04-18
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-sprint4-spec-canvas-extend E1: API 规格章节 — 2026-04-18
 - **E1-U1 类型定义**: `types/dds/api-endpoint.ts` — `APIEndpointCard` 接口（extends BaseCard），含 HTTPMethod/APIParameter/APIResponse
 - **E1-U2 组件**: `components/dds/cards/APIEndpointCard.tsx` — method badge（颜色映射）+ path（monospace）+ summary + tags + status codes，memo 优化
 - **E1-U3 CardRenderer 注册**: `CardRenderer.tsx` — `case 'api-endpoint'` 分发，`UnknownCardFallback`兜底
@@ -1988,62 +4703,212 @@
 - **单元测试**: `APIEndpointCard.test.tsx` — 11 个测试用例覆盖 method badge/path/summary/tags/parameters/responses
 - 提交: 581b5ad7
 
-### [Unreleased] vibex-sprint4-spec-canvas-extend E2: 业务规则章节 — 2026-04-18
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-sprint4-spec-canvas-extend E2: 业务规则章节 — 2026-04-18
 - **E2-U1 类型定义**: `types/dds/state-machine.ts` — StateType/TransitionType/SMState/SMTransition/StateMachineCard
 - **E2-U2 StateMachineCard**: `StateMachineCard.tsx` — state list/transition count/selected highlight
 - 提交: e87a5f06
 
-### [Unreleased] vibex-sprint4-spec-canvas-extend E3: 跨章节集成 — 2026-04-18
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-sprint4-spec-canvas-extend E3: 跨章节集成 — 2026-04-18
 - **E3-U1 DDSToolbar 扩展**: 5 章节按钮 (requirement/context/flow/api/business-rules)，点击切换 activeChapter，aria-pressed 状态
 - **E3-U1 DDSCanvasPage**: `?chapter=` URL 参数支持，mount 时读取并 setActiveChapter
 - **E3-U2 CrossChapterEdgesOverlay**: 5-chapter 支持 (CHAPTER_ORDER 含 api + business-rules)，跨章节边渲染验证
 - 提交: f3271119 (E3-U1) + 92f1e00d (E3-U2 tests)
 
-### [Unreleased] vibex-sprint5-delivery-integration E1: 数据层集成 — 2026-04-18
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-sprint5-delivery-integration E1: 数据层集成 — 2026-04-18
 - **T1 loadFromStores**: 从 prototypeStore + DDSCanvasStore 拉取数据，映射 chapters.context → contexts, chapters.flow → flows, prototypeStore → components
 - **T2 数据转换**: toComponent/toSchema/toDDL 函数实现
 - **T3 saveToStorage**: localStorage 持久化（已存在）
 - deliveryStore.ts 新增测试 12 个用例
 - 提交: a57b23f1 (T1) + 2d540bca (T2)
-### [Unreleased] vibex-sprint5-delivery-integration E2: 跨画布导航 — 2026-04-18
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-sprint5-delivery-integration E2: 跨画布导航 — 2026-04-18
 - **T4 DeliveryNav**: `components/delivery/DeliveryNav.tsx` — 3-canvas nav tabs (原型/DDS/交付中心)，usePathname 高亮当前
 - **T5 CanvasBreadcrumb**: `components/shared/CanvasBreadcrumb.tsx` — 面包屑导航组件，支援 items[] 任意层级
 - **交付中心集成**: delivery/page.tsx 导入 DeliveryNav + CanvasBreadcrumb，DeliveryNav.index.ts 导出
 - **测试**: DeliveryNav (7 tests, 扩自 3) + CanvasBreadcrumb (4 tests) = 11 passing
 - 提交: 75bf4ec3 + e213ccc5 (QA)
 
-### [Unreleased] vibex-sprint5-delivery-integration E3: DDL 生成 — 2026-04-18
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-sprint5-delivery-integration E3: DDL 生成 — 2026-04-18
 - **T6 DDLGenerator**: `lib/delivery/DDLGenerator.ts` — `generateDDL()` converts `APIEndpointCard[]` → `DDLTable[]` (tableName/columns/primaryKey/foreignKeys)
 - **T7 formatDDL**: `lib/delivery/formatDDL.ts` — `formatDDL()` converts `DDLTable[]` → SQL string, `downloadDDL()` triggers browser download
 - **DDL Tab 集成**: delivery/page.tsx DDL Tab，导入 generateDDL + formatDDL
 - **测试**: DDLGenerator (3 tests) + formatDDL (5 tests) = 8 passing
 - 提交: 6ee00b62 (T6/T7)
-### [Unreleased] vibex-sprint5-delivery-integration E4: PRD 融合 — 2026-04-18
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-sprint5-delivery-integration E4: PRD 融合 — 2026-04-18
 - **E4-U1 PRDGenerator**: `lib/delivery/PRDGenerator.ts` — generatePRD() + generatePRDMarkdown()，动态生成 PRD JSON/Markdown
 - **E4-U2 PRDTab**: `components/delivery/PRDTab.tsx` — 移除硬编码，动态展示 contexts/flows/components 数量
 - **E4-U3 exportItem**: `stores/deliveryStore.ts` + `/api/delivery/export/route.ts` — POST API 实现下载功能
 - 提交: 339d2da9
 
-### [Unreleased] vibex-sprint6-ai-coding-integration E3: 版本 Diff — 2026-04-18
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-sprint6-ai-coding-integration E3: 版本 Diff — 2026-04-18
 - **U6 VersionDiff**: `lib/version/VersionDiff.ts` — `diffVersions()` computes structural diff between two project snapshots (components added/removed/modified/changed type)
 - **U7 集成**: `app/canvas/delivery/version/page.tsx` — VersionDiff 页面，展示变更差异
 - **测试**: `VersionDiff.test.ts` — 11 passing tests
 - 提交: 90a90155
 
-### [Unreleased] vibex-sprint6-ai-coding-integration E1: 设计稿导入 — 2026-04-18
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-sprint6-ai-coding-integration E1: 设计稿导入 — 2026-04-18
 - **E1-U1 /api/figma route**: GET/POST Figma REST API proxy (`app/api/figma/route.ts`)
 - **E1-U1 Image AI import**: `src/lib/figma/image-ai-import.ts` — `importFromImage(file)` AI vision 分析图片，base64 → /api/chat → GPT-4o vision，JSON/markdown fallback，10MB 限制
 - **E1-U1 /api/chat route**: AI chat completions 端点，支持 vision (image_url) content parts，转发到 OpenAI-compatible AI provider
 - **单元测试**: `image-ai-import.test.ts` — 6 个用例 (AC1/AC2/AC3)，5/5 PASS for E4-QA image-import
 - 提交: 8e710864 (figma) + e6dd07a5 (image-ai)
 
-### [Unreleased] vibex-sprint6-ai-coding-integration E2: AI Coding Agent — 2026-04-18
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-sprint6-ai-coding-integration E2: AI Coding Agent — 2026-04-18
 - **U4 AgentFeedbackPanel**: `components/dds/canvas/AgentFeedbackPanel.tsx` — AI 反馈面板，session list + message history + retry
 - **U5 AgentSessions**: `components/dds/canvas/AgentSessions.tsx` — 会话列表，支持新建/删除/切换
 - **agentStore**: `stores/agentStore.ts` — sessions/activeSession/currentMessage/retryCount 状态管理
 - 提交: 0d36227d
 
-### [Unreleased] vibex-sprint4-spec-canvas-extend E2: 业务规则章节 — 2026-04-18
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-sprint4-spec-canvas-extend E2: 业务规则章节 — 2026-04-18
 - **E2-U1 类型定义**: `types/dds/state-machine.ts` — StateType/TransitionType/SMState/SMTransition/StateMachineCard
 - **E2-U2 StateMachineCard**: `StateMachineCard.tsx` — state list/transition count/selected highlight
 - **E2-U3 CardRenderer**: `CardRenderer.tsx` dispatch for state-machine type
@@ -2053,7 +4918,22 @@
 - **ImportPanel.module.css**: Figma tab styles (figmaTab/figmaBtn/figmaError/figmaSuccess)
 - 提交: 8e710864
 
-### [Unreleased] vibex-sprint1-prototype-canvas Epic1: 拖拽布局编辑器 — 2026-04-17
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-sprint1-prototype-canvas Epic1: 拖拽布局编辑器 — 2026-04-17
 - **E1-U1 组件面板**: `ComponentPanel.tsx` — 左侧面板展示 10 个默认组件，支持 HTML5 drag-and-drop
 - **E1-U2 React Flow 画布**: `ProtoFlowCanvas.tsx` — 接收组件拖拽，节点自由定位，MiniMap + Controls
 - **E1-U3 自定义节点渲染**: `ProtoNode.tsx` — 10 种组件类型的真实 UI 渲染
@@ -2064,28 +4944,103 @@
 - **Store**: `prototypeStore.ts` — Zustand + localStorage 持久化
 - 提交: f18d48f4
 
-### [Unreleased] vibex-sprint1-prototype-canvas Epic2: Mock数据绑定 — 2026-04-17
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-sprint1-prototype-canvas Epic2: Mock数据绑定 — 2026-04-17
 - **E2-U1 Mock数据Tab**: `ProtoAttrPanel.tsx` — 属性/Mock Tab切换，Mock Tab textarea输入JSON，blur时验证
 - **E2-U2 Mock存储与渲染**: `prototypeStore.ts` — `updateNodeMockData`保存，localStorage持久化，`ProtoNode`读取渲染
 - 提交: bde8f7a8
 
-### [Unreleased] vibex-sprint1-prototype-canvas Epic3: 路由树 — 2026-04-17
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-sprint1-prototype-canvas Epic3: 路由树 — 2026-04-17
 - **E3-U1 页面列表**: `RoutingDrawer.tsx` — 页面列表抽屉，增删页面，navigateToPage
 - **E3-U2 路由导航**: prototypeStore — `addPage`/`removePage`，ProtoEditor整合RoutingDrawer
 - 提交: vibex-sprint1-prototype-canvas/dev-epic3-路由树
 
-### [Unreleased] vibex-sprint3-prototype-extend Epic1: 页面跳转连线 — 2026-04-17
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-sprint3-prototype-extend Epic1: 页面跳转连线 — 2026-04-17
 - **E1-U1 prototypeStore CRUD**: `prototypeStore.ts` — addEdge/removeEdge，edges 独立于 nodes
 - **E1-U2 RoutingDrawer 连线UI**: `RoutingDrawer.tsx` — 添加连线按钮 + modal select（源/目标页面）
 - **E1-U3 ProtoFlowCanvas 渲染**: `ProtoFlowCanvas.tsx` — onConnect callback，Delete键删除边，store→local edges sync
 - 提交: vibex-sprint3-prototype-extend/dev-epic1-页面跳转连线（epic-1）
 
-### [Unreleased] vibex-sprint3-prototype-extend Epic2: 组件属性面板 — 2026-04-17
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-sprint3-prototype-extend Epic2: 组件属性面板 — 2026-04-17
 - **E2-U2 样式Tab**: `ProtoAttrPanel.tsx` — backgroundColor picker + borderRadius + opacity slider + border
 - **E2-U3 事件Tab**: `ProtoAttrPanel.tsx` — onClick/onHover/onFocus handler inputs
 - 提交: vibex-sprint3-prototype-extend/dev-epic2-组件属性面板（epic-2）
 
-### [Unreleased] vibex-sprint2-spec-canvas Epic4: 章节间 DAG 关系 — 2026-04-17
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-sprint2-spec-canvas Epic4: 章节间 DAG 关系 — 2026-04-17
 - **E4-U1 跨章节边创建**: `DDSCanvasStore.ts` — addCrossChapterEdge/deleteCrossChapterEdge, crossChapterEdges state
 - **E4-U2 跨章节边渲染**: `CrossChapterEdgesOverlay.tsx` — SVG overlay with ResizeObserver + RAF 双层监听
   - `strokeDasharray="6 4"` 虚线样式 + arrow marker
@@ -2096,13 +5051,43 @@
 - **类型扩展**: `DDSEdge` 新增 sourceChapter/targetChapter 可选字段
 - 提交: 2b3d69f4
 
-### [Unreleased] vibex-sprint2-spec-canvas Epic5: 状态与错误处理 — 2026-04-17
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-sprint2-spec-canvas Epic5: 状态与错误处理 — 2026-04-17
 - **E5-U1 骨架屏**: `ChapterPanel.tsx` — loading时显示 shimmer skeleton cards（3张卡片，shimmer动画）
 - **E5-U2 空状态引导**: `ChapterPanel.tsx` — 无卡片时显示空状态插图 + 引导文字
 - **E5-U3 错误态重试**: `ChapterPanel.tsx` — error message + loadChapter 重试按钮，error优先于loading/empty
 - 提交: 676c1be9
 
-### [Unreleased] vibex-sprint2-spec-canvas Epic6: 测试覆盖 — 2026-04-18
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-sprint2-spec-canvas Epic6: 测试覆盖 — 2026-04-18
 - **E6-U1 单元测试覆盖**: 143 tests passing，覆盖 DDSCanvasStore/ChapterPanel/DDSScrollContainer/DDSToolbar
 - **DDSScrollContainer 测试修复**: 3-panel 渲染验证（role=region）、章节导航点击切换 activeChapter
 - **DDSToolbar 测试修复**: 章节 Tab 高亮状态验证（aria-pressed）
@@ -2110,25 +5095,85 @@
 - **DDSCanvasStore 新测试**: addCard/deleteCard/selectCard/toggleFullscreen/toggleDrawer
 - 提交: vibex-sprint2-spec-canvas/dev-epic6-测试覆盖
 
-### [Unreleased] vibex-sprint3-prototype-extend Epic2: 组件属性面板 — 2026-04-18
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-sprint3-prototype-extend Epic2: 组件属性面板 — 2026-04-18
 - **E2-AC1 双击打开面板**: `ProtoFlowCanvas.tsx` — 添加 `onNodeDoubleClick` → `selectNode(node.id)`
 - **E2-AC3 Navigation Tab**: `ProtoAttrPanel.tsx` — 新增 Navigation tab（下拉选择跳转页面，调用 updateNodeNavigation）
 - **E2-AC4 Responsive Tab**: `ProtoAttrPanel.tsx` — 新增 Responsive tab（手机/平板/桌面 Toggle，调用 updateNodeBreakpoints）
 - **Store 扩展**: `prototypeStore.ts` — 新增 updateNodeNavigation/updateNodeBreakpoints 方法 + ProtoNodeNavigation/ProtoNodeBreakpoints 类型
 - 提交: bd7a9dea
 
-### [Unreleased] vibex-sprint3-prototype-extend Epic3: 响应式断点 — 2026-04-18
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-sprint3-prototype-extend Epic3: 响应式断点 — 2026-04-18
 - **E3-U1 设备切换工具栏**: `ProtoEditor.tsx` — DeviceSwitcher（手机/平板/桌面 SVG 按钮，点击切换断点）
 - **E3-U2 breakpoint 状态**: `prototypeStore.ts` — 新增 `breakpoint: '375'|'768'|'1024'` 状态 + `setBreakpoint` 方法
 - **E3-U3 画布缩放**: `ProtoFlowCanvas.tsx` — 容器 width 根据 breakpoint 动态设置，CSS transition 平滑切换
 - 提交: 46477b60
 
-### [Unreleased] vibex-sprint3-prototype-extend Epic4: AI 草图导入 — 2026-04-18
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-sprint3-prototype-extend Epic4: AI 草图导入 — 2026-04-18
 - **E4-U1 image-import.ts**: `services/figma/image-import.ts` — importFromImage() 调用 /api/chat 识别图片组件（base64 + JSON 解析）
 - **E4-U2 ImportPanel**: `ImportPanel.tsx` — 新增图片识别 Tab（上传/预览/识别/确认导入）
 - 提交: d795e72e
 
-### [Unreleased] vibex-sprint2-spec-canvas Epic3: AI 草稿生成 — 2026-04-17
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-sprint2-spec-canvas Epic3: AI 草稿生成 — 2026-04-17
 - **E3-U1 AI入口**: `DDSToolbar.tsx` — handleAIGenerate → toggleDrawer → AIDraftDrawer
 - **E3-U2 生成预览**: `AIDraftDrawer.tsx` — IDLE/LOADING/REVIEW/ERROR 状态机，prompt → /api/chat → CardPreview
 - **E3-U3 上下文传递**: AIDraftDrawer — chatHistory state，addChatMessage，handleRetry上下文延续
@@ -2136,7 +5181,22 @@
 - **E3-UX DDSToolbar cleanup**: 删除未使用 ddsChapterActions import，setActiveChapter 改为直接调用 getState() 防闭包陷阱
 - 提交: `aa966492` (feat(dds): Epic3 AI 草稿生成完成)
 
-### [Unreleased] vibex-sprint2-spec-canvas Epic2: 横向滚奏体验 — 2026-04-17
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-sprint2-spec-canvas Epic2: 横向滚奏体验 — 2026-04-17
 - **E2-U1 BLOCKER 修复**: useChapterURLSync.ts — VALID_CHAPTERS 扩展到 5 个章节类型，支持 api/business-rules URL 同步
 - **E2-U1 横向滚奏 UI**: `DDSScrollContainer.tsx` — scroll-snap 横向滚奏，`handleScroll` 检测可见面板，ratio > 0.3 时更新 `activeChapter`
 - **E2-U2 URL同步**: `useChapterURLSync` hook — mount 时从 `?chapter=` 读取参数写入 store，章节变化时 `router.replace` 更新 URL（不污染 history）
@@ -2145,7 +5205,22 @@
 - **E2-U3 Tab样式**: `DDSToolbar.module.css` — glassmorphism 暗色主题 tab，active 高亮 `#818cf8`，hover/focus-visible 完整支持
 - 提交: `d82ba715` (feat(dds): Epic2 横向滚奏体验完成)
 
-### [Unreleased] vibex-sprint2-spec-canvas Epic1: 三章节卡片管理 — 2026-04-17
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-sprint2-spec-canvas Epic1: 三章节卡片管理 — 2026-04-17
 - **E1-U1 三章节结构**: `DDSScrollContainer.tsx` — DDSPanel 已有 data-chapter 属性，默认渲染 ChapterPanel
 - **E1-U2 CRUD**: `ChapterPanel.tsx` — 单章节面板，含卡片列表、创建表单、删除按钮
 - **E1-U3 Schema渲染**: `ChapterPanel` 使用 `CardRenderer` 分发渲染 3 种卡片类型
@@ -2153,17 +5228,62 @@
 - **创建表单**: 用户故事（role/action/benefit/priority）、限界上下文（name/desc/resp）、流程步骤（stepName/actor/pre/post）
 - 提交: vibex-sprint2-spec-canvas/dev-epic1-三章节卡片管理
 
-### [Unreleased] vibex-sprint1-prototype-canvas Epic2: Mock数据绑定 — 2026-04-17
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-sprint1-prototype-canvas Epic2: Mock数据绑定 — 2026-04-17
 - **E2-U1 Mock数据Tab**: `ProtoAttrPanel.tsx` — 属性/Mock Tab切换，Mock Tab textarea输入JSON，blur时验证
 - **E2-U2 Mock存储与渲染**: `prototypeStore.ts` — `updateNodeMockData`保存，localStorage持久化，`ProtoNode`读取渲染
 - 提交: vibex-sprint1-prototype-canvas/dev-epic2-mock数据绑定
 
-### [Unreleased] vibex-sprint1-prototype-canvas Epic3: 路由树 — 2026-04-17
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-sprint1-prototype-canvas Epic3: 路由树 — 2026-04-17
 - **E3-U1 页面列表**: `RoutingDrawer.tsx` — 页面列表抽屉，增删页面，navigateToPage
 - **E3-U2 路由导航**: prototypeStore — `addPage`/`removePage`，ProtoEditor整合RoutingDrawer
 - 提交: vibex-sprint1-prototype-canvas/dev-epic3-路由树
 
-### [Unreleased] vibex-sprint1-prototype-canvas Epic1: 拖拽布局编辑器 — 2026-04-17
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-sprint1-prototype-canvas Epic1: 拖拽布局编辑器 — 2026-04-17
 - **E1-U1 组件面板**: `ComponentPanel.tsx` — 左侧面板展示 10 个默认组件，支持 HTML5 drag-and-drop
 - **E1-U2 React Flow 画布**: `ProtoFlowCanvas.tsx` — 接收组件拖拽，节点自由定位，MiniMap + Controls
 - **E1-U3 自定义节点渲染**: `ProtoNode.tsx` — 10 种组件类型的真实 UI 渲染（Button/Input/Card/Container/Header/Navigation/Modal/Table/Form/Image）
@@ -2174,7 +5294,22 @@
 - **Store**: `prototypeStore.ts` — Zustand + localStorage 持久化
 - 提交: vibex-sprint1-prototype-canvas/dev-epic1-拖拽布局编辑器
 
-### [Unreleased] vibex-canvas-silent-400 E1-F1.1: 前置校验 toast 补充 — 2026-04-17
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-canvas-silent-400 E1-F1.1: 前置校验 toast 补充 — 2026-04-17
 - **E1-F1.1 前置校验 toast**: `BusinessFlowTree.tsx` — handleContinueToComponents 增加前置校验 toast
   - 修复: contextsToSend/flowsToSend 为空时静默 return，用户无反馈
   - contextsToSend 为空 → toast('请先勾选至少一个上下文节点后再生成组件树', 'error')
@@ -2182,7 +5317,22 @@
   - contextNodes 为空 → toast('请先生成上下文树', 'error')
   - 提交: `4d716a38` (fix)
 
-### [Unreleased] vibex-canvas-ux-fix Epic2: canGenerateComponents flowsToSend 校验 — 2026-04-17
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-canvas-ux-fix Epic2: canGenerateComponents flowsToSend 校验 — 2026-04-17
 - **E2-F2.1 canGenerateComponents flowsToSend 校验**: `BusinessFlowTree.tsx` — 新增 `computeTreePayload` 纯函数
   - 修复: `canGenerateComponents` 原先只检查 `flowNodes.length > 0`，未过滤 deactive flows，导致 flows 全 deactive 时按钮错误 enabled
   - 修复后: `canGenerateComponents` 和 `handleContinueToComponents` 共用 `computeTreePayload`，校验 `contextsToSend.length > 0 && flowsToSend.length > 0`
@@ -2194,34 +5344,109 @@
   - 新增: `BusinessFlowTree.test.tsx` — 2 测试覆盖 AC-F2.2-1~2
   - 提交: `4d2d73b9` (fix)
 
-### [Unreleased] vibex-canvas-ux-fix Epic3: hasAllNodes isActive !== false 检查 — 2026-04-17
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-canvas-ux-fix Epic3: hasAllNodes isActive !== false 检查 — 2026-04-17
 - **E3-F3.1 hasAllNodes isActive !== false**: `ProjectBar.tsx` — hasAllNodes 改为 every(isActive !== false)
   - 修复: 原先只检查 nodes.length > 0，导致 deactive 节点存在时按钮错误 enabled
   - 修复后: 三树全部节点 isActive !== false 时按钮解锁
   - 新增: `ProjectBar.test.tsx` — 4 测试覆盖 AC-F3.1-1~4
   - 提交: `a38f79be` (fix)
 
-### [Unreleased] vibex-canvas-ux-fix Epic4: allConfirmed status === confirmed 检查 — 2026-04-17
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-canvas-ux-fix Epic4: allConfirmed status === confirmed 检查 — 2026-04-17
 - **E4-F4.1 allConfirmed status === confirmed**: `BoundedContextTree.tsx` — allConfirmed 改为检查 status === 'confirmed'
   - 修复: 原先检查 isActive !== false，与 checkbox 操作的 status !== 'confirmed' 语义不同步
   - 修复后: checkbox 勾选设置 status，按钮文案由 allConfirmed（status === 'confirmed'）决定
   - 新增: `BoundedContextTree.test.tsx` — 3 测试覆盖 AC-F4.1-1~3
   - 提交: `4ca97fd6` (fix)
 
-### [Unreleased] vibex-canvas-ux-fix Epic4-F4.3: Panel lock 审计完成 — 2026-04-17
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-canvas-ux-fix Epic4-F4.3: Panel lock 审计完成 — 2026-04-17
 - **E4-F4.3 Panel lock 审计**: `BusinessFlowTree.tsx` — 审计 inactivePanel 与 allConfirmed 一致性
   - 审计结论: inactivePanel 使用 isActive prop，CanvasPage 未传 → inactivePanel 永不显示
   - 面板锁定功能当前未实际使用，无需代码修改
   - 提交: `2edb5eb1` (audit)
 
-### [Unreleased] vibex-canvas-ux-fix Epic4-F4.2: handleConfirmAll 原子性设置双字段 — 2026-04-17
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-canvas-ux-fix Epic4-F4.2: handleConfirmAll 原子性设置双字段 — 2026-04-17
 - **E4-F4.2 handleConfirmAll 原子性设置**: `BoundedContextTree.tsx` — handleConfirmAll 调用 confirmContextNode
   - 修复: 原先只调用 advancePhase()，不设置任何状态，导致 allConfirmed 无法正确反映
   - 修复: contextNodes.forEach((n) => confirmContextNode(n.nodeId)) 设置 status:'confirmed' + isActive:true
   - 新增: `BoundedContextTree.test.tsx` — 3 测试覆盖 AC-F4.2-1~3
   - 提交: `1085762e` (fix)
 
-### [Unreleased] vibex-canvas-ux-fix Epic1: handleResponseError async/await 修复 — 2026-04-17
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-canvas-ux-fix Epic1: handleResponseError async/await 修复 — 2026-04-17
 - **E1-U1 handleResponseError async/await**: `canvasApi.ts` — `handleResponseError` 改为 async，await `res.json()` 解析后端错误
   - 修复: 后端 400 错误信息透传到 toast（之前统一显示 "API 请求失败: 400"）
   - 错误字段优先级: `error` > `message` > `details` > HTTP status fallback
@@ -2230,14 +5455,44 @@
   - 新增: `canvasApi.test.ts` — 8 测试覆盖 AC1/AC2 + 回归
   - 提交: `2a10b064` (fix)
 
-### [Unreleased] vibex-sprint-0415 Epic1: DDS路由构建修复 — 2026-04-16
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-sprint-0415 Epic1: DDS路由构建修复 — 2026-04-16
 - **E1-U1 DDS API Route 移除**: 删除 `vibex-fronted/src/app/api/v1/dds/[...path]/route.ts`
   - 根因: Next.js `output:'export'` 静态导出与 `[...path]` catch-all 动态路由不兼容
   - 解决: 删除 route.ts，依赖 `public/_redirects` 的 `/api/* → https://api.vibex.top/api/:splat` 做代理
   - 经验: 前端不应创建 catch-all API 路由代理后端接口（learnings: `vibex-dds-route-revert-0416`）
   - 提交: #384ff637
 
-### [Unreleased] vibex-canvas-404-post-project: POST /project Handler — 2026-04-16
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-canvas-404-post-project: POST /project Handler — 2026-04-16
 - **E1-U1+U2+U3+U4 Canvas 项目创建接口**: `POST /api/v1/canvas/project`
   - 新增: `src/routes/v1/canvas/index.ts` — `POST /project` handler（Hono, Cloudflare Workers）
   - 新增: `migrations/0007_canvas_project.sql` — `CanvasProject` D1 表（三树数据持久化）
@@ -2247,14 +5502,44 @@
   - 返回: `{ projectId, status: 'created' }` with status 201
   - 提交: `51327329` (feat)
 
-### [Unreleased] vibex-sprint2-20260415 E1: Tab State 重置修复 — 2026-04-16
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-sprint2-20260415 E1: Tab State 重置修复 — 2026-04-16
 - **E1-U1 Tab State 修复**: `CanvasPage.tsx` — `useEffect([activeTree])` 重置 phase
   - 修复: TabBar 切换时 phase 未重置（root cause: useEffect 依赖 dead activeTab state）
   - 修复: `useCanvasPanels` 添加 `resetPanelState()` 重置 queuePanelExpanded
   - 测试: `CanvasPage.test.tsx` 3/3 passing (AC3 resetPanelState)
   - 提交: `cb82559a` (fix) / `4dbe738e` (feat)
 
-### [Unreleased] vibex-sprint2-20260415 E2: 版本历史 Diff 对比 — 2026-04-16
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-sprint2-20260415 E2: 版本历史 Diff 对比 — 2026-04-16
 - **E2-U1+U2+U3 版本历史集成**: 快照列表 + Diff 对比 + 恢复功能
   - 新增: `src/lib/canvas/snapshotDiff.ts` — 树级别 diff 工具（added/removed 检测）
   - 新增: `SnapshotDiffView` 组件 — 对比结果视图（摘要统计 + 分组差异列表）
@@ -2262,7 +5547,22 @@
   - 保留: 原有单快照预览 + 恢复功能
   - 提交: `11a87f53` (feat)
 
-### [Unreleased] vibex-sprint2-20260415 E3: 导入导出 — 2026-04-16
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-sprint2-20260415 E3: 导入导出 — 2026-04-16
 - **E3-U1+U2+U3 导入导出**: JSON/YAML 导出 + 导入 + Round-trip 验证
   - 新增: `useCanvasExport` + `ExportMenu` — 支持 JSON/YAML 格式导出
   - 新增: `ImportService` — parseJSON/parseYAML/parseFile/roundTripTest
@@ -2273,7 +5573,22 @@
   - 依赖: `js-yaml` ^4.1.0
   - 提交: `ef90882a` (feat) / `96c04ed7` (fix)
 
-### [Unreleased] vibex-sprint2-20260415 E4: 三树持久化 — 2026-04-16
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-sprint2-20260415 E4: 三树持久化 — 2026-04-16
 - **E4-U1+U2+U3+U4 三树数据持久化**
   - 新增: `serialize.ts` — serializeThreeTrees/deserializeThreeTrees/restoreStore
   - 新增: `useProjectLoader` hook — Canvas 挂载时自动加载最新快照并恢复三树
@@ -2290,7 +5605,22 @@
   - 依赖: `js-yaml` ^4.1.0
   - 提交: `ef90882a` (feat)
 
-### [Unreleased] vibex-architect-proposals-vibex-proposals-20260416 Epic6: Prompts安全AST扫描 — 2026-04-16
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-architect-proposals-vibex-proposals-20260416 Epic6: Prompts安全AST扫描 — 2026-04-16
 - **E6-S1 AST解析实现**: `vibex-backend/src/lib/security/codeAnalyzer.ts` — `@babel/parser` AST 扫描
   - 检测: `eval()`, `new Function()`, `setTimeout/setInterval` 字符串字面量参数
   - 集成到 `code-review.ts` 和 `code-generation.ts`
@@ -2310,7 +5640,22 @@
   - Tests: 16 passed total (`pnpm test -- src/lib/security/`)
   - 提交: `4266c91d`
 
-### [Unreleased] vibex-architect-proposals-vibex-proposals-20260416 Epic7: MCP可观测性 — 2026-04-16
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-architect-proposals-vibex-proposals-20260416 Epic7: MCP可观测性 — 2026-04-16
 - **E7-S1 Health Check**: `packages/mcp-server/src/health.ts` — `health_check` MCP tool (stdio transport)
   - Returns: status/version/uptime/timestamp/connectedClients/tools/checks
   - Health checks: `server_running` + `tools_registered`
@@ -2327,9 +5672,39 @@
   - Tests: `logger.test.ts` 12/12 passing（含 E7-S2 脱敏用例）
   - 提交: `f4dafb18`
 
-### [Unreleased] vibex-dev-proposals-20260414 Epic5: 长期规划 — 2026-04-15
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
 
-### [Unreleased] vibex-qa-canvas-dashboard: Sprint 2 QA 验收 — 2026-04-15
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-dev-proposals-20260414 Epic5: 长期规划 — 2026-04-15
+
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-qa-canvas-dashboard: Sprint 2 QA 验收 — 2026-04-15
 - **Q1-E5-E2E验收**: `e2e/canvas-project-creation.spec.ts` E2E 测试文件已创建（blocked: Zustand skipHydration）
   - 单元测试 `ProjectCreationStep.test.tsx` 7/7 passing (TC-E5-01~07)
   - `canvas-project-creation.spec.ts` E2E 文件已创建，等待 Zustand skipHydration 修复后运行
@@ -2341,7 +5716,22 @@
   - `useRehydrateCanvasStores.test.ts` 4/4 passing (TC-E6-01~04)
   - Commits: #cfb780c4, #8ec8c422, #8ea96dcf, #4b2a349c
 
-### [Unreleased] Bug Fixes — 2026-04-15
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] Bug Fixes — 2026-04-15
 - **vibex-fix-canvas-bugs Bug1 (B1-U1+U2)**: DDS API 404 修复
   - `/api/v1/dds/*` 404 导致画布崩溃
   - 根因: Cloudflare Pages `_redirects` 对 Next.js SSR `/api/v1/*` 重写不稳定
@@ -2366,12 +5756,42 @@
   - Vitest 迁移方案: Sprint 2 → Sprint 3 分阶段（24h+，高风险）
   - 认证中间件规划: ~12h，依赖 Architect P0-3 路由重组
 
-### [Unreleased] vibex-dev-proposals-20260414 Epic4: 安全基线 — 2026-04-15
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-dev-proposals-20260414 Epic4: 安全基线 — 2026-04-15
 - **vibex-backend/eslint.config.mjs**: 修复 no-console 规则，移除 log（之前错误允许）
 - **.husky/pre-commit**: 替换 pnpm-install 桩脚本为真正的 console.log/debug/error 检查器
   - 扫描 vibex-backend/src/（排除 __tests__/、*.test.ts、log-sanitizer.ts、logger.ts）
   - 拦截包含 console.log/debug/error 的非测试文件提交
-### [Unreleased] vibex-dds-canvas-s2 Epic2a: 奏折布局 ScrollContainer — 2026-04-16
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-dds-canvas-s2 Epic2a: 奏折布局 ScrollContainer — 2026-04-16
 - **E2-U1 fullscreen**: `DDSScrollContainer.tsx` — body.overflow=hidden 横铺视口
   - `isFullscreen` prop 控制 CSS class
   - 全屏状态 store 管理 (`setFullscreen`/`toggleFullscreen`)
@@ -2382,7 +5802,22 @@
 - Tests: `DDSScrollContainer.test.tsx` + `useChapterURLSync.test.ts` passing
 - 提交: `edd08e1d` (feat E2a) / `476ec40d` (test E2a)
 
-### [Unreleased] vibex-dds-canvas-s2 Epic2b: ReactFlow 画布集成 — 2026-04-16
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-dds-canvas-s2 Epic2b: ReactFlow 画布集成 — 2026-04-16
 - **E2b-1 ReactFlow 集成**: `vibex-fronted/src/components/dds/canvas/DDSFlow.tsx`
   - `ReactFlowProvider` 包裹，`@xyflow/react` v12
   - 三章节（requirement/context/flow）各自渲染对应卡片类型
@@ -2394,15 +5829,60 @@
 - **E2b-2 测试**: `DDSFlow.test.tsx` 8/8 passing
 - 提交: `b72455ba` (feat E2b) / `849cb8a0` (test E2b)
 
-### [Unreleased] vibex-dds-canvas-s2 Epic4: 工具栏 Export/Import — 2026-04-16
-### [Unreleased] vibex-dds-canvas-s2 Epic3: AI Draft Flow — 2026-04-16
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-dds-canvas-s2 Epic4: 工具栏 Export/Import — 2026-04-16
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-dds-canvas-s2 Epic3: AI Draft Flow — 2026-04-16
 - **E3-1 AIDraftDrawer**: `vibex-fronted/src/components/dds/ai-draft/AIDraftDrawer.tsx`
   - F14/F16/F17: 滑出抽屉 + 状态机
   - CardPreview 组件嵌入
   - Tests: `CardPreview.test.tsx` 15/15 passing
   - 提交: `538ad1a6` (feat E3)
 
-### [Unreleased] vibex-dds-canvas-s2 Epic5: 路由与页面集成 — 2026-04-16
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-dds-canvas-s2 Epic5: 路由与页面集成 — 2026-04-16
 - **E5-1 DDSCanvasPage**: `vibex-fronted/src/components/dds/DDSCanvasPage.tsx`
   - F22/F23/F24: 路由与页面集成
   - 路由参数与章节状态同步
@@ -2419,7 +5899,22 @@
 - Tests: `DDSToolbar.test.tsx` 14/14 passing
 - 提交: `15de96a6` (feat E4) / `f3233edb` (changelog)
 
-### [Unreleased] vibex-dds-canvas-s2 Epic6: 数据持久化 — 2026-04-16
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-dds-canvas-s2 Epic6: 数据持久化 — 2026-04-16
 - **E6-1 localStorage 持久化**: `vibex-fronted/src/services/dds/ddsPersistence.ts`
   - `quickSave`/`quickLoad`: LRU 缓存（最多 10 个项目），快速同步 UI 状态
   - `isLocalStorageAvailable` 守卫 + localStorage 满时静默降级
@@ -2433,7 +5928,22 @@
 - Tests: `ddsPersistence.test.ts` 13/13 passing（`npx vitest run`）
 - 提交: `5fc4c178`
 
-### [Unreleased] vibex-dds-canvas Epic6: E2E 测试套件 — 2026-04-15
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-dds-canvas Epic6: E2E 测试套件 — 2026-04-15
 - **vibex-fronted/tests/e2e/dds-canvas-e2e.spec.ts**: F25/F26/F27 Playwright E2E 测试（522行）
 - setupDDSMocks() — Playwright page.route() 拦截所有 DDS API，无后端也可运行
 - waitForCanvasSettled() 修复 — error state 出现时抛出错误而非静默通过
@@ -2441,7 +5951,22 @@
 - 运行: `pnpm test:e2e -- tests/e2e/dds-canvas-e2e.spec.ts`
 - 修复: auth/me mock格式（`{user}`而非`{success,data}`）、删除injectMockCards死代码、Zustand patch变量重命名（#a443f5df, #cc91c831）
 
-### [Unreleased] vibex-dds-canvas Epic5: Project Creation API 替换 — 2026-04-15
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-dds-canvas Epic5: Project Creation API 替换 — 2026-04-15
 - **vibex-fronted/src/components/flow-project/ProjectCreationStep.tsx**: handleCreate 替换 setTimeout mock 为 projectApi.createProject()
   - 添加 useRouter 导航到 /project?id=xxx
   - 添加 error state 和 error banner UI
@@ -2454,7 +5979,22 @@
 - **vibex-fronted/src/app/design/dds-canvas/page.tsx**: 替换占位页为完整画布
 - AbortController 请求生命周期管理，102 tests passing
 
-### [Unreleased] vibex-dds-canvas Epic4: Backend CRUD API — 2026-04-15
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-dds-canvas Epic4: Backend CRUD API — 2026-04-15
 - **vibex-backend/src/routes/v1/dds/cards.ts**: F20 卡片 CRUD API（GET/POST/PUT/DELETE）
 - **vibex-backend/src/routes/v1/dds/relations.ts**: F21 Relations + Position API
 - **vibex-backend/src/routes/v1/dds/chapters.ts**: GET/POST /api/v1/dds/chapters?projectId=xxx（列出/创建章节）
@@ -2464,14 +6004,44 @@
 - **vibex-fronted/src/hooks/dds/useDDSAPI.ts**: AbortController 5000ms timeout，防止 API 无响应时页面永驻
 - 统一响应格式 { data, success } + safeError() 错误处理
 
-### [Unreleased] vibex-dds-canvas Epic3: AI Draft Flow — 2026-04-15
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-dds-canvas Epic3: AI Draft Flow — 2026-04-15
 - **vibex-fronted/src/components/dds/ai-draft/AIDraftDrawer.tsx**: F14 滑出抽屉 + 状态机（20 tests）
 - **vibex-fronted/src/components/dds/ai-draft/CardPreview.tsx**: F15 AI 卡片预览 + accept/edit/retry 按钮（15 tests）
 - AI Draft 状态机：IDLE → LOADING → PREVIEW | ERROR（组件级，不进 store）
 - 复用 ai-client.ts，30s 超时，accept → ddsChapterActions.addCard()
 - ESLint 0 errors，35 tests passing
 
-### [Unreleased] vibex-dds-canvas Epic2: 横向 Scroll-Snap Canvas 布局 — 2026-04-15
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-dds-canvas Epic2: 横向 Scroll-Snap Canvas 布局 — 2026-04-15
 - **vibex-fronted/src/components/dds/canvas/DDSScrollContainer.tsx**: F10 横向 Scroll-Snap 容器（19 tests）
 - **vibex-fronted/src/components/dds/canvas/DDSPanel.tsx**: F11 面板展开/收起动画（80px ↔ flex:1）
 - **vibex-fronted/src/components/dds/canvas/DDSThumbNav.tsx**: F12 缩略图导航
@@ -2479,7 +6049,22 @@
 - 全部 memo 化，CSS Modules + Dark mode tokens
 - ESLint 0 errors，33 tests passing
 
-### [Unreleased] vibex-dds-canvas Epic1: DDSCanvasStore + 三种卡片组件 — 2026-04-15
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-dds-canvas Epic1: DDSCanvasStore + 三种卡片组件 — 2026-04-15
 - **vibex-fronted/src/types/dds/index.ts**: F1 类型定义（ChapterType, BaseCard, DDSCard, DDSEdge, ChatMessage）
 - **vibex-fronted/src/stores/dds/DDSCanvasStore.ts**: F2 DDSCanvasStore（Zustand，30 tests）
 - **vibex-fronted/src/hooks/dds/useDDSCanvasFlow.ts**: F3 useDDSCanvasFlow hook（data→view 单向同步，9 tests）
@@ -2502,13 +6087,43 @@
 - **task_manager.py**: add review subcommand for reviewer task management (93a3c60e)
 - **apiError()**: E5 统一 API 错误处理 (f459a3c6)
 
-### [Unreleased] vibex-p0-q2-sprint1 E4: 错误体验统一 — 2026-04-14
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-p0-q2-sprint1 E4: 错误体验统一 — 2026-04-14
 - **vibex-backend/src/routes/**: 53 个路由文件迁移至 apiError() 格式（Unit 3 🔄 partial）
 - **vibex-fronted/src/lib/api-error-handler.ts**: 前端统一 API 错误处理，apiError payload 解析，toast 提示（Unit 10 ✅）
 - **vibex-fronted/src/lib/query-client.ts**: mutationErrorHandler 全局注册
 - 提交: c0a7e33c
 
-### [Unreleased] vibex-p0-q2-sprint1 E1: 品牌一致性 — 2026-04-14
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-p0-q2-sprint1 E1: 品牌一致性 — 2026-04-14
 - **auth/page.tsx**: auth 页面 CSS Module 迁移完成，所有内联样式迁移至 auth.module.css
 - **auth/page.tsx**: validateReturnTo 安全验证函数保留（E1-S2.1）
 - **auth/auth.module.css**: 样式覆盖 CSS 变量（var(--color-bg-primary)、var(--gradient-primary) 等）
@@ -2521,7 +6136,22 @@
 - 验证: pnpm tsc --noEmit 无新错误（仅 pre-existing MermaidRenderer）
 - 提交: `c13ef489`
 
-### [Unreleased] vibex-p0-q2-sprint1 Unit 2: apiError() 统一 API 错误处理 — 2026-04-14
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-p0-q2-sprint1 Unit 2: apiError() 统一 API 错误处理 — 2026-04-14
 - **vibex-backend/src/lib/api-error.ts**: ERROR_CODES enum (16 错误码) + apiError() 工厂函数
 - **vibex-backend/src/lib/api-error.test.ts**: 4 个 Jest 测试用例 ✅
 - 提交: `f459a3c6`
@@ -5729,6 +9359,21 @@ All notable changes to this project will be documented in this file.
   - 支持 Cron 定时运行: `0 9 * * * root cd /root/.openclaw/vibex && python3 scripts/proposal_tracker.py`
   - **Bug fix**: 正则字符类 `[a-zA-Z0-9_-]` 未包含 `.`，导致 `dev-e1.1-proposal-tracker` 被截断为 `dev-e1` → 修复为 `[a-zA-Z0-9_\.-]`
   - **Cleanup**: 移除未使用的 `TASK_MANAGER_SCRIPT` 常量和 `proposal_id` 参数
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] Sprint 48 — E1-E5 全部实现完成 ✅
 
 ##### S48-P001-E1: Canvas List 持久化 + 搜索增强
@@ -5774,6 +9419,21 @@ All notable changes to this project will be documented in this file.
 - **E5 Vitest 回归**: `DDSCanvasStore.test.ts` 57/57 PASS
 - 提交: cb55e8bf1
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] Sprint 47 — AI Session 搜索 / 键盘快捷键 / 画布管理
 
 ##### S47-P001-E1: AI Session 搜索验证 + 历史会话管理
@@ -5806,6 +9466,21 @@ All notable changes to this project will be documented in this file.
   - vitest: useCanvasExport.test.ts 10/10 PASS
   - Vitest 回归: DDSCanvasStore 57/57 PASS
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased]
 
 ### Features (vibex-proposals-20260412 Epic1: 测试基础设施修复 — Sprint 1+2) — 2026-04-12
@@ -5964,21 +9639,66 @@ See git history for complete changelog.
   - `vibex-backend/src/index.ts`: 注册 Hono 路由
   - 审查: `docs/review-reports/20260328/review-vibex-canvas-component-btn-20260328-epic1.md`
   - **P0-Backend**: Remove ambiguous [projectId] route, merge into [id]
-### [Unreleased] vibex-canvas-evolution Epic1-5: Phase1+Phase2 Canvas 架构演进 — 2026-04-23
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-canvas-evolution Epic1-5: Phase1+Phase2 Canvas 架构演进 — 2026-04-23
 - **Epic1 样式统一**: emoji checkbox → native `<input type="checkbox">` + CSS class `.cardIcon`；4 色域 CSS 变量统一在 `canvas.variables.css` (core/supporting/generic/external)；`deriveDomainType()`/`deriveStepType()` 推导函数，44 tests PASS
 - **Epic2 三栏展开**: 三栏展开方向独立控制 (`expandBoth` 布局)，CanvasBreadcrumb 导入导航修复
 - **Epic3 数据持久化**: localStorage 快速同步 + IndexedDB 快照存档，`quickSave`/`quickLoad` LRU 缓存
 - **Epic4 批量操作**: `selectAllNodes`/`clearNodeSelection`/`onDeselectAll`，多选交互能力
 - **Epic5 拖拽排序**: `useDndSortable` BusinessFlowTree / ComponentTree 拖拽排序，order 字段正确更新
 
-### [Unreleased] vibex-proposals-20260425-sprint10 E4: PRD 双格式预览 — 2026-04-26
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] vibex-proposals-20260425-sprint10 E4: PRD 双格式预览 — 2026-04-26
 - **E4-S1 格式转换库**: `prd-format.ts` — `yamlToJson`/`jsonToYaml` 双向转换，含友好错误提示（行号/YAMLException）
 - **E4-S2 PRD Editor UI**: `/editor` 页面新增 PRD tab，JSON/YAML 切换按钮（无刷新），textarea 编辑器，解析失败显示内联错误
 - **E4-S3 Playwright E2E**: `prd-format.spec.ts` 双向转换往返测试 + 错误展示测试
 - **Files**: src/lib/prd-format.ts, src/app/editor/page.tsx, tests/e2e/prd-format.spec.ts
 - 提交: 0990947fb, 557fda78d
 
-### [Unreleased] S15-E15-P006: Tech Debt Cleanup — 2026-04-28
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] S15-E15-P006: Tech Debt Cleanup — 2026-04-28
 
 ### S15-E15-P006: Tech Debt Cleanup
 
@@ -5988,6 +9708,21 @@ See git history for complete changelog.
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S15-E15-P005: MCP Server Integration — 2026-04-28
 
 ### S15-E15-P005: MCP Server Integration
@@ -6000,6 +9735,21 @@ See git history for complete changelog.
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S15-E15-P004: Version Compare UI — 2026-04-28
 
 ### S15-E15-P004: Version Compare UI
@@ -6012,6 +9762,21 @@ See git history for complete changelog.
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S15-E15-P003: BPMN Export — 2026-04-28
 
 ### S15-E15-P003: BPMN Export
@@ -6024,6 +9789,21 @@ See git history for complete changelog.
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S14-E2: Canvas Import/Export — 2026-04-27
 - **US-E2.1 JSON Canvas Format**: CanvasDocument schema (schemaVersion 1.2.0, metadata, chapters, crossChapterEdges); serialize.ts extended with serializeCanvasToJSON + deserializeCanvasFromJSON; forward compat (unknown fields → warnings, never throws)
 - **US-E2.2 File Import UI**: useCanvasImport hook (validateFile, importFile, showFilePicker, 10MB limit); window.confirm() before overwrite; data-testid=canvas-import-btn; import-error-message
@@ -6031,14 +9811,44 @@ See git history for complete changelog.
 - **US-E2.4 Import History**: ImportHistoryService (localStorage persistence, getImportLog, clearImportLog)
 - 提交: c202f33d0
 
-### [Unreleased] S14-E3: E2E Test Coverage — 2026-04-27
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] S14-E3: E2E Test Coverage — 2026-04-27
 - **US-E3.1 Playwright Setup**: playwright.config.ts updated (headless: true, viewport: 1280x720)
 - **US-E3.2 Canvas Interaction**: design-to-code.spec.ts (5 tests: generate button, output, download ZIP, feature flag, limit warning) — all use data-testid selectors
 - **US-E3.3 Import/Export + Token**: canvas-import-export.spec.ts (3 tests) + token-integration.spec.ts (3 tests) — no CSS chaining selectors
 - **US-E3.4 Mock Scope Docs**: MockAgentService scope documented in each spec file header comment
 - 提交: ea8be9ee7
 
-### [Unreleased] S14-E4: Analytics Dashboard Enhancement — 2026-04-27
+### [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
+## [Unreleased] S14-E4: Analytics Dashboard Enhancement — 2026-04-27
 - **US-E4.1 FunnelWidget**: pure SVG funnel chart (no external chart lib); empty state when any step < 3 records (`数据不足以计算漏斗`); data-testid=funnel-widget/skeleton/empty-state
 - **US-E4.2 Conversion Metrics**: GET /api/analytics/funnel?range=7d|30d; useFunnelQuery hook (React Query, staleTime 5min, refetchInterval 5min)
 - **US-E4.3 Dashboard Filters**: AnalyticsDashboard with range filters (7天/30天); data-testid=analytics-range-btn-7d/30d; FunnelWidget integrated
@@ -6048,6 +9858,21 @@ See git history for complete changelog.
 - 提交: 6faa55db7
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S49-E4: 画布版本历史可视化 — 2026-06-01
 - **S49-E4.1 snapshotHistoryStore**: `src/stores/dds/snapshotHistoryStore.ts` — debounce 2s auto-snapshot / MAX_SNAPSHOTS=20 / ai-generate + pre-export trigger / manual snapshot / restoreSnapshot / clearSnapshots
 - **S49-E4.2 Timeline**: `src/components/dds/version-history/Timeline.tsx` — 水平滚动时间轴，颜色 badge（AI生成/导出前/手动），点击选中，下载 JSON / 删除
@@ -6058,6 +9883,21 @@ See git history for complete changelog.
 - **S49-E4.7 stores/dds barrel export**: `index.ts` 导出 snapshotHistoryStore + types
 - 提交: epic/s49-e4-version-history
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S49-E1: AI 断线重连 + 流式可靠性增强 — 2026-06-01
 - **S49-E1.1 60s 请求超时**: `requestTimeout`(60000ms) via `setTimeout` + `AbortController.abort()`; 超时触发 `retryStatus='timeout'` + UI badge 显示"请求超时"
 - **S49-E1.2 可配置退避参数**: `retryBaseDelay`(1000ms)/`retryMaxDelay`(8000ms) 替换硬编码值; 公式: `delay = min(retryBaseDelay * 2^attempt, retryMaxDelay) + jitter(0-500ms)`
@@ -6068,6 +9908,21 @@ See git history for complete changelog.
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S49-E2: 画布模板管理完善 — 2026-06-01
 - **S49-E2.1 模板搜索**: `templateStore.searchTemplates(query)` 模糊搜索 name/displayName/description/tags，大小写不敏感
 - **S49-E2.2 分类筛选**: `templateStore.filterByCategory(category)` 按 `TemplateCategory` 筛选；`CategoryFilter` 组件（8个分类按钮）
@@ -6081,6 +9936,21 @@ See git history for complete changelog.
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S49-E3: 大型画布性能优化 v2 — 2026-06-01
 - **S49-E3.1**: viewportBoundsStore 防抖更新 (50ms debounce, 合并重复调用) + flushViewportBounds 立即生效
 - **S49-E3.2**: viewportBoundsStore nodeExtent 配置 (±50,000 默认边界) + setNodeExtent
@@ -6089,6 +9959,21 @@ See git history for complete changelog.
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S50-E3: 评论实时通知 — 2026-06-02
 - **S50-E3.1**: commentStore 计数器式 unreadCount + addListener/removeListener 事件订阅 API
 - **S50-E3.2**: wsCommentHandler 处理 backend WebSocket comment:created/resolved 消息
@@ -6098,6 +9983,21 @@ See git history for complete changelog.
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S50-E4: 模板导入/导出管理 — 2026-06-02
 - **E4 templateExport.ts**: `exportTemplatesToBlob()` + `downloadTemplatesAsFile()` — Blob download as .vbtmpl
 - **E4 templateImport.ts**: `parseImportFile()` + `mergeTemplates()` — JSON parse + schema validation + conflict detection
@@ -6106,6 +10006,21 @@ See git history for complete changelog.
 - **E4 TemplateGallery.tsx**: ⬇️ Export / ⬆️ Import buttons in header
 - **E4 vitest**: templateExport.test.ts + templateImport.test.ts + templateStore E4 tests
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S50-E1: 画布全局搜索 — 2026-06-02
 - **S50-E1.1 canvasSearchStore**: `keywordIndex` Map + Fuse.js 搜索 + `buildIndex`/`updateIndex`/`search` actions
 - **S50-E1.2 fullTextSearch.ts**: Map 查询（不 DB scan），结果按匹配得分排序
@@ -6117,6 +10032,21 @@ See git history for complete changelog.
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S50-E2: 画布节点自动布局 (Dagre) — 2026-06-02
 - **S50-E2.1 dagreLayout.ts**: `computeDagreLayout(cards, edges, opts)` — Dagre TB/LR 层级布局算法，`cardsToFlow`/`applyPositionsToCards` 辅助函数
 - **S50-E2.2 autoLayoutStore.ts**: Zustand store 管理 `isLayouting`/`fitViewRequested`/`lastLayoutDirection` 状态，`startLayout`/`endLayout`/`requestFitView`/`reset` actions
@@ -6128,6 +10058,21 @@ See git history for complete changelog.
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S51-E1: Undo/Redo 持久化 — 2026-06-02
 - **S51-E1.1**: 新增 `src/lib/canvas/historyDB.ts` — IndexedDB 持久化层，LIRS 驱逐策略，≤5MB 上限
 - **S51-E1.2**: `canvasHistoryStore` 新增 `saveHistory`/`loadHistory`/`clearHistory` actions
@@ -6136,6 +10081,21 @@ See git history for complete changelog.
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S51-E2: PNG 批量导出 — 2026-06-01
 - **S51-E2.1 exportMultipleAsPNG.ts**: `lib/canvas/exportMultipleAsPNG.ts` — 批量 PNG 导出函数，html-to-image + JSZip，data-id selector（ReactFlow v12 兼容）
 - **S51-E2.2 useBatchExport hook**: `hooks/useBatchExport.ts` — Zustand-style hook，管理 idle/collecting/exporting/done/cancelled/error 状态，支持 AbortController 取消
@@ -6146,6 +10106,21 @@ See git history for complete changelog.
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S51-E3: MiniMap 节点类型着色 — 2026-06-04
 - **E3 miniMapUtils.ts**: `src/lib/canvas/miniMapUtils.ts` — `getMiniMapNodeColor()` (user-story蓝/bounded-context紫/flow-step绿红灰) + `sampleNodesForMiniMap()` (100+节点分层采样)
 - **E3 MiniMapPanel.tsx**: `nodeColor={getMiniMapNodeColor}` 替换硬编码蓝色，支持节点类型着色
@@ -6154,6 +10129,21 @@ See git history for complete changelog.
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S51-E4: 多选批量操作 — 2026-06-02
 - **E4 useSelectionBox**: `hooks/dds/useSelectionBox.ts` — drag-to-select 框选 hook，[data-card] selector，鼠标拖拽生成选区
 - **E4 SelectionToolbar**: `components/dds/SelectionToolbar.tsx` — 浮动 Toolbar（左/右/水平居中/垂直居中对齐 + 复制 + 删除），选中 2+ 卡片时显示
@@ -6164,6 +10154,21 @@ See git history for complete changelog.
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S51-E5: @Mention 通知系统 — 2026-06-02
 - **S51-E5.1**: `parseMentions.ts` — @提及正则解析 (中英文用户名, /@[\w\u4e00-\u9fa5]+/)
 - **S51-E5.2**: `mentionsStore.ts` — Zustand store (mentions[], unreadCount, event listeners)
@@ -6175,6 +10180,21 @@ See git history for complete changelog.
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S52-E2: 批量导出 PNG/SVG/PDF — 2026-06-02
 - **S52-E2.1**: `exportMultipleAsSVG.ts` — SVG 格式批量导出 (toSvg + JSZip, AbortController, 正确 `data-card` selector)
 - **S52-E2.2**: `exportMultipleAsPDF.ts` — PDF 格式批量导出 (toPng + jsPDF, pixelRatio=2, AbortController)
@@ -6183,12 +10203,42 @@ See git history for complete changelog.
 - **S52-E2.5**: `ZipExporter.ts` — 添加 'pdf' 格式分支 + captureNodeAsPdf() (html-to-image → jsPDF)
 - **Tests**: exportMultipleAsSVG 5 cases + exportMultipleAsPDF 5 cases，vitest 10/10 ✅
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S52-E1: 画布协作实时感知 — 2026-06-02
 - **S52-E1.1**: `presenceStore.test.ts` 10个测试用例 — setRemoteUsers replace/update/remove semantics, cursor update, node locking, WebSocket message handlers
 - **S52-E1.2**: 复用 S42/S44 WebSocket presence 实现，新增 10 个 vitest cases 覆盖协作感知边界条件
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S52-E3: Undo/Redo 协作冲突处理 — 2026-06-02
 
 - **S52-E3.1**: `baseRevision` 字段 → 每次 execute() 时 bump；远程 `revision:bump` 时 `setBaseRevision()` 同步
@@ -6201,6 +10251,21 @@ See git history for complete changelog.
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S52-E4: 模板分类/标签管理 — 2026-06-02
 
 - **S52-E4.1**: `CanvasTemplateData.category` 字段 → `'flowchart' | 'mindmap' | 'uml' | 'other' | null`
@@ -6214,6 +10279,21 @@ See git history for complete changelog.
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S52-E5: 键盘快捷键可配置化 — 2026-06-02
 
 - **S52-E5.1**: `useKeyboardShortcuts.ts` → 重构为 store-driven 快捷键分发（替换20+硬编码）
@@ -6225,6 +10305,21 @@ See git history for complete changelog.
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S53-E1: 协作实时 Presence UI — 2026-06-02
 - **S53-E1.1**: `PresenceIndicator.tsx` — 在线协作者展示组件，avatar stack + 在线计数
 - **S53-E1.2**: `usePresence.ts` — WebSocket presence:join/leave/ping 消息订阅 hook
@@ -6234,6 +10329,21 @@ See git history for complete changelog.
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S53-E2: Undo/Redo 协作冲突处理 — 2026-06-02
 - **冲突通知**: `wsCommentHandler` 新增 `revision:bump` / `revision:conflict` WebSocket 消息处理
 - **Revision 同步**: `setBaseRevision()` 接收远端 revision bump，更新 canvasHistoryStore baseRevision
@@ -6244,6 +10354,21 @@ See git history for complete changelog.
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S58-E4: Canvas 分享权限选择 — 2026-06-03
 - **S58-E4.1**: `shareUtils.ts` — 新增 `generateShareToken()`、`checkSharePermission()`、`buildShareUrl()`、`parseShareTokenFromUrl()` 函数
 - **S58-E4.2**: `ShareDialog.tsx` — 重写为 E4 分享对话框，含权限下拉选择（仅查看 / 可编辑 / 关闭分享）
@@ -6251,6 +10376,21 @@ See git history for complete changelog.
 - **S58-E4.4**: `zh.json` / `en.json` — 新增 12 个分享权限相关 i18n key（permission、viewerOnly、editorAccess 等）
 - **S58-E4.5**: `shareUtils.test.ts` — 46 个 vitest 测试全部通过（含新函数 generateShareToken、checkSharePermission、buildShareUrl、parseShareTokenFromUrl）
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S58-E5: 协作冲突增强 — 2026-06-03
 - **S58-E5.1**: `wsConflictHandler.ts` — 新建 WS 冲突消息处理器，监听 `conflict:detected` 消息
 - **S58-E5.2**: `conflictStore.ts` — 新建冲突状态管理，新增 `conflictData` + `resolvedStrategy` 状态
@@ -6262,6 +10402,21 @@ See git history for complete changelog.
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S59-E1: 画布全局搜索 — 2026-06-11
 - **S59-E1.1**: `canvasSearchStore.ts` — Fuse.js 搜索状态管理，`cmd+k` 快捷键，`searchResults`/`isSearchOpen`
 - **S59-E1.2**: `SearchPanel.tsx` — DDSSearchPanel 搜索面板，支持实时搜索 + 节点高亮
@@ -6271,12 +10426,42 @@ See git history for complete changelog.
 - **S59-E1.6**: `canvasSearchStore.test.ts` — 11 个 vitest 测试全部通过
 - **S59-E1.7**: `fullTextSearch.test.ts` — 10 个 vitest 测试全部通过
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S59-E2: 评论实时通知 — 2026-06-11
 - **S59-E2.1**: `commentStore.ts` — reactions 支持 + @mention 通知状态管理
 - **S59-E2.2**: `wsCommentHandler.ts` — @mention 动态导入 `import('@/stores/dds/mentionsStore')`，`comment:mention` 消息处理
 - **S59-E2.3**: `commentStore.test.ts` — 18 个 vitest 测试全部通过
 - **S59-E2.4**: `wsCommentHandler.test.ts` — WS 消息处理测试全部通过
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S59-E3: 画布节点自动布局 — 2026-06-11
 - **S59-E3.1**: `dagreLayout.ts` — 基于 `@types/dagre` 的 DAG 自动布局算法，`applyLayoutToCards`/`computeLayout`
 - **S59-E3.2**: `autoLayoutStore.ts` — 布局状态管理 + `isLayouting` 状态
@@ -6284,6 +10469,21 @@ See git history for complete changelog.
 - **S59-E3.4**: `dagreLayout.test.ts` + `autoLayoutStore.test.ts` — 20 个 vitest 测试全部通过
 - **S59-E3.5**: `DDSToolbar.tsx` — Cmd+L 自动布局按钮集成，`aria-label="自动布局"`
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S59-E4: 模板批量导入导出 — 2026-06-11
 - **S59-E4.1**: `templateStore.ts` — `addTemplate`/`addTag`/`removeTag` 方法完善，`importTemplates`/`exportTemplates`
 - **S59-E4.2**: `templateExport.ts` — `exportTemplatesToBlob` Blob 下载，支持 JSON/YAML 格式
@@ -6291,12 +10491,42 @@ See git history for complete changelog.
 - **S59-E4.4**: `TemplateGallery.tsx` — 导入/导出按钮 UI，`importTemplatesFromFile` + `exportTemplatesToBlob` 集成
 - **S59-E4.5**: `templateStore.test.ts` — 42 个 vitest 测试全部通过（含 E4 import/export 策略测试）
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S59-E5: 键盘快捷键扩展 — 2026-06-11
 - **S59-E5.1**: `shortcutStore.ts` — 快捷键注册表 + 冲突检测 + localStorage 持久化 + `loadDefaults`
 - **S59-E5.2**: `useKeyboardShortcuts.ts` — 自动布局快捷键注册（Cmd+L），可扩展架构
 - **S59-E5.3**: `DDSToolbar.tsx` — 键盘快捷键设置按钮，`isShortcutSettingsOpen` 状态
 - **S59-E5.4**: `shortcutStore.test.ts` + `useKeyboardShortcuts.test.ts` — vitest 测试全部通过
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S60-E1: 画布版本历史 UI 增强 — 2026-06-03
 - **S60-E1.1**: `Snapshot` 接口新增 `branchName`/`isStarred` 可选字段
 - **S60-E1.2**: `SnapshotDiff` 接口：`added`/`removed`/`modified` 节点差异
@@ -6310,6 +10540,21 @@ See git history for complete changelog.
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S60-E2: 批量操作增强 — 2026-06-04
 - **S60-E2.1**: 新增 `batchOpsStore.ts` — UI状态管理（删除确认对话框、重命名对话框前缀/后缀模式、操作状态）
 - **S60-E2.2**: 新增 `BatchOpsToolbar.tsx` — 批量删除/重命名浮层，CanvasListPanel 多选时显示
@@ -6318,6 +10563,21 @@ See git history for complete changelog.
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S61-E1: 画布版本历史时间线视图 + 快照对比 — 2026-06-04
 - **S61-E1.1**: `HistoryPanel.tsx` — 时间线/列表双视图 Drawer 面板，搜索过滤 + 分支过滤 + 快照预览 + 对比按钮
 - **S61-E1.2**: `SnapshotPreview.tsx` — 快照详情面板，支持节点缩放查看
@@ -6329,12 +10589,42 @@ See git history for complete changelog.
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S61-E2: 批量导出（PNG/SVG/PDF）— 2026-06-04
 - **S61-E2.1**: `ExportDialog.tsx` — 批量导出对话框，支持格式选择（PNG/SVG/PDF）和范围选择（全部/选中）
 - **S61-E2.2**: `ExportProgress.tsx` — 导出进度条组件，实时显示当前节点 + 进度百分比
 - **S61-E2.3**: `ExportMenu.tsx` — 新增"批量导出"菜单项（`aria-label="批量导出"`），触发 ExportDialog
 - **S61-E2.4**: `useBatchExport.test.ts` — 18 个测试，91.42% 行覆盖率（PNG/SVG/PDF 路由、取消、错误处理、scope 映射）
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S61-E3: 国际化完善-多语言支持 — 2026-06-04
 - **S61-E3.1**: `BatchOpsToolbar.tsx` — 批量操作栏硬编码中文字符串全部替换为 `useTranslations('batchOps')()` 调用（15→0 硬编码）
 - **S61-E3.2**: `useLanguage.ts` — 用户语言偏好 Hook，支持 `setLanguage()` 切换，读取 `userPreferencesStore` 持久化
@@ -6344,6 +10634,21 @@ See git history for complete changelog.
 - **S61-E3.6**: `en.json`/`zh.json` — 新增 `toolbar`、`common`、`search`、`batchOps` 命名空间翻译键（batchOps 19 key, toolbar 18 key, search 12 key）
 - **S61-E3.7**: vitest: `useLanguage.test.ts` 4/4 通过
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S61-E4: AI Session 画布上下文集成 — 2026-06-04
 - **S61-E4.1**: `agentStore.ts` — DDS AI 会话 Store，持有 sessions[]/canvasContext/retryConfig，支持重试模式（3/5/无限）
 - **S61-E4.2**: `useAIAgentContext.ts` — Hook，序列化画布状态为节点/边计数摘要字符串（e.g. "3 nodes, 1 edge, chapters: 需求, 流程"）
@@ -6353,6 +10658,21 @@ See git history for complete changelog.
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S61-E5: 画布数据备份与导出 — 2026-06-04
 - **S61-E5.1**: BackupPanel.tsx — modal UI with export/import buttons + backup list
 - **S61-E5.2**: useBackup.ts — React hook wrapping BackupService
@@ -6385,6 +10705,21 @@ See git history for complete changelog.
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S62-E3: 画布云端备份与恢复 — 2026-06-04
 - **S62-E3.1**: BackupService — cloudBackup/cloudRestore/listCloudBackups/deleteCloudBackup via /api/backup endpoints
 - **S62-E3.2**: backupStore — pendingBackups Set + cloudBackupHistory + taskStatus FSM
@@ -6394,6 +10729,21 @@ See git history for complete changelog.
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S62-E4: 协作 Undo/Redo — 2026-06-04
 - **S62-E4.1**: undoRedoStore — currentOperator + conflictDialog + performUndo/performRedo + checkConflict + showConflict/dismissConflict
 - **S62-E4.2**: wsCollabHandler — broadcastUndo/broadcastRedo + collab:undo/collab:redo message types
@@ -6404,6 +10754,21 @@ See git history for complete changelog.
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S62-E5: 离线 PWA 支持 — 2026-06-04
 - **S62-E5.1**: SWRegistration 在 RootLayout 中注册 Service Worker
 - **S62-E5.2**: offline-queue.ts 新增 queueCloudBackup/queueUndoRedo 函数，离线时将操作入队
@@ -6413,6 +10778,21 @@ See git history for complete changelog.
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S63-E1: 协作者实时游标追踪 — 2026-06-05
 - **S63-E1.1**: `RemoteCursorsLayer.tsx` — RemoteCursor SVG 渲染组件，跟随远程用户鼠标位置，支持用户名标签
 - **S63-E1.2**: `RemoteCursorsLayer.module.css` — 脉冲动画样式 (online 绿/amber idle)
@@ -6424,6 +10804,21 @@ See git history for complete changelog.
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S63-E2: 协作撤销冲突对话框 — 2026-06-05
 - **S63-E2.1**: `ConflictDialog.tsx` — 三选项对话框（撤销你的操作/保留对方操作/取消），`aria-label="协作冲突对话框"`, `role="dialog"`
 - **S63-E2.2**: `undoRedoStore.ts` — `resolveConflict(choice)` action，`'undo-mine'` 强制执行撤销，`'keep-theirs'`/`'cancel'` 关闭对话框
@@ -6433,6 +10828,21 @@ See git history for complete changelog.
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S63-E3: 离线画布编辑 — 2026-06-05
 - **S63-E3.1**: `offline-queue.ts` — `CanvasOp` 接口 (addNode/updateNode/deleteNode/addEdge/deleteEdge/addCrossChapterEdge/deleteCrossChapterEdge + timestamp), `CANVAS_OP_DB_NAME = 'vibex-canvas-ops'`, `queueCanvasOp()`, `getQueueSize()`, `syncOfflineQueue()` (重放队列，409 时 dispatch `canvas-op-conflict` CustomEvent), `isOnline()` helper
 - **S63-E3.2**: `DDSCanvasStore.ts` — 7 个 ddsChapterActions 方法 (addCard/updateCard/deleteCard/addEdge/deleteEdge/addCrossChapterEdge/deleteCrossChapterEdge) 在 `!isOnline()` 时调用 `queueCanvasOp()` 并 return，不继续执行
@@ -6443,6 +10853,21 @@ See git history for complete changelog.
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S63-E5: 文件夹拖拽排序 — 2026-06-05
 - **S63-E5.1**: `canvasFolderStore.ts` — `Folder.order` field + `moveFolder(id, parentId, index)` 方法；创建时自动分配 order；跨父级移动时重排
 - **S63-E5.2**: `FolderTree.tsx` — `@dnd-kit` DndContext + SortableContext；根文件夹列表支持拖拽排序；子文件夹保持原有折叠/展开行为
@@ -6451,6 +10876,21 @@ See git history for complete changelog.
 - **S63-E5.5**: `BatchOpsToolbar.tsx` — `handleMoveToFolder` + `handleFolderPicked`；`batchMoveToFolder` 已在 S62-E2 实现
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S64-E1: 协作在线状态面板 — 2026-06-05
 - **S64-E1.1**: `presenceStore.ts` — `onlineUsers[]`, `heartbeatInterval`, `updateOnlineUsers()`, `removeStaleUsers()`, `clearOnlineUsers()`; presence 用户列表管理
 - **S64-E1.2**: `wsCollabHandler.ts` — `presence:heartbeat`, `presence:user_joined`, `presence:user_left` 消息处理
@@ -6459,6 +10899,21 @@ See git history for complete changelog.
 - **S64-E1.5**: vitest: presenceStore 35/35 通过
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S64-E3: AI 会话持久化 — 2026-06-05
 - **S64-E3.1**: `src/lib/ai-session-db.ts` — IndexedDB 辅助层：openDB / saveSessionToHistory / loadSessionsFromHistory / deleteSessionFromHistory / clearAllHistory
 - **S64-E3.2**: `agentStore.ts` — `sessionHistory[]`, `sessionHistoryLoaded` state + `loadSessions/saveSession/clearSession/clearAllSessions` actions
@@ -6467,6 +10922,21 @@ See git history for complete changelog.
 - **S64-E3.5**: `AISessionDrawer.tsx` — 新增「当前对话/历史」Tab 切换，渲染 AIHistoryPanel
 - **S64-E3.6**: `agentStore.sessionHistory.test.ts` — 8 个测试用例：D3.2a-D3.8
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S64-E4: 画布批量操作增强（Batch Rename + Archive）— 2026-06-05
 - **S64-E4.1**: `canvasListStore.batchRename(canvasIds, renameFn)` — 灵活批量重命名函数，支持序号模式和正则替换模式
 - **S64-E4.2**: `canvasListStore.batchArchive/batchUnarchive` — 设置/清除 archivedAt 时间戳
@@ -6477,6 +10947,21 @@ See git history for complete changelog.
 - **S64-E4.7**: `canvasListStore.e4.test.ts` — 6/6 vitest 测试通过（去重逻辑 + 归档过滤）
 - **Test**: 6/6 vitest ✅
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S64-E5: 模板画廊搜索增强 — 2026-06-05
 - **S64-E5.1**: `types.ts` — `TemplateTag` 类型定义（`'工作'|'个人'|'教程'|'空白'`） + `TEMPLATE_USE_CASE_TAGS` 配置数组
 - **S64-E5.2**: `templateStore.ts` — `selectedTags` 状态 + `filterByTag()` 交集过滤 + `setSelectedTags()` + 升级 `searchTemplates()` 使用 Fuse.js 模糊搜索（threshold=0.4）
@@ -6485,6 +10970,21 @@ See git history for complete changelog.
 - **S64-E5.5**: `templateStore.test.ts` — E5 测试用例 10 个：filterByTag 4 个 + setSelectedTags 3 个 + Fuse.js searchTemplates 3 个
 - **Test**: 66/66 vitest ✅（含全部既有测试 + 新增 E5 覆盖）
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S65-E2: 协作者编辑指示器 — 节点聚焦感知 — 2026-06-05
 - **S65-E2.1**: `wsNodeFocusHandler.ts` — `node:focused`/`node:unfocused` WebSocket 消息处理 + broadcastNodeFocus/clearNodeFocus
 - **S65-E2.2**: `presenceStore.ts` — `focusedNodes` (Record<nodeId, userId>) + `focusedNodeInfos` (Record<nodeId, FocusedNodeInfo>) + `setNodeFocus(nodeId, userId)` + `clearNodeFocus(nodeId)` + 30s setTimeout 自动释放
@@ -6495,6 +10995,21 @@ See git history for complete changelog.
 - **S65-E2.7**: `presenceStore.test.ts` — 覆盖 focus/lock 逻辑 (57/57 pass)
 - **Test**: 57/57 vitest ✅
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S65-E3: 画布视图个性化设置面板 — 2026-06-05
 - **S65-E3.1**: `settingsStore.ts` — 统一设置 Store：backgroundColor / gridSize / gridVariant / defaultZoom / snapToGrid，localStorage 持久化
 - **S65-E3.2**: `CanvasSettingsPanel.tsx` — Tab 式设置面板（背景 / 网格 / 缩放 / 快捷键）
@@ -6506,6 +11021,21 @@ See git history for complete changelog.
 - **S65-E3.10**: `settingsStore.test.ts` — 17/17 vitest 测试通过
 - **Test**: 17/17 vitest ✅
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S65-E4: 画布搜索与过滤增强 — IndexedDB + Fuse.js 全局搜索 — 2026-06-05
 - **S65-E4.1**: `canvasDb.ts` — IndexedDB 封装：initCanvasDb / saveCanvasMeta / getCanvasMetas / searchCanvases（Fuse.js 模糊搜索，name 权重 0.5，阈值 0.4，includeScore）
 - **S65-E4.2**: `GlobalSearchPanel.tsx` — Cmd+Shift+K 全局画布名称搜索浮层（模糊匹配 + 历史记录 + 排名徽章 + 键盘导航）
@@ -6517,6 +11047,21 @@ See git history for complete changelog.
 - **Test**: 5/5 vitest ✅
 
 ---
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S67-E5: 画布导出增强PDF/SVG — 2026-06-06
 - **E5.1**: `PdfExporter.ts` — exportPdf(canvasId, options) 服务函数，支持 A4/Letter、单页/多页、scale 质量、abort 信号
 - **E5.2**: `SvgExporter.ts` — exportSvg(canvasId) 服务函数，生成 SVG 向量格式含章节分组、节点关系箭头、特殊字符转义
@@ -6525,12 +11070,42 @@ See git history for complete changelog.
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S68-E1: 模板画廊增强（导出/评分）— 2026-06-06
 - **E1.1**: `TemplateExportDialog.tsx` — 导出预览对话框，支持全量/收藏/手动选择导出范围 + 文件名定制 + .vbtmpl 下载
 - **E1.2**: `TemplateGallery.tsx` — 每张卡片添加★收藏切换按钮，stopPropagation 防冒泡
 - **E1.3**: `templateStore.test.ts` — 新增 E1 收藏测试 9 项：toggleFavorite×2, isFavorite×2, getFavorites×2, exportTemplates×1, importTemplates×1
 - **Test**: 89/89 vitest ✅
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S68-E2: @提及通知系统 — 2026-06-06
 - **E2.1**: `notificationStore.ts` — Zustand + persist，通知列表 CRUD、getUnreadCount、getByCanvas、getByType
 - **E2.2**: `wsNotificationHandler.ts` — 处理 `notification:*` WebSocket 消息（new/update/read）
@@ -6542,6 +11117,21 @@ See git history for complete changelog.
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S68-E3: 全局画布全文搜索 — 2026-06-06
 - **E3.1**: `src/services/canvasFulltextIndex.ts` — Fuse.js 全文索引服务，IndexedDB 存储，1h TTL 缓存
 - **E3.2**: `canvasSearchStore.ts` — 新增 `fulltextQuery/fulltextResults/fulltextLoading` + `searchNodeContent()`
@@ -6551,6 +11141,21 @@ See git history for complete changelog.
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S68-E4: 批量操作画布节点复制/导出 — 2026-06-13
 - **E4.1**: `canvasListStore.ts` — `copyNodesBetweenCanvases(srcCanvasId, nodeIds, destCanvasId)` copies CanvasMeta entries with new IDs, appends " (副本)" suffix
 - **E4.2**: `canvasListStore.ts` — `batchTemplateExport(canvasIds)` exports `.vbtmpl` JSON blob with type `canvas-meta-template`, triggers browser download
@@ -6561,6 +11166,21 @@ See git history for complete changelog.
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S69-E1: 画布版本快照历史 — 2026-06-06
 - **S69-E1.1**: `BranchManager.tsx` — 分支管理面板（创建/切换/删除分支）
 - **S69-E1.2**: `BranchManager.module.css` — 分支管理面板样式
@@ -6585,6 +11205,21 @@ See git history for complete changelog.
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S69-E5: 画布视图预设 — 2026-06-06
 - **S69-E5.1**: `settingsStore.ts` — 扩展 CanvasPreset 接口 + canvasPresets 数组 + activePresetId + 8 个预设 CRUD actions
 - **S69-E5.2**: `ViewPresetsPanel.tsx` — 工具栏预设下拉菜单（apply/save/delete/rename preset + 设置链接）
@@ -6596,6 +11231,21 @@ See git history for complete changelog.
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S70-E1: 画布分支合并与冲突处理 — 2026-06-06
 - **E1.1**: `canvasHistoryStore.ts` — `mergeBranch(canvasId, source, target)` action + `pendingConflicts` state + `resolveBranchConflict` + `clearPendingConflicts`
 - **E1.2**: `BranchManager.tsx` — `MergeBranchButton` 组件（非主分支显示）+ 合并确认对话框
@@ -6604,6 +11254,21 @@ See git history for complete changelog.
 - **E1.5**: `DDSCanvasPage.tsx` — 合并成功后调用 `reloadFromSnapshot` 刷新画布
 - **E1.6**: `canvasHistoryStore.e1-merge.test.ts` — E1 测试：mergeBranch + pendingConflicts + resolveBranchConflict
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S70-E2: 模板市场发现与浏览 — 2026-06-06
 - **E2.1**: `templateStore.ts` — `featuredTemplates(limit?)` 按 usageCount 降序排序 + `searchMarketplace(query?, tags?)` 组合过滤 + `getMarketplaceTemplates()`
 - **E2.2**: `TemplateMarketplacePanel.tsx` — 市场发现面板（搜索框 + 标签云 + 热门模板 + 模板卡片网格 + 使用量徽章 + 导入按钮）
@@ -6616,12 +11281,42 @@ See git history for complete changelog.
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S70-E3: 多格式批量画布导出 — 2026-06-06
 - **E3.1**: `MultiFormatExporter.ts` — `exportMultiFormatZip(canvasId, options)` 编排 PNG+SVG+PDF 三格式并行生成 + JSZip 打包下载
 - **E3.2**: `ExportMenu.tsx` — 新增"多格式导出(ZIP)"菜单项，支持勾选 PNG/SVG/PDF 三格式
 - **E3.3**: `ZipExporter.multi-format.test.ts` — 6/6 接口测试覆盖三种格式 + ZIP 打包
 - **vitest**: `ZipExporter.multi-format.test.ts` 6/6 通过
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S70-E4: 协作冲突检测与锁升级 — 2026-06-06
 - **E4.1**: `presenceStore.ts` — 新增 `pendingConflicts: ConflictRecord[]` + `addConflict()`/`resolveConflict()`/`hasConflict()`/`getUnresolvedCount()`，冲突检测逻辑嵌入 `startEditing`
 - **E4.2**: `useCollabEditing.ts` — 新增 `detectConflict()` 5秒双写窗口检测
@@ -6630,6 +11325,21 @@ See git history for complete changelog.
 - **E4.5**: `presenceStore.conflict.test.ts` — 18个vitest测试覆盖冲突检测全场景
 
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S70-E5: 画布设置面板完善 — 2026-06-06
 - **E5.1**: `CanvasSettingsDrawer.tsx` — 新建侧边抽屉组件，4 tabs（预设/画布/节点/协作），复用 ViewPresetsTab + BackgroundSettings + GridSettings + ZoomSettings
 - **E5.2**: `CanvasSettingsDrawer.module.css` — 抽屉样式（overlay/drawer/tabs/content）
@@ -6640,6 +11350,21 @@ See git history for complete changelog.
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S71-E4: 画布使用统计分析 — 2026-06-07
 - **E4.1**: `canvasAnalyticsStore.ts` — Zustand + localStorage persist，记录 totalEdits / nodeEdits / lastEdit，支持 recordEdit / getStats / getTopNodes / exportAnalytics / clearStats
 - **E4.2**: `AnalyticsPanel.tsx` — HistoryPanel Tab5，显示编辑最多节点排行 + 导出 CSV，支持全量/折叠切换
@@ -6649,6 +11374,21 @@ See git history for complete changelog.
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S71-E5: 模板评分与收藏增强 — 2026-06-07
 - **E5.1**: `TemplateMarketplacePanel.tsx` — 新增排序选择器（⭐评分/🔥使用量/📅最近）+ 卡片评分星标（显示+交互）+ 收藏按钮
 - **E5.2**: `TemplateMarketplacePanel.module.css` — sortRow / starRow / favoriteBtn 样式
@@ -6657,12 +11397,42 @@ See git history for complete changelog.
 - **vitest**: `templateStore.rating.test.ts` + `TemplateMarketplacePanel.e5.test.tsx` 10/10 通过
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S72-E1: 画布历史管理面板快照测试 — 2026-06-07
 - **E1.4**: `canvasHistoryStore.snapshots.test.ts` — saveSnapshot/restoreSnapshot/renameSnapshot/deleteSnapshot + LRU eviction vitest 14/14
 - **E1.5**: `TimelineView.test.tsx` — 快照时间线组件测试：空状态/列表渲染/操作回调/键盘交互/相对时间格式化 vitest 16/16
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S72-E3: 协作presence统一store — 2026-06-07
 - **E3.1**: `src/lib/collaboration/presenceStore.ts` — Zustand store: `remoteUsers` + `cursors` (Map/Record) + `broadcastCursor`/`clearCursor`/`updateCursor`/`removeUser` actions
 - **E3.2**: `src/lib/collaboration/useWebSocketPresence.ts` — WS integration: `onCursorMove` → `presenceStore.broadcastCursor`, `onUserJoin` → `presenceStore.setRemoteUsers`, `onUserLeave` → `presenceStore.removeUser`
@@ -6672,6 +11442,21 @@ See git history for complete changelog.
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S72-E5: 模板预览模式 — 2026-06-07
 - **E5.1**: `vibex-fronted/src/components/dds/templates/TemplatePreviewPanel.tsx` — Drawer面板, 节点列表+详情双栏布局, 入边/出边数量显示
 - **E5.2**: `vibex-fronted/src/components/dds/templates/TemplatePreviewPanel.module.css` — 面板样式
@@ -6679,6 +11464,21 @@ See git history for complete changelog.
 - **E5.4**: `vibex-fronted/src/components/dds/templates/__tests__/TemplatePreviewPanel.test.tsx` — 9 tests: open/close/node list/detail/import/edge counts
 - **vitest**: `TemplatePreviewPanel.test.tsx` 9/9 通过
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S72-E4: 画布数据趋势分析图表 — 2026-06-07
 - **E4.1**: `vibex-fronted/src/components/dds/analytics/AnalyticsTrendChart.tsx` — 7天/30天切换柱状图, 历史记录列表, 分享按钮
 - **E4.2**: `vibex-fronted/src/stores/dds/canvasAnalyticsStore.ts` — `archiveHistory`/`getHistory`/`shareAnalytics`/`exportAnalytics` 扩展
@@ -6687,6 +11487,21 @@ See git history for complete changelog.
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S73-E1: 画布内容全文搜索 — 2026-06-07
 - **E1.1**: canvasSearchStore.searchNodes() 同步方法，返回 fulltextResults；re-export NodeSearchResult 类型
 - **E1.2**: CanvasSearchPanel.tsx 浮动搜索面板，Cmd/Ctrl+F 呼出，含 HighlightMatch 高亮 + 结果点击滚动
@@ -6694,6 +11509,21 @@ See git history for complete changelog.
 - **E1.4**: canvasSearchStore.test.ts 新增 searchNodes 测试 4 用例
 - **E1.5**: CanvasSearchPanel.test.tsx 新建集成测试 16 用例
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S73-E2: 模板节点导入画布 — 2026-06-07
 - **E2.1**: `lib/canvas/templateStore.ts` — `importTemplateToCanvas(templateId, position?, mode?)` 纯函数: 解析模板snapshot, ID映射, chapter类型映射, 节点/边构建, ImportResult返回
 - **E2.2**: `stores/templateStore.ts` — Zustand `importTemplateToCanvas()` 包装器: 模板存在性校验, 委托lib实现, 分组chapter调用addCard/addEdge, recordUsage追踪
@@ -6703,6 +11533,21 @@ See git history for complete changelog.
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S73-E3: 通知管理与历史 — 2026-06-07
 - **E3.1**: `notificationStore.ts` — 扩展 `preferences` 状态（推送渠道+类型开关）、`setChannelEnabled`/`setTypeEnabled`/`resetPreferences` actions、`addNotification` 按类型开关过滤、`partialize` 持久化 preferences
 - **E3.2**: `NotificationPanel.tsx` — header 新增「全部已读」+「清空历史」按钮 + 设置齿轮按钮 + ESC 关闭支持
@@ -6713,6 +11558,21 @@ See git history for complete changelog.
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S73-E4: 画布分支命名与保护 — 2026-06-07
 - **E4.1**: `historyDB.ts` — DB_VERSION=5, 新增 branchMeta objectStore (canvasId+branchName compound key), getBranchMeta/setBranchMeta/listBranchMetas/deleteBranchMeta CRUD
 - **E4.2**: `canvasHistoryStore.ts` — 扩展 setBranchName/setBranchProtected/getBranchMeta (get-before-set 保留现有字段)
@@ -6725,6 +11585,21 @@ See git history for complete changelog.
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S73-E5: AI会话导出与分享 — 2026-06-07
 - **E5.1**: `collabSessionStore.ts` — 新增 `exportSessionMarkdown(sessionId)` action，返回含元数据+事件的 Markdown 字符串
 - **E5.2**: `collabSessionStore.ts` — 新增 `exportSessionPDF(sessionId)` action，调用 `window.print()`
@@ -6738,6 +11613,21 @@ See git history for complete changelog.
 ---
 
 #
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S74-E5: 键盘导航增强 — 2026-06-07
 - **E5.1**: `CanvasSearchPanel.tsx` — 添加 `aria-activedescendant` + 搜索结果键盘导航
 - **E5.2**: `TemplateGallery.tsx` — `role="grid"` + Tab/Enter 键盘操作
@@ -6747,6 +11637,21 @@ See git history for complete changelog.
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S75-E1: 搜索历史工具栏快捷入口 — 2026-06-07
 - **E1.1**: `RecentSearchesDropdown.tsx` — 新建组件：最多显示5条最近搜索词，点击填充搜索框，支持清除历史
 - **E1.2**: `DDSToolbar.tsx` — 在导出按钮后插入 RecentSearchesDropdown（控制开关状态）
@@ -6757,6 +11662,21 @@ See git history for complete changelog.
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S75-E2: 通知中心分类 TabBar 过滤 — 2026-06-07
 - **E2.1**: `TabBar.tsx` — 新建 TabBar 组件，支持全部/提及/回复/系统四类筛选标签，含未读计数 badge
 - **E2.2**: `NotificationPanel.tsx` — 集成 TabBar，添加 `activeTab` state + `filterByType` 过滤逻辑，tab 切换重置分页到第1页
@@ -6764,6 +11684,21 @@ See git history for complete changelog.
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S75-E3: 分支对比历史记录 — 2026-06-07
 - **E3.1**: `historyDB.ts` — 新增 `branchDiffHistory` objectStore + `saveBranchDiffHistory()`/`getBranchDiffHistory()`/`clearBranchDiffHistory()` 三个 DB 函数
 - **E3.2**: `canvasHistoryStore.ts` — 新增 `addBranchDiffHistory()`/`getBranchDiffHistory()`/`clearBranchDiffHistory()` 方法，持久化分支对比结果
@@ -6775,6 +11710,21 @@ See git history for complete changelog.
 ---
 
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S75-E4: 协作活动流消息发送 — 2026-06-07
 - **E4.1**: `types.ts` — `ActivityType` 新增 `'comment'` 类型 + `ActivityEntry` 新增 `message?: string` + `canvasId?: string` 字段
 - **E4.2**: `activityStore.ts` — `activityLabel('comment')` = `'发送了评论'`
@@ -6782,22 +11732,82 @@ See git history for complete changelog.
 - **E4.4**: `MentionInput.tsx` — ESC 同时清空下拉框和输入框内容
 - **vitest**: `CollabActivityPanel.test.tsx` 14/14 测试通过（+4 新增测试）
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S75-E5: Canvas Snapshot Management — 2026-06-07
 - **E5.1**: SnapshotManagerPanel 组件 — 多选批量删除画布快照（header checkbox + 全选 + footer 批量删除按钮）
 - **E5.2**: CanvasSettingsDrawer 集成 — 添加"快照管理" Tab（第5个 Tab）
 - **E5.3**: `settingsStore.ts` — 扩展 `canvasPresets` 添加 `SnapshotManagerPanel` Tab 标签
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S76-E1: 画布背景设置集成 — 2026-06-07
 - **S76-E1.1**: 新增`canvasBackground`统一状态对象(`variant`/`gap`/`size`/`color`)于`settingsStore.ts`，含`setCanvasBackground()`action
 - **S76-E1.2**: `setGridVariant`/`setGridGap`/`setGridSize`/`setBackgroundColor` actions 同步更新 `canvasBackground` 对象
 - **S76-E1.3**: `DDSToolbar.tsx` — Background Settings 快捷入口按钮（点击打开 BackgroundSettingsPanel）
 - **S76-E1.4**: `BackgroundSettingsPanel.tsx` — 画布背景设置面板：variant (Dots/Lines/None) + gap (8/16/24/32) + size (0.5/1/2) + color picker
 - **vitest**: BackgroundSettingsPanel vitest 8/8 通过
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S76-E2: 批量画布PNG导出ZIP — 2026-06-07
 - **feat(S76-E2)**: BatchOpsToolbar export button + ZipExporter + canvasListStore.batchExport
 - **test(S76-E2)**: add batch export tests (Esc/click-outside/confirm)
 
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S76-E3: Canvas Fuse.js Weighted Indexed Search — 2026-06-08
 
 - **E3.1**: `canvasListStore.ts` — 新增 `CanvasMeta.description?: string` 和 `CanvasMeta.tags?: string[]` 字段
@@ -6809,6 +11819,21 @@ See git history for complete changelog.
 - **E3.7**: `canvasListStore.e3.test.ts` — 18 个测试用例覆盖 rebuildIndex + indexedSearch
 
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S76-E4: Canvas Batch Import/Export — 2026-06-08
 
 - **CanvasImportPanel**: Drag-drop .vibex/.json/.yaml files with validation, progress bar, and canvasListStore write
@@ -6817,6 +11842,21 @@ See git history for complete changelog.
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S77-E1: 通知持久化与跨设备同步 — 2026-06-08
 - **E1.1**: IndexedDB `notifications` objectStore + `saveNotificationToDB`/`getNotificationsFromDB`/`markAsReadInDB`/`getUnreadCountFromDB`/`saveNotificationsFromServer`/`clearNotificationsFromDB`
 - **E1.2**: `markAsRead` writes to IndexedDB + calls PATCH `/api/notifications/:id` (fire-and-forget); optimistic local update preserved on failure
@@ -6829,6 +11869,21 @@ See git history for complete changelog.
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S77-E3: 画布版本分支权限控制 — 2026-06-08
 - **S77-E3.1**: `BranchPermissionDialog` — 权限管理弹窗，owner/admin/write/read 权限设置
 - **S77-E3.2**: `canvasHistoryStore` permission checks — `deleteBranch`/`mergeBranch` 添加 owner/admin 权限校验
@@ -6839,6 +11894,21 @@ See git history for complete changelog.
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S77-E4: 画布离线缓存与冲突解决 — 2026-06-08
 
 - **canvasOfflineStore.ts** (NEW): Zustand store with `isOffline`/`pendingQueue`/`syncStatus`/`lastSyncedAt`, `queueChange()` → IndexedDB persistence, conflict detection via `remoteUpdatedAt > lastSyncedAt`
@@ -6849,6 +11919,21 @@ See git history for complete changelog.
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S77-E5: Canvas DPR 缩放性能优化 — 2026-06-08
 - **settingsStore**: 新增 `dprMode: 'auto'|'1x'|'2x'` + `setDprMode` action
 - **DDSCanvasPage**: mount 时根据 `devicePixelRatio` + `dprMode` 计算 `effectiveDPR`
@@ -6859,6 +11944,21 @@ See git history for complete changelog.
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S78-E1: Canvas 分支自动合并与智能冲突解决 — 2026-06-08
 - **canvasHistoryStore.autoMergeBranch**: 新增方法 — 检测两分支间的节点冲突，通过 `pendingConflicts` 状态传递给 UI
 - **BranchAutoMergeDialog**: 新增组件 — 颜色标记冲突预览（🟢自动合并/🟡需手动/🔴冲突），支持逐节点选择保留哪边
@@ -6869,6 +11969,21 @@ See git history for complete changelog.
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S78-E2: 模板订阅与更新通知 — 2026-06-08
 - **notificationStore**: 新增 `template_update` NotificationType + `templateId`/`authorId`/`thumbnail` 字段
 - **templateStore**: 新增 `subscribeTemplate`/`unsubscribeTemplate`/`subscribeAuthor`/`unsubscribeAuthor`/`getTemplateUpdates` actions + `subscribedTemplates`/`subscribedAuthors` 持久化状态
@@ -6877,6 +11992,21 @@ See git history for complete changelog.
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S78-E3: 画布节点内联评论 — 2026-06-08
 - **collabSessionStore**: 新增 `comments` Record + `addComment()`/`getComments()`/`getCommentCount()`/`addReply()`/`deleteComment()` actions
 - **NodeCommentBadge.tsx**: 节点评论计数Badge（count>0时显示emoji+数字）
@@ -6886,6 +12016,21 @@ See git history for complete changelog.
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S78-E4: 定时导出 & Webhook — 2026-06-08
 
 - **canvasListStore**: `ScheduledExport` interface + `scheduledExports` state + CRUD actions
@@ -6898,6 +12043,21 @@ See git history for complete changelog.
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S78-E5: 画布关联追踪 — 2026-06-08
 - **canvasListStore**: `CanvasRelation` interface + `RelationType` union + `canvasRelations` state + actions
   (`addCanvasRelation`, `removeCanvasRelation`, `updateCanvasRelation`, `getCanvasRelations`, `getRelationStats`, `detectCircularRelation`)
@@ -6909,6 +12069,21 @@ See git history for complete changelog.
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S79-E1: 定时导出执行引擎 — 2026-06-08
 - **S79-E1.1**: `ScheduledExportRunner` 单例 — `startScheduler()`/`stopScheduler()`，`isDue()`/`computeNextHour()` 工具函数
 - **S79-E1.2**: `canvasListStore.markExportRun(id)` — 更新 `lastRunAt`、推进 `nextRunAt` +1h、递增 `successCount`
@@ -6917,7 +12092,37 @@ See git history for complete changelog.
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S79-E2: 模板更新通知面板 — 2026-06-08
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S79-E3: 评论回复 + @提及通知系统 — 2026-06-09
 - **S79-E3.1**: `collabSessionStore.addReply()` — 创建 `comment_reply` 通知给父评论作者
 - **S79-E3.2**: `collabSessionStore.addReply()` — 遍历 `reply.mentions` 创建 `mention` 通知
@@ -6941,6 +12146,21 @@ See git history for complete changelog.
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S79-E5: Merge History Viewer — 2026-06-09
 - **E5.1**: Add `MergeHistoryEntry` type + `mergeHistory` state + `recordMerge/getMergeHistory/clearMergeHistory` actions in `canvasHistoryStore`
 - **E5.2**: Add `MERGE_HISTORY` IndexedDB object store (DB v10) + `saveMergeHistoryToDB/listMergeHistoryFromDB/clearMergeHistoryFromDB` functions
@@ -6950,6 +12170,21 @@ See git history for complete changelog.
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S80-E1: 通知偏好设置管理面板 — 2026-06-09
 - **S80-E1.1**: IndexedDB `notification_prefs` objectStore (DB v11)，`savePreferencesToDB`/`getPreferencesFromDB`
 - **S80-E1.2**: `notificationStore` 统一 `setPreference(key, enabled)` / `getPreference(key)` 接口，`loadPreferencesFromIndexedDB` 初始化
@@ -6957,6 +12192,21 @@ See git history for complete changelog.
 - **S80-E1.4**: `NotificationPanel` 集成新面板，移除 `NotificationSettingsDrawer`
 - **S80-E1.5**: `notificationStore.preferences.test.ts` 12 测试用例
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S80-E2: 模板分类/标签过滤测试 — 2026-06-09
 - **S80-E2.1**: `templateStore.category.test.ts` 19 测试用例 —— filterByCategory / filterByTag / searchTemplates / filterTemplates / CategoryFilter 覆盖率
 - **S80-E2.2**: 标签 AND 交集过滤逻辑验证 (`metadata.tags` 字段)，多标签组合场景测试
@@ -6967,6 +12217,21 @@ See git history for complete changelog.
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S80-E3: Merge History Enrichment — 2026-06-09
 - **E3.1**: `MergeHistoryEntry` 新增 `mergedNodeIds`/`conflictCount`/`authorIds` 字段
 - **E3.2**: `recordMerge` 接收并存储 enriched fields
@@ -6977,6 +12242,21 @@ See git history for complete changelog.
 - **E3.7**: vitest: `canvasHistoryStore.e3-merge-history.test.ts` 4/4
 
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S80-E4: 画布设置中心 — 2026-06-09
 - **S80-E4.1**: `SettingsModal.tsx` — 4-tab 统一设置入口（快捷键/画布/通知/性能）
 - **S80-E4.2**: `settingsStore.ts` — `lastOpenedTab` 持久化
@@ -6986,6 +12266,21 @@ See git history for complete changelog.
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S80-E5: 协作者在线状态与活动流 — 2026-06-09
 - **presenceStore**: 添加 `lastActiveAt: Record<userId, number>` — 记录每个协作者最后活动时间戳
 - **presenceStore**: 添加 `updateLastActive(userId)` — 更新协作者活动时间戳
@@ -7001,6 +12296,21 @@ See git history for complete changelog.
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S81-E1: 画布导入格式支持 — 2026-06-09
 - **CanvasImporter.ts**: 新建服务类 —— `parseFlowJson()` 解析 .flow.json + `parseFlowZip()` 解析 .flow.zip + `checkConflict()` 名称冲突检测
 - **ImportMenu.tsx**: 新建下拉组件 —— 文件选择 + URL 输入 + 拖拽区（.flow.json / .flow.zip）
@@ -7010,6 +12320,21 @@ See git history for complete changelog.
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S81-E2: 设置导入导出 — 2026-06-09
 - **settingsStore.ts**: 添加 `exportSettings()` — 导出版本化 JSON（含 version/exportedAt/data）；添加 `importSettings(json)` — 导入验证 + 状态还原；添加 `SETTINGS_VERSION = '1.0.0'`
 - **historyDB.ts**: `DB_VERSION` 11→12，新增 `settings_export` objectStore（含 `id` keyPath + `timestamp` 索引）
@@ -7019,6 +12344,21 @@ See git history for complete changelog.
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S81-E3: 画布性能监控面板 — 2026-06-09
 - **S81-E3.1**: `usePerformanceMonitor` hook — `getFPS()` via requestAnimationFrame loop, `getNodeCount()`/`getEdgeCount()` from `useReactFlow`
 - **S81-E3.2**: `PerformanceMonitor` component — real-time FPS + node/edge count overlay, collapsible, bottom-right corner
@@ -7028,6 +12368,21 @@ See git history for complete changelog.
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S82-E1: Canvas Branch Management UI — 2026-06-09
 
 ### E1: Canvas Branch UI — `switchBranch` / `diffBranches` / `loadBranch`
@@ -7037,6 +12392,21 @@ See git history for complete changelog.
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S82-E2: Template Gallery UI — 2026-06-09
 - **S82-E2.1**: TemplateCard 组件：缩略图/图标、标题、描述、分类标签、收藏按钮
 - **S82-E2.2**: TemplateGallery 组件：分类 Tab 切换、搜索框、卡片网格、预览 Dialog
@@ -7045,6 +12415,21 @@ See git history for complete changelog.
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S82-E3: Canvas Share Privacy — 2026-06-09
 - **S82-E3.1**: shareService.ts：localStorage 链接生成/撤销/列表/校验
 - **S82-E3.2**: canvasListStore：share link state + actions
@@ -7055,6 +12440,21 @@ See git history for complete changelog.
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S82-E4: 文件拖拽导入 — 2026-06-09
 - **S82-E4.1**: useFileDrop.ts hook — 检测 .vibex/.json/.yaml/.yml/.flow.json/.flow.zip 等文件拖拽，
   通过 onImportReady 回调触发 CanvasImportPanel 打开，支持嵌套元素 counter 追踪
@@ -7066,6 +12466,21 @@ See git history for complete changelog.
 
 ---
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S83-E1: 画布版本历史时间轴 — 2026-06-10
 - **src/stores/dds/canvasTimelineStore.ts**: 新建 timeline 状态管理（zoomLevel/activeBranch/selectedRange/previewSnapshotId）
 - **src/stores/dds/canvasTimelineStore.ts**: `filterSnapshotsByZoom()` / `getUniqueBranches()` / `getTickWidth()` 辅助函数
@@ -7077,6 +12492,21 @@ See git history for complete changelog.
 - **src/components/dds/history/__tests__/VersionTimeline.test.tsx**: 10+ 单元测试（zoom/branch/rendering/actions）
 - **vitest**: VersionTimeline.test.tsx 全部通过
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S83-E1: 画布版本历史时间轴 — 2026-06-10
 - **VersionTimeline.tsx**: 新建时间轴组件，支持缩放（hour/day/week/month）、分支筛选、时间范围选择、快照预览
 - **VersionTimeline.module.css**: 时间轴样式（.timeline / .zoomControls / .timelineBody / .card / .actions）
@@ -7086,6 +12516,21 @@ See git history for complete changelog.
 - **VersionTimeline.test.tsx**: 21 个单元测试全部通过 ✅
 
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S84-E1: 画布版本 Diff 对比 — 2026-06-10
 - **VersionDiffPanel.tsx**: 新增 `VersionDiffPanel` 组件 — 画布版本对比面板，支持新增/删除/修改三色高亮
 - **VersionDiffPanel.tsx**: 支持单向对比 (A→B) 和双向对比 (A↔B) 两种模式
@@ -7094,6 +12539,21 @@ See git history for complete changelog.
 - **canvasTimelineStore.ts**: 新增 diff state (`isDiffPanelOpen`, `compareSnapshotId`, `diffData`, `diffMode`)
 - **canvasDiff.ts**: 新建 API client — `canvasDiffApi.getDiff()`
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S84-E3: 命令面板 — Ctrl+K 快速跳转、模糊搜索、最近历史 — 2026-06-10
 - **CommandPalette.tsx**: 新增 `CommandPalette` 组件 — Ctrl+K 全局快捷键呼出，fuse.js 模糊搜索画布/模板/操作，键盘导航（↑↓ Enter ESC），最近使用历史（最近10条）
 - **CommandPalette.module.css**: CommandPalette 样式（174 行：输入框、下拉列表、键盘高亮、动画过渡）
@@ -7103,6 +12563,21 @@ See git history for complete changelog.
 - **DDSCanvasPage.tsx**: 集成 CommandPalette，canvasPage 加载时注册快捷键
 
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S84-E4: 模板搜索增强与收藏 — 2026-06-19
 - **TemplateGallery.tsx**: Fuse.js 模糊搜索集成 — `useMemo` 创建 Fuse 实例，搜索 name(0.4)/displayName(0.3)/description(0.2)/tags(0.1)，threshold 0.4，支持 typo 容错
 - **TemplateGallery.tsx**: 收藏 Tab 空状态提示「还没有收藏任何模板，点击卡片上的⭐添加收藏」
@@ -7112,6 +12587,21 @@ See git history for complete changelog.
 - **TemplateGallery.favorites.test.tsx**: 10 个 S84-E4 单元测试（Fuzzy 搜索/收藏 Tab/空状态/星标按钮 API 调用）
 - **vitest**: TemplateGallery.favorites.test.tsx ✅
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S84-E5: 全局键盘快捷键体系 — 2026-06-10
 - **E5.1**: `shortcutStore.ts` — Zustand store，shortcuts 配置 + localStorage 持久化，addBinding/removeBinding/import/export
 - **E5.2**: `useKeyboardShortcuts.ts` — 组合键解析 hook，支持 Ctrl/Alt/Shift/Meta + key 组合
@@ -7122,6 +12612,21 @@ See git history for complete changelog.
 - **vitest**: shortcutStore(9) + useKeyboardShortcuts(131) + shortcutManager(25) + ShortcutPanel(11) + ShortcutSettingsPanel(11) = 187 测试用例
 
 
+## [Unreleased]
+## [Epic S95-E4] Export Profile Templates (2026-06-13)
+
+### Features
+- **exportProfileStore**: Zustand store for named export profile CRUD + form state.
+- **ExportProfilePanel**: Template management component — profile cards, create form, format/scale buttons, delete.
+- **ExportProfilesSettingsTab**: Settings drawer integration tab.
+- **DDSToolbar open-canvas-settings event**: ExportMenu "Profile Templates" button opens CanvasSettingsDrawer at export-profiles tab.
+- **CanvasSettingsDrawer initialTab prop**: Deep-link support for settings drawer tabs.
+
+### Tests
+- 23 Vitest store tests (exportProfileStore.test.ts)
+- 20 Vitest panel tests (ExportProfilePanel.test.tsx)
+
+Type: feat | Sprint: S95-E4 | Commit: `686eb3482`
 ## [Unreleased] S85-E1: 画布级权限体系 — 2026-06-11
 - **canvasPermissionsStore.ts**: Zustand store — per-canvas role management (owner/admin/editor/viewer)
 - **canvasPermissionsStore.test.ts**: 176 lines vitest 14/14 ✅

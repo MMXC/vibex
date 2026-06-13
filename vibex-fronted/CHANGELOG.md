@@ -7561,3 +7561,15 @@ See git history for complete changelog.
 
 类型: feat
 影响: vibex-fronted/src/components/dds/settings/, vibex-fronted/src/app/public/, vibex-fronted/src/app/canvas/public/
+
+
+## [Epic S95-E3] Node Edit Locking (2026-06-13)
+
+- **Frontend Store**: `nodeLockStore.ts` — Zustand store with acquireLock, releaseLock, getLock, auto-cleanup via setTimeout
+- **Component**: `CollaboratorEditorBadge.tsx` — shows remote lock holder avatar/name pill (amber)
+- **Component**: `LockIndicator.tsx` — shows 🔓 when current user holds the lock
+- **Integration**: `CardRenderer.tsx` — renders both per card alongside NodeEditorLock
+- **Tests**: 9 Vitest (nodeLockStore) + 6 Vitest (CollaboratorEditorBadge)
+
+类型: feat
+影响: vibex-fronted/src/stores/nodeLockStore.ts, vibex-fronted/src/components/dds/canvas/CollaboratorEditorBadge.tsx, vibex-fronted/src/components/dds/canvas/LockIndicator.tsx, vibex-fronted/src/components/dds/cards/CardRenderer.tsx

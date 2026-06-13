@@ -7838,3 +7838,18 @@ See git history for complete changelog.
 
 类型: feat
 影响: vibex-backend/src/app/api/canvas/[id]/visibility/, vibex-backend/src/app/api/public/, vibex-backend/src/app/api/canvas/public/, vibex-fronted/src/components/dds/settings/, vibex-fronted/src/app/public/, vibex-fronted/src/app/canvas/public/
+
+
+## [Epic S95-E3] Node Edit Locking (2026-06-13)
+
+- **D1**: `canvas_node_locks` table (migration 0031) — canvas_id, node_id, user_id, user_name, avatar, expires_at, created_at
+- **API**: `POST /api/canvas/{id}/nodes/{nodeId}/lock` — acquire or extend lock (60s TTL, owner-only)
+- **API**: `DELETE /api/canvas/{id}/nodes/{nodeId}/lock` — release lock
+- **Frontend Store**: `nodeLockStore.ts` — Zustand store with acquireLock, releaseLock, getLock, auto-cleanup via setTimeout
+- **Component**: `CollaboratorEditorBadge.tsx` — shows remote lock holder avatar/name pill (amber)
+- **Component**: `LockIndicator.tsx` — shows 🔓 when current user holds the lock
+- **Integration**: `CardRenderer.tsx` — renders both per card alongside NodeEditorLock
+- **Tests**: 6 backend Jest (route.test.ts) + 9 Vitest (nodeLockStore) + 6 Vitest (CollaboratorEditorBadge)
+
+类型: feat
+影响: vibex-backend/migrations/, vibex-backend/src/app/api/canvas/[id]/nodes/[nodeId]/lock/, vibex-fronted/src/stores/nodeLockStore.ts, vibex-fronted/src/components/dds/canvas/CollaboratorEditorBadge.tsx, vibex-fronted/src/components/dds/canvas/LockIndicator.tsx, vibex-fronted/src/components/dds/cards/CardRenderer.tsx

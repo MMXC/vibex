@@ -21,11 +21,13 @@ import { CanvasSettingsPanel } from '@/components/dds/canvas/CanvasSettingsPanel
 import { GitHubLinkSection } from './GitHubLinkSection';
 // S94-E3: Canvas Audit Log — audit tab
 import { AuditLogSettingsTab } from './AuditLogSettingsTab';
+// S95-E1: Canvas Analytics Dashboard — analytics tab
+import { AnalyticsSettingsTab } from './AnalyticsSettingsTab';
 import { useDDSCanvasStore } from '@/stores/dds/DDSCanvasStore';
 import { useAuthStore } from '@/stores/authStore';
 import styles from './CanvasSettingsDrawer.module.css';
 
-type TabId = 'presets' | 'canvas' | 'nodes' | 'snapshots' | 'performance' | 'collaboration' | 'github' | 'audit';
+type TabId = 'presets' | 'canvas' | 'nodes' | 'snapshots' | 'performance' | 'collaboration' | 'github' | 'audit' | 'analytics';
 
 const TABS: { id: TabId; label: string }[] = [
   { id: 'presets', label: '预设' },
@@ -36,6 +38,7 @@ const TABS: { id: TabId; label: string }[] = [
   { id: 'collaboration', label: '协作' },
   { id: 'github', label: 'GitHub' },
   { id: 'audit', label: '审计日志' },
+  { id: 'analytics', label: '数据分析' },
 ];
 
 /** Placeholder for node-specific settings (future extension) */
@@ -189,6 +192,7 @@ export function CanvasSettingsDrawer({ isOpen, onClose }: CanvasSettingsDrawerPr
             <GitHubSettings />
           )}
           {activeTab === 'audit' && <AuditLogSettingsTab />}
+          {activeTab === 'analytics' && <AnalyticsSettingsTab />}
         </div>
       </div>
     </div>

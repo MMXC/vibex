@@ -71,6 +71,8 @@ import { HistoryPanel } from '@/components/canvas/features/HistoryPanel';
 import { NodeCommentPanel } from '@/components/dds/canvas/NodeCommentPanel';
 import { CanvasImportPanel } from '@/components/dds/canvas-dashboard/CanvasImportPanel';
 import { ImportShareDialog } from '@/components/dds/share/ImportShareDialog';
+// S94-E2: Advanced Canvas Sharing — SharePanel with role selection, expiration, password, embed code, webhooks
+import { SharePanel } from '@/components/dds/share/SharePanel';
 // S89-E4: GitHub Integration Deep Link
 import { PRStatusBadge } from '@/components/dds/github/PRStatusBadge';
 import { useGitHubPR, parseGitHubUrl } from '@/hooks/useGitHubPR';
@@ -312,6 +314,20 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
       url.searchParams.delete('import');
       window.history.replaceState({}, '', url.toString());
     }
+  }, []);
+
+  // ---- S94-E2: SharePanel state — opened via 'open-share-panel' custom event ----
+  const [sharePanelOpen, setSharePanelOpen] = useState(false);
+
+  // Listen for 'open-share-panel' event dispatched from toolbar or elsewhere
+  useEffect(() => {
+    const handler = () => setSharePanelOpen(true);
+    window.addEventListener('open-share-panel', handler);
+    return () => window.removeEventListener('open-share-panel', handler);
+  }, []);
+
+  const handleSharePanelClose = useCallback(() => {
+    setSharePanelOpen(false);
   }, []);
 
   // ---- S89-E4: GitHub PR Badge from ?github_pr= embed param ----
@@ -1555,6 +1571,12 @@ const { onCursorMove, broadcastCursor } = useWebSocketPresence({
       isOpen={importShareOpen}
       shareToken={importShareTokenState ?? ''}
       onClose={handleImportShareClose}
+    />
+
+    {/* S94-E2: SharePanel — advanced sharing with role selection, expiration, password, embed code, webhooks */}
+    <SharePanel
+      canvasId={projectId}
+      onClose={handleSharePanelClose}
     />
 
     {/* S83-E3: Conflict confirm toast — shown after auto-resolve strategy is chosen */}

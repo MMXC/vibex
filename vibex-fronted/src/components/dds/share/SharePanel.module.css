@@ -1,0 +1,457 @@
+/**
+ * SharePanel.module.css — S94-E2: Advanced Canvas Sharing
+ * Panel styles following VibeX design system tokens.
+ */
+
+.panel {
+  background: var(--color-surface, #1e1e2e);
+  border: 1px solid var(--color-border, #3a3a5c);
+  border-radius: 12px;
+  width: min(520px, 90vw);
+  max-height: 80vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 20px 20px 12px;
+  border-bottom: 1px solid var(--color-border, #3a3a5c);
+  gap: 12px;
+}
+
+.titleArea {
+  flex: 1;
+  min-width: 0;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-text-primary, #e5e7eb);
+  margin: 0;
+}
+
+.subtitle {
+  font-size: 13px;
+  color: var(--color-text-secondary, #9ca3af);
+  margin: 4px 0 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.closeBtn {
+  background: transparent;
+  border: none;
+  color: var(--color-text-secondary, #9ca3af);
+  font-size: 18px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: background-color 0.15s;
+  flex-shrink: 0;
+}
+
+.closeBtn:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* Tab bar */
+.tabBar {
+  display: flex;
+  border-bottom: 1px solid var(--color-border, #3a3a5c);
+  padding: 0 16px;
+}
+
+.tab {
+  background: transparent;
+  border: none;
+  color: var(--color-text-secondary, #9ca3af);
+  font-size: 14px;
+  font-weight: 500;
+  padding: 10px 12px;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.tab:hover {
+  color: var(--color-text-primary, #e5e7eb);
+}
+
+.tabActive {
+  color: var(--color-primary, #6366f1);
+  border-bottom-color: var(--color-primary, #6366f1);
+}
+
+/* Tab content */
+.tabContent {
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Sections */
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-secondary, #9ca3af);
+}
+
+/* Form controls */
+.input {
+  background: var(--color-bg, #111827);
+  border: 1px solid var(--color-border, #3a3a5c);
+  border-radius: 8px;
+  color: var(--color-text-primary, #e5e7eb);
+  font-size: 14px;
+  padding: 8px 12px;
+  width: 100%;
+  box-sizing: border-box;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.input:focus {
+  border-color: var(--color-primary, #6366f1);
+}
+
+.input::placeholder {
+  color: rgba(156, 163, 175, 0.5);
+}
+
+.select {
+  background: var(--color-bg, #111827);
+  border: 1px solid var(--color-border, #3a3a5c);
+  border-radius: 8px;
+  color: var(--color-text-primary, #e5e7eb);
+  font-size: 14px;
+  padding: 8px 12px;
+  width: 100%;
+  box-sizing: border-box;
+  outline: none;
+  cursor: pointer;
+}
+
+.select:focus {
+  border-color: var(--color-primary, #6366f1);
+}
+
+/* Role selection */
+.roleGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.roleOption {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--color-bg, #111827);
+  border: 1px solid var(--color-border, #3a3a5c);
+  border-radius: 8px;
+  padding: 8px 10px;
+  cursor: pointer;
+  transition: border-color 0.15s, background-color 0.15s;
+}
+
+.roleOption:hover {
+  border-color: var(--color-primary, #6366f1);
+  background: rgba(99, 102, 241, 0.06);
+}
+
+.radioInput {
+  accent-color: var(--color-primary, #6366f1);
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.roleLabel {
+  font-size: 13px;
+  color: var(--color-text-primary, #e5e7eb);
+}
+
+/* Toggle rows */
+.toggleRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--color-text-primary, #e5e7eb);
+}
+
+.checkbox {
+  accent-color: var(--color-primary, #6366f1);
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+/* Buttons */
+.primaryBtn {
+  background: var(--color-primary, #6366f1);
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 10px 16px;
+  cursor: pointer;
+  transition: opacity 0.15s;
+  width: 100%;
+}
+
+.primaryBtn:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.primaryBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.dangerBtn {
+  background: transparent;
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  border-radius: 8px;
+  color: #f87171;
+  font-size: 13px;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: background-color 0.15s;
+  width: 100%;
+}
+
+.dangerBtn:hover {
+  background: rgba(239, 68, 68, 0.08);
+}
+
+.dangerBtnSmall {
+  background: transparent;
+  border: none;
+  color: #9ca3af;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.dangerBtnSmall:hover {
+  color: #f87171;
+  background: rgba(239, 68, 68, 0.08);
+}
+
+.copyBtn {
+  background: rgba(99, 102, 241, 0.12);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  border-radius: 6px;
+  color: var(--color-primary, #6366f1);
+  font-size: 13px;
+  padding: 4px 12px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.15s;
+}
+
+.copyBtn:hover {
+  background: rgba(99, 102, 241, 0.2);
+}
+
+/* Error banner */
+.errorBanner {
+  background: rgba(239, 68, 68, 0.1);
+  border-bottom: 1px solid rgba(239, 68, 68, 0.3);
+  color: #f87171;
+  font-size: 13px;
+  padding: 8px 20px;
+}
+
+/* Active share link */
+.activeShare {
+  background: rgba(99, 102, 241, 0.06);
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  border-radius: 10px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.shareLinkRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.shareLinkInfo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+.shareRoleBadge {
+  background: rgba(99, 102, 241, 0.2);
+  color: #a5b4fc;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.shareExpiry {
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+.passwordBadge {
+  font-size: 12px;
+}
+
+/* Embed code */
+.embedSection {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.embedCodeRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.embedCode {
+  flex: 1;
+  background: var(--color-bg, #111827);
+  border: 1px solid var(--color-border, #3a3a5c);
+  border-radius: 6px;
+  padding: 8px;
+  font-size: 11px;
+  color: #a5b4fc;
+  font-family: 'Fira Code', 'Courier New', monospace;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* All links list */
+.allLinks {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.allLinksTitle {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-secondary, #9ca3af);
+  margin: 0 0 4px;
+}
+
+.linkItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  background: var(--color-bg, #111827);
+  border: 1px solid var(--color-border, #3a3a5c);
+  border-radius: 8px;
+}
+
+.linkItemInfo {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  font-size: 12px;
+}
+
+.viewCount {
+  color: #9ca3af;
+}
+
+/* Webhooks */
+.eventGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.eventOption {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--color-text-primary, #e5e7eb);
+}
+
+.webhookList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.webhookItem {
+  background: var(--color-bg, #111827);
+  border: 1px solid var(--color-border, #3a3a5c);
+  border-radius: 8px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.webhookInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.webhookUrl {
+  font-size: 13px;
+  color: var(--color-text-primary, #e5e7eb);
+  word-break: break-all;
+}
+
+.webhookEvents {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.eventTag {
+  background: rgba(99, 102, 241, 0.15);
+  color: #a5b4fc;
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.webhookStatus {
+  font-size: 12px;
+  color: #9ca3af;
+}

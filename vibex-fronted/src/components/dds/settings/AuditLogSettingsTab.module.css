@@ -1,0 +1,221 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  height: 100%;
+}
+
+.filterBar {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px;
+  border-bottom: 1px solid var(--color-border, rgba(255, 255, 255, 0.1));
+}
+
+.filterRow {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.filterSelect {
+  flex: 1;
+  height: 30px;
+  padding: 0 8px;
+  border-radius: 6px;
+  border: 1px solid var(--color-border, rgba(255, 255, 255, 0.1));
+  background: var(--color-bg-input, rgba(255, 255, 255, 0.06));
+  color: var(--color-text-primary, #e4e4e7);
+  font-size: 12px;
+  outline: none;
+}
+
+.filterInput {
+  flex: 1;
+  height: 30px;
+  padding: 0 8px;
+  border-radius: 6px;
+  border: 1px solid var(--color-border, rgba(255, 255, 255, 0.1));
+  background: var(--color-bg-input, rgba(255, 255, 255, 0.06));
+  color: var(--color-text-primary, #e4e4e7);
+  font-size: 12px;
+  outline: none;
+}
+
+.filterInput::placeholder {
+  color: var(--color-text-muted, #52525b);
+}
+
+.dateInput {
+  height: 30px;
+  padding: 0 6px;
+  border-radius: 6px;
+  border: 1px solid var(--color-border, rgba(255, 255, 255, 0.1));
+  background: var(--color-bg-input, rgba(255, 255, 255, 0.06));
+  color: var(--color-text-primary, #e4e4e7);
+  font-size: 11px;
+  outline: none;
+}
+
+.dateSep {
+  color: var(--color-text-muted, #52525b);
+  font-size: 12px;
+}
+
+.filterActions {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+.clearBtn {
+  background: transparent;
+  border: 1px solid var(--color-border, rgba(255, 255, 255, 0.1));
+  color: var(--color-text-secondary, #71717a);
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.applyBtn {
+  background: var(--color-primary, #6366f1);
+  border: none;
+  color: #fff;
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.exportBtn {
+  background: transparent;
+  border: 1px solid var(--color-border, rgba(255, 255, 255, 0.1));
+  color: var(--color-text-secondary, #71717a);
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.exportBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.timeline {
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px 0;
+}
+
+.timeline::-webkit-scrollbar {
+  width: 4px;
+}
+
+.timeline::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+}
+
+.loading,
+.error,
+.empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 80px;
+  color: var(--color-text-muted, #52525b);
+  font-size: 12px;
+}
+
+.error {
+  color: var(--color-error, #ef4444);
+}
+
+.entry {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  transition: background 0.12s;
+}
+
+.entry:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-primary, #6366f1);
+  margin-top: 4px;
+  flex-shrink: 0;
+}
+
+.dot.create { background: var(--color-success, #22c55e); }
+.dot.update { background: var(--color-info, #3b82f6); }
+.dot.delete { background: var(--color-error, #ef4444); }
+.dot.share { background: var(--color-warning, #f59e0b); }
+.dot.permission { background: #a855f7; }
+
+.entryContent {
+  flex: 1;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  min-width: 0;
+  flex-wrap: wrap;
+}
+
+.entryAction {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-text-primary, #e4e4e7);
+}
+
+.entryEntity {
+  font-size: 11px;
+  color: var(--color-text-secondary, #71717a);
+}
+
+.entryUser {
+  font-size: 11px;
+  color: var(--color-text-muted, #52525b);
+  margin-left: auto;
+}
+
+.entryTime {
+  font-size: 10px;
+  color: var(--color-text-muted, #52525b);
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 8px;
+  border-top: 1px solid var(--color-border, rgba(255, 255, 255, 0.1));
+  flex-shrink: 0;
+}
+
+.paginationInfo {
+  font-size: 11px;
+  color: var(--color-text-muted, #52525b);
+}
+
+.loadMoreBtn {
+  background: transparent;
+  border: 1px solid var(--color-border, rgba(255, 255, 255, 0.15));
+  color: var(--color-text-secondary, #71717a);
+  padding: 2px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  cursor: pointer;
+}

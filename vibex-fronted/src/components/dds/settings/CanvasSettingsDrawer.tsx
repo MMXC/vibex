@@ -19,11 +19,13 @@ import { PerformanceSettings } from './PerformanceSettings';
 import { CanvasSettingsPanel } from '@/components/dds/canvas/CanvasSettingsPanel';
 // S89-E4: GitHub Integration Deep Link — github tab
 import { GitHubLinkSection } from './GitHubLinkSection';
+// S94-E3: Canvas Audit Log — audit tab
+import { AuditLogSettingsTab } from './AuditLogSettingsTab';
 import { useDDSCanvasStore } from '@/stores/dds/DDSCanvasStore';
 import { useAuthStore } from '@/stores/authStore';
 import styles from './CanvasSettingsDrawer.module.css';
 
-type TabId = 'presets' | 'canvas' | 'nodes' | 'snapshots' | 'performance' | 'collaboration' | 'github';
+type TabId = 'presets' | 'canvas' | 'nodes' | 'snapshots' | 'performance' | 'collaboration' | 'github' | 'audit';
 
 const TABS: { id: TabId; label: string }[] = [
   { id: 'presets', label: '预设' },
@@ -33,6 +35,7 @@ const TABS: { id: TabId; label: string }[] = [
   { id: 'performance', label: '性能' },
   { id: 'collaboration', label: '协作' },
   { id: 'github', label: 'GitHub' },
+  { id: 'audit', label: '审计日志' },
 ];
 
 /** Placeholder for node-specific settings (future extension) */
@@ -185,6 +188,7 @@ export function CanvasSettingsDrawer({ isOpen, onClose }: CanvasSettingsDrawerPr
           {activeTab === 'github' && (
             <GitHubSettings />
           )}
+          {activeTab === 'audit' && <AuditLogSettingsTab />}
         </div>
       </div>
     </div>

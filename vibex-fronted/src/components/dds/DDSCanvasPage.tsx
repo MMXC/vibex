@@ -75,6 +75,9 @@ import { ImportShareDialog } from '@/components/dds/share/ImportShareDialog';
 import { SharePanel } from '@/components/dds/share/SharePanel';
 // S94-E3: Canvas Audit Log
 import { AuditLogPanel } from '@/components/dds/audit/AuditLogPanel';
+// S94-E4: Canvas Export as Code
+import { ExportPanel } from '@/components/dds/export/ExportPanel';
+import { useExportPanelStore } from '@/stores/exportStore';
 // S89-E4: GitHub Integration Deep Link
 import { PRStatusBadge } from '@/components/dds/github/PRStatusBadge';
 import { useGitHubPR, parseGitHubUrl } from '@/hooks/useGitHubPR';
@@ -341,6 +344,23 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
     window.addEventListener('open-audit-log-panel', handler);
     return () => window.removeEventListener('open-audit-log-panel', handler);
   }, []);
+
+  // ---- S94-E4: ExportPanel state — opened via 'open-export-panel' custom event or store ----
+  const { isOpen: exportPanelOpen, openPanel: openExportPanel, closePanel: closeExportPanel } = useExportPanelStore();
+
+  // Listen for 'open-export-panel' custom event from toolbar/shortcuts
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent<{ canvasId?: string }>).detail;
+      openExportPanel(detail?.canvasId ?? projectId ?? '');
+    };
+    window.addEventListener('open-export-panel', handler);
+    return () => window.removeEventListener('open-export-panel', handler);
+  }, [openExportPanel, projectId]);
+
+  const handleExportPanelClose = useCallback(() => {
+    closeExportPanel();
+  }, [closeExportPanel]);
 
   // ---- S89-E4: GitHub PR Badge from ?github_pr= embed param ----
   // When canvas is loaded as embed with ?github_pr=<url>, fetch and display PR status
@@ -1596,6 +1616,9 @@ const { onCursorMove, broadcastCursor } = useWebSocketPresence({
       canvasId={projectId}
       onClose={() => setAuditPanelOpen(false)}
     />
+
+    {/* S94-E4: ExportPanel — Canvas Export as Code: React/SVG/MD/JSON formats with preview */}
+    <ExportPanel onClose={handleExportPanelClose} />
 
     {/* S83-E3: Conflict confirm toast — shown after auto-resolve strategy is chosen */}
     <ConflictConfirmToast

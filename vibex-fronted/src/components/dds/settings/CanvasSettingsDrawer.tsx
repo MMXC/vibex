@@ -23,11 +23,12 @@ import { GitHubLinkSection } from './GitHubLinkSection';
 import { AuditLogSettingsTab } from './AuditLogSettingsTab';
 // S95-E1: Canvas Analytics Dashboard — analytics tab
 import { AnalyticsSettingsTab } from './AnalyticsSettingsTab';
+import { ExportProfilesSettingsTab } from './ExportProfilesSettingsTab';
 import { useDDSCanvasStore } from '@/stores/dds/DDSCanvasStore';
 import { useAuthStore } from '@/stores/authStore';
 import styles from './CanvasSettingsDrawer.module.css';
 
-type TabId = 'presets' | 'canvas' | 'nodes' | 'snapshots' | 'performance' | 'collaboration' | 'github' | 'audit' | 'analytics';
+type TabId = 'presets' | 'canvas' | 'nodes' | 'snapshots' | 'performance' | 'collaboration' | 'github' | 'audit' | 'analytics' | 'export-profiles';
 
 const TABS: { id: TabId; label: string }[] = [
   { id: 'presets', label: '预设' },
@@ -39,6 +40,7 @@ const TABS: { id: TabId; label: string }[] = [
   { id: 'github', label: 'GitHub' },
   { id: 'audit', label: '审计日志' },
   { id: 'analytics', label: '数据分析' },
+  { id: 'export-profiles', label: '导出配置' },
 ];
 
 /** Placeholder for node-specific settings (future extension) */
@@ -89,13 +91,16 @@ function GitHubSettings() {
 }
 
 // S85-E1: Collaboration settings — reads canvasId from DDSCanvasStore, userId from auth store
-interface CanvasSettingsDrawerProps {
+// S95-E4: Export Profile Templates — initial tab when drawer opens
+export interface CanvasSettingsDrawerProps {
   isOpen: boolean;
   onClose: () => void;
+  /** Optional: open drawer with a specific tab active */
+  initialTab?: TabId;
 }
 
-export function CanvasSettingsDrawer({ isOpen, onClose }: CanvasSettingsDrawerProps) {
-  const [activeTab, setActiveTab] = useState<TabId>('presets');
+export function CanvasSettingsDrawer({ isOpen, onClose, initialTab }: CanvasSettingsDrawerProps) {
+  const [activeTab, setActiveTab] = useState<TabId>(initialTab ?? 'presets');
 
   // E5.4: ESC 键盘关闭抽屉
   useEffect(() => {
@@ -110,6 +115,13 @@ export function CanvasSettingsDrawer({ isOpen, onClose }: CanvasSettingsDrawerPr
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, onClose]);
+
+  // S95-E4: When drawer opens with initialTab, switch to that tab
+  useEffect(() => {
+    if (isOpen && initialTab) {
+      setActiveTab(initialTab);
+    }
+  }, [isOpen, initialTab]);
 
   const handleTabChange = (tabId: TabId) => {
     setActiveTab(tabId);
@@ -193,6 +205,7 @@ export function CanvasSettingsDrawer({ isOpen, onClose }: CanvasSettingsDrawerPr
           )}
           {activeTab === 'audit' && <AuditLogSettingsTab />}
           {activeTab === 'analytics' && <AnalyticsSettingsTab />}
+          {activeTab === 'export-profiles' && <ExportProfilesSettingsTab />}
         </div>
       </div>
     </div>

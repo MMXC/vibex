@@ -307,6 +307,12 @@ export const ExportMenu = memo(function ExportMenu({
     }
   }, [allCanvases]);
 
+  // S95-E4: Open CanvasSettingsDrawer at the Export Profiles tab
+  const handleOpenProfileTemplates = useCallback(() => {
+    setIsOpen(false);
+    window.dispatchEvent(new CustomEvent('open-canvas-settings', { detail: { tab: 'export-profiles' } }));
+  }, []);
+
   const handleExport = useCallback(
     async (format: ExportFormat) => {
       switch (format) {
@@ -460,6 +466,19 @@ export const ExportMenu = memo(function ExportMenu({
                 ? `全部 ${allCanvases.length} 个画布打包`
                 : '无画布可导出'}
             </span>
+          </button>
+
+          {/* S95-E4: Export Profile Templates — open settings drawer at export-profiles tab */}
+          <button
+            type="button"
+            className={`${styles.menuItem} ${styles.menuItemBatch}`}
+            role="menuitem"
+            onClick={handleOpenProfileTemplates}
+            aria-label="Profile Templates"
+            data-testid="export-option-profile-templates"
+          >
+            <span className={styles.menuItemLabel}>Profile Templates</span>
+            <span className={styles.menuItemDesc}>管理导出模板配置</span>
           </button>
         </div>
       )}

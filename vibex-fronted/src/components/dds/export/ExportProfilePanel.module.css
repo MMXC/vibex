@@ -1,0 +1,826 @@
+/**
+ * ExportProfilePanel.module.css — S95-E4: Export Profile Templates
+ *
+ * Design tokens from DESIGN.md:
+ * - --color-primary: #00ffff (accent/cyan)
+ * - --color-surface-elevated: glass background
+ * - --color-border: border color
+ * - --color-text-primary/secondary
+ */
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  z-index: 899;
+  animation: backdropIn 150ms ease-out;
+}
+
+@keyframes backdropIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 420px;
+  max-width: 100vw;
+  z-index: 900;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-surface-elevated, #1e1e24);
+  border-left: 1px solid var(--color-border, rgba(255, 255, 255, 0.1));
+  box-shadow: -8px 0 32px rgba(0, 0, 0, 0.4);
+  animation: panelSlideIn 200ms ease-out;
+}
+
+@keyframes panelSlideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* ==================== Header ==================== */
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--color-border, rgba(255, 255, 255, 0.08));
+  flex-shrink: 0;
+}
+
+.headerTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.headerIcon {
+  font-size: 18px;
+}
+
+.headerTitle h2 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text-primary, #fff);
+  font-family: inherit;
+}
+
+.closeButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--color-text-secondary, #a0a0a0);
+  cursor: pointer;
+  transition: background 150ms, color 150ms;
+}
+
+.closeButton:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--color-text-primary, #fff);
+}
+
+.closeButton:focus-visible {
+  outline: 2px solid var(--color-primary, #00ffff);
+  outline-offset: 2px;
+}
+
+/* ==================== Profile List ==================== */
+
+.profileList {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.profileCard {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--color-border, rgba(255, 255, 255, 0.08));
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  cursor: pointer;
+  transition: all 150ms;
+  text-align: left;
+  font-family: inherit;
+  width: 100%;
+}
+
+.profileCard:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+.profileCard:focus-visible {
+  outline: 2px solid var(--color-primary, #00ffff);
+  outline-offset: 2px;
+}
+
+.profileCardActive {
+  background: rgba(0, 255, 255, 0.1);
+  border-color: rgba(0, 255, 255, 0.3);
+}
+
+.profileIcon {
+  font-size: 20px;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.profileInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.profileName {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-primary, #fff);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.3;
+}
+
+.profileMeta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.profileFormat {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-primary, #00ffff);
+  background: rgba(0, 255, 255, 0.1);
+  border: 1px solid rgba(0, 255, 255, 0.2);
+  border-radius: 4px;
+  padding: 1px 5px;
+}
+
+.profileZoom {
+  font-size: 11px;
+  color: var(--color-text-secondary, #a0a0a0);
+}
+
+.profileDescription {
+  font-size: 11px;
+  color: var(--color-text-secondary, #a0a0a0);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 2px;
+}
+
+.profileActions {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.iconButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--color-text-secondary, #a0a0a0);
+  cursor: pointer;
+  transition: all 150ms;
+  flex-shrink: 0;
+}
+
+.iconButton:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--color-text-primary, #fff);
+}
+
+.iconButton:focus-visible {
+  outline: 2px solid var(--color-primary, #00ffff);
+  outline-offset: 2px;
+}
+
+.iconButtonDanger:hover {
+  background: rgba(248, 113, 113, 0.15);
+  color: #f87171;
+}
+
+/* ==================== Create / Edit Form ==================== */
+
+.formSection {
+  border-top: 1px solid var(--color-border, rgba(255, 255, 255, 0.08));
+  padding: 16px;
+  flex-shrink: 0;
+}
+
+.formTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-primary, #fff);
+  margin: 0 0 12px;
+}
+
+.formGroup {
+  margin-bottom: 10px;
+}
+
+.formLabel {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-text-secondary, #a0a0a0);
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.formInput {
+  width: 100%;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: var(--color-text-primary, #fff);
+  font-size: 13px;
+  font-family: inherit;
+  transition: border-color 150ms;
+  box-sizing: border-box;
+}
+
+.formInput::placeholder {
+  color: var(--color-text-secondary, #a0a0a0);
+  opacity: 0.6;
+}
+
+.formInput:focus {
+  outline: none;
+  border-color: rgba(0, 255, 255, 0.5);
+}
+
+.formRow {
+  display: flex;
+  gap: 8px;
+}
+
+.formRow > * {
+  flex: 1;
+}
+
+.formatSelect {
+  width: 100%;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: var(--color-text-primary, #fff);
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 150ms;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23a0a0a0' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 28px;
+}
+
+.formatSelect:focus {
+  outline: none;
+  border-color: rgba(0, 255, 255, 0.5);
+}
+
+.zoomInput {
+  width: 100%;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: var(--color-text-primary, #fff);
+  font-size: 13px;
+  font-family: inherit;
+  transition: border-color 150ms;
+  box-sizing: border-box;
+}
+
+.zoomInput:focus {
+  outline: none;
+  border-color: rgba(0, 255, 255, 0.5);
+}
+
+.toggleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+}
+
+.toggleLabel {
+  font-size: 13px;
+  color: var(--color-text-primary, #fff);
+}
+
+.toggle {
+  position: relative;
+  width: 36px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
+
+.toggleTrack {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  transition: background 200ms;
+  cursor: pointer;
+}
+
+.toggle input:checked + .toggleTrack {
+  background: rgba(0, 255, 255, 0.5);
+}
+
+.toggleThumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform 200ms;
+  pointer-events: none;
+}
+
+.toggle input:checked ~ .toggleThumb {
+  transform: translateX(16px);
+}
+
+.toggle input:focus-visible + .toggleTrack {
+  outline: 2px solid var(--color-primary, #00ffff);
+  outline-offset: 2px;
+}
+
+.formActions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.primaryButton {
+  flex: 1;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 10px;
+  background: var(--color-primary, #00ffff);
+  color: #0f0f1a;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 150ms;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.primaryButton:hover:not(:disabled) {
+  filter: brightness(1.1);
+}
+
+.primaryButton:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.primaryButton:focus-visible {
+  outline: 2px solid var(--color-primary, #00ffff);
+  outline-offset: 2px;
+}
+
+.secondaryButton {
+  flex: 1;
+  padding: 10px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--color-text-primary, #fff);
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 150ms;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.secondaryButton:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.secondaryButton:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.secondaryButton:focus-visible {
+  outline: 2px solid var(--color-primary, #00ffff);
+  outline-offset: 2px;
+}
+
+/* ==================== States ==================== */
+
+.loadingState,
+.emptyState {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: var(--color-text-secondary, #a0a0a0);
+  font-size: 13px;
+  padding: 32px;
+  text-align: center;
+}
+
+.emptyState {
+  padding: 32px 24px;
+}
+
+.emptyIcon {
+  font-size: 32px;
+}
+
+.errorBanner {
+  margin: 0 16px 8px;
+  padding: 10px 14px;
+  background: rgba(248, 113, 113, 0.12);
+  border: 1px solid rgba(248, 113, 113, 0.3);
+  border-radius: 8px;
+  color: #f87171;
+  font-size: 12px;
+  line-height: 1.4;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.errorBannerIcon {
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+/* ==================== Scrollbar ==================== */
+
+.profileList::-webkit-scrollbar {
+  width: 6px;
+}
+
+.profileList::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.profileList::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 3px;
+}
+
+.profileList::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* ==================== Spinner ==================== */
+
+/* ==================== Container (settings drawer context) ==================== */
+
+.container {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  height: 100%;
+}
+
+/* ==================== Section Header ==================== */
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.sectionTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-primary, #fff);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.count {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-primary, #00ffff);
+  background: rgba(0, 255, 255, 0.1);
+  border: 1px solid rgba(0, 255, 255, 0.2);
+  border-radius: 10px;
+  padding: 1px 7px;
+}
+
+/* ==================== Profile Card (compact, settings context) ==================== */
+
+.profileBadge {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-primary, #00ffff);
+  background: rgba(0, 255, 255, 0.1);
+  border: 1px solid rgba(0, 255, 255, 0.2);
+  border-radius: 4px;
+  padding: 1px 5px;
+  flex-shrink: 0;
+}
+
+.profileScale {
+  font-size: 11px;
+  color: var(--color-text-secondary, #a0a0a0);
+}
+
+.deleteBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--color-text-secondary, #a0a0a0);
+  cursor: pointer;
+  transition: all 150ms;
+  flex-shrink: 0;
+}
+
+.deleteBtn:hover {
+  background: rgba(248, 113, 113, 0.15);
+  color: #f87171;
+}
+
+/* ==================== Create Section ==================== */
+
+.createSection {
+  border-top: 1px solid var(--color-border, rgba(255, 255, 255, 0.08));
+  padding-top: 12px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.formField {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-text-secondary, #a0a0a0);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.input {
+  width: 100%;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: var(--color-text-primary, #fff);
+  font-size: 13px;
+  font-family: inherit;
+  transition: border-color 150ms;
+  box-sizing: border-box;
+}
+
+.input::placeholder {
+  color: var(--color-text-secondary, #a0a0a0);
+  opacity: 0.6;
+}
+
+.input:focus {
+  outline: none;
+  border-color: rgba(0, 255, 255, 0.5);
+}
+
+/* ==================== Format Grid ==================== */
+
+.formatGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+
+.formatBtn {
+  padding: 7px 4px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--color-text-secondary, #a0a0a0);
+  font-size: 11px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 150ms;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.formatBtn:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--color-text-primary, #fff);
+}
+
+.formatBtnActive {
+  border-color: rgba(0, 255, 255, 0.4);
+  background: rgba(0, 255, 255, 0.08);
+  color: var(--color-primary, #00ffff);
+}
+
+/* ==================== Scale Row ==================== */
+
+.scaleRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.scaleBtn {
+  flex: 1;
+  padding: 7px 4px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--color-text-secondary, #a0a0a0);
+  font-size: 12px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 150ms;
+  text-align: center;
+}
+
+.scaleBtn:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--color-text-primary, #fff);
+}
+
+.scaleBtnActive {
+  border-color: rgba(0, 255, 255, 0.4);
+  background: rgba(0, 255, 255, 0.08);
+  color: var(--color-primary, #00ffff);
+}
+
+/* ==================== Toggle (reused) ==================== */
+
+.toggleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 0;
+}
+
+.toggleLabel {
+  font-size: 13px;
+  color: var(--color-text-primary, #fff);
+}
+
+/* ==================== Action Buttons ==================== */
+
+.createBtn {
+  flex: 1;
+  padding: 9px 16px;
+  border: none;
+  border-radius: 10px;
+  background: var(--color-primary, #00ffff);
+  color: #0f0f1a;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 150ms;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.createBtn:hover:not(:disabled) {
+  filter: brightness(1.1);
+}
+
+.createBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.resetBtn {
+  flex: 1;
+  padding: 9px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--color-text-primary, #fff);
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 150ms;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.resetBtn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* ==================== States ==================== */
+
+.loadingState,
+.emptyState {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: var(--color-text-secondary, #a0a0a0);
+  font-size: 13px;
+  padding: 32px;
+  text-align: center;
+}
+
+.emptyState {
+  padding: 32px 24px;
+}
+
+/* ==================== Spinner ==================== */
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}

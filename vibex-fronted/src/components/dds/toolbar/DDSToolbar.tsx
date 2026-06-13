@@ -285,6 +285,8 @@ export const DDSToolbar = memo(function DDSToolbar({
   const [isScheduledExportOpen, setIsScheduledExportOpen] = useState(false);
   // E4 (Sprint80): Settings modal state
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  // S95-E4: Export Profile Templates — track initial tab to open when settings drawer opens
+  const [settingsInitialTab, setSettingsInitialTab] = React.useState<string | null>(null);
   // S79-E2: Notification panel state
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const unreadCount = useNotificationStore((s) => s.getUnreadCount());
@@ -295,6 +297,17 @@ export const DDSToolbar = memo(function DDSToolbar({
   const activeCanvas = useCanvasListStore((s) =>
     s.canvases.find((c) => c.id === activeCanvasId)
   );
+
+  // S95-E4: Listen for 'open-canvas-settings' custom event (dispatched by ExportMenu "Profile Templates")
+  React.useEffect(() => {
+    function handleOpenSettings(e: Event) {
+      const detail = (e as CustomEvent<{ tab?: string }>).detail;
+      setIsCanvasSettingsOpen(true);
+      setSettingsInitialTab(detail?.tab ?? null);
+    }
+    window.addEventListener('open-canvas-settings', handleOpenSettings);
+    return () => window.removeEventListener('open-canvas-settings', handleOpenSettings);
+  }, []);
 
   // E3-S3: RBAC for toolbar actions
   const rbac = useCanvasRBAC(projectId);
@@ -1197,6 +1210,7 @@ export const DDSToolbar = memo(function DDSToolbar({
       <CanvasSettingsDrawer
         isOpen={isCanvasSettingsOpen}
         onClose={() => setIsCanvasSettingsOpen(false)}
+        initialTab={settingsInitialTab as any}
       />
 
       {/* S63-E2: Collaborative undo/redo conflict resolution dialog */}

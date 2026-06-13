@@ -7787,3 +7787,24 @@ See git history for complete changelog.
 
 类型: feat
 影响: vibex-backend/src/app/api/canvas/[id]/audit-log/, vibex-backend/src/app/api/admin/export-audit/, vibex-fronted/src/components/dds/audit/, vibex-fronted/src/stores/auditStore.ts
+
+
+## S94-E4 (2026-06-13): Canvas Export as Code
+
+- **Feature**: Canvas Export as Code — export canvas to React/SVG/Markdown/JSON formats
+- **Feature**: ExportPanel with 4 format tabs (React, SVG, Markdown, JSON)
+- **Feature**: Preview area with zoom controls (50%–200%)
+- **Feature**: Copy to Clipboard and Download buttons
+- **API**: `GET /api/canvas/{id}/export?format=react|svg|md|json` — owner-only export
+- **Backend**: React export generates runnable JSX component with canvas nodes/edges as SVG
+- **Backend**: SVG export preserves node positions, edge paths, labels with XML escaping
+- **Backend**: Markdown export includes card descriptions, connection table, statistics
+- **Backend**: JSON export includes full canvas state with metadata
+- **Frontend**: `exportStore` (Zustand) — format, preview, isLoading, error, copyToClipboard, download
+- **Frontend**: `useExport` hook — TanStack Query data fetching
+- **Frontend**: `ExportPanel` component — 4-tab panel with scrollable preview and zoom
+- **Frontend**: Integration into `DDSCanvasPage` via 'open-export-panel' custom event
+- **Tests**: 13 vitest (ExportPanel) + 7 backend Jest (export route)
+
+类型: feat
+影响: vibex-backend/src/app/api/canvas/[id]/export/, vibex-fronted/src/components/dds/export/, vibex-fronted/src/stores/exportStore.ts, vibex-fronted/src/hooks/canvas/useExport.ts

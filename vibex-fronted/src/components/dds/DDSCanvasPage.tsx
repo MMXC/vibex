@@ -33,6 +33,9 @@ import { useAuthStore } from '@/stores/authStore';
 import { AIDraftDrawer } from '@/components/dds/ai-draft';
 import { AISuggestionsPanel } from '@/components/dds/ai-suggestions/AISuggestionsPanel';
 import { useAIDesignSuggestionsStore } from '@/stores/dds/aiDesignSuggestionsStore';
+// S94-E1: Canvas AI Insights
+import { AIInsightsPanel } from '@/components/dds/ai-insights/AIInsightsPanel';
+import { useCanvasAIStore } from '@/stores/canvasAIStore';
 import { DDSFlow } from '@/components/dds/DDSFlow';
 import { useDDSCanvasStore, ddsChapterActions } from '@/stores/dds/DDSCanvasStore';
 // S85-E1: 画布级权限体系 — viewer mode
@@ -1268,6 +1271,39 @@ const { onCursorMove, broadcastCursor } = useWebSocketPresence({
         title="AI Suggestions"
       >
         💡
+      </button>
+
+      {/* S94-E1: AI Canvas Insights Panel */}
+      <AIInsightsPanel canvasId={projectId ?? ''} />
+
+      {/* S94-E1: Floating toggle button for AI Insights */}
+      <button
+        type="button"
+        onClick={() => useCanvasAIStore.getState().togglePanel()}
+        style={{
+          position: 'fixed',
+          bottom: '24px',
+          right: '82px',
+          zIndex: 30,
+          width: '48px',
+          height: '48px',
+          borderRadius: '50%',
+          border: '1px solid var(--color-border, #374151)',
+          background: 'var(--color-surface, #1f2937)',
+          color: 'var(--color-text-primary, #f9fafb)',
+          fontSize: '1.25rem',
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.4)',
+          transition: 'background 0.15s ease',
+        }}
+        aria-label="Toggle AI Canvas Insights"
+        title="AI Canvas Insights"
+        data-testid="ai-insights-toggle"
+      >
+        🔬
       </button>
 
       {/* E1: CodeGenContext Panel — shown when agentSession=new */}

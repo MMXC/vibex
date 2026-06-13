@@ -1,0 +1,17 @@
+/**
+ * LockIndicator.module.css
+ * S95-E3: Node Edit Locking
+ *
+ * Subtle lock indicator — just a small icon, not a big badge.
+ */
+
+.indicator {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  line-height: 1;
+  pointer-events: none;
+  user-select: none;
+  opacity: 0.8;
+}

@@ -7808,3 +7808,15 @@ See git history for complete changelog.
 
 类型: feat
 影响: vibex-backend/src/app/api/canvas/[id]/export/, vibex-fronted/src/components/dds/export/, vibex-fronted/src/stores/exportStore.ts, vibex-fronted/src/hooks/canvas/useExport.ts
+
+## [Epic S95-E1] Canvas Analytics Dashboard (2026-06-13)
+
+- **Backend**: `GET /api/canvas/[id]/analytics` API，支持 7d/30d/90d 时间范围，聚合 views/edits/uniqueUsers/shareCount/exportCount，返回 dailyTrend 趋势数据
+- **Backend**: Migration `0025_audit_logs_performance_index.sql` 添加 canvas_id + created_at 复合索引
+- **Frontend**: `AnalyticsDashboard.tsx` 原生 SVG 折线图，支持 range 切换 + CSV 导出，集成到 Canvas Settings Drawer 数据分析 Tab
+- **Frontend**: `analyticsStore.ts` Zustand store，`AnalyticsSettingsTab.tsx` settings drawer 包装器
+- **Frontend**: `lib/api/analytics.ts` API client
+- **Tests**: 7 backend Jest tests + 14 frontend Vitest tests (6 store + 8 component)
+
+类型: feat
+影响: vibex-backend/src/app/api/canvas/[id]/analytics/, vibex-fronted/src/components/dds/AnalyticsDashboard.tsx, vibex-fronted/src/components/dds/settings/, vibex-fronted/src/stores/analyticsStore.ts

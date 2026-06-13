@@ -7536,3 +7536,15 @@ See git history for complete changelog.
 
 类型: feat
 影响: vibex-backend/src/app/api/canvas/[id]/export/, vibex-fronted/src/components/dds/export/, vibex-fronted/src/stores/exportStore.ts, vibex-fronted/src/hooks/canvas/useExport.ts
+
+## [Epic S95-E1] Canvas Analytics Dashboard (2026-06-13)
+
+- **Component**: `AnalyticsDashboard.tsx` — 原生 SVG 折线图，数据分析面板
+- **Component**: `AnalyticsSettingsTab.tsx` — Canvas Settings Drawer Tab 包装器
+- **Store**: `analyticsStore.ts` — Zustand analytics state
+- **API Client**: `lib/api/analytics.ts` — `fetchCanvasAnalytics()` client function
+- **Integration**: `CanvasSettingsDrawer.tsx` 新增「数据分析」Tab
+- **Tests**: 14 Vitest tests (6 store + 8 component)
+
+类型: feat
+影响: vibex-fronted/src/components/dds/AnalyticsDashboard.tsx, vibex-fronted/src/components/dds/settings/, vibex-fronted/src/stores/analyticsStore.ts

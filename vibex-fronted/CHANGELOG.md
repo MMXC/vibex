@@ -7548,3 +7548,16 @@ See git history for complete changelog.
 
 类型: feat
 影响: vibex-fronted/src/components/dds/AnalyticsDashboard.tsx, vibex-fronted/src/components/dds/settings/, vibex-fronted/src/stores/analyticsStore.ts
+
+
+## [Epic S95-E2] Public Canvas Portal (2026-06-13)
+
+- **Component**: `PublicVisibilitySection.tsx` — Settings Drawer "公开" Tab
+- **Component**: `PublicVisibilitySection.module.css` — styling
+- **Page**: `/public/[slug]/page.tsx` — read-only public canvas renderer (no auth, no toolbar)
+- **Page**: `/canvas/public/page.tsx` — public canvas gallery (pagination + Newest/Popular sort)
+- **Integration**: `CanvasSettingsDrawer.tsx` 新增 "公开" Tab (id: 'public')
+- **Tests**: 8 Vitest (PublicVisibilitySection) + 8 Vitest (public pages)
+
+类型: feat
+影响: vibex-fronted/src/components/dds/settings/, vibex-fronted/src/app/public/, vibex-fronted/src/app/canvas/public/

@@ -7820,3 +7820,21 @@ See git history for complete changelog.
 
 类型: feat
 影响: vibex-backend/src/app/api/canvas/[id]/analytics/, vibex-fronted/src/components/dds/AnalyticsDashboard.tsx, vibex-fronted/src/components/dds/settings/, vibex-fronted/src/stores/analyticsStore.ts
+
+
+## [Epic S95-E2] Public Canvas Portal (2026-06-13)
+
+- **Feature**: Public Canvas Portal — publish canvas to public URL, browse public canvases
+- **API**: `PATCH /api/canvas/{id}/visibility` — set is_public + public_slug (owner-only)
+- **API**: `GET /api/canvas/{id}/visibility` — get current visibility state
+- **API**: `GET /api/public/canvas/{slug}` — read-only public canvas (no auth)
+- **API**: `GET /api/canvas/public` — paginated list of public canvases (sort: newest | popular)
+- **D1**: Uses existing `canvas_permissions.is_public` + `public_slug` columns
+- **Frontend**: `PublicVisibilitySection.tsx` — Settings Drawer tab: toggle public, edit slug, copy URL, view count
+- **Frontend**: `/public/[slug]/page.tsx` — read-only public canvas renderer (no toolbar, no auth)
+- **Frontend**: `/canvas/public/page.tsx` — public canvas gallery with pagination and sort
+- **Integration**: `CanvasSettingsDrawer.tsx` new "公开" Tab
+- **Tests**: 3 backend Jest (visibility route) + 2 backend Jest (public routes) + 8 frontend Vitest (PublicVisibilitySection) + 8 frontend Vitest (public pages)
+
+类型: feat
+影响: vibex-backend/src/app/api/canvas/[id]/visibility/, vibex-backend/src/app/api/public/, vibex-backend/src/app/api/canvas/public/, vibex-fronted/src/components/dds/settings/, vibex-fronted/src/app/public/, vibex-fronted/src/app/canvas/public/

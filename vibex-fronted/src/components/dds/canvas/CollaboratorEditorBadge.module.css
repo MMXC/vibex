@@ -1,0 +1,50 @@
+/**
+ * CollaboratorEditorBadge.module.css
+ * S95-E3: Node Edit Locking
+ *
+ * Compact pill badge shown on a node when a remote user holds the edit lock.
+ */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1, 4px);
+  padding: 2px 8px 2px 4px;
+  background: var(--color-bg-elevated, #1e1e2e);
+  border: 1px solid var(--color-border-subtle, #3a3a5c);
+  border-radius: 999px;
+  font-size: 11px;
+  color: var(--color-text-secondary, #a0a0c0);
+  pointer-events: none;
+  user-select: none;
+  white-space: nowrap;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+.avatar {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.avatarFallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--color-accent-primary, #6366f1);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.userName {
+  max-width: 80px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

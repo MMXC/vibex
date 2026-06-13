@@ -7467,3 +7467,16 @@ See git history for complete changelog.
 - **useOfflineSync.ts**: React hook，online/offline 监听 + auto replay
 - **OfflineIndicator.tsx**: 离线状态指示器，pending sync 计数显示
 - **manifest.json**: PWA manifest 完善
+
+## [Epic S94-E1] Canvas AI Insights (2026-06-13)
+
+- **Canvas AI Insights** — AI-powered canvas health score + optimization suggestions
+- `ai_insights_cache` D1 table: id, canvas_id, score, suggestions, isolated_nodes, created_at
+- `GET /api/canvas/{id}/insights`: 计算画布健康度(0-100)，返回优化建议
+- `POST /api/canvas/{id}/optimize`: 应用层次结构/力导向布局优化
+- Backend Jest: 4 test cases covering auth, score range, isolated nodes, suggestions
+- `canvasAIStore.ts`: Zustand store (insights, isLoading, isOptimizing)
+- `useCanvasAIInsights.ts`: API integration hook
+- `AIInsightsPanel.tsx`: 健康度环形进度条 + 建议列表 + 布局选择器
+- `DDSCanvasPage.tsx`: 工具栏入口 🔬 按钮
+- Vitest: 9 tests covering all states
